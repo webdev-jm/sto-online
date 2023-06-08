@@ -1,2 +1,2 @@
-# PMS
-Performance Management System (PMS)
+# STO ONLINE
+STO ONLINE - for uploading sales and inventory online.
