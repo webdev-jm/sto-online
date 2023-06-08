@@ -65,12 +65,16 @@
                                 <a href="{{route('user.show', encrypt($user->id))}}" class="btn btn-info btn-xs">
                                     <i class="fa fa-list"></i>
                                 </a>
-                                <a href="{{route('user.edit', encrypt($user->id))}}" class="btn btn-success btn-xs">
-                                    <i class="fa fa-pen"></i>
-                                </a>
-                                <a href="" class="btn btn-danger btn-xs">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                @can('user edit')
+                                    <a href="{{route('user.edit', encrypt($user->id))}}" class="btn btn-success btn-xs">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                @endcan
+                                @can('user delete')
+                                    <a href="" class="btn btn-danger btn-xs">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                @endcan
                             </p>
                             <b>ACTION</b>
                         </div>

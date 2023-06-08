@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreInventorySalesRequest extends FormRequest
+class AreaUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class StoreInventorySalesRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->user()->can('area create');
     }
 
     /**
@@ -24,7 +24,12 @@ class StoreInventorySalesRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'code' => [
+                'required'
+            ],
+            'name' => [
+                'required'
+            ]
         ];
     }
 }

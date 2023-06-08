@@ -38,12 +38,16 @@
                                     <a href="" class="btn btn-info btn-xs">
                                         <i class="fa fa-list"></i>
                                     </a>
-                                    <a href="{{route('role.edit', encrypt($role->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
-                                    </a>
-                                    <a href="" class="btn btn-danger btn-xs">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    @can('role edit')
+                                        <a href="{{route('role.edit', encrypt($role->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('role delete')
+                                        <a href="" class="btn btn-danger btn-xs">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
                                 </p>
                                 <b>ACTION</b>
                             </div>
