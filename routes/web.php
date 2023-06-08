@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\InventorySalesController;
+use App\Http\Controllers\AreaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +23,20 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+
+    Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+
+    // AREA
+    Route::group(['middleware' => 'permission:area access'], function() {
+        Route::get('area', [AreaController::class, 'index'])->name('area.index');
+        Route::get('area/create', [AreaController::class, 'create'])->name('area.create')->middleware('permission:area create');
+        Route::post('area', [AreaController::class, 'store'])->name('area.store')->middleware('permission:area create');
+
+        Route::get('area/{id}', [AreaController::class, 'show'])->name('area.show');
+
+        Route::get('area/{id}/edit', [AreaController::class, 'edit'])->name('area.edit')->middleware('permission:area edit');
+        Route::post('area/{id}', [AreaController::class, 'update'])->name('area.update')->middleware('permission:area edit');
+    });
 
     // ROLES
     Route::group(['middleware' => 'permission:role access'], function() {
@@ -44,11 +58,5 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('user/{id}/edit', [UserController::class, 'edit'])->name('user.edit')->middleware('permission:user edit');
         Route::post('user/{id}', [UserController::class, 'update'])->name('user.update')->middleware('permission:user edit');
-    });
-
-    // INVENTORY SALES
-    Route::group(['middleware' => 'permission:inventory sales access'], function() {
-        Route::get('inventory-sales/{id}/branches', [InventorySalesController::class, 'branches'])->name('inventory-sales.branches');
-        Route::get('inventory-sales/{id}/index', [InventorySalesController::class, 'index'])->name('inventory-sales.index');
     });
 });

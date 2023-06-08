@@ -18,23 +18,24 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions_arr = [
-            'Inventory Sales' => [
-                'inventory sales access'   =>  'Allow account to access inventory sales list and details',
-                'inventory sales add'      =>  'Allow account to add inventory sales',
-                'inventory sales edit'     =>  'Allow account to edit inventory sales',
-                'inventory sales delete'   =>  'Allow account to delete inventory sales',
+            'Area' => [
+                'area access'   => 'Allow user to access areas list and details',
+                'area add'      => 'Allow user to add area.',
+                'area edit'      => 'Allow user to edit area.',
+                'area delete'      => 'Allow user to delete area.',
             ],
             'User' => [
-                'user access'   =>  'Allow account to access users list and details',
-                'user add'      =>  'Allow account to add user',
-                'user edit'     =>  'Allow account to edit user',
-                'user delete'   =>  'Allow account to delete user',
+                'user access'           =>  'Allow user to access users list and details',
+                'user add'              =>  'Allow user to add user',
+                'user edit'             =>  'Allow user to edit user',
+                'user delete'           =>  'Allow user to delete user',
+                'user assign account'   =>  'Allow user to assign accounts to user.'
             ],
             'Role' => [
-                'role access'   =>  'Allow account to access roles list and details',
-                'role add'      =>  'Allow account to add role',
-                'role edit'     =>  'Allow account to edit role',
-                'role delete'   =>  'Allow account to delete role',
+                'role access'   =>  'Allow user to access roles list and details',
+                'role add'      =>  'Allow user to add role',
+                'role edit'     =>  'Allow user to edit role',
+                'role delete'   =>  'Allow user to delete role',
             ],
         ];
 

@@ -18,12 +18,16 @@ class AssignedAccounts extends Component
     public $selected;
     public $search;
 
+    public $form_message;
+
     public function updatedSearch() {
         $this->resetPage('account-page');
     }
 
     public function assign() {
         $this->user->accounts()->sync($this->selected);
+
+        $this->form_message = 'Accounts has been assigned.';
     }
 
     public function selectAll() {

@@ -1,4 +1,10 @@
 <div>
+    @if(!empty($form_message))
+        <div class="alert alert-success">
+            {{$form_message}}
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Assign Account</h3>

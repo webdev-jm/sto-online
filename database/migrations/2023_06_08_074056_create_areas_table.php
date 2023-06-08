@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInventorySalesTable extends Migration
+class CreateAreasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateInventorySalesTable extends Migration
      */
     public function up()
     {
-        Schema::create('inventory_sales', function (Blueprint $table) {
+        Schema::create('areas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('branch_id')->nullable();
-            $table->string('control_number')->unique();
-            $table->integer('total_quantity')->default(0);
-            $table->decimal('total_sales', 10,2)->default(0);
+            $table->unsignedBigInteger('account_id')->nullable();
+            $table->string('code');
+            $table->string('name');
             $table->timestamps();
 
             $table->softDeletes();
@@ -32,6 +31,6 @@ class CreateInventorySalesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inventory_sales');
+        Schema::dropIfExists('areas');
     }
 }

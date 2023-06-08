@@ -42,6 +42,7 @@
             </div>
         </div>
 
+        @can('user assign account')
         <div class="col-lg-9">
             <div class="card card-outline card-primary">
                 <div class="card-header">
@@ -52,6 +53,7 @@
                 </div>
             </div>
         </div>
+        @endcan
     </div>
 @stop
 
