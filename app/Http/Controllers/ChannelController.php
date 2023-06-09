@@ -31,7 +31,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $channels = Channel::orderBy('created_at', 'DESC')
@@ -54,7 +56,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         return view('pages.channels.create')->with([
@@ -73,7 +77,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $channel = new Channel([
@@ -104,7 +110,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $channel = Channel::findOrFail(decrypt($id));
@@ -126,7 +134,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $channel = Channel::findOrFail(decrypt($id));
@@ -149,7 +159,9 @@ class ChannelController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $channel = Channel::findOrFail(decrypt($id));

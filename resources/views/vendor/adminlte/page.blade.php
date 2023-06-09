@@ -9,6 +9,18 @@
 @section('adminlte_css')
     @stack('css')
     @yield('css')
+
+    <style>
+        .pagination {
+            margin-bottom: 3px;
+        }
+        .pagination .page-link {
+            padding:5px 9px 5px 9px;
+        }
+        .card-title {
+            font-weight: 750;
+        }
+    </style>
 @stop
 
 @section('classes_body', $layoutHelper->makeBodyClasses())

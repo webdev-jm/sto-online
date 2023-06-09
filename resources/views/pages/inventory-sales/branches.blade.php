@@ -30,7 +30,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="card-footer pb-0">
+        <div class="card-footer">
             {{$branches->links()}}
         </div>
     </div>

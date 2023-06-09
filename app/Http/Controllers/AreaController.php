@@ -13,9 +13,7 @@ class AreaController extends Controller
     private function checkAccount() {
         $account = Session::get('account');
         if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
+            return redirect()->route('home');
         }
     
         return $account;
@@ -31,7 +29,9 @@ class AreaController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $areas = Area::orderBy('created_at', 'DESC')
@@ -40,7 +40,7 @@ class AreaController extends Controller
 
         return view('pages.areas.index')->with([
             'account' => $account,
-            'areas' => $areas
+            'areas' => $areas,
         ]);
     }
 
@@ -54,7 +54,9 @@ class AreaController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         return view('pages.areas.create')->with([
@@ -73,7 +75,9 @@ class AreaController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
         
         $area = new Area([
@@ -104,7 +108,9 @@ class AreaController extends Controller
        // check account
        $account = $this->checkAccount();
        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-           return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
        }
 
         $area = Area::findOrFail(decrypt($id));
@@ -126,7 +132,9 @@ class AreaController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $area = Area::findOrfail(decrypt($id));
@@ -149,7 +157,9 @@ class AreaController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $area = Area::findOrfail(decrypt($id));
