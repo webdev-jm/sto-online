@@ -21,7 +21,7 @@
             <div class="row">
                 @foreach($accounts as $account)
                     <div class="col-lg-3">
-                        <a href="{{route('menu', encrypt($account->account_id))}}" class="btn btn-block btn-app bg-default ml-0">
+                        <a href="{{route('menu', encrypt($account->account_id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
                             <span class="badge bg-info">{{\App\Models\SMSBranch::where('account_id', $account->account_id)->count()}}</span>
                             <i class="fa fa-user"></i>
                             [{{$account->account_code}}] {{$account->short_name}}

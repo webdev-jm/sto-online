@@ -34,7 +34,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $salesmen = Salesman::orderBy('created_at', 'DESC')
@@ -57,7 +59,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $areas = Area::where('account_id', $account->id)->get();
@@ -84,7 +88,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $salesman = new Salesman([
@@ -116,7 +122,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $salesman = Salesman::findOrFail(decrypt($id));
@@ -138,7 +146,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $salesman = Salesman::findOrFail(decrypt($id));
@@ -168,7 +178,9 @@ class SalesmanController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $salesman = Salesman::findOrFail(decrypt($id));

@@ -35,7 +35,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $customers = Customer::orderBy('created_at', 'DESC')
@@ -58,7 +60,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         // AREA OPTIONS
@@ -93,7 +97,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $customer = new Customer([
@@ -127,7 +133,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $customer = Customer::findOrFail(decrypt($id));
@@ -149,7 +157,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $customer = Customer::findOrFail(decrypt($id));
@@ -188,7 +198,9 @@ class CustomerController extends Controller
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account; // Redirect response, so return it directly
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
         }
 
         $customer = Customer::findOrFail(decrypt($id));
