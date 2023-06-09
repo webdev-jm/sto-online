@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Salesman;
+use App\Models\Customer;
 use App\Models\Area;
+use App\Models\Channel;
 use Illuminate\Http\Request;
 
-use App\Http\Requests\SalesmanAddRequest;
-use App\Http\Requests\SalesmanUpdateRequest;
+use App\Http\Requests\CustomerAddRequest;
+use App\Http\Requests\CustomerUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
-class SalesmanController extends Controller
+class CustomerController extends Controller
 {
     private function checkAccount() {
         $account = Session::get('account');
@@ -37,13 +38,13 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $salesmen = Salesman::orderBy('created_at', 'DESC')
+        $customers = Customer::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
             ->paginate(10)->onEachSide(1);
 
-        return view('pages.salesmen.index')->with([
+        return view('pages.customers.index')->with([
             'account' => $account,
-            'salesmen' => $salesmen
+            'customers' => $customers
         ]);
     }
 
@@ -60,26 +61,34 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
+        // AREA OPTIONS
         $areas = Area::where('account_id', $account->id)->get();
-        $area_arr = array();
+        $areas_arr = array();
         foreach($areas as $area) {
-            $area_arr[$area->id] = '['.$area->code.'] '.$area->name;
+            $areas_arr[$area->id] = '['.$area->code.'] '.$area->name;
         }
 
-        return view('pages.salesmen.create')->with([
-            'account' => $account,
-            'areas' => $area_arr
-        ]);
+        // CHANNEL OPTIONS
+        $channels = Channel::where('account_id', $account->id)->get();
+        $channel_arr = array();
+        foreach($channels as $channel) {
+            $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
+        }
 
+        return view('pages.customers.create')->with([
+            'account' => $account,
+            'areas' => $areas_arr,
+            'channels' => $channel_arr
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\SalesmanAddRequest  $request
+     * @param  \Illuminate\Http\CustomerAddRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SalesmanAddRequest $request)
+    public function store(CustomerAddRequest $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -87,28 +96,30 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $salesman = new Salesman([
+        $customer = new Customer([
             'account_id' => $account->id,
             'area_id' => $request->area_id,
+            'channel_id' => $request->channel_id,
             'code' => $request->code,
             'name' => $request->name
         ]);
-        $salesman->save();
-
+        $customer->save();
+        
         // logs
         activity('create')
-        ->performedOn($salesman)
-        ->log(':causer.name has created saleman ['.$account->short_name.'] :subject.code :subject.name');
+        ->performedOn($customer)
+        ->log(':causer.name has created customer ['.$account->short_name.'] :subject.code :subject.name');
 
-        return redirect()->route('salesman.index')->with([
-            'message_success' => 'Salesman '.$salesman->name.' was created.'
+        return redirect()->route('customer.index')->with([
+            'message_success' => 'Customer '.$customer->name.' was created.'
         ]);
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Salesman  $salesman
+     * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -119,18 +130,18 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $salesman = Salesman::findOrFail(decrypt($id));
-
-        return view('pages.salesmen.show')->with([
+        $customer = Customer::findOrFail(decrypt($id));
+        
+        return view('pages.customers.show')->with([
             'account' => $account,
-            'salesman' => $salesman
+            'customer' => $customer
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Salesman  $salesman
+     * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -141,29 +152,38 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $salesman = Salesman::findOrFail(decrypt($id));
+        $customer = Customer::findOrFail(decrypt($id));
 
+        // AREA OPTIONS
         $areas = Area::where('account_id', $account->id)->get();
-        $area_arr = array();
+        $areas_arr = array();
         foreach($areas as $area) {
-            $area_arr[$area->id] = '['.$area->code.'] '.$area->name;
+            $areas_arr[$area->id] = '['.$area->code.'] '.$area->name;
         }
 
-        return view('pages.salesmen.edit')->with([
+        // CHANNEL OPTIONS
+        $channels = Channel::where('account_id', $account->id)->get();
+        $channel_arr = array();
+        foreach($channels as $channel) {
+            $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
+        }
+
+        return view('pages.customers.edit')->with([
             'account' => $account,
-            'salesman' => $salesman,
-            'areas' => $area_arr
+            'customer' => $customer,
+            'areas' => $areas_arr,
+            'channels' => $channel_arr
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\SalesmanUpdateRequest  $request
-     * @param  \App\Models\Salesman  $salesman
+     * @param  \Illuminate\Http\CustomerUpdateRequest  $request
+     * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function update(SalesmanUpdateRequest $request, $id)
+    public function update(CustomerUpdateRequest $request, $id)
     {
         // check account
         $account = $this->checkAccount();
@@ -171,35 +191,36 @@ class SalesmanController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $salesman = Salesman::findOrFail(decrypt($id));
-        $changes_arr['old'] = $salesman->getOriginal();
+        $customer = Customer::findOrFail(decrypt($id));
+        $changes_arr['old'] = $customer->getOriginal();
 
-        $salesman->update([
+        $customer->update([
             'area_id' => $request->area_id,
+            'channel_id' => $request->channel_id,
             'code' => $request->code,
-            'name' => $request->name
+            'name' => $request->name,
         ]);
 
-        $changes_arr['changes'] = $salesman->getChanges();
+        $changes_arr['changes'] = $customer->getChanges();
 
         // logs
         activity('update')
-        ->performedOn($salesman)
+        ->performedOn($customer)
         ->withProperties($changes_arr)
-        ->log(':causer.name has updated salesman ['.$account->short_name.'] :subject.code :subject.name');
+        ->log(':causer.name has updated customer ['.$account->short_name.'] :subject.code :subject.name');
 
         return back()->with([
-            'message_success' => 'Salesman '.$salesman->name.' was updated.'
+            'message_success' => 'Customer '.$customer->name.' was updated.'
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Salesman  $salesman
+     * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Salesman $salesman)
+    public function destroy(Customer $customer)
     {
         //
     }

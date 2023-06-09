@@ -16,7 +16,7 @@
             <h1>ROLES</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="{{route('role.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>BACK</a>
+            <a href="{{route('role.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
         </div>
     </div>
 @stop

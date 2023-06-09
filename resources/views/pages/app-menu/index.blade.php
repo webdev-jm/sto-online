@@ -8,7 +8,7 @@
             <h1>[{{$account->account_code}}] {{$account->short_name}}</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>CHANGE ACCOUNT</a>
+            <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Change Account</a>
         </div>
     </div>
 @stop
@@ -33,12 +33,14 @@
 <hr>
 
 <div class="row">
+    @can('customer access')
     <div class="col-lg-3">
-        <a href="#" class="btn btn-block btn-app bg-primary ml-0">
+        <a href="{{route('customer.index')}}" class="btn btn-block btn-app bg-primary ml-0">
             <i class="fa fa-people-arrows"></i>
             Customers
         </a>
     </div>
+    @endcan
 
     @can('channel access')
     <div class="col-lg-3">

@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - EDIT CHANNELS</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('channel.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>BACK</a>
+        <a href="{{route('channel.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
         <a href="{{route('channel.show', encrypt($channel->id))}}" class="btn btn-info btn-sm"><i class="fa fa-list mr-1"></i>Details</a>
     </div>
 </div>
