@@ -152,15 +152,15 @@ class AreaController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-         $area = Area::findOrfail(decrypt($id));
-         $changes_arr['old'] = $area->getOriginal();
+        $area = Area::findOrfail(decrypt($id));
+        $changes_arr['old'] = $area->getOriginal();
 
-         $area->update([
-            'code' => $request->code,
-            'name' => $request->name
-         ]);
+        $area->update([
+        'code' => $request->code,
+        'name' => $request->name
+        ]);
 
-         $changes_arr['changes'] = $area->getChanges();
+        $changes_arr['changes'] = $area->getChanges();
 
         // logs
         activity('update')

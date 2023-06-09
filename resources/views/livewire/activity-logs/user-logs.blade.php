@@ -27,7 +27,7 @@
                             <td>{{$activity->description}}</td>
                             <td>{{$activity->created_at->diffForHumans()}}</td>
                             <td class="p-1">
-                                @if($activity->log_name == 'update')
+                                @if($activity->log_name == 'update' && !empty($updates[$activity->id]))
                                 <ul class="list-group">
                                     @foreach($updates[$activity->id] as $column => $data)
                                     <li class="list-group-item p-1">

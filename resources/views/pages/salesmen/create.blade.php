@@ -35,7 +35,7 @@
                 
                 <div class="col-lg-4">
                     <div class="form-group">
-                        {!! Form::label('code', 'Area Code') !!}
+                        {!! Form::label('code', 'Salesman Code') !!}
                         {!! Form::text('code', '', ['class' => 'form-control'.($errors->has('code') ? ' is-invalid' : ''), 'form' => 'add_salesman']) !!}
                         <p class="text-danger">{{$errors->first('code')}}</p>
                     </div>
@@ -43,7 +43,7 @@
 
                 <div class="col-lg-4">
                     <div class="form-group">
-                        {!! Form::label('name', 'Area Name') !!}
+                        {!! Form::label('name', 'Salesman Name') !!}
                         {!! Form::text('name', '', ['class' => 'form-control'.($errors->has('name') ? ' is-invalid' : ''), 'form' => 'add_salesman']) !!}
                         <p class="text-danger">{{$errors->first('name')}}</p>
                     </div>
