@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\ChannelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,18 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+
+    // CHANNEL
+    Route::group(['middleware' => 'permission:channel access'], function() {
+        Route::get('channel', [ChannelController::class, 'index'])->name('channel.index');
+        Route::get('channel/create', [ChannelController::class, 'create'])->name('channel.create')->middleware('permission:channel create');
+        Route::post('channel', [ChannelController::class, 'store'])->name('channel.store')->middleware('permission:channel create');
+
+        Route::get('channel/{id}', [ChannelController::class, 'show'])->name('channel.show');
+
+        Route::get('channel/{id}/edit', [ChannelController::class, 'edit'])->name('channel.edit')->middleware('permission:channel edit');
+        Route::post('channel/{id}', [ChannelController::class, 'update'])->name('channel.update')->middleware('permission:channel edit');
+    });
 
     // AREA
     Route::group(['middleware' => 'permission:area access'], function() {

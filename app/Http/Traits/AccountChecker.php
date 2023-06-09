@@ -5,10 +5,12 @@ use Illuminate\Support\Facades\Session;
 
 trait AccountChecker {
 
-    public function check() {
-        // check session
-        if(empty(Session::get('account'))) {
+    public function checkAccount() {
+        $account = Session::get('account');
+        if(empty($account)) {
             return redirect()->route('home');
-        }
+        } 
+    
+        return $account;
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Area;
-use App\Http\Requests\AreaAddRequest;
-use App\Http\Requests\AreaUpdateRequest;
+use App\Models\Channel;
+use App\Http\Requests\ChannelAddRequest;
+use App\Http\Requests\ChannelUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
-class AreaController extends Controller
+class ChannelController extends Controller
 {
     private function checkAccount() {
         $account = Session::get('account');
@@ -34,13 +34,13 @@ class AreaController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $areas = Area::orderBy('created_at', 'DESC')
+        $channels = Channel::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
             ->paginate(10)->onEachSide(1);
 
-        return view('pages.areas.index')->with([
-            'account' => $account,
-            'areas' => $areas
+        return view('pages.channels.index')->with([
+            'channels' => $channels,
+            'account' => $account
         ]);
     }
 
@@ -57,7 +57,7 @@ class AreaController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        return view('pages.areas.create')->with([
+        return view('pages.channels.create')->with([
             'account' => $account
         ]);
     }
@@ -65,60 +65,60 @@ class AreaController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\AreaAddRequest  $request
+     * @param  \App\Http\Requests\ChannelAddRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AreaAddRequest $request)
+    public function store(ChannelAddRequest $request)
     {
         // check account
         $account = $this->checkAccount();
         if ($account instanceof \Illuminate\Http\RedirectResponse) {
             return $account; // Redirect response, so return it directly
         }
-        
-        $area = new Area([
+
+        $channel = new Channel([
             'account_id' => $account->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
-        $area->save();
+        $channel->save();
 
         // logs
         activity('create')
-        ->performedOn($area)
-        ->log(':causer.name has created area ['.$account->short_name.'] :subject.code :subject.name');
+        ->performedOn($channel)
+        ->log(':causer.name has created channel ['.$account->short_name.'] :subject.code :subject.name');
 
-        return redirect()->route('area.index')->with([
-            'message_success' => 'Area '.$area->name.' was created.'
+        return redirect()->route('channel.index')->with([
+            'message_success' => 'Channel '.$channel->name.' was created.'
         ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Area  $area
+     * @param  \App\Models\Channel  $channel
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-       // check account
-       $account = $this->checkAccount();
-       if ($account instanceof \Illuminate\Http\RedirectResponse) {
-           return $account; // Redirect response, so return it directly
-       }
+        // check account
+        $account = $this->checkAccount();
+        if ($account instanceof \Illuminate\Http\RedirectResponse) {
+            return $account; // Redirect response, so return it directly
+        }
 
-        $area = Area::findOrFail(decrypt($id));
+        $channel = Channel::findOrFail(decrypt($id));
 
-        return view('pages.areas.show')->with([
-            'account' => $account,
-            'area' => $area
+        return view('pages.channels.show')->with([
+            'channel' => $channel,
+            'account' => $account
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Area  $area
+     * @param  \App\Models\Channel  $channel
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -129,22 +129,22 @@ class AreaController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-        $area = Area::findOrfail(decrypt($id));
+        $channel = Channel::findOrFail(decrypt($id));
 
-        return view('pages.areas.edit')->with([
-            'account' => $account,
-            'area' => $area
+        return view('pages.channels.edit')->with([
+            'channel' => $channel,
+            'account' => $account
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\AreaUpdateRequest  $request
-     * @param  \App\Models\Area  $area
+     * @param  \App\Http\Requests\ChannelUpdateRequest  $request
+     * @param  \App\Models\Channel  $channel
      * @return \Illuminate\Http\Response
      */
-    public function update(AreaUpdateRequest $request, $id)
+    public function update(ChannelUpdateRequest $request, $id)
     {
         // check account
         $account = $this->checkAccount();
@@ -152,34 +152,34 @@ class AreaController extends Controller
             return $account; // Redirect response, so return it directly
         }
 
-         $area = Area::findOrfail(decrypt($id));
-         $changes_arr['old'] = $area->getOriginal();
+        $channel = Channel::findOrFail(decrypt($id));
+        $changes_arr['old'] = $channel->getOriginal();
 
-         $area->update([
+        $channel->update([
             'code' => $request->code,
             'name' => $request->name
-         ]);
+        ]);
 
-         $changes_arr['changes'] = $area->getChanges();
+        $changes_arr['changes'] = $channel->getChanges();
 
         // logs
         activity('update')
-        ->performedOn($area)
+        ->performedOn($channel)
         ->withProperties($changes_arr)
-        ->log(':causer.name has updated area ['.$account->short_name.'] :subject.code :subject.name');
+        ->log(':causer.name has updated channel ['.$account->short_name.'] :subject.code :subject.name');
 
-         return back()->with([
-            'message_success' => 'Area '.$area->name.' has been updated.'
-         ]);
+        return back()->with([
+            'message_success' => 'Channel '.$channel->name.' was updated.'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Area  $area
+     * @param  \App\Models\Channel  $channel
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Area $area)
+    public function destroy(Channel $channel)
     {
         //
     }

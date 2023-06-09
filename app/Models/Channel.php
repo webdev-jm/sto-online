@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Area extends Model
+class Channel extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -14,7 +14,7 @@ class Area extends Model
     protected $fillable = [
         'account_id',
         'code',
-        'name'
+        'name',
     ];
 
     public function account() {
