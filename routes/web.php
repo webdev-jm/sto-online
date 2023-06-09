@@ -6,6 +6,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\SalesmanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,18 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+
+    // SALESMEN
+    Route::group(['middleware' => 'permission:salesman access'], function() {
+        Route::get('salesman', [SalesmanController::class, 'index'])->name('salesman.index');
+        Route::get('salesman/create', [SalesmanController::class, 'create'])->name('salesman.create')->middleware('permission:salesman create');
+        Route::post('salesman', [SalesmanController::class, 'store'])->name('salesman.store')->middleware('permission:salesman create');
+
+        Route::get('salesman/{id}', [SalesmanController::class, 'show'])->name('salesman.show');
+
+        Route::get('salesman/{id}/edit', [SalesmanController::class, 'edit'])->name('salesman.edit')->middleware('permission:salesman edit');
+        Route::post('salesman/{id}', [SalesmanController::class, 'update'])->name('salesman.update')->middleware('permission:salesman edit');
+    });
 
     // CHANNEL
     Route::group(['middleware' => 'permission:channel access'], function() {

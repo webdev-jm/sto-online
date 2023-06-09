@@ -58,12 +58,14 @@
     </div>
     @endcan
 
+    @can('saleman access')
     <div class="col-lg-3">
-        <a href="#" class="btn btn-block btn-app bg-danger ml-0">
+        <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-danger ml-0">
             <i class="fa fa-user-tie"></i>
             Salesman
         </a>
     </div>
+    @endcan
 </div>
 @stop
 

@@ -18,6 +18,12 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions_arr = [
+            'Salesman' => [
+                'salesman access'   => 'Allow user to access salesman list and details',
+                'salesman add'      => 'Allow user to add salesman.',
+                'salesman edit'      => 'Allow user to edit salesman.',
+                'salesman delete'      => 'Allow user to delete salesman.',
+            ],
             'Channel' => [
                 'channel access'   => 'Allow user to access channel list and details',
                 'channel add'      => 'Allow user to add channel.',
