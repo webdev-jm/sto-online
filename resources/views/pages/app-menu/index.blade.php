@@ -60,7 +60,7 @@
     </div>
     @endcan
 
-    @can('saleman access')
+    @can('salesman access')
     <div class="col-lg-3">
         <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-danger ml-0">
             <i class="fa fa-user-tie"></i>

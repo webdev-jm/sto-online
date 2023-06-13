@@ -76,7 +76,20 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        //
+        $role = Role::findOrFail(decrypt($id));
+
+        $permissions_arr = array();
+        foreach($role->permissions as $permission) {
+            $permissions_arr[$permission->module][$permission->id] = [
+                'name' => $permission->name,
+                'description' => $permission->description
+            ];
+        }
+
+        return view('pages.roles.show')->with([
+            'role' => $role,
+            'permissions_arr' => $permissions_arr
+        ]);
     }
 
     /**

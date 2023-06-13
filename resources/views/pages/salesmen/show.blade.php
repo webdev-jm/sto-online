@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - SALESMAN</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
+        <a href="{{route('salesman.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
         @can('salesman edit')
             <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Salesman</a>
         @endcan
