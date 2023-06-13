@@ -35,7 +35,7 @@
                             </div>
                             <div class="col-lg-4 text-center">
                                 <p class="m-0">
-                                    <a href="" class="btn btn-info btn-xs">
+                                    <a href="{{route('role.show', encrypt($role->id))}}" class="btn btn-info btn-xs">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('role edit')
