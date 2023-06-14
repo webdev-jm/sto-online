@@ -50,6 +50,15 @@ class HomeController extends Controller
 
     public function appMenu($id) {
         $account = SMSAccount::findOrFail(decrypt($id));
+
+        // check if account is assigned to user
+        $check = auth()->user()->accounts()->where('id', $account->id)->first();
+        if(empty($check)) {
+            return redirect()->route('home')->with([
+                'message_error' => 'this account was not assigned to you. Please message the system admin for more details.'
+            ]);
+        }
+
         Session::put('account', $account);
 
         return view('pages.app-menu.index')->with([

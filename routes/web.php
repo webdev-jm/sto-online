@@ -8,6 +8,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\SalesmanController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,13 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+    
+    // SALES 
+    Route::group(['middleware' => 'permission:sales access'], function() {
+        Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::get('sales/create', [SaleController::class, 'create'])->name('sales.create')->middleware('permission:sales create');
+        Route::post('sales/upload', [SaleController::class, 'store'])->name('sales.upload')->middleware('permission:sales upload');
+    });
 
     // CUSTOMERS
     Route::group(['middleware' => 'permission:customer access'], function() {
