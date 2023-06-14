@@ -41,6 +41,29 @@
                 </div>
             </div>
         </div>
+
+        @if(!empty($salesman->areas))
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">SALESMAN AREAS</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-unbordered">
+                        @foreach($salesman->areas as $area)
+                        <li class="list-group-item p-1">
+                            <b>{{$area->code}}</b>
+                            <span class="float-right">{{$area->name ?? '-'}}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                    
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 @stop
 

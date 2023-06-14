@@ -20,28 +20,31 @@ class PermissionSeeder extends Seeder
         $permissions_arr = [
             'Sales' => [
                 'sales access'      => 'Allow user to access customer list and details',
-                'sales upload'      => 'Allow user to upload sales data.',
                 'sales add'         => 'Allow user to add customer.',
                 'sales edit'        => 'Allow user to edit customer.',
                 'sales delete'      => 'Allow user to delete customer.',
+                'sales upload'      => 'Allow user to upload sales data.',
             ],
             'Customers' => [
                 'customer access'   => 'Allow user to access customer list and details',
                 'customer add'      => 'Allow user to add customer.',
                 'customer edit'     => 'Allow user to edit customer.',
                 'customer delete'   => 'Allow user to delete customer.',
+                'customer upload'   => 'Allow user to upload customer data.',
             ],
             'Salesman' => [
                 'salesman access'   => 'Allow user to access salesman list and details',
                 'salesman add'      => 'Allow user to add salesman.',
                 'salesman edit'     => 'Allow user to edit salesman.',
                 'salesman delete'   => 'Allow user to delete salesman.',
+                'salesman upload'   => 'Allow user to upload salesman data.',
             ],
             'Channel' => [
                 'channel access'   => 'Allow user to access channel list and details',
                 'channel add'      => 'Allow user to add channel.',
                 'channel edit'     => 'Allow user to edit channel.',
                 'channel delete'   => 'Allow user to delete channel.',
+                'channel upload'   => 'Allow user to upload channel data.',
             ],
             'Area' => [
                 'area access'   => 'Allow user to access areas list and details',
@@ -54,6 +57,7 @@ class PermissionSeeder extends Seeder
                 'location add'      => 'Allow user to add location.',
                 'location edit'     => 'Allow user to edit location.',
                 'location delete'   => 'Allow user to delete location.',
+                'location upload'   => 'Allow user to upload location data.',
             ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',

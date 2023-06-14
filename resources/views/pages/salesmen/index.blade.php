@@ -20,6 +20,11 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">SALESMEN LIST</h3>
+            @can('salesman upload')
+                <div class="card-tools">
+                    <button class="btn btn-info btn-sm" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
+                </div>
+            @endcan
         </div>
         <div class="card-body">
 
@@ -63,6 +68,15 @@
             {{$salesmen->links()}}
         </div>
     </div>
+
+    @can('saleman upload')
+        {{-- MODAL --}}
+        <div class="modal fade" id="modal-upload">
+            <div class="modal-dialog modal-lg">
+                <livewire:uploads.salesman/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -70,4 +84,14 @@
 @stop
 
 @section('js')
+    @can('salesman upload')
+        <script>
+            $(function() {
+                $('#btn-upload').on('click', function(e) {
+                    e.preventDefault();
+                    $('#modal-upload').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

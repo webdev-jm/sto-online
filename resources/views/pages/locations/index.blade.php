@@ -20,9 +20,11 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">LOCATION LIST</h3>
+            @can('location upload')
             <div class="card-tools">
                 <button class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
             </div>
+            @endcan
         </div>
         <div class="card-body">
 
@@ -67,12 +69,14 @@
         </div>
     </div>
 
-{{-- MODAL --}}
-<div class="modal fade" id="modal-upload">
-    <div class="modal-dialog modal-lg">
-        <livewire:uploads.location/>
-    </div>
-</div>
+    @can('location upload')
+        {{-- MODAL --}}
+        <div class="modal fade" id="modal-upload">
+            <div class="modal-dialog modal-lg">
+                <livewire:uploads.location/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -80,13 +84,14 @@
 @stop
 
 @section('js')
-<script>
-    $(function() {
-        $('#btn-upload').on('click', function(e) {
-            e.preventDefault();
-
-            $('#modal-upload').modal('show');
-        });
-    });
-</script>
+    @can('location upload')
+        <script>
+            $(function() {
+                $('#btn-upload').on('click', function(e) {
+                    e.preventDefault();
+                    $('#modal-upload').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop
