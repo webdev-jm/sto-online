@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
-use App\Models\Salesman;
+use App\Models\Location;
 use Illuminate\Http\Request;
-
-use App\Http\Requests\CustomerAddRequest;
-use App\Http\Requests\CustomerUpdateRequest;
+use App\Http\Requests\LocationAddRequest;
+use App\Http\Requests\LocationUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
-class CustomerController extends Controller
+class LocationController extends Controller
 {
+
     private function checkAccount() {
         $account = Session::get('account');
         if(!isset($account) || empty($account)) {
@@ -39,13 +38,13 @@ class CustomerController extends Controller
             ]);
         }
 
-        $customers = Customer::orderBy('created_at', 'DESC')
+        $locations = Location::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
             ->paginate(10)->onEachSide(1);
 
-        return view('pages.customers.index')->with([
-            'account' => $account,
-            'customers' => $customers
+        return view('pages.locations.index')->with([
+            'locations' => $locations,
+            'account' => $account
         ]);
     }
 
@@ -64,26 +63,18 @@ class CustomerController extends Controller
             ]);
         }
 
-        // SALESMEN OPTIONS
-        $salesmen = Salesman::where('account_id', $account->id)->get();
-        $salesmen_arr = array();
-        foreach($salesmen as $salesman) {
-            $salesmen_arr[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
-        }
-
-        return view('pages.customers.create')->with([
-            'account' => $account,
-            'salesmen' => $salesmen_arr,
+        return view('pages.locations.create')->with([
+            'account' => $account
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\CustomerAddRequest  $request
+     * @param  \Illuminate\Http\LocationAddRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CustomerAddRequest $request)
+    public function store(LocationAddRequest $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -93,54 +84,51 @@ class CustomerController extends Controller
             ]);
         }
 
-        $customer = new Customer([
+        $location = new Location([
             'account_id' => $account->id,
-            'salesman_id' => $request->salesman_id,
             'code' => $request->code,
-            'name' => $request->name,
-            'address' => $request->address,
+            'name' => $request->name
         ]);
-        $customer->save();
-        
+        $location->save();
+
         // logs
         activity('create')
-        ->performedOn($customer)
-        ->log(':causer.name has created customer ['.$account->short_name.'] :subject.code :subject.name');
+        ->performedOn($location)
+        ->log(':causer.name has created location ['.$account->short_name.'] :subject.code :subject.name');
 
-        return redirect()->route('customer.index')->with([
-            'message_success' => 'Customer '.$customer->name.' was created.'
+        return redirect()->route('location.index')->with([
+            'message_success' => 'Location '.$location->name.' was created.'
         ]);
-
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Customer  $customer
+     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
-        }
+         // check account
+         $account = $this->checkAccount();
+         if ($account instanceof \Illuminate\Http\RedirectResponse) {
+             return $account->with([
+                 'message_error' => 'Please select an account.'
+             ]);
+         }
+ 
+         $location = Location::findOrFail(decrypt($id));
 
-        $customer = Customer::findOrFail(decrypt($id));
-        
-        return view('pages.customers.show')->with([
+         return view('pages.locations.show')->with([
             'account' => $account,
-            'customer' => $customer
-        ]);
+            'location' => $location
+         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Customer  $customer
+     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -153,30 +141,22 @@ class CustomerController extends Controller
             ]);
         }
 
-        $customer = Customer::findOrFail(decrypt($id));
+        $location = Location::findOrFail(decrypt($id));
 
-       // SALESMEN OPTIONS
-       $salesmen = Salesman::where('account_id', $account->id)->get();
-       $salesmen_arr = array();
-       foreach($salesmen as $salesman) {
-           $salesmen_arr[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
-       }
-
-        return view('pages.customers.edit')->with([
+        return view('pages.locations.edit')->with([
             'account' => $account,
-            'customer' => $customer,
-            'salesmen' => $salesmen_arr
+            'location' => $location
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\CustomerUpdateRequest  $request
-     * @param  \App\Models\Customer  $customer
+     * @param  \Illuminate\Http\LocationUpdateRequest  $request
+     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
-    public function update(CustomerUpdateRequest $request, $id)
+    public function update(LocationUpdateRequest $request, $id)
     {
         // check account
         $account = $this->checkAccount();
@@ -186,36 +166,34 @@ class CustomerController extends Controller
             ]);
         }
 
-        $customer = Customer::findOrFail(decrypt($id));
-        $changes_arr['old'] = $customer->getOriginal();
+        $location = Location::findOrFail(decrypt($id));
+        $changes_arr['old'] = $location->getOriginal();
 
-        $customer->update([
-            'area_id' => $request->area_id,
-            'channel_id' => $request->channel_id,
+        $location->update([
             'code' => $request->code,
-            'name' => $request->name,
+            'name' => $request->name
         ]);
 
-        $changes_arr['changes'] = $customer->getChanges();
+        $changes_arr['changes'] = $location->getChanges();
 
         // logs
         activity('update')
-        ->performedOn($customer)
+        ->performedOn($location)
         ->withProperties($changes_arr)
-        ->log(':causer.name has updated customer ['.$account->short_name.'] :subject.code :subject.name');
+        ->log(':causer.name has updated location ['.$account->short_name.'] :subject.code :subject.name');
 
         return back()->with([
-            'message_success' => 'Customer '.$customer->name.' was updated.'
+            'message_success' => 'Location '.$location->name.' was updated.'
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Customer  $customer
+     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy(Location $location)
     {
         //
     }

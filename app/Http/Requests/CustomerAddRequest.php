@@ -24,10 +24,7 @@ class CustomerAddRequest extends FormRequest
     public function rules()
     {
         return [
-            'area_id' => [
-                'required'
-            ],
-            'channel_id' => [
+            'salesman_id' => [
                 'required'
             ],
             'code' => [
@@ -35,6 +32,9 @@ class CustomerAddRequest extends FormRequest
             ],
             'name' => [
                 'required'
+            ],
+            'address' => [
+                'max:255'
             ]
         ];
     }

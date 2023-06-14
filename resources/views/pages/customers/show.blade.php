@@ -18,7 +18,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">CUSTOMER DETAILS</h3>
@@ -35,12 +35,12 @@
                             <span class="float-right">{{$customer->name ?? '-'}}</span>
                         </li>
                         <li class="list-group-item p-1">
-                            <b>Area</b>
-                            <span class="float-right">{{$customer->area->name ?? '-'}}</span>
+                            <b>Salesman</b>
+                            <span class="float-right">[{{$customer->salesman->code ?? '-'}}] {{$customer->salesman->name ?? '-'}}</span>
                         </li>
                         <li class="list-group-item p-1">
-                            <b>Channel</b>
-                            <span class="float-right">{{$customer->channel->name ?? '-'}}</span>
+                            <b>Address</b>
+                            <span class="float-right">{{$customer->address ?? '-'}}</span>
                         </li>
                     </ul>
                     

@@ -28,20 +28,20 @@
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->area->name}}</p>
-                            <small class="font-weight-bold text-muted">AREA</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->channel->name}}</p>
-                            <small class="font-weight-bold text-muted">CHANNEL</small>
-                        </div>
-                        <div class="col-lg-3 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->code}}</p>
                             <small class="font-weight-bold text-muted">CODE</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->name}}</p>
                             <small class="font-weight-bold text-muted">NAME</small>
+                        </div>
+                        <div class="col-lg-3 text-center">
+                            <p class="m-0 font-weight-bold">{{$customer->address}}</p>
+                            <small class="font-weight-bold text-muted">ADDRESS</small>
+                        </div>
+                        <div class="col-lg-2 text-center">
+                            <p class="m-0 font-weight-bold">{{$customer->salesman->code ?? '-'}}</p>
+                            <small class="font-weight-bold text-muted">SALESMAN</small>
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">

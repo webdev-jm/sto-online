@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomerUpdateRequest extends FormRequest
+class LocationAddRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class CustomerUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->user()->can('customer edit');
+        return auth()->user()->can('location create');
     }
 
     /**
@@ -24,17 +24,11 @@ class CustomerUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'salesman_id' => [
-                'required'
-            ],
             'code' => [
                 'required'
             ],
             'name' => [
                 'required'
-            ],
-            'address' => [
-                'max:255'
             ]
         ];
     }

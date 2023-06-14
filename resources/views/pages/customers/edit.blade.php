@@ -25,23 +25,6 @@
         <div class="card-body">
             
             <div class="row">
-                {{-- AREA --}}
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        {!! Form::label('area_id', 'Area') !!}
-                        {!! Form::select('area_id', $areas, $customer->area_id, ['class' => 'form-control'.($errors->has('area_id') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
-                        <p class="text-danger">{{$errors->first('area_id')}}</p>
-                    </div>
-                </div>
-
-                {{-- CHANNEL --}}
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        {!! Form::label('channel_id', 'Channel') !!}
-                        {!! Form::select('channel_id', $channels, $customer->channel_id, ['class' => 'form-control'.($errors->has('channel_id') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
-                        <p class="text-danger">{{$errors->first('channel_id')}}</p>
-                    </div>
-                </div>
 
                 {{-- CODE --}}
                 <div class="col-lg-4">
@@ -58,6 +41,24 @@
                         {!! Form::label('name', 'Customer Name') !!}
                         {!! Form::text('name', $customer->name, ['class' => 'form-control'.($errors->has('name') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
                         <p class="text-danger">{{$errors->first('name')}}</p>
+                    </div>
+                </div>
+
+                {{-- SALESMAN --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('salesman_id', 'Salesman') !!}
+                        {!! Form::select('salesman_id', $salesmen, $customer->salesman_id, ['class' => 'form-control'.($errors->has('salesman_id') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('salesman_id')}}</p>
+                    </div>
+                </div>
+
+                {{-- ADDRESS --}}
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        {!! Form::label('address', 'Address') !!}
+                        {!! Form::text('address', $customer->address, ['class' => 'form-control'.($errors->has('address') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('address')}}</p>
                     </div>
                 </div>
 

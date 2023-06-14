@@ -53,6 +53,15 @@
     </div>
     @endcan
 
+    @can('location access')
+    <div class="col-lg-3">
+        <a href="{{route('location.index')}}" class="btn btn-block btn-app bg-info ml-0">
+            <i class="fa fa-shuttle-van"></i>
+            Location
+        </a>
+    </div>
+    @endcan
+
     @can('area access')
     <div class="col-lg-3">
         <a href="{{route('area.index')}}" class="btn btn-block btn-app bg-success ml-0">
