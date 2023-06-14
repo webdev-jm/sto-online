@@ -20,10 +20,12 @@ class CreateSalesTable extends Migration
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('channel_id')->nullable();
             $table->unsignedBigInteger('salesman_id')->nullable();
+            $table->unsignedBigInteger('location_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('uom');
             $table->integer('quantity')->default(0);
-            $table->decimal('sales', 10,2)->default(0);
+            $table->decimal('price_inc_vat', 10,2)->default(0);
+            $table->decimal('amount_inc_vat', 10,2)->default(0);
             $table->timestamps();
 
             $table->softDeletes();

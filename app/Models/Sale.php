@@ -14,13 +14,15 @@ class Sale extends Model
     protected $fillable = [
         'account_id',
         'customer_id',
-        'area_id',
+        'product_id',
         'channel_id',
         'salesman_id',
+        'location_id',
         'user_id',
         'uom',
         'quantity',
-        'sales',
+        'price_inc_vat',
+        'amount_inc_vat',
     ];
 
     public function account() {
@@ -29,10 +31,6 @@ class Sale extends Model
 
     public function customer() {
         return $this->belongsTo('App\Models\Customer');
-    }
-
-    public function area() {
-        return $this->belongsTo('App\Models\Area');
     }
 
     public function channel() {
@@ -45,5 +43,9 @@ class Sale extends Model
     
     public function user() {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function location() {
+        return $this->belongsTo('App\Models\Location');
     }
 }

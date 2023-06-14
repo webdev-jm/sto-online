@@ -13,22 +13,18 @@ class Customer extends Model
 
     protected $fillable = [
         'account_id',
-        'area_id',
-        'channel_id',
+        'salesman_id',
         'code',
         'name',
+        'address',
     ];
 
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
     }
 
-    public function area() {
-        return $this->belongsTo('App\Models\Area');
-    }
-
-    public function channel() {
-        return $this->belongsTo('App\Models\Channel');
+    public function salesman() {
+        return $this->belongsTo('App\Models\Salesman');
     }
 
     public function sales() {

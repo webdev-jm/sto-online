@@ -49,6 +49,12 @@ class PermissionSeeder extends Seeder
                 'area edit'     => 'Allow user to edit area.',
                 'area delete'   => 'Allow user to delete area.',
             ],
+            'Location' => [
+                'location access'   => 'Allow user to access location list and details',
+                'location add'      => 'Allow user to add location.',
+                'location edit'     => 'Allow user to edit location.',
+                'location delete'   => 'Allow user to delete location.',
+            ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',
                 'user add'              =>  'Allow user to add user',

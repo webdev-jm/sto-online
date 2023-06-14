@@ -9,6 +9,7 @@ use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\SalesmanController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +84,18 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('area/{id}/edit', [AreaController::class, 'edit'])->name('area.edit')->middleware('permission:area edit');
         Route::post('area/{id}', [AreaController::class, 'update'])->name('area.update')->middleware('permission:area edit');
+    });
+
+    // LOCATION
+    Route::group(['middleware' => 'permission:location access'], function() {
+        Route::get('location', [LocationController::class, 'index'])->name('location.index');
+        Route::get('location/create', [LocationController::class, 'create'])->name('location.create')->middleware('permission:location create');
+        Route::post('location', [LocationController::class, 'store'])->name('location.store')->middleware('permission:location create');
+
+        Route::get('location/{id}', [LocationController::class, 'show'])->name('location.show');
+
+        Route::get('location/{id}/edit', [LocationController::class, 'edit'])->name('location.edit')->middleware('permission:location edit');
+        Route::post('location/{id}', [LocationController::class, 'update'])->name('location.update')->middleware('permission:location edit');
     });
 
     // ROLES
