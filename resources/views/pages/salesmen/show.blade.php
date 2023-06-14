@@ -34,10 +34,6 @@
                             <b>Salesman Name</b>
                             <span class="float-right">{{$salesman->name ?? '-'}}</span>
                         </li>
-                        <li class="list-group-item p-1">
-                            <b>Area</b>
-                            <span class="float-right">{{$salesman->area->name ?? '-'}}</span>
-                        </li>
                     </ul>
                     
                 </div>

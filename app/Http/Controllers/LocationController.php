@@ -40,7 +40,7 @@ class LocationController extends Controller
 
         $locations = Location::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
-            ->paginate(10)->onEachSide(1);
+            ->paginate(10, ['*'], 'location-page')->onEachSide(1);
 
         return view('pages.locations.index')->with([
             'locations' => $locations,

@@ -13,7 +13,6 @@ class Salesman extends Model
 
     protected $fillable = [
         'account_id',
-        'area_id',
         'code',
         'name',
     ];
@@ -22,8 +21,8 @@ class Salesman extends Model
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
     }
 
-    public function area() {
-        return $this->belongsTo('App\Models\Area');
+    public function areas() {
+        return $this->belongsToMany('App\Models\Area');
     }
 
     public function customers() {
