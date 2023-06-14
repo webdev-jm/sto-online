@@ -25,14 +25,6 @@
         <div class="card-body">
 
             <div class="row">
-
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        {!! Form::label('area_id', 'Area') !!}
-                        {!! Form::select('area_id', $areas, $salesman->area_id, ['class' => 'form-control'.($errors->has('area_id') ? ' is-invalid' : ''), 'form' => 'update_salesman']) !!}
-                        <p class="text-danger">{{$errors->first('area_id')}}</p>
-                    </div>
-                </div>
                 
                 <div class="col-lg-4">
                     <div class="form-group">

@@ -27,19 +27,15 @@
                 @foreach($salesmen as $salesman)
                 <li class="list-group-item">
                     <div class="row">
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">[{{$salesman->area->code}}] {{$salesman->area->name}}</p>
-                            <b>AREA</b>
-                        </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-4 text-center">
                             <p class="m-0">{{$salesman->code}}</p>
                             <b>CODE</b>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-4 text-center">
                             <p class="m-0">{{$salesman->name}}</p>
                             <b>NAME</b>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-4 text-center">
                             <p class="m-0">
                                 <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">
                                     <i class="fa fa-list"></i>

@@ -95,7 +95,6 @@ class SalesmanController extends Controller
 
         $salesman = new Salesman([
             'account_id' => $account->id,
-            'area_id' => $request->area_id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -187,7 +186,6 @@ class SalesmanController extends Controller
         $changes_arr['old'] = $salesman->getOriginal();
 
         $salesman->update([
-            'area_id' => $request->area_id,
             'code' => $request->code,
             'name' => $request->name
         ]);

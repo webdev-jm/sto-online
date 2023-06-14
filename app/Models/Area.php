@@ -21,6 +21,10 @@ class Area extends Model
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
     }
 
+    public function salesmen() {
+        return $this->belongsToMany('App\Models\Salesman');
+    }
+
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }

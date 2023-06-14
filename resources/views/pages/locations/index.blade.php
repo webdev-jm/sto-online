@@ -20,6 +20,9 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">LOCATION LIST</h3>
+            <div class="card-tools">
+                <button class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
+            </div>
         </div>
         <div class="card-body">
 
@@ -63,6 +66,13 @@
             {{$locations->links()}}
         </div>
     </div>
+
+{{-- MODAL --}}
+<div class="modal fade" id="modal-upload">
+    <div class="modal-dialog modal-lg">
+        <livewire:uploads.location/>
+    </div>
+</div>
 @stop
 
 @section('css')
@@ -70,4 +80,13 @@
 @stop
 
 @section('js')
+<script>
+    $(function() {
+        $('#btn-upload').on('click', function(e) {
+            e.preventDefault();
+
+            $('#modal-upload').modal('show');
+        });
+    });
+</script>
 @stop

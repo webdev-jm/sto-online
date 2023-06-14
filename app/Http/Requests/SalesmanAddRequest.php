@@ -24,9 +24,6 @@ class SalesmanAddRequest extends FormRequest
     public function rules()
     {
         return [
-            'area_id' => [
-                'required'
-            ],
             'code' => [
                 'required'
             ],
