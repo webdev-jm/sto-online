@@ -15,12 +15,14 @@
 
 @section('content')
 <div class="row">
+    @can('sales access')
     <div class="col-lg-3">
-        <a href="#" class="btn btn-block btn-app bg-info ml-0">
+        <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-info ml-0">
             <i class="fa fa-money-check-alt"></i>
             Sales
         </a>
     </div>
+    @endcan
 
     <div class="col-lg-3">
         <a href="#" class="btn btn-block btn-app bg-secondary ml-0">

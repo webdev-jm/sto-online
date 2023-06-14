@@ -423,6 +423,21 @@ return [
                 ],
             ],
         ],
+        'Dropzone' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => '/vendor/dropzone/min/dropzone.min.css'
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '/vendor/dropzone/min/dropzone.min.js'
+                ]
+            ]
+        ]
     ],
 
     /*

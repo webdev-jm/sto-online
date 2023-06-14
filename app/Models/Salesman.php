@@ -25,4 +25,8 @@ class Salesman extends Model
     public function area() {
         return $this->belongsTo('App\Models\Area');
     }
+
+    public function sales() {
+        return $this->hasMany('App\Models\Sales');
+    }
 }
