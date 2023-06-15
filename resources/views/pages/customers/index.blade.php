@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - CUSTOMERS</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Main Menu</a>
+        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
         @can('customer create')
             <a href="{{route('customer.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>Add Customer</a>
         @endcan
@@ -20,6 +20,11 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">CUSTOMER LIST</h3>
+            @can('customer upload')
+                <div class="card-tools">
+                    <button class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
+                </div>
+            @endcan
         </div>
         <div class="card-body">
 
@@ -71,6 +76,15 @@
             {{$customers->links()}}
         </div>
     </div>
+
+    @can('customer upload')
+        {{-- MODAL --}}
+        <div class="modal fade" id="modal-upload">
+            <div class="modal-dialog modal-lg">
+                <livewire:uploads.customer/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -78,4 +92,14 @@
 @stop
 
 @section('js')
+    @can('customer upload')
+        <script>
+            $(function() {
+                $('#btn-upload').on('click', function(e) {
+                    e.preventDefault();
+                    $('#modal-upload').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

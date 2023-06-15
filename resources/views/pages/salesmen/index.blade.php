@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - SALESMEN</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Menu</a>
+        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Menu</a>
         @can('salesman create')
             <a href="{{route('salesman.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>Add Salesman</a>
         @endcan
@@ -33,12 +33,12 @@
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-lg-4 text-center">
-                            <p class="m-0">{{$salesman->code}}</p>
-                            <b>CODE</b>
+                            <p class="m-0 font-weight-bold">{{$salesman->code}}</p>
+                            <small class="font-weight-bold text-muted">CODE</small>
                         </div>
                         <div class="col-lg-4 text-center">
-                            <p class="m-0">{{$salesman->name}}</p>
-                            <b>NAME</b>
+                            <p class="m-0 font-weight-bold">{{$salesman->name}}</p>
+                            <small class="font-weight-bold text-muted">NAME</small>
                         </div>
                         <div class="col-lg-4 text-center">
                             <p class="m-0">
