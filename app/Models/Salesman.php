@@ -29,6 +29,10 @@ class Salesman extends Model
         return $this->hasMany('App\Models\Customer');
     }
 
+    public function salesman_customers() {
+        return $this->hasMany('App\Models\SalesmanCustomer');
+    }
+
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }

@@ -1,0 +1,65 @@
+<div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Customer Upload</h4>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                {{-- FILE --}}
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        {!! Form::label('file', 'Upload File') !!}
+                        {!! Form::file('file', ['class' => 'form-control'.($errors->has('file') ? ' is-invalid' : ''), 'wire:model' => 'file', 'accept' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel']) !!}
+                        <small class="text-danger">{{$errors->first('file')}}</small>
+                        @if(!empty($err_msg))
+                            <small class="text-danger">{{$err_message}}</small>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- PREVIEW --}}
+                @if(!empty($customer_data))
+                <div class="col-12">
+                    <label>PREVIEW <span wire:loading><i class="fa fa-spinner fa-spin mr-1"></i></span></label>
+                    <label class="float-right">COUNT: {{count($customer_data)}}</label>
+                </div>
+                <div class="col-12 table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>CODE</th>
+                                <th>NAME</th>
+                                <th>ADDRESS</th>
+                                <th>SALESMAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($paginatedData as $data)
+                            <tr>
+                                <td>{{$data['code'] ?? '-'}}</td>
+                                <td>{{$data['name'] ?? '-'}}</td>
+                                <td>{{$data['address'] ?? '-'}}</td>
+                                <td>{{$data['salesman'] ?? '-'}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-12">
+                    {{$paginatedData->links()}}
+                </div>
+                @endif
+
+            </div>
+            
+        </div>
+        <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            @if(!empty($customer_data))
+                <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">Upload</button>
+            @endif
+        </div>
+    </div>
+</div>
