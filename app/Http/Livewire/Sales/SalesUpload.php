@@ -40,6 +40,7 @@ class SalesUpload extends Component
                 'sku_count' => 0,
                 'total_quantity' => 0,
                 'total_price_vat' => 0,
+                'total_amount' => 0,
                 'total_amount_vat' => 0,
             ]);
             $upload->save();
@@ -47,6 +48,7 @@ class SalesUpload extends Component
             $sku_count = 0;
             $total_quantity = 0;
             $total_price_vat = 0;
+            $total_amount = 0;
             $total_amount_vat = 0;
             foreach($this->sales_data as $data) {
                 // check data
@@ -54,6 +56,7 @@ class SalesUpload extends Component
                     $sku_count++;
                     $total_quantity += $data['quantity'];
                     $total_price_vat += $data['price_inc_vat'];
+                    $total_amount += $data['amount'];
                     $total_amount_vat += $data['amount_inc_vat'];
 
                     $sale = new Sale([
@@ -66,9 +69,11 @@ class SalesUpload extends Component
                         'location_id' => $data['location_id'],
                         'user_id' => auth()->user()->id,
                         'date' => date('Y-m-d', strtotime($data['date'])),
+                        'document_number' => $data['document'],
                         'uom' => $data['uom'],
                         'quantity' => $data['quantity'],
                         'price_inc_vat' => $data['price_inc_vat'],
+                        'amount' => $data['amount'],
                         'amount_inc_vat' => $data['amount_inc_vat'],
                     ]);
                     $sale->save();
@@ -79,6 +84,7 @@ class SalesUpload extends Component
                 'sku_count' => $sku_count,
                 'total_quantity' => $total_quantity,
                 'total_price_vat' => $total_price_vat,
+                'total_amount' => $total_amount,
                 'total_amount_vat' => $total_amount_vat,
             ]);
         }
@@ -131,9 +137,11 @@ class SalesUpload extends Component
                     $sku_arr = explode('-', $skuCode);
                     if($sku_arr[0] == 'FG') { // Free Goods
                         $skuCode = end($sku_arr);
+                        // process when free goods
                     }
                     if($sku_arr[0] == 'PRM') { // Promo
                         $skuCode = end($sku_arr);
+                        // process when promo
                     }
                 }
 

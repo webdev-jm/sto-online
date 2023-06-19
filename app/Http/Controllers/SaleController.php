@@ -105,9 +105,22 @@ class SaleController extends Controller
      * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function show(Sale $sale)
+    public function show($id)
     {
-        //
+        // check account
+        $account = $this->checkAccount();
+        if ($account instanceof \Illuminate\Http\RedirectResponse) {
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
+        }
+
+        $sales_upload = SalesUpload::findOrFail(decrypt($id));
+
+        return view('pages.sales.show')->with([
+            'account' => $account,
+            'sales_upload' => $sales_upload
+        ]);
     }
 
     /**

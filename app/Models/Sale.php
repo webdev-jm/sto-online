@@ -21,9 +21,11 @@ class Sale extends Model
         'location_id',
         'user_id',
         'date',
+        'document_number',
         'uom',
         'quantity',
         'price_inc_vat',
+        'amount',
         'amount_inc_vat',
     ];
 
@@ -53,5 +55,9 @@ class Sale extends Model
 
     public function location() {
         return $this->belongsTo('App\Models\Location');
+    }
+
+    public function product() {
+        return $this->belongsTo('App\Models\SMSProduct', 'product_id', 'id');
     }
 }
