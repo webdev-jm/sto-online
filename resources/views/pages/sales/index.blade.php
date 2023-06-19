@@ -24,32 +24,36 @@
         <div class="card-body">
 
             <ul class="list-group">
-                @foreach($sales as $sale)
+                @foreach($sales_uploads as $sale)
                 <li class="list-group-item">
                     <div class="row">
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">[{{$sale->area->code}}] {{$salesman->area->name}}</p>
-                            <b>AREA</b>
+                        <div class="col-lg-2 text-center">
+                            <p class="m-0">{{$sale->created_at->diffForHumans()}}</p>
+                            <b>CREATED</b>
                         </div>
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$salesman->code}}</p>
-                            <b>CODE</b>
+                            <p class="m-0">{{$sale->user->name ?? '-'}}</p>
+                            <b>USER</b>
+                        </div>
+                        <div class="col-lg-2 text-center">
+                            <p class="m-0">{{$sale->sku_count ?? 0}}</p>
+                            <b>COUNT</b>
                         </div>
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$salesman->name}}</p>
-                            <b>NAME</b>
+                            <p class="m-0">{{number_format($sale->total_amount_vat ?? 0, 2)}}</p>
+                            <b>AMOUNT</b>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0">
-                                <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">
+                                <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs">
                                     <i class="fa fa-list"></i>
                                 </a>
-                                @can('salesman edit')
-                                    <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-xs">
+                                @can('sales edit')
+                                    <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs">
                                         <i class="fa fa-pen"></i>
                                     </a>
                                 @endcan
-                                @can('salesman delete')
+                                @can('sales delete')
                                     <a href="" class="btn btn-danger btn-xs">
                                         <i class="fa fa-trash"></i>
                                     </a>
@@ -64,7 +68,7 @@
             
         </div>
         <div class="card-footer">
-            {{$sales->links()}}
+            {{$sales_uploads->links()}}
         </div>
     </div>
 @stop

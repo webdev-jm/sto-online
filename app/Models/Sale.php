@@ -12,6 +12,7 @@ class Sale extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'sales_upload_id',
         'account_id',
         'customer_id',
         'product_id',
@@ -19,11 +20,16 @@ class Sale extends Model
         'salesman_id',
         'location_id',
         'user_id',
+        'date',
         'uom',
         'quantity',
         'price_inc_vat',
         'amount_inc_vat',
     ];
+
+    public function sales_upload() {
+        return $this->belongsTo('App\Models\SalesUpload');
+    }
 
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');

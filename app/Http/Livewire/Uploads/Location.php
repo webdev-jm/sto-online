@@ -43,6 +43,10 @@ class Location extends Component
             }
         }
 
+        // logs
+        activity('upload')
+        ->log(':causer.name has uploaded location data on ['.$this->account->short_name.']');
+
         return redirect()->route('location.index')->with([
             'message_success' => 'Location data has been uploaded.'
         ]);
@@ -76,25 +80,31 @@ class Location extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
+        
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
             $perPage,
-            $currentPage
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'onEachSide' => 1]
         );
 
         return $paginator;
     }
 
     private function checkHeader($header) {
+        $requiredHeaders = [
+            'code',
+            'name',
+        ];
+    
         $err = 0;
-        if(trim(strtolower($header[0])) != 'code') {
-            $err++;
+        foreach ($requiredHeaders as $index => $requiredHeader) {
+            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+                $err++;
+            }
         }
-        if(trim(strtolower($header[1])) != 'name') {
-            $err++;
-        }
-
+    
         return $err;
     }
 

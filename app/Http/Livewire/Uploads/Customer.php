@@ -18,8 +18,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class Customer extends Component
 {
-    use WithPagination;
     use WithFileUploads;
+    use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
     public $customer_data;
@@ -80,8 +80,12 @@ class Customer extends Component
             
         }
 
-        return redirect()->route('salesman.index')->with([
-            'message_success' => 'Salesman data has been uploaded.'
+        // logs
+        activity('upload')
+        ->log(':causer.name has uploaded customer data on ['.$this->account->short_name.']');
+
+        return redirect()->route('customer.index')->with([
+            'message_success' => 'Customer data has been uploaded.'
         ]);
     }
 
@@ -120,31 +124,33 @@ class Customer extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
+        
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
             $perPage,
-            $currentPage
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'onEachSide' => 1]
         );
 
         return $paginator;
     }
 
     private function checkHeader($header) {
+        $requiredHeaders = [
+            'no.',
+            'name',
+            'address',
+            'salesperson code',
+        ];
+    
         $err = 0;
-        if(trim(strtolower($header[0])) != 'no.') {
-            $err++;
+        foreach ($requiredHeaders as $index => $requiredHeader) {
+            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+                $err++;
+            }
         }
-        if(trim(strtolower($header[1])) != 'name') {
-            $err++;
-        }
-        if(trim(strtolower($header[2])) != 'address') {
-            $err++;
-        }
-        if(trim(strtolower($header[3])) != 'salesperson code') {
-            $err++;
-        }
-
+    
         return $err;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Models\SalesUpload;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Session;
@@ -35,13 +36,13 @@ class SaleController extends Controller
             ]);
         }
 
-        $sales = Sale::orderBy('created_at', 'DESC')
+        $sales_uploads = SalesUpload::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
             ->paginate(10)->onEachSide(1);
 
         return view('pages.sales.index')->with([
             'account' => $account,
-            'sales' => $sales
+            'sales_uploads' => $sales_uploads
         ]);
 
     }
