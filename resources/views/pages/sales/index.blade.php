@@ -40,7 +40,7 @@
                             <b>COUNT</b>
                         </div>
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{number_format($sale->total_amount_vat ?? 0, 2)}}</p>
+                            <p class="m-0">{{number_format($sale->total_amount ?? 0, 2)}}</p>
                             <b>AMOUNT</b>
                         </div>
                         <div class="col-lg-2 text-center">

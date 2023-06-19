@@ -17,6 +17,7 @@ class SalesUpload extends Model
         'sku_count',
         'total_quantity',
         'total_price_vat',
+        'total_amount',
         'total_amount_vat',
     ];
 

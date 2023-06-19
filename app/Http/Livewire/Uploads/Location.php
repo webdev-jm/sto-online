@@ -28,12 +28,7 @@ class Location extends Component
 
     public function uploadData() {
         foreach($this->location_data as $data) {
-            // check
-            $check = Loc::where('account_id', $this->account->id)
-                ->where('code', $data['code'])
-                ->where('name', $data['name'])
-                ->first();
-            if(empty($check)) {
+            if($data['check'] == 0) {
                 $location = new Loc([
                     'account_id' => $this->account->id,
                     'code' => $data['code'],
@@ -65,9 +60,21 @@ class Location extends Component
         if($this->checkHeader($header) == 0) {
             foreach($data as $key => $row) {
                 if($key > 1) {
+                    // check duplicate
+                    $location = Loc::where('account_id', $this->account->id)
+                        ->where('code', $row[0])
+                        ->where('name', $row[1])
+                        ->first();
+
+                    $check = 0;
+                    if(!empty($location)) {
+                        $check = 1;
+                    }
+
                     $this->location_data[] = [
+                        'check' => $check,
                         'code' => $row[0],
-                        'name' => $row[1]
+                        'name' => $row[1],
                     ];
                 }
             }

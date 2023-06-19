@@ -96,8 +96,7 @@ class Salesman extends Component
         }
     }
 
-    private function paginateArray($data, $perPage)
-    {
+    private function paginateArray($data, $perPage) {
         $currentPage = $this->page ?: 1;
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;

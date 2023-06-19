@@ -24,9 +24,11 @@ class CreateSalesTable extends Migration
             $table->unsignedBigInteger('location_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->date('date');
-            $table->string('uom');
+            $table->string('document_number')->nullable();
+            $table->string('uom')->nullable();
             $table->integer('quantity')->default(0);
             $table->decimal('price_inc_vat', 10,2)->default(0);
+            $table->decimal('amount', 10,2)->default(0);
             $table->decimal('amount_inc_vat', 10,2)->default(0);
             $table->timestamps();
 

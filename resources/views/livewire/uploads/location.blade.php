@@ -25,6 +25,7 @@
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>CODE</th>
                                 <th>NAME</th>
                             </tr>
@@ -32,6 +33,14 @@
                         <tbody>
                             @foreach($paginatedData as $data)
                             <tr>
+                                <td class="text-center align-middle">
+                                    @if($data['check'] == 0)
+                                        <i class="fa fa-check-circle text-success fa-sm"></i>
+                                    @else
+                                        <i class="fa fa-times-circle text-danger fa-sm"></i>
+                                        <small class="text-danger">Duplicate</small>
+                                    @endif
+                                </td>
                                 <td>{{$data['code'] ?? '-'}}</td>
                                 <td>{{$data['name'] ?? '-'}}</td>
                             </tr>

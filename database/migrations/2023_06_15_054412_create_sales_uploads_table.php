@@ -20,6 +20,7 @@ class CreateSalesUploadsTable extends Migration
             $table->integer('sku_count')->nullable();
             $table->integer('total_quantity')->default(0);
             $table->decimal('total_price_vat', 10, 2)->default(0);
+            $table->decimal('total_amount', 10, 2)->default(0);
             $table->decimal('total_amount_vat', 10, 2)->default(0);
             $table->timestamps();
 
