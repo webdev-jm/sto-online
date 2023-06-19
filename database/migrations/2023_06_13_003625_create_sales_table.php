@@ -15,6 +15,7 @@ class CreateSalesTable extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('sales_upload_id')->nullable();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
@@ -22,6 +23,7 @@ class CreateSalesTable extends Migration
             $table->unsignedBigInteger('salesman_id')->nullable();
             $table->unsignedBigInteger('location_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->date('date');
             $table->string('uom');
             $table->integer('quantity')->default(0);
             $table->decimal('price_inc_vat', 10,2)->default(0);

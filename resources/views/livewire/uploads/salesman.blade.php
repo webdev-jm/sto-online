@@ -27,6 +27,7 @@
                             <tr>
                                 <th>CODE</th>
                                 <th>NAME</th>
+                                <th>AREA</th>
                             </tr>
                         </thead>
                         <tbody>

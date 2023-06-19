@@ -17,7 +17,7 @@
 <div class="row">
     @can('sales access')
     <div class="col-lg-3">
-        <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-info ml-0">
+        <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-warning ml-0">
             <i class="fa fa-money-check-alt"></i>
             Sales
         </a>

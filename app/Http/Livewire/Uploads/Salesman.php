@@ -64,6 +64,10 @@ class Salesman extends Component
             }
         }
 
+        // logs
+        activity('upload')
+        ->log(':causer.name has uploaded salesman data on ['.$this->account->short_name.']');
+
         return redirect()->route('salesman.index')->with([
             'message_success' => 'Salesman data has been uploaded.'
         ]);
@@ -98,28 +102,32 @@ class Salesman extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
+        
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
             $perPage,
-            $currentPage
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'onEachSide' => 1]
         );
 
         return $paginator;
     }
 
     private function checkHeader($header) {
+        $requiredHeaders = [
+            'code',
+            'name',
+            'area',
+        ];
+    
         $err = 0;
-        if(trim(strtolower($header[0])) != 'code') {
-            $err++;
+        foreach ($requiredHeaders as $index => $requiredHeader) {
+            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+                $err++;
+            }
         }
-        if(trim(strtolower($header[1])) != 'name') {
-            $err++;
-        }
-        if(trim(strtolower($header[2])) != 'area') {
-            $err++;
-        }
-
+    
         return $err;
     }
 

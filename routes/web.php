@@ -36,6 +36,10 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
         Route::get('sales/create', [SaleController::class, 'create'])->name('sales.create')->middleware('permission:sales create');
         Route::post('sales/upload', [SaleController::class, 'store'])->name('sales.upload')->middleware('permission:sales upload');
+
+        Route::get('sales/{id}', [SaleController::class, 'show'])->name('sales.show');
+
+        Route::get('sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit')->middleware('permission:sales edit');
     });
 
     // CUSTOMERS
