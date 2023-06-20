@@ -17,6 +17,9 @@
 @stop
 
 @section('content')
+{!! Form::open(['method' => 'GET', 'route' => ['location.index'], 'id' => 'search_form']) !!}
+{!! Form::close() !!}
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">LOCATION LIST</h3>
@@ -28,6 +31,16 @@
         </div>
         <div class="card-body">
 
+            <div class="row mb-1">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('search', 'Search') !!}
+                        {!! Form::text('search', $search, ['class' => 'form-control', 'form' => 'search_form', 'placeholder' => 'Search']) !!}
+                    </div>
+                </div>
+            </div>
+
+            <b>{{$locations->total()}} total result{{$locations->total() > 1 ? 's' : ''}}</b>
             <ul class="list-group">
                 @foreach($locations as $location)
                 <li class="list-group-item">

@@ -17,31 +17,42 @@
 @stop
 
 @section('content')
+{!! Form::open(['method' => 'GET', 'route' => ['sales.index'], 'id' => 'search_form']) !!}
+{!! Form::close() !!}
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">SALES UPLOADS</h3>
         </div>
         <div class="card-body">
 
+            <div class="row mb-3">
+                <div class="col-lg-4">
+                    {!! Form::label('search', 'Search') !!}
+                    {!! Form::text('search', $search, ['class' => 'form-control', 'form' => 'search_form', 'placeholder' => 'Search']) !!}
+                </div>
+            </div>
+
+            <b>{{$sales_uploads->total()}} total result{{$sales_uploads->total() > 1 ? 's' : ''}}</b>
             <ul class="list-group">
                 @foreach($sales_uploads as $sale)
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-lg-2 text-center">
-                            <p class="m-0">{{$sale->created_at->diffForHumans()}}</p>
-                            <b>CREATED</b>
+                            <p class="m-0 font-weight-bold">{{$sale->created_at->diffForHumans()}}</p>
+                            <small class="font-weight-bold text-muted">CREATED AT</small>
                         </div>
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$sale->user->name ?? '-'}}</p>
-                            <b>USER</b>
+                            <p class="m-0 font-weight-bold">{{$sale->user->name ?? '-'}}</p>
+                            <small class="font-weight-bold text-muted">USER</small>
                         </div>
                         <div class="col-lg-2 text-center">
-                            <p class="m-0">{{$sale->sku_count ?? 0}}</p>
-                            <b>COUNT</b>
+                            <p class="m-0 font-weight-bold">{{number_format($sale->sku_count) ?? 0}}</p>
+                            <small class="font-weight-bold text-muted">COUNT</small>
                         </div>
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{number_format($sale->total_amount ?? 0, 2)}}</p>
-                            <b>AMOUNT</b>
+                            <p class="m-0 font-weight-bold">{{number_format($sale->total_amount, 2) ?? 0}}</p>
+                            <small class="font-weight-bold text-muted">AMOUNT</small>
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">

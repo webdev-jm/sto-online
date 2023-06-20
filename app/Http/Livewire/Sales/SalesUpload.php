@@ -87,15 +87,17 @@ class SalesUpload extends Component
                 'total_amount' => $total_amount,
                 'total_amount_vat' => $total_amount_vat,
             ]);
+
+            // logs
+            activity('upload')
+            ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
+
+            return redirect()->route('sales.index')->with([
+                'message_success' => 'Location data has been uploaded.'
+            ]);
+        } else {
+            $this->err_msg = 'No data has been saved!';
         }
-
-        // logs
-        activity('upload')
-        ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
-
-        return redirect()->route('sales.index')->with([
-            'message_success' => 'Location data has been uploaded.'
-        ]);
     }
 
     public function updatedFile() {
