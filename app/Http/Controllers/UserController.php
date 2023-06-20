@@ -18,13 +18,21 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim($request->get('search'));
+
         $users = User::orderBy('id', 'DESC')
-        ->paginate(10)->onEachSide(1);
+        ->when(!empty($search), function($query) use($search) {
+            $query->where('name', 'like', '%'.$search.'%')
+                ->orWhere('email', 'like', '%'.$search.'%');
+        })
+        ->paginate(10)->onEachSide(1)
+        ->appends(request()->query());
 
         return view('pages.users.index')->with([
-            'users' => $users
+            'users' => $users,
+            'search' => $search
         ]);
     }
 

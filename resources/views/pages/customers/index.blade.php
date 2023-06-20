@@ -17,6 +17,9 @@
 @stop
 
 @section('content')
+{!! Form::open(['method' => 'GET', 'route' => ['customer.index'], 'id' => 'search_form']) !!}
+{!! Form::close() !!}
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">CUSTOMER LIST</h3>
@@ -28,6 +31,16 @@
         </div>
         <div class="card-body">
 
+            <div class="row mb-1">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('search', 'Search') !!}
+                        {!! Form::text('search', $search, ['class' => 'form-control', 'form' => 'search_form', 'placeholder' => 'Search']) !!}
+                    </div>
+                </div>
+            </div>
+
+            <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>
             <ul class="list-group">
                 @foreach($customers as $customer)
                 <li class="list-group-item">
@@ -36,7 +49,7 @@
                             <p class="m-0 font-weight-bold">{{$customer->code}}</p>
                             <small class="font-weight-bold text-muted">CODE</small>
                         </div>
-                        <div class="col-lg-2 text-center">
+                        <div class="col-lg-3 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->name}}</p>
                             <small class="font-weight-bold text-muted">NAME</small>
                         </div>

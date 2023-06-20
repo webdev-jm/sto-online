@@ -1,4 +1,11 @@
 <div>
+
+    @if(!empty($err_msg))
+    <div class="alert alert-danger">
+        {{$err_msg}}
+    </div>
+    @endif
+
     <div class="card card-default">
         <div class="card-header">
             <h3 class="card-title">UPLOAD SALES DATA</h3>

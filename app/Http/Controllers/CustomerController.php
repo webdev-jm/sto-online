@@ -29,7 +29,7 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -39,13 +39,25 @@ class CustomerController extends Controller
             ]);
         }
 
+        $search = trim($request->get('search'));
+
         $customers = Customer::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
-            ->paginate(10)->onEachSide(1);
+            ->when(!empty($search), function($query) use($search) {
+                $query->where('code', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%')
+                    ->orWhere('address', 'like', '%'.$search.'%')
+                    ->orWhereHas('salesman', function($qry) use($search) {
+                        $qry->where('code', 'like', '%'.$search.'%');
+                    });
+            })
+            ->paginate(10)->onEachSide(1)
+            ->appends(request()->query());
 
         return view('pages.customers.index')->with([
             'account' => $account,
-            'customers' => $customers
+            'customers' => $customers,
+            'search' => $search
         ]);
     }
 

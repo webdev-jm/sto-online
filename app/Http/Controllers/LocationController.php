@@ -28,7 +28,7 @@ class LocationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -38,13 +38,21 @@ class LocationController extends Controller
             ]);
         }
 
+        $search = trim($request->get('search'));
+
         $locations = Location::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
-            ->paginate(10, ['*'], 'location-page')->onEachSide(1);
+            ->when(!empty($search), function($query) use($search) {
+                $query->where('code', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%');
+            })
+            ->paginate(10, ['*'], 'location-page')->onEachSide(1)
+            ->appends(request()->query());
 
         return view('pages.locations.index')->with([
             'locations' => $locations,
-            'account' => $account
+            'account' => $account,
+            'search' => $search,
         ]);
     }
 

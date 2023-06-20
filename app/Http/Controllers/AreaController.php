@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use Illuminate\Http\Request;
 use App\Http\Requests\AreaAddRequest;
 use App\Http\Requests\AreaUpdateRequest;
 
@@ -24,7 +25,7 @@ class AreaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -34,13 +35,21 @@ class AreaController extends Controller
             ]);
         }
 
+        $search = trim($request->get('search'));
+
         $areas = Area::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
-            ->paginate(10)->onEachSide(1);
+            ->when(!empty($search), function($query) use($search) {
+                $query->where('code', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%');
+            })
+            ->paginate(10)->onEachSide(1)
+            ->appends(request()->query());
 
         return view('pages.areas.index')->with([
             'account' => $account,
             'areas' => $areas,
+            'search' => $search
         ]);
     }
 

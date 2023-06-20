@@ -26,7 +26,7 @@ class SaleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // check account
         $account = $this->checkAccount();
@@ -36,13 +36,23 @@ class SaleController extends Controller
             ]);
         }
 
+        $search = trim($request->get('search'));
+
         $sales_uploads = SalesUpload::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
-            ->paginate(10)->onEachSide(1);
+            ->when(!empty($search), function($query) use($search) {
+                $query->whereHas('user', function($qry) use($search) {
+                    $qry->where('name', 'like', '%'.$search.'%');
+                })
+                ->orWhere('sku_count', 'like', '%'.$search.'%');
+            })
+            ->paginate(10)->onEachSide(1)
+            ->appends(request()->query());
 
         return view('pages.sales.index')->with([
             'account' => $account,
-            'sales_uploads' => $sales_uploads
+            'sales_uploads' => $sales_uploads,
+            'search' => $search
         ]);
 
     }
