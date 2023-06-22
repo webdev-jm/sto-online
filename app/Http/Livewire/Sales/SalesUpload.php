@@ -38,12 +38,16 @@ class SalesUpload extends Component
 
     public function updateData() {
         $this->checkData($this->data);
-        $this->dispatchBrowserEvent('closeCustomerModal');
     }
 
     public function maintainCustomer($customer_code) {
         $this->emit('maintainCustomer', $customer_code);
         $this->dispatchBrowserEvent('maintainCustomer');
+    }
+
+    public function maintainLocation($location_code) {
+        $this->emit('maintainLocation', $location_code);
+        $this->dispatchBrowserEvent('maintainLocation');
     }
 
     public function saveUpload() {
@@ -69,10 +73,14 @@ class SalesUpload extends Component
                 // check data
                 if($data['check'] == 0) { // no error
                     $sku_count++;
-                    $total_quantity += $data['quantity'];
-                    $total_price_vat += $data['price_inc_vat'];
-                    $total_amount += $data['amount'];
-                    $total_amount_vat += $data['amount_inc_vat'];
+
+                    // check if not FG or PROMO
+                    if($data['type'] == 1) {
+                        $total_quantity += $data['quantity'];
+                        $total_price_vat += $data['price_inc_vat'];
+                        $total_amount += $data['amount'];
+                        $total_amount_vat += $data['amount_inc_vat'];
+                    }
 
                     $sale = new Sale([
                         'sales_upload_id' => $upload->id,
@@ -125,6 +133,8 @@ class SalesUpload extends Component
         $this->data = Excel::toArray([], $path)[0];
 
         $this->checkData($this->data);
+
+        $this->resetPage('page');
     }
 
     public function checkData($data) {
@@ -182,10 +192,17 @@ class SalesUpload extends Component
                     $customer = $customers->get($customerCode);
                     $location = $locations->get($locationCode);
                     $product = $products->get($skuCode);
-    
+
+                    // check if already exists
+                    $exist = Sale::where('account_id', $this->account->id)
+                        ->where('document_number', $row[1])
+                        ->where('customer_id', $customer->id)
+                        ->where('product_id', $product->id)
+                        ->first();
+
                     $this->sales_data[] = [
                         'type' => $type,
-                        'check' => 0,
+                        'check' => (!empty($exist)) ? 4 : 0,
                         'date' => $row[0],
                         'document' => $row[1],
                         'customer_code' => $customerCode,
@@ -204,6 +221,7 @@ class SalesUpload extends Component
                         'amount_inc_vat' => $amount_inc_vat,
                         'line_discount' => $line_discount,
                     ];
+                    
                 } else {
 
                     $this->sales_data[] = [
@@ -229,10 +247,11 @@ class SalesUpload extends Component
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
 
-        $check = array_column($this->sales_data, 'check');
-        $date = array_column($this->sales_data, 'date');
-
-        array_multisort($check, SORT_DESC, $date, SORT_ASC, $this->sales_data);
+        usort($this->sales_data, function($a, $b) {
+            return ($a['check'] === $b['check'])
+                ? ($a['date'] <=> $b['date'])
+                : ($b['check'] <=> $a['check']);
+        });
     }
 
     private function paginateArray($data, $perPage)

@@ -92,6 +92,10 @@
                                                 {{-- Product --}}
                                                 <small class="text-danger">Product</small>
                                                 @break
+                                            @case(4)
+                                                {{-- Existed --}}
+                                                <small class="text-danger">Exists</small>
+                                                @break
                                             @default
                                                 
                                         @endswitch
@@ -115,7 +119,11 @@
                                 </td>
                                 {{-- LOCATION --}}
                                 <td class="align-middle">
-                                    {{$data['location_code'] ?? '-'}}
+                                    @if($data['check'] == 2)
+                                        <a href="#" wire:click.prevent="maintainLocation('{{$data['location_code'] ?? ''}}')">{{$data['location_code'] ?? '-'}}</a>
+                                    @else
+                                        {{$data['location_code'] ?? '-'}}
+                                    @endif
                                 </td>
                                 {{-- SKU CODE --}}
                                 <td class="align-middle">
@@ -168,6 +176,12 @@
         </div>
     </div>
 
+    <div class="modal fade" id="location-modal">
+        <div class="modal-dialog modal-lg">
+            <livewire:sales.location-maintenance/>
+        </div>
+    </div>
+
     <script>
         window.addEventListener('maintainCustomer', event => {
             $('#customer-modal').modal('show');
@@ -175,6 +189,14 @@
 
         window.addEventListener('closeCustomerModal', event => {
             $('#customer-modal').modal('hide');
+        });
+
+        window.addEventListener('maintainLocation', event => {
+            $('#location-modal').modal('show');
+        });
+
+        window.addEventListener('closeLocationModal', event => {
+            $('#location-modal').modal('hide');
         });
     </script>
 </div>
