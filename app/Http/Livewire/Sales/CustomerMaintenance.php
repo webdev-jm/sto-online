@@ -49,6 +49,8 @@ class CustomerMaintenance extends Component
 
         $this->emit('checkData');
 
+        $this->dispatchBrowserEvent('closeCustomerModal');
+
         $this->reset([
             'customer_code',
             'customer_name',
