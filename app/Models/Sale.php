@@ -20,6 +20,7 @@ class Sale extends Model
         'salesman_id',
         'location_id',
         'user_id',
+        'type',
         'date',
         'document_number',
         'uom',
