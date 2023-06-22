@@ -73,6 +73,7 @@
                     <tbody>
                         @foreach($paginatedData as $key => $data)
                             <tr class="text-center">
+                                {{-- CHECK --}}
                                 <td class="align-middle p-1">
                                     @if($data['check'] == 0)
                                         <i class="fa fa-check-circle fa-sm text-success"></i>
@@ -96,18 +97,58 @@
                                         @endswitch
                                     @endif
                                 </td>
-                                <td class="align-middle p-1">{{date('Y-m-d', strtotime($data['date'])) ?? '-'}}</td>
-                                <td class="align-middle">{{$data['document'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['customer_code'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['location_code'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['sku_code'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['description'] ?? '-'}} {{$data['size'] ?? '-'}}</td>
-                                <td class="align-middle text-right">{{number_format($data['quantity']) ?? '-'}}</td>
-                                <td class="align-middle">{{$data['uom'] ?? '-'}}</td>
-                                <td class="align-middle text-right">{{number_format($data['price_inc_vat'], 2) ?? '-'}}</td>
-                                <td class="align-middle text-right">{{number_format($data['amount'], 2) ?? '-'}}</td>
-                                <td class="align-middle text-right">{{number_format($data['amount_inc_vat'], 2) ?? '-'}}</td>
-                                <td class="align-middle text-right">{{number_format($data['line_discount'], 2) ?? '-'}}</td>
+                                {{-- DATE --}}
+                                <td class="align-middle p-1">
+                                    {{date('Y-m-d', strtotime($data['date'])) ?? '-'}}
+                                </td>
+                                {{-- DOCUMENT --}}
+                                <td class="align-middle">
+                                    {{$data['document'] ?? '-'}}
+                                </td>
+                                {{-- CUSTOMER --}}
+                                <td class="align-middle">
+                                    @if($data['check'] == '1')
+                                        <a href="#" wire:click.prevent="maintainCustomer('{{$data['customer_code'] ?? ''}}')">{{$data['customer_code'] ?? '-'}}</a>
+                                    @else
+                                        {{$data['customer_code'] ?? '-'}}
+                                    @endif
+                                </td>
+                                {{-- LOCATION --}}
+                                <td class="align-middle">
+                                    {{$data['location_code'] ?? '-'}}
+                                </td>
+                                {{-- SKU CODE --}}
+                                <td class="align-middle">
+                                    {{$data['sku_code'] ?? '-'}}
+                                </td>
+                                {{-- SKU DESCRIPTION --}}
+                                <td class="align-middle">
+                                    {{$data['description'] ?? '-'}} {{$data['size'] ?? '-'}}
+                                </td>
+                                {{-- QUANTITY --}}
+                                <td class="align-middle text-right">
+                                    {{number_format($data['quantity']) ?? '-'}}
+                                </td>
+                                {{-- UOM --}}
+                                <td class="align-middle">
+                                    {{$data['uom'] ?? '-'}}
+                                </td>
+                                {{-- PRICE INC VAT --}}
+                                <td class="align-middle text-right">
+                                    {{number_format($data['price_inc_vat'], 2) ?? '-'}}
+                                </td>
+                                {{-- AMOUNT --}}
+                                <td class="align-middle text-right">
+                                    {{number_format($data['amount'], 2) ?? '-'}}
+                                </td>
+                                {{-- AMOUNT INC VAT --}}
+                                <td class="align-middle text-right">
+                                    {{number_format($data['amount_inc_vat'], 2) ?? '-'}}
+                                </td>
+                                {{-- LINE DISCOUNT --}}
+                                <td class="align-middle text-right">
+                                    {{number_format($data['line_discount'], 2) ?? '-'}}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -120,4 +161,20 @@
             </div>
         @endif
     </div>
+    
+    <div class="modal fade" id="customer-modal">
+        <div class="modal-dialog modal-lg">
+            <livewire:sales.customer-maintenance/>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('maintainCustomer', event => {
+            $('#customer-modal').modal('show');
+        });
+
+        window.addEventListener('closeCustomerModal', event => {
+            $('#customer-modal').modal('hide');
+        });
+    </script>
 </div>

@@ -23,6 +23,7 @@ class CreateSalesTable extends Migration
             $table->unsignedBigInteger('salesman_id')->nullable();
             $table->unsignedBigInteger('location_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->integer('type')->default(1)->comment('1 - default, 2 - FG, 3 - PROMO');
             $table->date('date');
             $table->string('document_number')->nullable();
             $table->string('uom')->nullable();

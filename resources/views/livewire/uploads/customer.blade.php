@@ -13,7 +13,7 @@
                         {!! Form::file('file', ['class' => 'form-control'.($errors->has('file') ? ' is-invalid' : ''), 'wire:model' => 'file', 'accept' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel']) !!}
                         <small class="text-danger">{{$errors->first('file')}}</small>
                         @if(!empty($err_msg))
-                            <small class="text-danger">{{$err_message}}</small>
+                            <small class="text-danger">{{$err_msg}}</small>
                         @endif
                     </div>
                 </div>

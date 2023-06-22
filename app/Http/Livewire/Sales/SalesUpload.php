@@ -25,11 +25,26 @@ class SalesUpload extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $sales_data;
+    public $data;
     public $file;
     public $account;
     public $err_msg;
 
     public $perPage = 20;
+
+    protected $listeners = [
+        'checkData' => 'updateData'
+    ];
+
+    public function updateData() {
+        $this->checkData($this->data);
+        $this->dispatchBrowserEvent('closeCustomerModal');
+    }
+
+    public function maintainCustomer($customer_code) {
+        $this->emit('maintainCustomer', $customer_code);
+        $this->dispatchBrowserEvent('maintainCustomer');
+    }
 
     public function saveUpload() {
         if(!empty($this->sales_data)) {
@@ -68,6 +83,7 @@ class SalesUpload extends Component
                         'salesman_id' => $data['salesman_id'],
                         'location_id' => $data['location_id'],
                         'user_id' => auth()->user()->id,
+                        'type' => $data['type'],
                         'date' => date('Y-m-d', strtotime($data['date'])),
                         'document_number' => $data['document'],
                         'uom' => $data['uom'],
@@ -106,13 +122,18 @@ class SalesUpload extends Component
         ]);
     
         $path = $this->file->getRealPath();
-        $data = Excel::toArray([], $path)[0];
-        $header = $data[1];
-    
+        $this->data = Excel::toArray([], $path)[0];
+
+        $this->checkData($this->data);
+    }
+
+    public function checkData($data) {
         $this->reset([
             'sales_data',
             'err_msg'
         ]);
+        
+        $header = $data[1];
     
         if($this->checkHeader($header) == 0) {
             // get customers
@@ -135,15 +156,18 @@ class SalesUpload extends Component
                 $locationCode = $row[4];
                 $skuCode = trim($row[5]);
 
+                $type = 1;
                 if(strpos(trim($skuCode), '-')) {
                     $sku_arr = explode('-', $skuCode);
                     if($sku_arr[0] == 'FG') { // Free Goods
                         $skuCode = end($sku_arr);
                         // process when free goods
+                        $type = 2;
                     }
                     if($sku_arr[0] == 'PRM') { // Promo
                         $skuCode = end($sku_arr);
                         // process when promo
+                        $type = 3;
                     }
                 }
 
@@ -160,6 +184,7 @@ class SalesUpload extends Component
                     $product = $products->get($skuCode);
     
                     $this->sales_data[] = [
+                        'type' => $type,
                         'check' => 0,
                         'date' => $row[0],
                         'document' => $row[1],
@@ -182,6 +207,7 @@ class SalesUpload extends Component
                 } else {
 
                     $this->sales_data[] = [
+                        'type' => $type,
                         'check' => ($customers->has($customerCode)) ? ($locations->has($locationCode) ? 3 : 2) : 1,
                         'date' => $row[0],
                         'document' => $row[1],
@@ -202,6 +228,11 @@ class SalesUpload extends Component
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
+
+        $check = array_column($this->sales_data, 'check');
+        $date = array_column($this->sales_data, 'date');
+
+        array_multisort($check, SORT_DESC, $date, SORT_ASC, $this->sales_data);
     }
 
     private function paginateArray($data, $perPage)
