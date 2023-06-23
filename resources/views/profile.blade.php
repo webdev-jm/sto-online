@@ -53,13 +53,13 @@
                 <div class="card-body">
                     <div class="tab-content">
                         <div class="active tab-pane" id="settings">
-                            <livewire:user.profile-settings/>
+                            <livewire:user.profile-settings />
                         </div>
                         <div class="tab-pane" id="activity">
-                            <livewire:activity-logs.user-logs/>
+                            <livewire:activity-logs.user-logs />
                         </div>
                         <div class="tab-pane" id="change-password">
-                            
+                            <livewire:user.change-password />
                         </div>
                     </div>
                 </div>
