@@ -114,6 +114,7 @@ class SalesUpload extends Component
 
             // logs
             activity('upload')
+            ->performedOn($upload)
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
 
             return redirect()->route('sales.index')->with([

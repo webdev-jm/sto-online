@@ -69,6 +69,7 @@ class InventoryUpload extends Component
 
             // logs
             activity('upload')
+            ->performedOn($inventory_upload)
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
 
             return redirect()->route('inventory.index')->with([

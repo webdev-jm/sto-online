@@ -310,6 +310,13 @@ return [
             'icon'      => 'fa fa-fw fa-user-tag',
             'can'       => 'role access',
             'active'    => ['role*']
+        ],
+        [
+            'text'      => 'Systemlog',
+            'url'       => '/systemlog',
+            'icon'      => 'fa fa-fw fa-history',
+            'can'       => 'systemlog',
+            'active'    => ['systemlog']
         ]
     ],
 
