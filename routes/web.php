@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SystemlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,5 +139,10 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('user/{id}/edit', [UserController::class, 'edit'])->name('user.edit')->middleware('permission:user edit');
         Route::post('user/{id}', [UserController::class, 'update'])->name('user.update')->middleware('permission:user edit');
+    });
+
+    // SYSTEMLOGS
+    Route::group(['middleware' => 'permission:systemlog'], function() {
+        Route::get('systemlog', [SystemlogController::class, 'index'])->name('systemlog');
     });
 });

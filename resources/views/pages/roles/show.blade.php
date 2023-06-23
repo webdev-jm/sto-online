@@ -17,16 +17,24 @@
 
 @section('content')
 <div class="row">
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">ROLE DETAILS</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body py-0">
                 <ul class="list-group list-group-unbordered">
-                    <li class="list-group-item">
+                    <li class="list-group-item py-1">
                         <b>Role Name:</b>
                         <span class="float-right">{{$role->name ?? '-'}}</span>
+                    </li>
+                    <li class="list-group-item py-1">
+                        <b>Created at:</b>
+                        <span class="float-right">{{$role->created_at ?? '-'}}</span>
+                    </li>
+                    <li class="list-group-item py-1">
+                        <b>Updated at:</b>
+                        <span class="float-right">{{$role->updated_at ?? '-'}}</span>
                     </li>
                 </ul>
     
@@ -36,7 +44,7 @@
         </div>
     </div>
 
-    <div class="col-lg-9">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Permissions</h3>
@@ -44,7 +52,7 @@
             <div class="card-body">
                 <div class="row">
                     @foreach($permissions_arr as $module => $permission_data)
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="card card-primary card-outline">
                                 <div class="card-header">
                                     <h3 class="card-title">{{$module}}</h3>
@@ -53,7 +61,7 @@
                                     <ul class="list-group list-group-unbordered">
                                         @foreach($permission_data as $id => $permission)
                                         <li class="list-group-item p-1">
-                                            <b class="d-block">{{$permission['name']}}</b>
+                                            <b class="d-block">{{ucwords($permission['name'])}}</b>
                                             <small>{{$permission['description']}}</small>
                                         </li>
                                         @endforeach

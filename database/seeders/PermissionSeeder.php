@@ -79,6 +79,9 @@ class PermissionSeeder extends Seeder
                 'role edit'     =>  'Allow user to edit role',
                 'role delete'   =>  'Allow user to delete role',
             ],
+            'Systemlog' => [
+                'systemlog'   =>  'Allow user to access systemlog.',
+            ],
         ];
 
         foreach($permissions_arr as $module => $permissions) {

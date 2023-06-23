@@ -11,6 +11,7 @@
     <div class="row">
 
         <div class="col-lg-4">
+            
             <!-- User Details -->
             <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
@@ -36,6 +37,7 @@
                     </ul>
                 </div>
             </div>
+
         </div>
 
         <div class="col-lg-8">
@@ -62,6 +64,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>
