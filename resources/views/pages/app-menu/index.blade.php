@@ -8,7 +8,7 @@
             <h1>[{{$account->account_code}}] {{$account->short_name}}</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-th mr-1"></i>Change Account</a>
+            <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Account</a>
         </div>
     </div>
 @stop
@@ -24,12 +24,14 @@
     </div>
     @endcan
 
+    @can('inventory access')
     <div class="col-lg-3">
-        <a href="#" class="btn btn-block btn-app bg-secondary ml-0">
+        <a href="{{route('inventory.index')}}" class="btn btn-block btn-app bg-secondary ml-0">
             <i class="fa fa-warehouse"></i>
             Inventory
         </a>
     </div>
+    @endcan
 </div>
 
 <hr>
@@ -38,7 +40,7 @@
     @can('customer access')
     <div class="col-lg-3">
         <a href="{{route('customer.index')}}" class="btn btn-block btn-app bg-primary ml-0">
-            <i class="fa fa-people-arrows"></i>
+            <i class="fa fa-people-carry"></i>
             Customers
         </a>
     </div>
@@ -56,7 +58,7 @@
     @can('location access')
     <div class="col-lg-3">
         <a href="{{route('location.index')}}" class="btn btn-block btn-app bg-info ml-0">
-            <i class="fa fa-shuttle-van"></i>
+            <i class="fa fa-truck-loading"></i>
             Location
         </a>
     </div>

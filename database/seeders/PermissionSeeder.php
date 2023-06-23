@@ -18,11 +18,18 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions_arr = [
+            'Inventory' => [
+                'inventory access'      => 'Allow user to access inventory list and details',
+                'inventory add'         => 'Allow user to add inventory.',
+                'inventory edit'        => 'Allow user to edit inventory.',
+                'inventory delete'      => 'Allow user to delete inventory.',
+                'inventory upload'      => 'Allow user to upload inventory data.',
+            ],
             'Sales' => [
-                'sales access'      => 'Allow user to access customer list and details',
-                'sales add'         => 'Allow user to add customer.',
-                'sales edit'        => 'Allow user to edit customer.',
-                'sales delete'      => 'Allow user to delete customer.',
+                'sales access'      => 'Allow user to access sales list and details',
+                'sales add'         => 'Allow user to add sales.',
+                'sales edit'        => 'Allow user to edit sales.',
+                'sales delete'      => 'Allow user to delete sales.',
                 'sales upload'      => 'Allow user to upload sales data.',
             ],
             'Customers' => [

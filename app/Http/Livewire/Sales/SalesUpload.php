@@ -117,7 +117,7 @@ class SalesUpload extends Component
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
 
             return redirect()->route('sales.index')->with([
-                'message_success' => 'Location data has been uploaded.'
+                'message_success' => 'Sales data has been uploaded.'
             ]);
         } else {
             $this->err_msg = 'No data has been saved!';
@@ -243,15 +243,17 @@ class SalesUpload extends Component
                     ];
                 }
             }
+
+            usort($this->sales_data, function($a, $b) {
+                return ($a['check'] === $b['check'])
+                    ? ($a['date'] <=> $b['date'])
+                    : ($b['check'] <=> $a['check']);
+            });
+
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
 
-        usort($this->sales_data, function($a, $b) {
-            return ($a['check'] === $b['check'])
-                ? ($a['date'] <=> $b['date'])
-                : ($b['check'] <=> $a['check']);
-        });
     }
 
     private function paginateArray($data, $perPage)
@@ -293,7 +295,7 @@ class SalesUpload extends Component
     
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+            if(empty($header[$index]) || trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
                 $err++;
             }
         }

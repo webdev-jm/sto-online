@@ -10,6 +10,7 @@ use App\Http\Controllers\SalesmanController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\InventoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,7 @@ use App\Http\Controllers\LocationController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
@@ -30,6 +32,18 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+
+    // INVENTORIES
+    Route::group(['middleware' => 'permission:inventory access'], function() {
+        Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('inventory/create', [InventoryController::class, 'create'])->name('inventory.create')->middleware('permission:inventory create');
+        Route::post('inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('permission:inventory create');
+
+        Route::get('inventory/{id}', [InventoryController::class, 'show'])->name('inventory.show');
+
+        Route::get('inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inventory.edit')->middleware('permission:inventory edit');
+        Route::post('inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update')->middleware('permission:inventory update');
+    });
     
     // SALES 
     Route::group(['middleware' => 'permission:sales access'], function() {
