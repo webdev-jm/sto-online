@@ -20,12 +20,12 @@
 
         {{-- Logo --}}
         <div class="{{ $auth_type ?? 'login' }}-logo">
-            <a href="{{ $dashboard_url }}">
+            <a href="{{ $dashboard_url }}" class="text-white">
 
                 
 
                 {{-- Logo Label --}}
-                {!! config('adminlte.logo', 'PMS') !!}
+                {!! config('adminlte.logo', 'STO') !!}
 
             </a>
         </div>
