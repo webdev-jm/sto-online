@@ -43,7 +43,29 @@
             </div>
         </div>
     </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">INVENTORY TOTAL</h3>
+            </div>
+            <div class="card-body py-0">
+                <ul class="list-group list-group-unbordered">
+                    @foreach($inventory_locations as $location)
+                    <li class="list-group-item py-1">
+                        <b>{{$location->code}}</b>
+                        <span class="float-right">{{number_format($location->total) ?? '-'}}</span>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
+
     <div class="col-lg-12">
+        <livewire:inventory.inventory-details :inventory_upload="$inventory_upload"/>
     </div>
 </div>
     
