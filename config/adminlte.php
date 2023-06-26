@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b>STO ONLINE</b>',
-    'logo_img' => '/images/LOGO.jpg',
+    'logo_img' => '/images/STO ONLINE.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -84,9 +84,9 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
-            'path' => '/images/LOGO.jpg',
+            'path' => '/images/STO ONLINE.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -109,7 +109,7 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => '/images/LOGO.jpg',
+            'path' => '/images/STO ONLINE.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -186,7 +186,7 @@ return [
     |
     */
 
-    'classes_body' => '',
+    'classes_body' => 'text-sm',
     'classes_brand' => '',
     'classes_brand_text' => '',
     'classes_content_wrapper' => '',
@@ -195,7 +195,7 @@ return [
     'classes_sidebar' => 'sidebar-dark-primary elevation-4',
     'classes_sidebar_nav' => '',
     'classes_topnav' => 'navbar-white navbar-light',
-    'classes_topnav_nav' => 'navbar-expand-md',
+    'classes_topnav_nav' => 'navbar-expand-md text-sm',
     'classes_topnav_container' => 'container',
 
     /*
