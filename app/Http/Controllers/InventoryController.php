@@ -7,6 +7,7 @@ use App\Models\InventoryUpload;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class InventoryController extends Controller
 {
@@ -103,9 +104,21 @@ class InventoryController extends Controller
 
         $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
 
+        $inventory_locations = DB::table('inventories as i')
+            ->select(
+                'l.code',
+                DB::raw('SUM(i.inventory) as total')
+            )
+            ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+            ->where('i.account_id', $account->id)
+            ->where('i.inventory_upload_id', $inventory_upload->id)
+            ->groupBy('l.code')
+            ->get();
+
         return view('pages.inventories.show')->with([
             'inventory_upload' => $inventory_upload,
-            'account' => $account
+            'account' => $account,
+            'inventory_locations' => $inventory_locations
         ]);
     }
 
