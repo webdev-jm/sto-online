@@ -25,6 +25,7 @@ class Customer extends Component
     public $customer_data;
     public $file;
     public $account;
+    public $account_branch;
     public $err_msg;
 
     public $perPage = 10;
@@ -33,17 +34,20 @@ class Customer extends Component
         foreach($this->customer_data as $data) {
             // get salesman
             $salesman = Salesman::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->where('code', $data['salesman'])
                 ->first();
             
             // check
             $customer = Cust::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->where('code', $data['code'])
                 ->where('name', $data['name'] ?? '-')
                 ->first();
             if(empty($customer)) {
                 $customer = new Cust([
                     'account_id' => $this->account->id,
+                    'account_branch_id' => $this->account_branch->id,
                     'code' => $data['code'],
                     'name' => $data['name'] ?? '-',
                     'address' => $data['address'] ?? '-',
@@ -156,6 +160,7 @@ class Customer extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

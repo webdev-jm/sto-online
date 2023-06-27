@@ -83,7 +83,8 @@ class PermissionSeeder extends Seeder
                 'user create'           =>  'Allow user to add user',
                 'user edit'             =>  'Allow user to edit user',
                 'user delete'           =>  'Allow user to delete user',
-                'user assign account'   =>  'Allow user to assign accounts to user.'
+                'user assign account'   =>  'Allow user to assign accounts to user.',
+                'user assign branch'    =>  'Allow user to assign branches to user',
             ],
             'Role' => [
                 'role access'   =>  'Allow user to access roles list and details',

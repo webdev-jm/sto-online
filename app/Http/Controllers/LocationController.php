@@ -9,19 +9,11 @@ use App\Http\Requests\LocationUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
+use App\Http\Traits\AccountChecker;
+
 class LocationController extends Controller
 {
-
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
-        }
-    
-        return $account;
-    }
+    use AccountChecker;
 
     /**
      * Display a listing of the resource.
@@ -30,18 +22,17 @@ class LocationController extends Controller
      */
     public function index(Request $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $search = trim($request->get('search'));
 
         $locations = Location::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where('code', 'like', '%'.$search.'%')
                     ->orWhere('name', 'like', '%'.$search.'%');
@@ -52,6 +43,7 @@ class LocationController extends Controller
         return view('pages.locations.index')->with([
             'locations' => $locations,
             'account' => $account,
+            'account_branch' => $account_branch,
             'search' => $search,
         ]);
     }
@@ -64,15 +56,15 @@ class LocationController extends Controller
     public function create()
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         return view('pages.locations.create')->with([
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch,
         ]);
     }
 
@@ -84,16 +76,15 @@ class LocationController extends Controller
      */
     public function store(LocationAddRequest $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $location = new Location([
             'account_id' => $account->id,
+            'account_branch_id' => $account_branch->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -117,18 +108,17 @@ class LocationController extends Controller
      */
     public function show($id)
     {
-         // check account
-         $account = $this->checkAccount();
-         if ($account instanceof \Illuminate\Http\RedirectResponse) {
-             return $account->with([
-                 'message_error' => 'Please select an account.'
-             ]);
-         }
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
  
          $location = Location::findOrFail(decrypt($id));
 
          return view('pages.locations.show')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'location' => $location
          ]);
     }
@@ -141,18 +131,17 @@ class LocationController extends Controller
      */
     public function edit($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $location = Location::findOrFail(decrypt($id));
 
         return view('pages.locations.edit')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'location' => $location
         ]);
     }
@@ -166,13 +155,11 @@ class LocationController extends Controller
      */
     public function update(LocationUpdateRequest $request, $id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $location = Location::findOrFail(decrypt($id));
         $changes_arr['old'] = $location->getOriginal();

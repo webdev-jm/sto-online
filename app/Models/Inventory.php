@@ -13,6 +13,7 @@ class Inventory extends Model
     
     protected $fillable = [
         'account_id',
+        'account_branch_id',
         'inventory_upload_id',
         'location_id',
         'product_id',

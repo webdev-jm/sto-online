@@ -20,4 +20,8 @@ class AccountBranch extends Model
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
     }
+
+    public function users() {
+        return $this->belongsToMany('App\Models\User');
+    }
 }

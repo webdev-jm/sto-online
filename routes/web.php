@@ -31,6 +31,7 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');

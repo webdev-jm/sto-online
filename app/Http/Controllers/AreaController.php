@@ -9,17 +9,12 @@ use App\Http\Requests\AreaUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
+use App\Http\Traits\AccountChecker;
+
 class AreaController extends Controller
 {
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home');
-        }
+    use AccountChecker;
     
-        return $account;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -27,18 +22,17 @@ class AreaController extends Controller
      */
     public function index(Request $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $search = trim($request->get('search'));
 
         $areas = Area::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where('code', 'like', '%'.$search.'%')
                     ->orWhere('name', 'like', '%'.$search.'%');
@@ -48,6 +42,7 @@ class AreaController extends Controller
 
         return view('pages.areas.index')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'areas' => $areas,
             'search' => $search
         ]);
@@ -60,16 +55,15 @@ class AreaController extends Controller
      */
     public function create()
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         return view('pages.areas.create')->with([
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch
         ]);
     }
 
@@ -81,16 +75,15 @@ class AreaController extends Controller
      */
     public function store(AreaAddRequest $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
         
         $area = new Area([
             'account_id' => $account->id,
+            'account_branch_id' => $account_branch->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -114,19 +107,18 @@ class AreaController extends Controller
      */
     public function show($id)
     {
-       // check account
-       $account = $this->checkAccount();
-       if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
-       }
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
 
         $area = Area::findOrFail(decrypt($id));
 
         return view('pages.areas.show')->with([
             'account' => $account,
-            'area' => $area
+            'account_branch' => $account_branch,
+            'area' => $area,
         ]);
     }
 
@@ -138,18 +130,17 @@ class AreaController extends Controller
      */
     public function edit($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $area = Area::findOrfail(decrypt($id));
 
         return view('pages.areas.edit')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'area' => $area
         ]);
     }
@@ -163,20 +154,18 @@ class AreaController extends Controller
      */
     public function update(AreaUpdateRequest $request, $id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $area = Area::findOrfail(decrypt($id));
         $changes_arr['old'] = $area->getOriginal();
 
         $area->update([
-        'code' => $request->code,
-        'name' => $request->name
+            'code' => $request->code,
+            'name' => $request->name
         ]);
 
         $changes_arr['changes'] = $area->getChanges();

@@ -11,18 +11,11 @@ use App\Http\Requests\CustomerUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
+use App\Http\Traits\AccountChecker;
+
 class CustomerController extends Controller
 {
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
-        }
-    
-        return $account;
-    }
+    use AccountChecker;
 
     /**
      * Display a listing of the resource.
@@ -31,19 +24,18 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $search = trim($request->get('search'));
 
         $customers = Customer::orderBy('created_at', 'DESC')
             ->with('salesman')
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where('code', 'like', '%'.$search.'%')
                     ->orWhere('name', 'like', '%'.$search.'%')
@@ -57,6 +49,7 @@ class CustomerController extends Controller
 
         return view('pages.customers.index')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'customers' => $customers,
             'search' => $search
         ]);
@@ -69,13 +62,11 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         // SALESMEN OPTIONS
         $salesmen = Salesman::where('account_id', $account->id)->get();
@@ -86,6 +77,7 @@ class CustomerController extends Controller
 
         return view('pages.customers.create')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'salesmen' => $salesmen_arr,
         ]);
     }
@@ -98,16 +90,15 @@ class CustomerController extends Controller
      */
     public function store(CustomerAddRequest $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $customer = new Customer([
             'account_id' => $account->id,
+            'account_branch_id' => $account_branch->id,
             'salesman_id' => $request->salesman_id,
             'code' => $request->code,
             'name' => $request->name,
@@ -134,18 +125,17 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $customer = Customer::findOrFail(decrypt($id));
         
         return view('pages.customers.show')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'customer' => $customer
         ]);
     }
@@ -158,13 +148,11 @@ class CustomerController extends Controller
      */
     public function edit($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $customer = Customer::findOrFail(decrypt($id));
 
@@ -177,6 +165,7 @@ class CustomerController extends Controller
 
         return view('pages.customers.edit')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'customer' => $customer,
             'salesmen' => $salesmen_arr
         ]);
@@ -191,13 +180,11 @@ class CustomerController extends Controller
      */
     public function update(CustomerUpdateRequest $request, $id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $customer = Customer::findOrFail(decrypt($id));
         $changes_arr['old'] = $customer->getOriginal();

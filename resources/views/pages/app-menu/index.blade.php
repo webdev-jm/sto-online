@@ -1,14 +1,14 @@
 @extends('adminlte::page')
 
-@section('title', 'APP MENU - '.$account->short_name)
+@section('title', 'APP MENU - '.$account->short_name.' - ['.$account_branch->code.'] '.$account_branch->name)
 
 @section('content_header')
     <div class="row">
         <div class="col-lg-6">
-            <h1>[{{$account->account_code}}] {{$account->short_name}}</h1>
+            <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}}</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Account</a>
+            <a href="{{route('branches', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Branch</a>
         </div>
     </div>
 @stop

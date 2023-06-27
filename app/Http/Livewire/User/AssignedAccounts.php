@@ -60,11 +60,13 @@ class AssignedAccounts extends Component
 
     public function mount($user) {
         $this->user = $user;
+
+        $db2 = env('DB_DATABASE_2');
     
         // get selected account
         $accounts = DB::connection('mysql')
             ->table('account_user as au')
-            ->join(env('DB_DATABASE_2').'.accounts as a', 'a.id', '=', 'au.account_id')
+            ->join($db2.'.accounts as a', 'a.id', '=', 'au.account_id')
             ->where('au.user_id', $this->user->id)
             ->get();
 
@@ -80,7 +82,7 @@ class AssignedAccounts extends Component
                 $query->where('account_code', 'like', '%'.$this->search.'%')
                     ->orWhere('short_name', 'like', '%'.$this->search.'%');
             })
-            ->paginate(16, ['*'], 'account-page')->onEachSide(1);
+            ->paginate(10, ['*'], 'account-page')->onEachSide(1);
 
         return view('livewire.user.assigned-accounts')->with([
             'accounts' => $accounts

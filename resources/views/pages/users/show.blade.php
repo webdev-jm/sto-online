@@ -40,20 +40,67 @@
                     </ul>
                 </div>
             </div>
+
+            @if(!empty($user->accounts))
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">ACCOUNTS</h3>
+                </div>
+                <div class="card-body py-0 px-2">
+                    <ul class="list-group list-group-unbordered">
+                        @foreach($user->accounts as $account)
+                            <li class="list-group-item py-1">
+                                <b>{{$account->account_code ?? '-'}}</b>
+                                <span class="float-right">{{$account->short_name ?? '-'}}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            @endif
+
+            @if(!empty($user->account_branches))
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">BRANCHES</h3>
+                </div>
+                <div class="card-body py-0 px-2">
+                    <ul class="list-group list-group-unbordered">
+                        @foreach($user->account_branches as $branch)
+                            <li class="list-group-item py-1">
+                                <b>{{$branch->code ?? '-'}}</b>
+                                <span class="float-right">{{$branch->name ?? '-'}}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            @endif
         </div>
 
-        @can('user assign account')
         <div class="col-lg-9">
+            @can('user assign account')
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Assigned Accounts</h3>
+                    <h3 class="card-title">Assigne Accounts</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-1">
                     <livewire:user.assigned-accounts :user="$user" />
                 </div>
             </div>
+            @endcan
+
+            @can('user assign branch')
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Assign Branches</h3>
+                </div>
+                <div class="card-body p-1">
+                    <livewire:user.assigned-branches :user="$user"/>
+                </div>
+            </div>
+            @endcan
         </div>
-        @endcan
     </div>
 @stop
 

@@ -1,9 +1,16 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'Inventory - '.$account->short_name)
 
 @section('content_header')
-    <h1>Dashboard</h1>
+<div class="row">
+    <div class="col-lg-6">
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - BRANCHES</h1>
+    </div>
+    <div class="col-lg-6 text-right">
+        <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Account</a>
+    </div>
+</div>
 @stop
 
 @section('content')
@@ -12,25 +19,25 @@
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">ACCOUNTS</h3>
+            <h3 class="card-title">BRANCHES</h3>
             <div class="card-tools">
                 {!! Form::text('search', $search, ['class' => 'form-control form-control-sm', 'placeholder' => 'Search', 'form' => 'search_form']) !!}
             </div>
         </div>
         <div class="card-body">
             <div class="row">
-                @foreach($accounts as $account)
+                @foreach($branches as $branch)
                     <div class="col-lg-3">
-                        <a href="{{route('branches', encrypt($account->account_id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
-                            <i class="fa fa-user"></i>
-                            [{{$account->account_code}}] {{$account->short_name}}
+                        <a href="{{route('menu', encrypt($branch->id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
+                            <i class="fa fa-store"></i>
+                            [{{$branch->code}}] {{$branch->name}}
                         </a>
                     </div>
                 @endforeach
             </div>
         </div>
         <div class="card-footer">
-            {{$accounts->links()}}
+            {{$branches->links()}}
         </div>
     </div>
 @stop

@@ -5,7 +5,7 @@
 @section('content_header')
 <div class="row">
     <div class="col-lg-6">
-        <h1>[{{$account->account_code}}] {{$account->short_name}} - EDIT AREA</h1>
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - EDIT AREA</h1>
     </div>
     <div class="col-lg-6 text-right">
         <a href="{{route('area.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
