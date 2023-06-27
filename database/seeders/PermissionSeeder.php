@@ -66,6 +66,12 @@ class PermissionSeeder extends Seeder
                 'location delete'   => 'Allow user to delete location.',
                 'location upload'   => 'Allow user to upload location data.',
             ],
+            'Branch' => [
+                'branch access'           =>  'Allow user to access branch list and details',
+                'branch add'              =>  'Allow user to add branch',
+                'branch edit'             =>  'Allow user to edit branch',
+                'branch delete'           =>  'Allow user to delete branch',
+            ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',
                 'user add'              =>  'Allow user to add user',

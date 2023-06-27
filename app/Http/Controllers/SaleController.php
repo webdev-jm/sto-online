@@ -39,6 +39,7 @@ class SaleController extends Controller
         $search = trim($request->get('search'));
 
         $sales_uploads = SalesUpload::orderBy('created_at', 'DESC')
+            ->with('user')
             ->where('account_id', $account->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->whereHas('user', function($qry) use($search) {

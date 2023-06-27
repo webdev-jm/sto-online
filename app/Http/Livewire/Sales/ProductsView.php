@@ -20,6 +20,7 @@ class ProductsView extends Component
     public function render()
     {
         $sales = $this->sales_upload->sales()
+            ->with(['salesman', 'location', 'product', 'customer'])
             ->paginate(15)->onEachSide(1);
 
         return view('livewire.sales.products-view')->with([

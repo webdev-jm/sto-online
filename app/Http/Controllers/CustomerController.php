@@ -42,6 +42,7 @@ class CustomerController extends Controller
         $search = trim($request->get('search'));
 
         $customers = Customer::orderBy('created_at', 'DESC')
+            ->with('salesman')
             ->where('account_id', $account->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where('code', 'like', '%'.$search.'%')
