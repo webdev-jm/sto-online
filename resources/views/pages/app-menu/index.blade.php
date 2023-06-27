@@ -15,6 +15,7 @@
 
 @section('content')
 <div class="row">
+
     @can('sales access')
     <div class="col-lg-3">
         <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-warning ml-0">

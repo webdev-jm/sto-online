@@ -23,12 +23,13 @@ class UserController extends Controller
         $search = trim($request->get('search'));
 
         $users = User::orderBy('id', 'DESC')
-        ->when(!empty($search), function($query) use($search) {
-            $query->where('name', 'like', '%'.$search.'%')
-                ->orWhere('email', 'like', '%'.$search.'%');
-        })
-        ->paginate(10)->onEachSide(1)
-        ->appends(request()->query());
+            ->with('roles')
+            ->when(!empty($search), function($query) use($search) {
+                $query->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            })
+            ->paginate(10)->onEachSide(1)
+            ->appends(request()->query());
 
         return view('pages.users.index')->with([
             'users' => $users,
