@@ -40,6 +40,7 @@ class InventoryController extends Controller
         $search = trim($request->get('search'));
 
         $inventory_uploads = InventoryUpload::orderBy('created_at', 'DESC')
+            ->with('user')
             ->where('account_id', $account->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->whereIn('user', function($qry) use($search) {
@@ -128,9 +129,34 @@ class InventoryController extends Controller
      * @param  \App\Models\Inventory  $inventory
      * @return \Illuminate\Http\Response
      */
-    public function edit(Inventory $inventory)
+    public function edit($id)
     {
-        //
+        // check account
+        $account = $this->checkAccount();
+        if ($account instanceof \Illuminate\Http\RedirectResponse) {
+            return $account->with([
+                'message_error' => 'Please select an account.'
+            ]);
+        }
+
+        $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
+
+        $inventory_locations = DB::table('inventories as i')
+            ->select(
+                'l.code',
+                DB::raw('SUM(i.inventory) as total')
+            )
+            ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+            ->where('i.account_id', $account->id)
+            ->where('i.inventory_upload_id', $inventory_upload->id)
+            ->groupBy('l.code')
+            ->get();
+
+        return view('pages.inventories.edit')->with([
+            'inventory_upload' => $inventory_upload,
+            'account' => $account,
+            'inventory_locations' => $inventory_locations
+        ]);
     }
 
     /**

@@ -17,9 +17,15 @@ class InventoryDetails extends Component
 
     public $inventory_upload;
     public $account;
+    public $type;
 
-    public function mount($inventory_upload) {
+    public function editLine($product_id) {
+        
+    }
+
+    public function mount($inventory_upload, $type) {
         $this->inventory_upload = $inventory_upload;
+        $this->type = $type;
 
         $this->account = Session::get('account');
     }
@@ -35,6 +41,7 @@ class InventoryDetails extends Component
 
         $inventories = DB::table('inventories as i')
             ->select(
+                'i.product_id',
                 'p.stock_code',
                 'p.description',
                 'i.uom'

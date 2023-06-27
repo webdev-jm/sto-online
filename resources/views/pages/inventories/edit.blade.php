@@ -5,13 +5,11 @@
 @section('content_header')
 <div class="row">
     <div class="col-lg-6">
-        <h1>[{{$account->account_code}}] {{$account->short_name}} - INVENTORY</h1>
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - EDIT INVENTORY</h1>
     </div>
     <div class="col-lg-6 text-right">
         <a href="{{route('inventory.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
-        @can('inventory edit')
-            <a href="{{route('inventory.edit', encrypt($inventory_upload->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit</a>
-        @endcan
+        <a href="{{route('inventory.show', encrypt($inventory_upload->id))}}" class="btn btn-info btn-sm"><i class="fa fa-list mr-1"></i>Details</a>
     </div>
 </div>
 @stop
@@ -21,7 +19,7 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">HEADER</h3>
+                <h3 class="card-title">INVENTORY DETAILS</h3>
             </div>
             <div class="card-body py-0">
                 <ul class="list-group list-group-unbordered">
@@ -65,7 +63,7 @@
     </div>
 
     <div class="col-lg-12">
-        <livewire:inventory.inventory-details :inventory_upload="$inventory_upload" type="show"/>
+        <livewire:inventory.inventory-details :inventory_upload="$inventory_upload" type="edit"/>
     </div>
 </div>
     
