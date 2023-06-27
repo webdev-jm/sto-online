@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SystemlogController;
+use App\Http\Controllers\AccountBranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
     Route::get('app-menu/{id}', [HomeController::class, 'appMenu'])->name('menu');
+
+    // AJAX
+    Route::post('account/ajax', [AccountBranchController::class, 'ajax'])->name('account.ajax');
+    Route::get('account/get-ajax/{id}', [AccountBranchController::class, 'getAjax'])->name('account.get-ajax');
 
     // INVENTORIES
     Route::group(['middleware' => 'permission:inventory access'], function() {
@@ -115,6 +120,18 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('location/{id}/edit', [LocationController::class, 'edit'])->name('location.edit')->middleware('permission:location edit');
         Route::post('location/{id}', [LocationController::class, 'update'])->name('location.update')->middleware('permission:location edit');
+    });
+
+    // ACCOUNT BRANCH
+    Route::group(['middleware' => 'permission:account branch access'], function() {
+        Route::get('account-branch', [AccountBranchController::class, 'index'])->name('account-branch.index');
+        Route::get('account-branch/create', [AccountBranchController::class, 'create'])->name('account-branch.create')->middleware('permission:account branch create');
+        Route::post('account-branch', [AccountBranchController::class, 'store'])->name('account-branch.store')->middleware('permission:account branch create');
+
+        Route::get('account-branch/{id}', [AccountBranchController::class, 'show'])->name('account-branch.show');
+
+        Route::get('account-branch/{id}/edit', [AccountBranchController::class, 'edit'])->name('account-branch.edit')->middleware('permission:account branch edit');
+        Route::post('account-branch/{id}', [AccountBranchController::class, 'update'])->name('account-branch.update')->middleware('permission:account branch edit');
     });
 
     // ROLES

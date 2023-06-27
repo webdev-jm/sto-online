@@ -312,6 +312,13 @@ return [
             'active'    => ['role*']
         ],
         [
+            'text'      => 'Branches',
+            'url'       => '/account-branch',
+            'icon'      => 'fa fa-fw fa-code-branch',
+            'can'       => 'account branch access',
+            'active'    => ['account-branch*']
+        ],
+        [
             'text'      => 'Systemlog',
             'url'       => '/systemlog',
             'icon'      => 'fa fa-fw fa-history',
