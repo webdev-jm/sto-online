@@ -29,12 +29,16 @@ class InventoryUpload extends Component
     public $data;
     public $err_msg;
 
+    public $account;
+    public $account_branch;
+
     public $perPage = 20;
 
     public function uploadData() {
         if(!empty($this->inventory_data)) {
             $inventory_upload = new IU([
                 'account_id' => $this->account->id,
+                'account_branch_id' => $this->account_branch->id,
                 'user_id' => auth()->user()->id,
                 'date' => date('Y-m-d'),
                 'total_inventory' => 0
@@ -51,6 +55,7 @@ class InventoryUpload extends Component
 
                         $inventory = new Inventory([
                             'account_id' => $this->account->id,
+                            'account_branch_id' => $this->account_branch->id,
                             'inventory_upload_id' => $inventory_upload->id,
                             'location_id' => $location['id'],
                             'product_id' => $data['product_id'],
@@ -116,6 +121,7 @@ class InventoryUpload extends Component
             // check header
             foreach($header as $key => $val) {
                 $location = Location::where('account_id', $this->account->id)
+                    ->where('account_branch_id', $this->account_branch->id)
                     ->where(function($query) use($val) {
                         $query->where('code', $val)
                             ->orWhere('name', $val);
@@ -218,6 +224,7 @@ class InventoryUpload extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

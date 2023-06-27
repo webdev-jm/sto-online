@@ -11,18 +11,11 @@ use App\Http\Requests\SalesmanUpdateRequest;
 
 use Illuminate\Support\Facades\Session;
 
+use App\Http\Traits\AccountChecker;
+
 class SalesmanController extends Controller
 {
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
-        }
-    
-        return $account;
-    }
+    use AccountChecker;
 
     /**
      * Display a listing of the resource.
@@ -31,18 +24,17 @@ class SalesmanController extends Controller
      */
     public function index(Request $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $search = trim($request->get('search'));
 
         $salesmen = Salesman::orderBy('created_at', 'DESC')
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where('code', 'like', '%'.$search.'%')
                     ->orWhere('name', 'like', '%'.$search.'%');
@@ -52,6 +44,7 @@ class SalesmanController extends Controller
 
         return view('pages.salesmen.index')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'salesmen' => $salesmen,
             'search' => $search
         ]);
@@ -64,13 +57,11 @@ class SalesmanController extends Controller
      */
     public function create()
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $areas = Area::where('account_id', $account->id)->get();
         $area_arr = array();
@@ -80,6 +71,7 @@ class SalesmanController extends Controller
 
         return view('pages.salesmen.create')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'areas' => $area_arr
         ]);
 
@@ -93,16 +85,15 @@ class SalesmanController extends Controller
      */
     public function store(SalesmanAddRequest $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $salesman = new Salesman([
             'account_id' => $account->id,
+            'account_branch_id' => $account_branch->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -126,18 +117,17 @@ class SalesmanController extends Controller
      */
     public function show($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $salesman = Salesman::findOrFail(decrypt($id));
 
         return view('pages.salesmen.show')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'salesman' => $salesman
         ]);
     }
@@ -150,13 +140,11 @@ class SalesmanController extends Controller
      */
     public function edit($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $salesman = Salesman::findOrFail(decrypt($id));
 
@@ -168,6 +156,7 @@ class SalesmanController extends Controller
 
         return view('pages.salesmen.edit')->with([
             'account' => $account,
+            'account_branch' => $account_branch,
             'salesman' => $salesman,
             'areas' => $area_arr
         ]);
@@ -182,13 +171,11 @@ class SalesmanController extends Controller
      */
     public function update(SalesmanUpdateRequest $request, $id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $salesman = Salesman::findOrFail(decrypt($id));
         $changes_arr['old'] = $salesman->getOriginal();

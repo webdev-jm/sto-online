@@ -7,7 +7,7 @@
 
     <div class="card mb-0">
         <div class="card-header">
-            <h3 class="card-title">Accounts</h3>
+            <h3 class="card-title">Branches</h3>
             <div class="card-tools">
                 <input type="text" class="form-control form-control-sm" wire:model="search" placeholder="Search">
             </div>
@@ -21,22 +21,22 @@
             </div>
 
             <div class="row">
-                @foreach($accounts as $account)
+                @foreach($branches as $branch)
                     @php
                         $class = 'btn-default';
-                        if(!empty($selected) && in_array($account->id, $selected)) {
+                        if(!empty($selected) && in_array($branch->id, $selected)) {
                             $class = 'btn-primary';
                         }
                     @endphp
                     <div class="col-lg-6 mb-1">
-                        <button class="btn btn-block {{$class}}" wire:loading.attr="disabled" wire:click.prevent="selectAccount('{{encrypt($account->id)}}')">[{{$account->account_code}}] {{$account->short_name}}</button>
+                        <button class="btn btn-block {{$class}}" wire:loading.attr="disabled" wire:click.prevent="selectBranch('{{encrypt($branch->id)}}')">[{{$branch->code}}] {{$branch->name}}</button>
                     </div>
                 @endforeach
             </div>
 
             <div class="row mt-1">
                 <div class="col-12">
-                    {{$accounts->links()}}
+                    {{$branches->links()}}
                 </div>
             </div>
         </div>

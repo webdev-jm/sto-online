@@ -13,6 +13,7 @@ class Customer extends Model
 
     protected $fillable = [
         'account_id',
+        'account_branch_id',
         'salesman_id',
         'code',
         'name',
@@ -21,6 +22,10 @@ class Customer extends Model
 
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
+    }
+
+    public function account_branch() {
+        return $this->belongsTo('App\Models\AccountBranch');
     }
 
     public function salesman() {

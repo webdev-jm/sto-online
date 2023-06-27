@@ -9,18 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Traits\AccountChecker;
+
 class InventoryController extends Controller
 {
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
-        }
-    
-        return $account;
-    }
+    use AccountChecker;
 
     /**
      * Display a listing of the resource.
@@ -29,19 +22,18 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $search = trim($request->get('search'));
 
         $inventory_uploads = InventoryUpload::orderBy('created_at', 'DESC')
             ->with('user')
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->whereIn('user', function($qry) use($search) {
                     $qry->where('name', 'like', '%'.$search.'%');
@@ -53,6 +45,7 @@ class InventoryController extends Controller
         return view('pages.inventories.index')->with([
             'inventory_uploads' => $inventory_uploads,
             'account' => $account,
+            'account_branch' => $account_branch,
             'search' => $search
         ]);
     }
@@ -64,16 +57,15 @@ class InventoryController extends Controller
      */
     public function create()
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         return view('pages.inventories.create')->with([
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch
         ]);
     }
 
@@ -95,13 +87,11 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
 
@@ -112,6 +102,7 @@ class InventoryController extends Controller
             )
             ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
             ->where('i.account_id', $account->id)
+            ->where('i.account_branch_id', $account_branch->id)
             ->where('i.inventory_upload_id', $inventory_upload->id)
             ->groupBy('l.code')
             ->get();
@@ -119,6 +110,7 @@ class InventoryController extends Controller
         return view('pages.inventories.show')->with([
             'inventory_upload' => $inventory_upload,
             'account' => $account,
+            'account_branch' => $account_branch,
             'inventory_locations' => $inventory_locations
         ]);
     }
@@ -131,13 +123,11 @@ class InventoryController extends Controller
      */
     public function edit($id)
     {
-        // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
 
@@ -148,6 +138,7 @@ class InventoryController extends Controller
             )
             ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
             ->where('i.account_id', $account->id)
+            ->where('i.account_branch_id', $account_branch->id)
             ->where('i.inventory_upload_id', $inventory_upload->id)
             ->groupBy('l.code')
             ->get();
@@ -155,6 +146,7 @@ class InventoryController extends Controller
         return view('pages.inventories.edit')->with([
             'inventory_upload' => $inventory_upload,
             'account' => $account,
+            'account_branch' => $account_branch,
             'inventory_locations' => $inventory_locations
         ]);
     }

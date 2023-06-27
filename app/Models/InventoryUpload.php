@@ -13,6 +13,7 @@ class InventoryUpload extends Model
 
     protected $fillable = [
         'account_id',
+        'account_branch_id',
         'user_id',
         'date',
         'total_inventory',
@@ -20,6 +21,10 @@ class InventoryUpload extends Model
 
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
+    }
+
+    public function account_branch() {
+        return $this->belongsTo('App\Models\AccountBranch');
     }
 
     public function user() {

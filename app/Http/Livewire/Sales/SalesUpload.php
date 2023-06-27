@@ -28,6 +28,7 @@ class SalesUpload extends Component
     public $data;
     public $file;
     public $account;
+    public $account_branch;
     public $err_msg;
 
     public $perPage = 20;
@@ -55,6 +56,7 @@ class SalesUpload extends Component
 
             $upload = new Upload([
                 'account_id' => $this->account->id,
+                'account_branch_id' => $this->account_branch->id,
                 'user_id' => auth()->user()->id,
                 'sku_count' => 0,
                 'total_quantity' => 0,
@@ -85,6 +87,7 @@ class SalesUpload extends Component
                     $sale = new Sale([
                         'sales_upload_id' => $upload->id,
                         'account_id' => $this->account->id,
+                        'account_branch_id' => $this->account_branch->id,
                         'customer_id' => $data['customer_id'],
                         'product_id' => $data['product_id'],
                         'channel_id' => NULL,
@@ -149,11 +152,13 @@ class SalesUpload extends Component
         if($this->checkHeader($header) == 0) {
             // get customers
             $customers = Customer::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->whereIn('code', array_unique(array_map('trim', Collection::make($data)->pluck(2)->slice(2)->toArray())))
                 ->get()
                 ->keyBy('code');
             // get locations
             $locations = Location::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->whereIn('code', array_unique(Collection::make($data)->pluck(4)->slice(2)->toArray()))
                 ->get()
                 ->keyBy('code');
@@ -196,6 +201,7 @@ class SalesUpload extends Component
 
                     // check if already exists
                     $exist = Sale::where('account_id', $this->account->id)
+                        ->where('account_branch_id', $this->account_branch->id)
                         ->where('document_number', $row[1])
                         ->where('customer_id', $customer->id)
                         ->where('product_id', $product->id)
@@ -306,6 +312,7 @@ class SalesUpload extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

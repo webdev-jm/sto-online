@@ -80,4 +80,8 @@ class User extends Authenticatable
     public function accounts() {
         return $this->belongsToMany('App\Models\SMSAccount', env('DB_DATABASE').'.account_user', 'user_id', 'account_id');
     }
+
+    public function account_branches() {
+        return $this->belongsToMany('App\Models\AccountBranch');
+    }
 }

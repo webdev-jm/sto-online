@@ -17,6 +17,7 @@ class CreateSalesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('sales_upload_id')->nullable();
             $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('channel_id')->nullable();

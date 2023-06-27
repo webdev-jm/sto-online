@@ -14,6 +14,7 @@ class Sale extends Model
     protected $fillable = [
         'sales_upload_id',
         'account_id',
+        'account_branch_id',
         'customer_id',
         'product_id',
         'channel_id',
@@ -36,6 +37,10 @@ class Sale extends Model
 
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
+    }
+
+    public function account_branch() {
+        return $this->belongsTo('App\Models\AccountBranch');
     }
 
     public function customer() {

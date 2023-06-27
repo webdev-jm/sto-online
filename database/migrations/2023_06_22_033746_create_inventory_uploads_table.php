@@ -16,6 +16,7 @@ class CreateInventoryUploadsTable extends Migration
         Schema::create('inventory_uploads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->date('date');
             $table->integer('total_inventory');

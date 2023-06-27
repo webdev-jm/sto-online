@@ -24,6 +24,7 @@ class Salesman extends Component
     public $salesman_data;
     public $file;
     public $account;
+    public $account_branch;
 
     public $perPage = 10;
 
@@ -31,12 +32,14 @@ class Salesman extends Component
         foreach($this->salesman_data as $data) {
             // check
             $salesman = Sale::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->where('code', $data['code'])
                 ->where('name', $data['name'])
                 ->first();
             if(empty($salesman)) {
                 $salesman = new Sale([
                     'account_id' => $this->account->id,
+                    'account_branch_id' => $this->account_branch->id,
                     'code' => $data['code'],
                     'name' => $data['name'],
                 ]);
@@ -46,6 +49,7 @@ class Salesman extends Component
             if(!empty($data['area'])) {
                 // assign area
                 $area = Area::where('account_id', $this->account->id)
+                    ->where('account_branch_id', $this->account_branch->id)
                     ->where(function($query) use($data) {
                         $query->where('code', $data['area'])
                             ->orWhere('name', $data['area']);
@@ -54,6 +58,7 @@ class Salesman extends Component
                 if(empty($area)) {
                     $area = new Area([
                         'account_id' => $this->account->id,
+                        'account_branch_id' => $this->account_branch->id,
                         'code' => $data['area'],
                         'name' => $data['area']
                     ]);
@@ -132,6 +137,7 @@ class Salesman extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

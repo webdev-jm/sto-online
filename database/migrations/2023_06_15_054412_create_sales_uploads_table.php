@@ -16,6 +16,7 @@ class CreateSalesUploadsTable extends Migration
         Schema::create('sales_uploads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->integer('sku_count')->nullable();
             $table->integer('total_quantity')->default(0);

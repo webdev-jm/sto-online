@@ -23,6 +23,7 @@ class Location extends Component
     public $file;
     public $location_data;
     public $account;
+    public $account_branch;
 
     public $perPage = 10;
 
@@ -31,6 +32,7 @@ class Location extends Component
             if($data['check'] == 0) {
                 $location = new Loc([
                     'account_id' => $this->account->id,
+                    'account_branch_id' => $this->account_branch->id,
                     'code' => $data['code'],
                     'name' => $data['name'],
                 ]);
@@ -62,6 +64,7 @@ class Location extends Component
                 if($key > 1) {
                     // check duplicate
                     $location = Loc::where('account_id', $this->account->id)
+                        ->where('account_branch_id', $this->account_branch->id)
                         ->where('code', $row[0])
                         ->where('name', $row[1])
                         ->first();
@@ -117,6 +120,7 @@ class Location extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

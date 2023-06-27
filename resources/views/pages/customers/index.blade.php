@@ -5,10 +5,10 @@
 @section('content_header')
 <div class="row">
     <div class="col-lg-6">
-        <h1>[{{$account->account_code}}] {{$account->short_name}} - CUSTOMERS</h1>
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - CUSTOMERS</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('menu', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
+        <a href="{{route('menu', encrypt($account_branch->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
         @can('customer create')
             <a href="{{route('customer.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>Add Customer</a>
         @endcan

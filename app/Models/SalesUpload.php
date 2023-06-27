@@ -13,6 +13,7 @@ class SalesUpload extends Model
 
     protected $fillable = [
         'account_id',
+        'account_branch_id',
         'user_id',
         'sku_count',
         'total_quantity',
