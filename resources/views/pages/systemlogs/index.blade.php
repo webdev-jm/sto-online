@@ -47,7 +47,7 @@
                                 <td>{{$activity->log_name}}</td>
                                 <td>{{$activity->description}}</td>
                                 <td>{{$activity->causer->name}}</td>
-                                <td class="p-1">
+                                <td class="p-1 text-xs">
                                     @if($activity->log_name == 'update' && !empty($updates[$activity->id]))
                                     <ul class="list-group">
                                         @foreach($updates[$activity->id] as $column => $data)

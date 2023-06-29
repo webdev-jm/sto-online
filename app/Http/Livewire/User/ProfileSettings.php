@@ -47,6 +47,10 @@ class ProfileSettings extends Component
             'profile_picture_url' => $profile_picture_url,
             'user_signature_url' => $user_signature_url
         ]);
+
+        return redirect()->route('profile')->with([
+            'message_success' => 'Profile data has been updated.'
+        ]);
         
     }
 
