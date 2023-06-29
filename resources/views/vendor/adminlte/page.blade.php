@@ -55,9 +55,14 @@
         @endempty
 
         {{-- Footer --}}
-        @hasSection('footer')
+        {{-- @hasSection('footer')
             @include('adminlte::partials.footer.footer')
-        @endif
+        @endif --}}
+        <footer class="main-footer">
+            <div class="text-center">
+                <b>Copyright © 2023 <a href="https://www.bevi.com.ph/" target="_blank">BEVI</a>. All rights reserved</b>
+            </div>
+        </footer>
 
         {{-- Right Control Sidebar --}}
         @if(config('adminlte.right_sidebar'))

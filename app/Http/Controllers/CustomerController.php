@@ -194,6 +194,7 @@ class CustomerController extends Controller
             'channel_id' => $request->channel_id,
             'code' => $request->code,
             'name' => $request->name,
+            'address' => $request->address,
         ]);
 
         $changes_arr['changes'] = $customer->getChanges();

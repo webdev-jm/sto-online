@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 class LocationMaintenance extends Component
 {
     public $account;
+    public $account_branch;
     
     public $location_code;
     public $location_name;
@@ -30,6 +31,7 @@ class LocationMaintenance extends Component
 
         $location = new Location([
             'account_id' => $this->account->id,
+            'account_branch_id' => $this->account_branch->id,
             'code' => $this->location_code,
             'name' => $this->location_name,
         ]);
@@ -51,6 +53,7 @@ class LocationMaintenance extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
     }
 
     public function render()

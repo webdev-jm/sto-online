@@ -24,6 +24,7 @@ class Sale extends Model
         'type',
         'date',
         'document_number',
+        'category',
         'uom',
         'quantity',
         'price_inc_vat',
