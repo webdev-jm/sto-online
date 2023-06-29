@@ -17,8 +17,12 @@ use App\Models\Inventory;
 use App\Models\InventoryUpload as IU;
 use App\Models\SMSProduct;
 
+use App\Http\Traits\GenerateMonthlyInventory;
+
 class InventoryUpload extends Component
 {
+    use GenerateMonthlyInventory;
+
     use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
@@ -76,6 +80,9 @@ class InventoryUpload extends Component
             activity('upload')
             ->performedOn($inventory_upload)
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
+
+            // generate monthly inventory
+            $this->setMonthlyInventory($this->account, $this->account_branch, date('Y'), (int)date('m'));
 
             return redirect()->route('inventory.index')->with([
                 'message_success' => 'Inventory data has been uploaded.'
