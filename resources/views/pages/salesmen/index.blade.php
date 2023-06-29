@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    @can('saleman upload')
+    @can('salesman upload')
         {{-- MODAL --}}
         <div class="modal fade" id="modal-upload">
             <div class="modal-dialog modal-lg">

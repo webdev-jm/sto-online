@@ -13,7 +13,7 @@ class AreaUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->user()->can('area create');
+        return auth()->user()->can('area edit');
     }
 
     /**

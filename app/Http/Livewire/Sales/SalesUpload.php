@@ -297,10 +297,10 @@ class SalesUpload extends Component
         $requiredHeaders = [
             'Posting Date',
             'Document No.',
-            'Sell-to Customer No.',
+            'Customer Code',
             'Type',
             'Location Code',
-            'No.',
+            'Sku Code',
             'Description',
             'Description 2',
             'Item Category Code',

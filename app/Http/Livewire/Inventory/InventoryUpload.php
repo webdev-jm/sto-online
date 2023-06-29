@@ -198,8 +198,8 @@ class InventoryUpload extends Component
 
     private function checkHeader($header) {
         $requiredHeaders = [
-            'no.',
-            'description',
+            'SKU CODE',
+            'DESCRIPTION',
         ];
     
         $err = 0;

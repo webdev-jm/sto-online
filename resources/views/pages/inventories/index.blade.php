@@ -9,7 +9,7 @@
     </div>
     <div class="col-lg-6 text-right">
         <a href="{{route('menu', encrypt($account_branch->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Menu</a>
-        @can('inventory create')
+        @can('inventory upload')
             <a href="{{route('inventory.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload mr-1"></i>Upload Inventory</a>
         @endcan
     </div>

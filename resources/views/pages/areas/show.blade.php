@@ -23,7 +23,7 @@
                 <div class="card-header">
                     <h3 class="card-title">AREA DETAILS</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body py-0">
         
                     <ul class="list-group list-group-unbordered">
                         <li class="list-group-item p-1">
@@ -38,6 +38,31 @@
                     
                 </div>
                 <div class="card-footer">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">SALESMEN</h3>
+                </div>
+                <div class="card-body py-0">
+                    <ul class="list-group list-group-unbordered">
+                        @if(!empty($area->salesmen->count()))
+                            @foreach($area->salesmen as $salesman)
+                            <li class="list-group-item p-1">
+                                <b>{{$salesman->code}}</b>
+                                <span class="float-right">{{$salesman->name}}</span>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="list-group-item text-center">No available data.</li>
+                        @endif
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    
                 </div>
             </div>
         </div>

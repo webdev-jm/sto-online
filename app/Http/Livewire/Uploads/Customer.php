@@ -142,10 +142,10 @@ class Customer extends Component
 
     private function checkHeader($header) {
         $requiredHeaders = [
-            'no.',
+            'code',
             'name',
             'address',
-            'salesperson code',
+            'salesman code',
         ];
     
         $err = 0;

@@ -43,8 +43,8 @@ Route::group(['middleware' => 'auth'], function() {
     // INVENTORIES
     Route::group(['middleware' => 'permission:inventory access'], function() {
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
-        Route::get('inventory/create', [InventoryController::class, 'create'])->name('inventory.create')->middleware('permission:inventory create');
-        Route::post('inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('permission:inventory create');
+        Route::get('inventory/create', [InventoryController::class, 'create'])->name('inventory.create')->middleware('permission:inventory upload');
+        Route::post('inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('permission:inventory upload');
 
         Route::get('inventory/{id}', [InventoryController::class, 'show'])->name('inventory.show');
 
@@ -55,7 +55,7 @@ Route::group(['middleware' => 'auth'], function() {
     // SALES 
     Route::group(['middleware' => 'permission:sales access'], function() {
         Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
-        Route::get('sales/create', [SaleController::class, 'create'])->name('sales.create')->middleware('permission:sales create');
+        Route::get('sales/create', [SaleController::class, 'create'])->name('sales.create')->middleware('permission:sales upload');
         Route::post('sales/upload', [SaleController::class, 'store'])->name('sales.upload')->middleware('permission:sales upload');
 
         Route::get('sales/{id}', [SaleController::class, 'show'])->name('sales.show');
@@ -66,7 +66,7 @@ Route::group(['middleware' => 'auth'], function() {
     // CUSTOMERS
     Route::group(['middleware' => 'permission:customer access'], function() {
         Route::get('customer', [CustomerController::class, 'index'])->name('customer.index');
-        Route::get('customer/create', [CustomerController::class, 'create'])->name('customer.create')->middleware('permission:salesman create');
+        Route::get('customer/create', [CustomerController::class, 'create'])->name('customer.create')->middleware('permission:customer create');
         Route::post('customer', [CustomerController::class, 'store'])->name('customer.store')->middleware('permission:customer create');
 
         Route::get('customer/{id}', [CustomerController::class, 'show'])->name('customer.show');

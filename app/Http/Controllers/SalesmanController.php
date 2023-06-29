@@ -193,7 +193,7 @@ class SalesmanController extends Controller
         ->withProperties($changes_arr)
         ->log(':causer.name has updated salesman ['.$account->short_name.'] :subject.code :subject.name');
 
-        return back()->with([
+        return redirect()->route('salesman.show', encrypt($salesman->id))->with([
             'message_success' => 'Salesman '.$salesman->name.' was updated.'
         ]);
     }

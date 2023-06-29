@@ -16,8 +16,66 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="">Upload File</label>
-                        <input type="file" class="form-control" wire:model="file">
+                        <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model="file">
+                        @if(!empty($err_msg))
+                            <small class="text-danger">{{$err_msg}}</small>
+                        @endif
                     </div>
+                </div>
+
+                {{-- UPLOAD COLUMNS --}}
+                <div class="col-lg-12">
+                    <ul>
+                        <li>
+                            <b>POSTING DATE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>DOCUMENT NO.</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>CUSTOMER CODE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>TYPE</b> - <span>Optional</span>
+                        </li>
+                        <li>
+                            <b>LOCATION CODE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>SKU CODE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>DESCRIPTION</b> - <span>Optional</span>
+                        </li>
+                        <li>
+                            <b>DESCRIPTION 2</b> - <span>Optional</span>
+                        </li>
+                        <li>
+                            <b>ITEM CATEGORY CODE</b> - <span>Optional</span>
+                        </li>
+                        <li>
+                            <b>QUANTITY</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>UNIT OF MEASURE CODE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>UNIT PRICE INCL. VAT</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>AMOUNT</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>AMOUNT INCLUDING VAT</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>LINE DISCOUNT</b> - <span>Optional</span>
+                        </li>
+                    </ul>
+
+                    <p>
+                        <a href="{{asset('/templates/sales-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading sales data.
+                    </p>
                 </div>
             </div>
 

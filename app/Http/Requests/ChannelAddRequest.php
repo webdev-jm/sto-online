@@ -13,7 +13,7 @@ class ChannelAddRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->user()->can('channel access');
+        return auth()->user()->can('channel create');
     }
 
     /**

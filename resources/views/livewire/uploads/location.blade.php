@@ -15,6 +15,22 @@
                     </div>
                 </div>
 
+                {{-- COLUMN DESCRIPTIONS --}}
+                <div class="col-12">
+                    <ul>
+                        <li>
+                            <b>CODE</b> - <span>Required, First column in the excel</span>
+                        </li>
+                        <li>
+                            <b>NAME</b> - <span>Required, Second column in the excel</span>
+                        </li>
+                    </ul>
+
+                    <p>
+                        <a href="{{asset('/templates/location-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading location data.
+                    </p>
+                </div>
+
                 {{-- PREVIEW --}}
                 @if(!empty($location_data))
                 <div class="col-12">

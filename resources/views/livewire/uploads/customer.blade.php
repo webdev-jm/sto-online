@@ -18,6 +18,28 @@
                     </div>
                 </div>
 
+                 {{-- COLUMN DESCRIPTIONS --}}
+                 <div class="col-12">
+                    <ul>
+                        <li>
+                            <b>CODE</b> - <span>Required, First column in the excel</span>
+                        </li>
+                        <li>
+                            <b>NAME</b> - <span>Required, Second column in the excel</span>
+                        </li>
+                        <li>
+                            <b>ADDRESS</b> - <span>Required, Third column in the excel</span>
+                        </li>
+                        <li>
+                            <b>SALESMAN CODE</b> - <span>Optional, Fourth column in the excel</span>
+                        </li>
+                    </ul>
+
+                    <p>
+                        <a href="{{asset('/templates/customer-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading customer data.
+                    </p>
+                </div>
+
                 {{-- PREVIEW --}}
                 @if(!empty($customer_data))
                 <div class="col-12">
