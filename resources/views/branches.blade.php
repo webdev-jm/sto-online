@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - BRANCHES</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Account</a>
+        <a href="/home" class="btn btn-secondary btn-sm"><i class="fa fa-user mr-1"></i>Change Account</a>
     </div>
 </div>
 @stop

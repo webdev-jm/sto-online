@@ -64,7 +64,7 @@
                                     </a>
                                 @endcan
                                 @can('location delete')
-                                    <a href="" class="btn btn-danger btn-xs">
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($location->id)}}">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 @endcan
@@ -90,6 +90,14 @@
             </div>
         </div>
     @endcan
+
+    @can('location delete')
+    <div class="modal fade" id="modal-delete">
+        <div class="modal-dialog">
+            <livewire:confirm-delete/>
+        </div>
+    </div>
+    @endcan
 @stop
 
 @section('css')
@@ -106,5 +114,18 @@
                 });
             });
         </script>
+    @endcan
+
+    @can('location delete')
+    <script>
+        $(function() {
+            $('body').on('click', '.btn-delete', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                Livewire.emit('setDeleteModel', 'Location', id);
+                $('#modal-delete').modal('show');
+            });
+        });
+    </script>
     @endcan
 @stop

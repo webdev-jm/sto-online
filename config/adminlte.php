@@ -314,7 +314,7 @@ return [
         [
             'text'      => 'Branches',
             'url'       => '/account-branch',
-            'icon'      => 'fa fa-fw fa-code-branch',
+            'icon'      => 'fa fa-fw fa-sitemap',
             'can'       => 'account branch access',
             'active'    => ['account-branch*']
         ],

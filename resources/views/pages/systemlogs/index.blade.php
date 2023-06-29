@@ -38,6 +38,7 @@
                                 <th>DESCRIPTION</th>
                                 <th>USER</th>
                                 <th>CHANGES</th>
+                                <th>TIMESTAMP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,6 +61,7 @@
                                     </ul>
                                     @endif
                                 </td>
+                                <td>{{date('F j, Y H:i:s a', strtotime($activity->created_at))}}</td>
                             </tr>
                             @endforeach
                         </tbody>
