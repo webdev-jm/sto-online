@@ -49,6 +49,10 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-12">
+            <livewire:customer.sales-details :customer="$customer"/>
+        </div>
     </div>
 @stop
 
