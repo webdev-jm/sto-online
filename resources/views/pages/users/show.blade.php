@@ -9,6 +9,12 @@
         </div>
         <div class="col-lg-6 text-right">
             <a href="{{route('user.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>BACK</a>
+            @can('user edit')
+                <a href="{{route('user.edit', encrypt($user->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit</a>
+            @endcan
+            @can('user delete')
+                <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{encrypt($user->id)}}"><i class="fa fa-trash-alt mr-1"></i>Delete</a>
+            @endcan
         </div>
     </div>
 @stop
@@ -102,6 +108,14 @@
             @endcan
         </div>
     </div>
+
+    @can('user delete')
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <livewire:confirm-delete/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -109,4 +123,16 @@
 @stop
 
 @section('js')
+    @can('user delete')
+        <script>
+            $(function() {
+                $('body').on('click', '.btn-delete', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    Livewire.emit('setDeleteModel', 'User', id);
+                    $('#modal-delete').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

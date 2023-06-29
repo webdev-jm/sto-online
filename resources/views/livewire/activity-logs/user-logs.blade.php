@@ -25,7 +25,7 @@
                             <td>{{$activity->log_name}}</td>
                             <td>{{$activity->causer->name}}</td>
                             <td>{{$activity->description}}</td>
-                            <td>{{$activity->created_at->diffForHumans()}}</td>
+                            <td>{{date('F j, Y H:i:s a', strtotime($activity->created_at))}}</td>
                             <td class="p-1">
                                 @if($activity->log_name == 'update' && !empty($updates[$activity->id]))
                                 <ul class="list-group">
@@ -40,6 +40,7 @@
                                 </ul>
                                 @endif
                             </td>
+                            
                         </tr>
                     @endforeach
                 </tbody>

@@ -12,6 +12,9 @@
             @can('account branch edit')
                 <a href="{{route('account-branch.edit', encrypt($account_branch->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit</a>
             @endcan
+            @can('account branch delete')
+                <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{encrypt($account_branch->id)}}"><i class="fa fa-trash-alt mr-1"></i>Delete</a>
+            @endcan
         </div>
     </div>
 @stop
@@ -46,6 +49,14 @@
         </div>
 
     </div>
+
+    @can('account branch delete')
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <livewire:confirm-delete/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -53,8 +64,16 @@
 @stop
 
 @section('js')
-<script>
-    $(function() {
-    });
-</script>
+    @can('account branch delete')
+        <script>
+            $(function() {
+                $('body').on('click', '.btn-delete', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    Livewire.emit('setDeleteModel', 'AccountBranch', id);
+                    $('#modal-delete').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

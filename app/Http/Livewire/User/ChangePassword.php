@@ -32,6 +32,9 @@ class ChangePassword extends Component
 
         session()->flash('message', 'Password has been updated.');
 
+        activity('change password')
+            ->log(':causer.name has change password');
+
         $this->reset();
     }
 

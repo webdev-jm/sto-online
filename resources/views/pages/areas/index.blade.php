@@ -59,7 +59,7 @@
                                     </a>
                                 @endcan
                                 @can('area delete')
-                                    <a href="" class="btn btn-danger btn-xs">
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($area->id)}}">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 @endcan
@@ -76,6 +76,14 @@
             {{$areas->links()}}
         </div>
     </div>
+
+    @can('area delete')
+    <div class="modal fade" id="modal-delete">
+        <div class="modal-dialog">
+            <livewire:confirm-delete/>
+        </div>
+    </div>
+    @endcan
 @stop
 
 @section('css')
@@ -83,4 +91,16 @@
 @stop
 
 @section('js')
+    @can('area delete')
+        <script>
+            $(function() {
+                $('body').on('click', '.btn-delete', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    Livewire.emit('setDeleteModel', 'Area', id);
+                    $('#modal-delete').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

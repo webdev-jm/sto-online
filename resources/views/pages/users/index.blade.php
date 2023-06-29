@@ -84,7 +84,7 @@
                                     </a>
                                 @endcan
                                 @can('user delete')
-                                    <a href="" class="btn btn-danger btn-xs">
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($user->id)}}">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 @endcan
@@ -100,6 +100,14 @@
             {{$users->links()}}
         </div>
     </div>
+
+    @can('user delete')
+    <div class="modal fade" id="modal-delete">
+        <div class="modal-dialog">
+            <livewire:confirm-delete/>
+        </div>
+    </div>
+    @endcan
 @stop
 
 @section('css')
@@ -107,4 +115,16 @@
 @stop
 
 @section('js')
+    @can('user delete')
+        <script>
+            $(function() {
+                $('body').on('click', '.btn-delete', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    Livewire.emit('setDeleteModel', 'User', id);
+                    $('#modal-delete').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop

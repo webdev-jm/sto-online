@@ -8,7 +8,7 @@
             <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}}</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="{{route('branches', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-sync mr-1"></i>Change Branch</a>
+            <a href="{{route('branches', encrypt($account->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-store mr-1"></i>Change Branch</a>
         </div>
     </div>
 @stop

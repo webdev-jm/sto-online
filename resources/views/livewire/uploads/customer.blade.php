@@ -5,6 +5,12 @@
         </div>
         <div class="modal-body">
 
+            @if(!empty($err_msg))
+            <div class="alert alert-danger">
+                {{$err_msg}}
+            </div>
+            @endif
+
             <div class="row">
                 {{-- FILE --}}
                 <div class="col-lg-6">

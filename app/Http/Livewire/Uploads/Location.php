@@ -24,6 +24,7 @@ class Location extends Component
     public $location_data;
     public $account;
     public $account_branch;
+    public $err_msg;
 
     public $perPage = 10;
 
@@ -81,6 +82,8 @@ class Location extends Component
                     ];
                 }
             }
+        } else {
+            $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
     }
 

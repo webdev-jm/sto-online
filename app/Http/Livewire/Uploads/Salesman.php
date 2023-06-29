@@ -25,6 +25,7 @@ class Salesman extends Component
     public $file;
     public $account;
     public $account_branch;
+    public $err_msg;
 
     public $perPage = 10;
 
@@ -98,6 +99,8 @@ class Salesman extends Component
                     ];
                 }
             }
+        } else {
+            $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
     }
 

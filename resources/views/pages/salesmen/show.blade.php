@@ -12,6 +12,9 @@
         @can('salesman edit')
             <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Salesman</a>
         @endcan
+        @can('salesman delete')
+            <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{encrypt($salesman->id)}}"><i class="fa fa-trash-alt mr-1"></i>Delete</a>
+        @endcan
     </div>
 </div>
 @stop
@@ -68,6 +71,14 @@
         </div>
         
     </div>
+
+    @can('salesman delete')
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <livewire:confirm-delete/>
+            </div>
+        </div>
+    @endcan
 @stop
 
 @section('css')
@@ -75,4 +86,16 @@
 @stop
 
 @section('js')
+    @can('salesman delete')
+        <script>
+            $(function() {
+                $('body').on('click', '.btn-delete', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    Livewire.emit('setDeleteModel', 'Salesman', id);
+                    $('#modal-delete').modal('show');
+                });
+            });
+        </script>
+    @endcan
 @stop
