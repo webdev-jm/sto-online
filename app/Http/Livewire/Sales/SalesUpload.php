@@ -71,6 +71,7 @@ class SalesUpload extends Component
             $total_price_vat = 0;
             $total_amount = 0;
             $total_amount_vat = 0;
+            $num = 0;
             foreach($this->sales_data as $data) {
                 // check data
                 if($data['check'] == 0) { // no error
