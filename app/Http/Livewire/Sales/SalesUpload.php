@@ -76,8 +76,8 @@ class SalesUpload extends Component
                 if($data['check'] == 0) { // no error
                     $sku_count++;
 
-                    // check if not FG or PROMO
-                    if($data['type'] == 1) {
+                    // check if not FG or PROMO and not Credit Memo
+                    if($data['type'] == 1 && $data['category'] == 0) {
                         $total_quantity += $data['quantity'];
                         $total_price_vat += $data['price_inc_vat'];
                         $total_amount += $data['amount'];
@@ -97,6 +97,7 @@ class SalesUpload extends Component
                         'type' => $data['type'],
                         'date' => date('Y-m-d', strtotime($data['date'])),
                         'document_number' => $data['document'],
+                        'category' => $data['category'],
                         'uom' => $data['uom'],
                         'quantity' => $data['quantity'],
                         'price_inc_vat' => $data['price_inc_vat'],
@@ -187,6 +188,15 @@ class SalesUpload extends Component
                     }
                 }
 
+                $category = 0;
+                $document = trim($row[1]);
+                if(!empty($document) && strpos($document, '-')) {
+                    $document_str_arr = explode('-', $document);
+                    if($document_str_arr[0] == 'PSC') { // credit memo
+                        $category = 1;
+                    }
+                }
+
                 // remove comma and convert to float from values
                 $quantity = (float)trim(str_replace(',', '', $row[9]));
                 $price_inc_vat = (float)trim(str_replace(',', '', $row[11]));
@@ -212,6 +222,7 @@ class SalesUpload extends Component
                         'check' => (!empty($exist)) ? 4 : 0,
                         'date' => $row[0],
                         'document' => $row[1],
+                        'category' => $category,
                         'customer_code' => $customerCode,
                         'location_code' => $locationCode,
                         'sku_code' => $row[5],
@@ -236,6 +247,7 @@ class SalesUpload extends Component
                         'check' => ($customers->has($customerCode)) ? ($locations->has($locationCode) ? 3 : 2) : 1,
                         'date' => $row[0],
                         'document' => $row[1],
+                        'category' => $category,
                         'customer_code' => $customerCode,
                         'location_code' => $locationCode,
                         'sku_code' => $row[5],

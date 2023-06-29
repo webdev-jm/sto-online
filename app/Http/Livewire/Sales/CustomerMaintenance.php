@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 class CustomerMaintenance extends Component
 {
     public $account;
+    public $account_branch;
     public $salesmen;
     
     public $customer_code;
@@ -40,6 +41,7 @@ class CustomerMaintenance extends Component
 
         $customer = new Customer([
             'account_id' => $this->account->id,
+            'account_branch_id' => $this->account_branch->id,
             'code' => $this->customer_code,
             'name' => $this->customer_name,
             'address' => $this->customer_address,
@@ -65,12 +67,15 @@ class CustomerMaintenance extends Component
 
     public function mount() {
         $this->account = Session::get('account');
+        $this->account_branch = Session::get('account_branch');
         // salesman options
-        $salesmen = Salesman::where('account_id', $this->account->id)->get();
+        $salesmen = Salesman::where('account_id', $this->account->id)
+            ->where('account_branch_id', $this->account_branch->id)
+            ->get();
         foreach($salesmen as $salesman) {
             $this->salesmen[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
         }
-
+        
     }
 
     public function render()

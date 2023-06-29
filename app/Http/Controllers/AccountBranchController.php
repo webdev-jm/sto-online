@@ -22,6 +22,7 @@ class AccountBranchController extends Controller
         $search = trim($request->get('search'));
 
         $account_branches = AccountBranch::orderBy('created_at', 'DESC')
+            ->with('account')
             ->when(!empty($search), function($query) use($search) {
                 $query->whereHas('account', function($qry) use($search) {
                     $qry->where('short_name', 'like', '%'.$search.'%')

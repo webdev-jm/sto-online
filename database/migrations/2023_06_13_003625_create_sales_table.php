@@ -27,6 +27,7 @@ class CreateSalesTable extends Migration
             $table->integer('type')->default(1)->comment('1 - default, 2 - FG, 3 - PROMO');
             $table->date('date');
             $table->string('document_number')->nullable();
+            $table->integer('category')->default(0);
             $table->string('uom')->nullable();
             $table->integer('quantity')->default(0);
             $table->decimal('price_inc_vat', 10,2)->default(0);

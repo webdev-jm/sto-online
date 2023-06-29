@@ -12,6 +12,7 @@ class SystemlogController extends Controller
         $search = trim($request->get('search'));
 
         $activities = Activity::where('causer_id', auth()->user()->id)
+            ->with('causer')
             ->where('causer_type', 'App\Models\User')
             ->when(!empty($search), function($query) use($search) {
                 $query->where(function($qry) use($search) {
