@@ -176,7 +176,7 @@ class AreaController extends Controller
         ->withProperties($changes_arr)
         ->log(':causer.name has updated area ['.$account->short_name.'] :subject.code :subject.name');
 
-         return back()->with([
+         return redirect()->route('area.show', encrypt($area->id))->with([
             'message_success' => 'Area '.$area->name.' has been updated.'
          ]);
     }

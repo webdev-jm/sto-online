@@ -1,4 +1,10 @@
 <div>
+    @if(!empty($err_msg))
+    <div class="alert alert-danger">
+        {{$err_msg}}
+    </div>
+    @endif
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">UPLOAD INVENTORY DATA</h3>
@@ -6,9 +12,31 @@
         <div class="card-body">
 
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                     <label for="">Upload File</label>
-                    <input type="file" class="form-control" wire:model="file">
+                    <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model="file">
+                    @if(!empty($err_msg))
+                        <small class="text-danger">{{$err_msg}}</small>
+                    @endif
+                </div>
+
+                {{-- UPLOAD COLUMNS --}}
+                <div class="col-lg-12">
+                    <ul>
+                        <li>
+                            <b>SKU CODE</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>DESCRIPTION</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>[LOCATION CODE]</b> - <span>Required, If the location code is not maintained, it will not be included in the upload.</span>
+                        </li>
+                    </ul>
+
+                    <p>
+                        <a href="{{asset('/templates/inventory-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading inventory data.
+                    </p>
                 </div>
             </div>
 

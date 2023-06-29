@@ -177,7 +177,7 @@ class LocationController extends Controller
         ->withProperties($changes_arr)
         ->log(':causer.name has updated location ['.$account->short_name.'] :subject.code :subject.name');
 
-        return back()->with([
+        return redirect()->route('location.show', encrypt($location->id))->with([
             'message_success' => 'Location '.$location->name.' was updated.'
         ]);
     }

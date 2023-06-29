@@ -46,7 +46,20 @@
                                 <td>{{$activity->log_name}}</td>
                                 <td>{{$activity->description}}</td>
                                 <td>{{$activity->causer->name}}</td>
-                                <td></td>
+                                <td class="p-1">
+                                    @if($activity->log_name == 'update' && !empty($updates[$activity->id]))
+                                    <ul class="list-group">
+                                        @foreach($updates[$activity->id] as $column => $data)
+                                        <li class="list-group-item p-1">
+                                            <b>{{$column}}:</b> {{$data['old']}}
+                                            <p class="mb-0">
+                                                <b>to:</b> {{$data['new']}}
+                                            </p>
+                                        </li>
+                                        @endforeach
+                                    </ul>
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
