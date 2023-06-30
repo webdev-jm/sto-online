@@ -17,4 +17,12 @@ class SalesmanCustomer extends Model
         'start_date',
         'end_date'
     ];
+
+    public function salesman() {
+        return $this->belongsTo('App\Models\Salesman');
+    }
+
+    public function customer() {
+        return $this->belongsTo('App\Models\Customer');
+    }
 }

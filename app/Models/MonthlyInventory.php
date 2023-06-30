@@ -37,7 +37,7 @@ class MonthlyInventory extends Model
     }
 
     public function product() {
-        return $this->belongsTo('App\Models\Product', 'product_id', 'id');
+        return $this->belongsTo('App\Models\SMSProduct', 'product_id', 'id');
     }
 
     public function inventory() {

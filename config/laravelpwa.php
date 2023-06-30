@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'name' => 'LaravelPWA',
+    'name' => 'STO ONLINE',
     'manifest' => [
         'name' => env('APP_NAME', 'My PWA App'),
-        'short_name' => 'PWA',
+        'short_name' => 'STO ONLINE',
         'start_url' => '/',
         'background_color' => '#ffffff',
         'theme_color' => '#000000',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Salesman;
+use App\Models\SalesmanCustomer;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\CustomerAddRequest;
@@ -189,9 +190,32 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail(decrypt($id));
         $changes_arr['old'] = $customer->getOriginal();
 
+        // record customer salesman history
+        if(!empty($request->salesman_id) && $customer->salesman_id != $request->salesman_id) {
+            // update end date of previous salesman
+            $prev_history = SalesmanCustomer::where('customer_id', $customer->id)
+                ->where('salesman_id', $customer->salesman_id)
+                ->whereNull('end_date')
+                ->first();
+
+            $prev_history->update([
+                'end_date' => date('Y-m-d')
+            ]);
+
+            // add new salesman history
+            $new_history = new SalesmanCustomer([
+                'salesman_id' => $request->salesman_id,
+                'customer_id' => $customer->id,
+                'start_date' => date('Y-m-d'),
+                'end_date' => NULL
+            ]);
+            $new_history->save();
+        }
+
         $customer->update([
             'area_id' => $request->area_id,
             'channel_id' => $request->channel_id,
+            'salesman_id' => $request->salesman_id,
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,

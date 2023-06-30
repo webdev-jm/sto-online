@@ -41,7 +41,7 @@
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$inventory->created_at->diffForHumans()}}</p>
+                            <p class="m-0 font-weight-bold">{{date('Y-m-d H:i:s a', strtotime($inventory->created_at))}}</p>
                             <small class="font-weight-bold text-muted">CREATED AT</small>
                         </div>
                         <div class="col-lg-4 text-center">

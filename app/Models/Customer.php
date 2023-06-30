@@ -35,4 +35,8 @@ class Customer extends Model
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }
+
+    public function customer_salesmen() {
+        return $this->hasMany('App\Models\SalesmanCustomer');
+    }
 }

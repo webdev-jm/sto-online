@@ -73,6 +73,8 @@
         <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">
     @endif
 
+    @laravelPWA
+
 </head>
 
 <body class="@yield('classes_body'){{Auth::user() && auth()->user()->dark_mode ? ' dark-mode' : ' '}}" @yield('body_data')>
