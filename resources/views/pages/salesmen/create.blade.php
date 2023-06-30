@@ -42,6 +42,24 @@
                 </div>
 
             </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Areas</label> 
+                        @if($errors->has('area_ids'))
+                            <span class="badge badge-danger">{{$errors->first('area_ids')}}</span>
+                        @endif
+                        {!! Form::hidden('area_ids', '', ['id' => 'area_ids', 'form' => 'add_salesman']) !!}
+                        <br>
+                        @foreach($areas as $area)
+                            <button class="btn btn-default mb-2 btn-area" data-id="{{$area->id}}">[{{$area->code}}] {{$area->name}}</button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
             
         </div>
         <div class="card-footer text-right">
@@ -55,4 +73,25 @@
 @stop
 
 @section('js')
+<script>
+    $(function() {
+        // AREA
+        $('body').on('click', '.btn-area', function(e) {
+            e.preventDefault();
+            $(this).toggleClass('btn-success').toggleClass('btn-default');
+
+            // get all selected
+            var area_ids = [];
+            $('body').find('.btn-area').each(function() {
+                var id = $(this).data('id');
+                if($(this).hasClass('btn-success')) {
+                    area_ids.push(id);
+                }
+            });
+
+            var areas = area_ids.join(',');
+            $('#area_ids').val(areas);
+        });
+    });
+</script>
 @stop

@@ -46,7 +46,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <label>Permissions</label>
+                    <label>PERMISSIONS</label>
                     @if($errors->has('permissions'))
                     <span class="badge badge-danger ml-1">Required</span>
                     @endif

@@ -64,15 +64,11 @@ class SalesmanController extends Controller
         $account = Session::get('account');
 
         $areas = Area::where('account_id', $account->id)->get();
-        $area_arr = array();
-        foreach($areas as $area) {
-            $area_arr[$area->id] = '['.$area->code.'] '.$area->name;
-        }
 
         return view('pages.salesmen.create')->with([
             'account' => $account,
             'account_branch' => $account_branch,
-            'areas' => $area_arr
+            'areas' => $areas
         ]);
 
     }
@@ -98,6 +94,9 @@ class SalesmanController extends Controller
             'name' => $request->name
         ]);
         $salesman->save();
+
+        $area_ids = explode(',', $request->area_ids);
+        $salesman->areas()->sync($area_ids);
 
         // logs
         activity('create')
@@ -149,16 +148,15 @@ class SalesmanController extends Controller
         $salesman = Salesman::findOrFail(decrypt($id));
 
         $areas = Area::where('account_id', $account->id)->get();
-        $area_arr = array();
-        foreach($areas as $area) {
-            $area_arr[$area->id] = '['.$area->code.'] '.$area->name;
-        }
+
+        $salesman_areas = $salesman->areas->pluck('id')->toArray();
 
         return view('pages.salesmen.edit')->with([
             'account' => $account,
             'account_branch' => $account_branch,
             'salesman' => $salesman,
-            'areas' => $area_arr
+            'areas' => $areas,
+            'salesman_areas' => $salesman_areas
         ]);
     }
 
@@ -179,13 +177,18 @@ class SalesmanController extends Controller
 
         $salesman = Salesman::findOrFail(decrypt($id));
         $changes_arr['old'] = $salesman->getOriginal();
-
+        $changes_arr['old']['arr'] = $salesman->areas->pluck('name');
+        
         $salesman->update([
             'code' => $request->code,
             'name' => $request->name
         ]);
 
+        $area_ids = explode(',', $request->area_ids);
+        $salesman->areas()->sync($area_ids);
+
         $changes_arr['changes'] = $salesman->getChanges();
+        $changes_arr['changes']['arr'] = $salesman->areas()->pluck('name');
 
         // logs
         activity('update')

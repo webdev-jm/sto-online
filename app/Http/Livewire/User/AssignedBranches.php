@@ -27,7 +27,7 @@ class AssignedBranches extends Component
     public function assign() {
         $this->user->account_branches()->sync($this->selected);
 
-        $this->form_message = 'Accounts has been assigned.';
+        $this->form_message = 'Branches has been assigned.';
     }
 
     public function selectAll() {

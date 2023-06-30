@@ -28,6 +28,9 @@ class SalesmanAddRequest extends FormRequest
                 'required'
             ],
             'name' => [
+                'required',
+            ],
+            'area_ids' => [
                 'required'
             ]
         ];

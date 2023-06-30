@@ -21,7 +21,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">CUSTOMER DETAILS</h3>
@@ -49,6 +49,28 @@
                     
                 </div>
                 <div class="card-footer">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">CUSTOMER SALESMAN HISTORY</h3>
+                </div>
+                <div class="card-body py-0">
+                    <ul class="list-group list-group-unbordered">
+                        @empty($customer->customer_salesmen)
+                            <li class="list-group-item">No history.</li>
+                        @else
+                            @foreach($customer->customer_salesmen()->orderBy('created_at', 'DESC')->get() as $cust_salesman)
+                            <li class="list-group-item p-1">
+                                <b>[{{$cust_salesman->salesman->code}}] {{$cust_salesman->salesman->name}}</b>
+                                <span class="float-right">{{$cust_salesman->start_date ?? '-'}} to {{$cust_salesman->end_date ?? 'current date'}}</span>
+                            </li>
+                            @endforeach
+                        @endempty
+                    </ul>
                 </div>
             </div>
         </div>

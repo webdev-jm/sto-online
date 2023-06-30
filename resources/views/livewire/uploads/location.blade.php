@@ -16,7 +16,7 @@
                 <div class="col-lg-6">
                     <div class="form-group">
                         {!! Form::label('file', 'Upload File') !!}
-                        {!! Form::file('file', ['class' => 'form-control'.($errors->has('file') ? ' is-invalid' : ''), 'wire:model' => 'file', 'accept' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel']) !!}
+                        {!! Form::file('file', ['class' => 'form-control'.($errors->has('file') ? ' is-invalid' : ''), 'wire:model.lazy' => 'file', 'accept' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel']) !!}
                         <small class="text-danger">{{$errors->first('file')}}</small>
                         @if(!empty($err_msg))
                             <small class="text-danger">{{$err_msg}}</small>

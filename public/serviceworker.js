@@ -14,7 +14,20 @@ var filesToCache = [
     '/images/STO ONLINE.png',
     '/images/user2-160x160.jpg',
     '/images/avatar.png',
-    '/images/LOGO.jpg'
+    '/images/LOGO.jpg',
+    '/vendor/adminlte/dist/css/adminlte.min.css',
+    '/vendor/dropzone/min/dropzone.min.js',
+    '/vendor/jquery/jquery.min.js',
+    '/vendor/bootstrap/js/bootstrap.bundle.min.js',
+    '/vendor/fontawesome-free/webfonts/fa-solid-900.woff2',
+    '/vendor/select2/js/select2.min.js',
+    '/vendor/fontawesome-free/css/all.min.css',
+    '/vendor/adminlte/dist/js/adminlte.min.js',
+    '/vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
+    '/vendor/overlayScrollbars/css/OverlayScrollbars.min.css',
+    '/vendor/select2/css/select2.min.css',
+    '/vendor/dropzone/min/dropzone.min.css',
+    '/css/admin_custom.css',
 ];
 
 // Cache on install
