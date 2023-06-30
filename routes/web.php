@@ -30,6 +30,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 Route::group(['middleware' => 'auth'], function() {
+    Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
