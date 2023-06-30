@@ -40,7 +40,11 @@
                 </div>
             </div>
 
-            <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>
+            <div class="row mb-2">
+                <div class="col-lg-6">
+                    <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>
+                </div>
+            </div>
             <ul class="list-group">
                 @foreach($customers as $customer)
                 <li class="list-group-item">
@@ -63,19 +67,25 @@
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">
-                                <a href="{{route('customer.show', encrypt($customer->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('customer edit')
-                                    <a href="{{route('customer.edit', encrypt($customer->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($customer->deleted_at))
+                                    <a href="{{route('customer.show', encrypt($customer->id))}}" class="btn btn-info btn-xs" title="view details">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('customer delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($customer->id)}}">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('customer edit')
+                                        <a href="{{route('customer.edit', encrypt($customer->id))}}" class="btn btn-success btn-xs" title="edit">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('customer delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($customer->id)}}" title="delete">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('customer restore')
+                                        <a href="{{route('customer.restore', encrypt($customer->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <small class="font-weight-bold text-muted">ACTION</small>
                         </div>

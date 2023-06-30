@@ -38,8 +38,8 @@
                             @if(!empty($inventories->total()))
                                 @foreach($inventories as $inventory)
                                 <tr>
-                                    <td>{{$inventory->product->stock_code}}</td>
-                                    <td>{{$inventory->product->description}} {{$inventory->product->size}}</td>
+                                    <td>{{$inventory->product->stock_code ?? '-'}}</td>
+                                    <td>{{$inventory->product->description ?? '-'}} {{$inventory->product->size ?? '-'}}</td>
                                     <td class="text-center align-middle">
                                         @switch($inventory->type)
                                             @case(2)

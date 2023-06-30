@@ -34,6 +34,9 @@ class CustomerController extends Controller
         $search = trim($request->get('search'));
 
         $customers = Customer::orderBy('created_at', 'DESC')
+            ->when(auth()->user()->can('customer restore'), function($query) {
+                $query->withTrashed();
+            })
             ->with('salesman')
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
@@ -234,14 +237,23 @@ class CustomerController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Customer $customer)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $customer = Customer::withTrashed()->findOrFail(decrypt($id));
+
+        $customer->restore();
+
+        activity('restore')
+            ->performedOn($customer)
+            ->log(':causer.name has restored customer '.$customer->name);
+
+        return back()->with([
+            'message_success' => 'Customer '.$customer->name.' has been restored.'
+        ]);
     }
 }

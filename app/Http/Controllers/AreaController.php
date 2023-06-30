@@ -31,6 +31,9 @@ class AreaController extends Controller
         $search = trim($request->get('search'));
 
         $areas = Area::orderBy('created_at', 'DESC')
+            ->when(auth()->user()->can('area restore'), function($query) {
+                $query->withTrashed();
+            })
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
@@ -181,14 +184,23 @@ class AreaController extends Controller
          ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Area  $area
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Area $area)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $area = Area::withTrashed()->findOrFail(decrypt($id));
+
+        $area->restore();
+
+        activity('restore')
+            ->performedOn($area)
+            ->log(':causer.name has restored area '.$area->name);
+
+        return back()->with([
+            'message_success' => 'Area '.$area->name.' has been restored.'
+        ]);
     }
 }

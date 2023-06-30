@@ -55,19 +55,25 @@
                         </div>
                         <div class="col-lg-4 text-center">
                             <p class="m-0">
-                                <a href="{{route('location.show', encrypt($location->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('location edit')
-                                    <a href="{{route('location.edit', encrypt($location->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($location->deleted_at))
+                                    <a href="{{route('location.show', encrypt($location->id))}}" class="btn btn-info btn-xs">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('location delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($location->id)}}">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('location edit')
+                                        <a href="{{route('location.edit', encrypt($location->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('location delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($location->id)}}">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('location restore')
+                                        <a href="{{route('location.restore', encrypt($location->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <b>ACTION</b>
                         </div>

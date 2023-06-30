@@ -33,6 +33,9 @@ class SalesmanController extends Controller
         $search = trim($request->get('search'));
 
         $salesmen = Salesman::orderBy('created_at', 'DESC')
+            ->when(auth()->user()->can('salesman restore'), function($query) {
+                $query->withTrashed();
+            })
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
@@ -201,14 +204,23 @@ class SalesmanController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Salesman  $salesman
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Salesman $salesman)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $salesman = Salesman::withTrashed()->findOrFail(decrypt($id));
+
+        $salesman->restore();
+
+        activity('restore')
+            ->performedOn($salesman)
+            ->log(':causer.name has restored salesman '.$salesman->name);
+
+        return back()->with([
+            'message_success' => 'Salesman '.$salesman->name.' has been restored.'
+        ]);
     }
 }

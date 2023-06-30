@@ -65,7 +65,7 @@
                         @else
                             @foreach($customer->customer_salesmen()->orderBy('created_at', 'DESC')->get() as $cust_salesman)
                             <li class="list-group-item p-1">
-                                <b>[{{$cust_salesman->salesman->code}}] {{$cust_salesman->salesman->name}}</b>
+                                <b>[{{$cust_salesman->salesman->code ?? '-'}}] {{$cust_salesman->salesman->name ?? '-'}}</b>
                                 <span class="float-right">{{$cust_salesman->start_date ?? '-'}} to {{$cust_salesman->end_date ?? 'current date'}}</span>
                             </li>
                             @endforeach
