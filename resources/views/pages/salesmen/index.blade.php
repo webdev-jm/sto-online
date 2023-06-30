@@ -55,19 +55,25 @@
                         </div>
                         <div class="col-lg-4 text-center">
                             <p class="m-0">
-                                <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('salesman edit')
-                                    <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($salesman->deleted_at))
+                                    <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('salesman delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($salesman->id)}}">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('salesman edit')
+                                        <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('salesman delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($salesman->id)}}">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('salesman restore')
+                                        <a href="{{route('salesman.restore', encrypt($salesman->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <b>ACTION</b>
                         </div>

@@ -75,6 +75,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('customer/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit')->middleware('permission:customer edit');
         Route::post('customer/{id}', [CustomerController::class, 'update'])->name('customer.update')->middleware('permission:customer edit');
+
+        Route::get('customer/{id}/restore', [CustomerController::class, 'restore'])->name('customer.restore')->middleware('permission:customer restore');
     });
 
     // SALESMEN
@@ -87,6 +89,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('salesman/{id}/edit', [SalesmanController::class, 'edit'])->name('salesman.edit')->middleware('permission:salesman edit');
         Route::post('salesman/{id}', [SalesmanController::class, 'update'])->name('salesman.update')->middleware('permission:salesman edit');
+
+        Route::get('salesman/{id}/restore', [SalesmanController::class, 'restore'])->name('salesman.restore')->middleware('permission:salesman restore');
     });
 
     // CHANNEL
@@ -111,6 +115,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('area/{id}/edit', [AreaController::class, 'edit'])->name('area.edit')->middleware('permission:area edit');
         Route::post('area/{id}', [AreaController::class, 'update'])->name('area.update')->middleware('permission:area edit');
+
+        Route::get('area/{id}/restore', [AreaController::class, 'restore'])->name('area.restore')->middleware('permission:area restore');
     });
 
     // LOCATION
@@ -123,6 +129,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('location/{id}/edit', [LocationController::class, 'edit'])->name('location.edit')->middleware('permission:location edit');
         Route::post('location/{id}', [LocationController::class, 'update'])->name('location.update')->middleware('permission:location edit');
+
+        Route::get('location/{id}/restore', [LocationController::class, 'restore'])->name('location.restore')->middleware('permission:location restore');
     });
 
     // ACCOUNT BRANCH

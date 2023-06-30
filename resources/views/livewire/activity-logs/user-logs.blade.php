@@ -23,7 +23,7 @@
                     @foreach($activities as $activity)
                         <tr>
                             <td>{{$activity->log_name}}</td>
-                            <td>{{$activity->causer->name}}</td>
+                            <td>{{$activity->causer->name ?? '-'}}</td>
                             <td>{{$activity->description}}</td>
                             <td>{{date('F j, Y H:i:s a', strtotime($activity->created_at))}}</td>
                             <td class="p-1">

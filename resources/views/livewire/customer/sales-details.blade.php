@@ -37,11 +37,11 @@
                                 <tr>
                                     <td class="text-center align-middle">{{$sale->date}}</td>
                                     <td class="text-center align-middle">{{$sale->document_number}}</td>
-                                    <td class="text-left align-middle">{{'['.$sale->customer->code.'] '.$sale->customer->name}}</td>
-                                    <td class="text-left align-middle">{{'['.$sale->salesman->code.'] '.$sale->salesman->name}}</td>
-                                    <td class="text-center align-middle">{{$sale->location->code}}</td>
-                                    <td class="text-center align-middle">{{$sale->product->stock_code}}</td>
-                                    <td class="text-left align-middle">{{$sale->product->description.' '.$sale->product->size}}</td>
+                                    <td class="text-left align-middle">{{'['.($sale->customer->code ?? '-').'] '.($sale->customer->name ?? '-')}}</td>
+                                    <td class="text-left align-middle">{{'['.($sale->salesman->code ?? '-').'] '.($sale->salesman->name ?? '-')}}</td>
+                                    <td class="text-center align-middle">{{$sale->location->code ?? '-'}}</td>
+                                    <td class="text-center align-middle">{{$sale->product->stock_code ?? '-'}}</td>
+                                    <td class="text-left align-middle">{{($sale->product->description ?? '-').' '.($sale->product->size ?? '-')}}</td>
                                     <td class="text-center align-middle">{{$sale->uom}}</td>
                                     <td class="text-right align-middle">{{number_format($sale->quantity)}}</td>
                                     <td class="text-right align-middle">{{number_format($sale->price_inc_vat, 2)}}</td>

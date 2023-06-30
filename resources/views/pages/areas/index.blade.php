@@ -50,19 +50,25 @@
                         </div>
                         <div class="col-lg-4 text-center">
                             <p class="m-0">
-                                <a href="{{route('area.show', encrypt($area->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('area edit')
-                                    <a href="{{route('area.edit', encrypt($area->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($area->deleted_at))
+                                    <a href="{{route('area.show', encrypt($area->id))}}" class="btn btn-info btn-xs">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('area delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($area->id)}}">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('area edit')
+                                        <a href="{{route('area.edit', encrypt($area->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('area delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($area->id)}}">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('area restore')
+                                        <a href="{{route('area.restore', encrypt($area->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <b>ACTION</b>
                         </div>

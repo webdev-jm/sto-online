@@ -38,6 +38,7 @@ class PermissionSeeder extends Seeder
                 'customer edit'     => 'Allow user to edit customer.',
                 'customer delete'   => 'Allow user to delete customer.',
                 'customer upload'   => 'Allow user to upload customer data.',
+                'customer restore'  => 'Allow user to restore customer data.',
             ],
             'Salesman' => [
                 'salesman access'   => 'Allow user to access salesman list and details',
@@ -45,6 +46,7 @@ class PermissionSeeder extends Seeder
                 'salesman edit'     => 'Allow user to edit salesman.',
                 'salesman delete'   => 'Allow user to delete salesman.',
                 'salesman upload'   => 'Allow user to upload salesman data.',
+                'salesman restore'  => 'Allow user to restore salesman data.',
             ],
             'Channel' => [
                 'channel access'   => 'Allow user to access channel list and details',
@@ -52,12 +54,14 @@ class PermissionSeeder extends Seeder
                 'channel edit'     => 'Allow user to edit channel.',
                 'channel delete'   => 'Allow user to delete channel.',
                 'channel upload'   => 'Allow user to upload channel data.',
+                'channel restore'  => 'Allow user to restore channel data.',
             ],
             'Area' => [
                 'area access'   => 'Allow user to access areas list and details',
                 'area create'   => 'Allow user to add area.',
                 'area edit'     => 'Allow user to edit area.',
                 'area delete'   => 'Allow user to delete area.',
+                'area restore'  => 'Allow user to restore area data.',
             ],
             'Location' => [
                 'location access'   => 'Allow user to access location list and details',
@@ -65,12 +69,14 @@ class PermissionSeeder extends Seeder
                 'location edit'     => 'Allow user to edit location.',
                 'location delete'   => 'Allow user to delete location.',
                 'location upload'   => 'Allow user to upload location data.',
+                'location restore'  => 'Allow user to restore location data.',
             ],
             'Account Branch' => [
-                'account branch access' =>  'Allow user to access account branch list and details',
-                'account branch create' =>  'Allow user to add account branch',
-                'account branch edit'   =>  'Allow user to edit account branch',
-                'account branch delete' =>  'Allow user to delete account branch',
+                'account branch access'     =>  'Allow user to access account branch list and details',
+                'account branch create'     =>  'Allow user to add account branch',
+                'account branch edit'       =>  'Allow user to edit account branch',
+                'account branch delete'     =>  'Allow user to delete account branch',
+                'account branch restore'    => 'Allow user to restore account branch.',
             ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',
@@ -79,7 +85,8 @@ class PermissionSeeder extends Seeder
                 'user delete'           =>  'Allow user to delete user',
                 'user assign account'   =>  'Allow user to assign accounts to user.',
                 'user assign branch'    =>  'Allow user to assign branches to user',
-                'user change signature' =>  'Allow user to change signature in profile settings.'
+                'user change signature' =>  'Allow user to change signature in profile settings.',
+                'user restore'          => 'Allow user to restore user',
             ],
             'Role' => [
                 'role access'   =>  'Allow user to access roles list and details',

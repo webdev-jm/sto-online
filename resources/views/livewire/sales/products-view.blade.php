@@ -23,11 +23,11 @@
                     @foreach($sales as $sale)
                     <tr class="text-center">
                         <td class="align-middle pl-1">{{$sale->date}}</td>
-                        <td class="align-middle text-left">[{{$sale->customer->code}}] {{$sale->customer->name}}</td>
-                        <td class="align-middle text-left">[{{$sale->salesman->code}}] {{$sale->name}}</td>
-                        <td class="align-middle">{{$sale->location->code}}</td>
-                        <td class="align-middle">{{$sale->product->stock_code}}</td>
-                        <td class="align-middle">{{$sale->product->description}} - {{$sale->product->size}}</td>
+                        <td class="align-middle text-left">[{{$sale->customer->code ?? '-'}}] {{$sale->customer->name ?? '-'}}</td>
+                        <td class="align-middle text-left">[{{$sale->salesman->code ?? '-'}}] {{$sale->name}}</td>
+                        <td class="align-middle">{{$sale->location->code ?? '-'}}</td>
+                        <td class="align-middle">{{$sale->product->stock_code ?? '-'}}</td>
+                        <td class="align-middle">{{$sale->product->description ?? '-'}} - {{$sale->product->size ?? '-'}}</td>
                         <td class="align-middle">{{$sale->uom}}</td>
                         <td class="align-middle text-right">{{number_format($sale->quantity)}}</td>
                         <td class="align-middle text-right">{{number_format($sale->amount, 2)}}</td>

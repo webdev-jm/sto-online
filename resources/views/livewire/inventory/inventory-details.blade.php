@@ -13,7 +13,7 @@
                         <th>DESCRIPTION</th>
                         <th>UOM</th>
                         @foreach($location_ids as $location_id)
-                            <th>{{$location_id->location->code}}</th>
+                            <th>{{$location_id->location->code ?? '-'}}</th>
                         @endforeach
                         @if($type == 'edit')
                             <th class="p-0"></th>
