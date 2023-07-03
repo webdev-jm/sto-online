@@ -95,7 +95,8 @@ class InventoryUpload extends Component
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
 
-        $path = $this->file->getRealPath();
+        $path1 = $this->file->store('inventory-uploads');
+        $path = storage_path('app').'/'.$path1;
         $this->data = Excel::toArray([], $path)[0];
 
         $this->resetPage('page');
