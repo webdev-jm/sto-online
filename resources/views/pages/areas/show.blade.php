@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - AREA</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('area.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
+        <a href="{{route('area.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back to List</a>
         @can('area edit')
             <a href="{{route('area.edit', encrypt($area->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Area</a>
         @endcan
@@ -55,8 +55,14 @@
                         @if(!empty($area->salesmen->count()))
                             @foreach($area->salesmen as $salesman)
                             <li class="list-group-item p-1">
-                                <b>{{$salesman->code}}</b>
-                                <span class="float-right">{{$salesman->name}}</span>
+                                <b>
+                                    <a href="{{route('salesman.show', encrypt($salesman->id))}}">
+                                        {{$salesman->code}}
+                                    </a>
+                                </b>
+                                <span class="float-right">
+                                        {{$salesman->name}}
+                                </span>
                             </li>
                             @endforeach
                         @else

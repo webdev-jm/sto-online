@@ -18,16 +18,22 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row">
-                @foreach($accounts as $account)
-                    <div class="col-lg-3">
-                        <a href="{{route('branches', encrypt($account->account_id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
-                            <i class="fa fa-user"></i>
-                            [{{$account->account_code}}] {{$account->short_name}}
-                        </a>
-                    </div>
-                @endforeach
-            </div>
+            @if(!empty($accounts->total()))
+                <div class="row">
+                    @foreach($accounts as $account)
+                        <div class="col-lg-3">
+                            <a href="{{route('branches', encrypt($account->account_id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
+                                <i class="fa fa-user"></i>
+                                [{{$account->account_code}}] {{$account->short_name}}
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <ul class="list-group">
+                    <li class="list-group-item text-center">No data available.</li>
+                </ul>
+            @endif
         </div>
         <div class="card-footer">
             {{$accounts->links()}}

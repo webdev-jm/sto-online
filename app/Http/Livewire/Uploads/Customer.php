@@ -98,7 +98,8 @@ class Customer extends Component
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
 
-        $path = $this->file->getRealPath();
+        $path1 = $this->file->store('customer-uploads');
+        $path = storage_path('app').'/'.$path1;
         $data = Excel::toArray([], $path)[0];
         $header = $data[1];
         

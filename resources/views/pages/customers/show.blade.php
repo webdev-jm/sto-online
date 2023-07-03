@@ -8,7 +8,7 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - CUSTOMER</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('customer.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
+        <a href="{{route('customer.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back to List</a>
         @can('customer edit')
             <a href="{{route('customer.edit', encrypt($customer->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Customer</a>
         @endcan
@@ -39,7 +39,11 @@
                         </li>
                         <li class="list-group-item p-1">
                             <b>Salesman</b>
-                            <span class="float-right">[{{$customer->salesman->code ?? '-'}}] {{$customer->salesman->name ?? '-'}}</span>
+                            <span class="float-right">
+                                <a href="{{route('salesman.show', encrypt($customer->salesman_id))}}">
+                                    [{{$customer->salesman->code ?? '-'}}] {{$customer->salesman->name ?? '-'}}
+                                </a>
+                            </span>
                         </li>
                         <li class="list-group-item p-1">
                             <b>Address</b>
