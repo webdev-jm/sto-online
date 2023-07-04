@@ -28,6 +28,8 @@ class AssignedAccounts extends Component
         $this->user->accounts()->sync($this->selected);
 
         $this->form_message = 'Accounts has been assigned.';
+
+        $this->emit('updateBranches');
     }
 
     public function selectAll() {
