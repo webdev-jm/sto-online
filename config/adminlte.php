@@ -324,6 +324,13 @@ return [
             'icon'      => 'fa fa-fw fa-history',
             'can'       => 'systemlog',
             'active'    => ['systemlog']
+        ],
+        [
+            'text'      => 'Error Logs',
+            'url'       => '/logs',
+            'icon'      => 'fa fa-fw fa-exclamation-triangle',
+            'can'       => 'error logs',
+            'active'    => ['logs']
         ]
     ],
 

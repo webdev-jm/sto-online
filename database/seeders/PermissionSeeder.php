@@ -96,6 +96,7 @@ class PermissionSeeder extends Seeder
             ],
             'Systemlog' => [
                 'systemlog'   =>  'Allow user to access systemlog.',
+                'error logs'  =>  'Allow user to view error logs.'
             ],
         ];
 

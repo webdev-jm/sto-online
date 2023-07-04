@@ -20,6 +20,10 @@ class AssignedBranches extends Component
 
     public $form_message;
 
+    protected $listeners = [
+        'updateBranches' => 'clear'
+    ];
+
     public function updatedSearch() {
         $this->resetPage('branch-page');
     }

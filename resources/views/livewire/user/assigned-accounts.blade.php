@@ -9,7 +9,7 @@
         <div class="card-header">
             <h3 class="card-title">Accounts</h3>
             <div class="card-tools">
-                <input type="text" class="form-control form-control-sm" wire:model="search" placeholder="Search">
+                <input type="text" class="form-control form-control-sm" wire:model.lazy="search" placeholder="Search">
             </div>
         </div>
         <div class="card-body">

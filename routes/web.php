@@ -30,8 +30,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 Route::group(['middleware' => 'auth'], function() {
-    Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
-
+    
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
@@ -173,4 +172,6 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:systemlog'], function() {
         Route::get('systemlog', [SystemlogController::class, 'index'])->name('systemlog');
     });
+    // ERROR LOGS
+    Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('error-logs')->middleware('permission:error logs');
 });

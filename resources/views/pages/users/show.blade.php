@@ -88,7 +88,7 @@
             @can('user assign account')
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Assigne Accounts</h3>
+                    <h3 class="card-title">Assign Accounts</h3>
                 </div>
                 <div class="card-body p-1">
                     <livewire:user.assigned-accounts :user="$user" />
