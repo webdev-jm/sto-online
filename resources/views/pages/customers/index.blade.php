@@ -40,6 +40,14 @@
                 </div>
             </div>
 
+            @if(!empty(session('upload_data')))
+            <div class="row">
+                <div class="col-12">
+                    <livewire:customer.upload-progress :upload_data="session('upload_data')"/>
+                </div>
+            </div>
+            @endif
+
             <div class="row mb-2">
                 <div class="col-lg-6">
                     <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>

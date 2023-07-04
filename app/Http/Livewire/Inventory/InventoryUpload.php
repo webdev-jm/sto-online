@@ -19,6 +19,8 @@ use App\Models\SMSProduct;
 
 use App\Http\Traits\GenerateMonthlyInventory;
 
+use App\Jobs\InventoryImportJob;
+
 class InventoryUpload extends Component
 {
     use GenerateMonthlyInventory;
@@ -40,6 +42,50 @@ class InventoryUpload extends Component
 
     public function uploadData() {
         if(!empty($this->inventory_data)) {
+            // $inventory_upload = new IU([
+            //     'account_id' => $this->account->id,
+            //     'account_branch_id' => $this->account_branch->id,
+            //     'user_id' => auth()->user()->id,
+            //     'date' => date('Y-m-d'),
+            //     'total_inventory' => 0
+            // ]);
+            // $inventory_upload->save();
+
+            // $total_inventory = 0;
+            // foreach($this->inventory_data as $data) {
+
+            //     // check
+            //     if($data['check'] == 0) {
+            //         foreach($this->keys as $key => $location) {
+            //             $total_inventory += $data[$location['id']];
+
+            //             $inventory = new Inventory([
+            //                 'account_id' => $this->account->id,
+            //                 'account_branch_id' => $this->account_branch->id,
+            //                 'inventory_upload_id' => $inventory_upload->id,
+            //                 'location_id' => $location['id'],
+            //                 'product_id' => $data['product_id'],
+            //                 'type' => $data['type'],
+            //                 'uom' => $data['uom'],
+            //                 'inventory' => $data[$location['id']],
+            //             ]);
+            //             $inventory->save();
+            //         }
+            //     }
+            // }
+
+            // $inventory_upload->update([
+            //     'total_inventory' => $total_inventory
+            // ]);
+
+            // // logs
+            // activity('upload')
+            // ->performedOn($inventory_upload)
+            // ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
+
+            // // generate monthly inventory
+            // $this->setMonthlyInventory($this->account, $this->account_branch, date('Y'), (int)date('m'));
+
             $inventory_upload = new IU([
                 'account_id' => $this->account->id,
                 'account_branch_id' => $this->account_branch->id,
@@ -49,43 +95,29 @@ class InventoryUpload extends Component
             ]);
             $inventory_upload->save();
 
-            $total_inventory = 0;
+            InventoryImportJob::dispatch($this->inventory_data, $this->account->id, $this->account_branch->id, auth()->user()->id, $inventory_upload->id, $this->keys);
+
+            $total = 0;
             foreach($this->inventory_data as $data) {
-
-                // check
                 if($data['check'] == 0) {
-                    foreach($this->keys as $key => $location) {
-                        $total_inventory += $data[$location['id']];
-
-                        $inventory = new Inventory([
-                            'account_id' => $this->account->id,
-                            'account_branch_id' => $this->account_branch->id,
-                            'inventory_upload_id' => $inventory_upload->id,
-                            'location_id' => $location['id'],
-                            'product_id' => $data['product_id'],
-                            'type' => $data['type'],
-                            'uom' => $data['uom'],
-                            'inventory' => $data[$location['id']],
-                        ]);
-                        $inventory->save();
-                    }
+                    $total++;
                 }
             }
 
-            $inventory_upload->update([
-                'total_inventory' => $total_inventory
-            ]);
+            $upload_data = [
+                'total' => $total,
+                'start' => 0,
+                'upload_id' => $inventory_upload->id,
+            ];
 
             // logs
             activity('upload')
             ->performedOn($inventory_upload)
-            ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
-
-            // generate monthly inventory
-            $this->setMonthlyInventory($this->account, $this->account_branch, date('Y'), (int)date('m'));
+            ->log(':causer.name has uploaded inventory data on ['.$this->account->short_name.']');
 
             return redirect()->route('inventory.index')->with([
-                'message_success' => 'Inventory data has been uploaded.'
+                'message_success' => 'Inventory data has been uploaded.',
+                'upload_data' => $upload_data
             ]);
         }
     }

@@ -1,7 +1,7 @@
 @extends('adminlte::master')
 
 @section('meta_tags')
-<link rel="shortcut icon" href="{{asset('/images/LOGO.jpg')}}" type="image/x-icon">
+<link rel="shortcut icon" href="{{asset('/images/STO ONLINE.png')}}" type="image/x-icon">
 @endsection
 
 @inject('layoutHelper', 'JeroenNoten\LaravelAdminLte\Helpers\LayoutHelper')
