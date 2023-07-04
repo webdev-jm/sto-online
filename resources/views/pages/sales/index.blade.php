@@ -33,6 +33,14 @@
                 </div>
             </div>
 
+            @if(!empty(session('upload_data')))
+            <div class="row">
+                <div class="col-12">
+                    <livewire:sales.upload-progress :upload_data="session('upload_data')"/>
+                </div>
+            </div>
+            @endif
+
             <b>{{$sales_uploads->total()}} total result{{$sales_uploads->total() > 1 ? 's' : ''}}</b>
             <ul class="list-group">
                 @foreach($sales_uploads as $sale)

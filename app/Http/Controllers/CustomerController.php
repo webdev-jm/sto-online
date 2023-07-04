@@ -55,7 +55,7 @@ class CustomerController extends Controller
             'account' => $account,
             'account_branch' => $account_branch,
             'customers' => $customers,
-            'search' => $search
+            'search' => $search,
         ]);
     }
 
