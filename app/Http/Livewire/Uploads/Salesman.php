@@ -32,12 +32,7 @@ class Salesman extends Component
     public function uploadData() {
         foreach($this->salesman_data as $data) {
             // check
-            $salesman = Sale::where('account_id', $this->account->id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->where('code', $data['code'])
-                ->where('name', $data['name'])
-                ->first();
-            if(empty($salesman)) {
+            if($data['check'] == 0) {
                 $salesman = new Sale([
                     'account_id' => $this->account->id,
                     'account_branch_id' => $this->account_branch->id,
@@ -45,29 +40,30 @@ class Salesman extends Component
                     'name' => $data['name'],
                 ]);
                 $salesman->save();
+                
+                if(!empty($data['area'])) {
+                    // assign area
+                    $area = Area::where('account_id', $this->account->id)
+                        ->where('account_branch_id', $this->account_branch->id)
+                        ->where(function($query) use($data) {
+                            $query->where('code', $data['area'])
+                                ->orWhere('name', $data['area']);
+                        })
+                        ->first();
+                    if(empty($area)) {
+                        $area = new Area([
+                            'account_id' => $this->account->id,
+                            'account_branch_id' => $this->account_branch->id,
+                            'code' => $data['area'],
+                            'name' => $data['area']
+                        ]);
+                        $area->save();
+                    }
+        
+                    $salesman->areas()->syncWithoutDetaching($area->id);
+                }
             }
 
-            if(!empty($data['area'])) {
-                // assign area
-                $area = Area::where('account_id', $this->account->id)
-                    ->where('account_branch_id', $this->account_branch->id)
-                    ->where(function($query) use($data) {
-                        $query->where('code', $data['area'])
-                            ->orWhere('name', $data['area']);
-                    })
-                    ->first();
-                if(empty($area)) {
-                    $area = new Area([
-                        'account_id' => $this->account->id,
-                        'account_branch_id' => $this->account_branch->id,
-                        'code' => $data['area'],
-                        'name' => $data['area']
-                    ]);
-                    $area->save();
-                }
-    
-                $salesman->areas()->syncWithoutDetaching($area->id);
-            }
         }
 
         // logs
@@ -91,9 +87,17 @@ class Salesman extends Component
         
         $this->reset('salesman_data');
         if($this->checkHeader($header) == 0) {
+            $current_salesmen = Sale::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->get()
+                ->keyBy('code');
+
             foreach($data as $key => $row) {
                 if($key > 0) {
+                    $check = $current_salesmen->get($row[0]);
+
                     $this->salesman_data[] = [
+                        'check' => empty($check) ? 0 : 1,
                         'code' => $row[0],
                         'name' => $row[1],
                         'area' => $row[2],

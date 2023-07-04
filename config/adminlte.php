@@ -415,17 +415,17 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js',
+                    'asset' => true,
+                    'location' => '/vendor/sweetalert2/sweetalert2.all.min.js',
                 ],
                 [
                     'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css',
+                    'asset' => true,
+                    'location' => '/vendor/sweetalert2/sweetalert2.min.css',
                 ],
             ],
         ],

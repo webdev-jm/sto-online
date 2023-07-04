@@ -46,6 +46,12 @@
                     </p>
                 </div>
 
+                @if(empty($customer_data))
+                <div class="col-12" wire:loading>
+                    <label><i class="fa fa-spinner fa-spin mr-1"></i></span>Loading</label>
+                </div>
+                @endif
+
                 {{-- PREVIEW --}}
                 @if(!empty($customer_data))
                 <div class="col-12">
@@ -56,6 +62,7 @@
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>CODE</th>
                                 <th>NAME</th>
                                 <th>ADDRESS</th>
@@ -65,6 +72,17 @@
                         <tbody>
                             @foreach($paginatedData as $data)
                             <tr>
+                                <td class="text-center align-middle">
+                                    @switch($data['check'])
+                                        @case(0)
+                                            <i class="fa fa-check-circle text-success"></i>
+                                        @break
+                                        @case(1)
+                                            <i class="fa fa-times-circle text-danger d-block"></i>
+                                            <small class="text-danger">exists</small>
+                                        @break
+                                    @endswitch
+                                </td>
                                 <td>{{$data['code'] ?? '-'}}</td>
                                 <td>{{$data['name'] ?? '-'}}</td>
                                 <td>{{$data['address'] ?? '-'}}</td>
