@@ -53,6 +53,7 @@
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>CODE</th>
                                 <th>NAME</th>
                                 <th>AREA</th>
@@ -61,6 +62,17 @@
                         <tbody>
                             @foreach($paginatedData as $data)
                             <tr>
+                                <td class="text-center align-middle">
+                                    @switch($data['check'])
+                                        @case(0)
+                                            <i class="fa fa-check-circle text-success"></i>
+                                        @break
+                                        @case(1)
+                                            <i class="fa fa-times-circle text-danger d-block"></i>
+                                            <small class="text-danger">exists</small>
+                                        @break
+                                    @endswitch
+                                </td>
                                 <td>{{$data['code'] ?? '-'}}</td>
                                 <td>{{$data['name'] ?? '-'}}</td>
                                 <td>{{$data['area'] ?? '-'}}</td>

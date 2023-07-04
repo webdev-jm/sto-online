@@ -47,13 +47,7 @@ class CustomerImportJob implements ShouldQueue
                 ->where('code', $data['salesman'])
                 ->first();
             
-            // check
-            $customer = Customer::where('account_id', $this->account_id)
-                ->where('account_branch_id', $this->account_branch_id)
-                ->where('code', $data['code'])
-                ->where('name', $data['name'] ?? '-')
-                ->first();
-            if(empty($customer)) {
+            if($data['check'] == 0) {
                 $customer = new Customer([
                     'account_id' => $this->account_id,
                     'account_branch_id' => $this->account_branch_id,
@@ -75,20 +69,21 @@ class CustomerImportJob implements ShouldQueue
                     $salesman_customer->update([
                         'end_date' => date('Y-m-d')
                     ]);
+                } else {
+                    // record new salesman history
+                    $salesman_customer = new SalesmanCustomer([
+                        'salesman_id' => $salesman->id,
+                        'customer_id' => $customer->id,
+                        'start_date' => date('Y-m-d'),
+                    ]);
+                    $salesman_customer->save();
                 }
 
                 // update salesman
                 $customer->update([
                     'salesman_id' => $salesman->id
                 ]);
-
-                // record new salesman history
-                $salesman_customer = new SalesmanCustomer([
-                    'salesman_id' => $salesman->id,
-                    'customer_id' => $customer->id,
-                    'start_date' => date('Y-m-d'),
-                ]);
-                $salesman_customer->save();
+                
             }
             
         }

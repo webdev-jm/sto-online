@@ -8,6 +8,7 @@
             <h1>ROLE</h1>
         </div>
         <div class="col-lg-6 text-right">
+            <a href="{{route('role.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
             @can('role edit')
                 <a href="{{route('role.edit', encrypt($role->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Role</a>
             @endcan

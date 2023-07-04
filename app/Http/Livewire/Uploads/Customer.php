@@ -86,8 +86,15 @@ class Customer extends Component
             
         // }
 
+        $total = 0;
+        foreach($this->customer_data as $data) {
+            if($data['check'] == 0) {
+                $total++;
+            }
+        }
+
         $upload_data = [
-            'total' => count($this->customer_data),
+            'total' => $total,
             'start' => Cust::where('account_id', $this->account->id)->where('account_branch_id', $this->account_branch->id)->count(),
         ];
 
@@ -109,26 +116,35 @@ class Customer extends Component
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
 
-        $path1 = $this->file->store('customer-uploads');
+        $path1 = $this->file->storeAs('customer-uploads', $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
-        $data = Excel::toArray([], $path)[0];
-        $header = $data[1];
+
+        $data = collect(Excel::toArray([], $path))->flatten(1)->skip(1);
+        $header = $data->first();
         
         $this->reset([
             'customer_data',
             'err_msg'
         ]);
+
         if($this->checkHeader($header) == 0) {
-            foreach($data as $key => $row) {
-                if($key > 1) {
-                    $this->customer_data[] = [
-                        'code' => $row[0],
-                        'name' => $row[1],
-                        'address' => $row[2],
-                        'salesman' => $row[3],
-                    ];
-                }
-            }
+
+            $current_customers = Cust::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->get()
+                ->keyBy('code');
+            
+            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers) {
+                $customer = $current_customers->get($row[0]);
+            
+                return [
+                    'check' => empty($customer) ? 0 : 1,
+                    'code' => $row[0],
+                    'name' => $row[1],
+                    'address' => $row[2],
+                    'salesman' => $row[3],
+                ];
+            })->toArray();
         } else {
             $this->err_msg = 'Invalid format. please provide an excel with the correct format.';
         }
