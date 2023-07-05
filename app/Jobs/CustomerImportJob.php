@@ -59,7 +59,7 @@ class CustomerImportJob implements ShouldQueue
             }
 
             // add salesman
-            if(!empty($salesman) && $customer->salesman_id != $salesman->id) {
+            if(!empty($salesman) && !empty($customer) && $customer->salesman_id != $salesman->id) {
                 // update previous salesan history record
                 $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
                     ->where('customer_id', $customer->id)
