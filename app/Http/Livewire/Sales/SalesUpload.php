@@ -37,6 +37,8 @@ class SalesUpload extends Component
 
     public $upload_data;
 
+    public $upload_triggered = false;
+
     protected $listeners = [
         'checkData' => 'updateData'
     ];
@@ -56,6 +58,10 @@ class SalesUpload extends Component
     }
 
     public function saveUpload() {
+        if ($this->upload_triggered) {
+            return;
+        }
+
         if(!empty($this->sales_data)) {
 
             // $upload = new Upload([
@@ -154,10 +160,13 @@ class SalesUpload extends Component
             ->performedOn($upload)
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
 
+            $this->upload_triggered = true;
+
             return redirect()->route('sales.index')->with([
                 'message_success' => 'Sales data has been added to queue for processing.',
                 'upload_data' => $upload_data
             ]);
+            
         } else {
             $this->err_msg = 'No data has been saved!';
         }

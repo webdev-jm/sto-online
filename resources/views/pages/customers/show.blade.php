@@ -22,7 +22,7 @@
 @section('content')
     <div class="row">
         <div class="col-lg-6">
-            <div class="card">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">CUSTOMER DETAILS</h3>
                 </div>
@@ -58,7 +58,7 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">CUSTOMER SALESMAN HISTORY</h3>
                 </div>

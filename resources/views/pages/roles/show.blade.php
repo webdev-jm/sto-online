@@ -19,7 +19,7 @@
 @section('content')
 <div class="row">
     <div class="col-lg-4">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title">ROLE DETAILS</h3>
             </div>

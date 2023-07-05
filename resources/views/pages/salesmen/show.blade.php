@@ -22,7 +22,7 @@
 @section('content')
     <div class="row">
         <div class="col-lg-4">
-            <div class="card">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">SALESMAN DETAILS</h3>
                 </div>
@@ -45,7 +45,7 @@
             </div>
 
             @if(!empty($salesman->areas))
-                <div class="card">
+                <div class="card card-outline card-primary">
                     <div class="card-header">
                         <h3 class="card-title">SALESMAN AREAS</h3>
                     </div>
