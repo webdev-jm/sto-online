@@ -23,7 +23,7 @@
     <div class="row">
 
         <div class="col-lg-5">
-            <div class="card">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">BRANCH DETAILS</h3>
                 </div>
@@ -43,6 +43,38 @@
                             <span class="float-right">{{$account_branch->name ?? '-'}}</span>
                         </li>
                     </ul>
+
+                </div>
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Users</h3>
+                </div>
+                <div class="card-body py-0">
+                    <ul class="list-group list-group-unbordered">
+                        @if(!empty($account_branch->users->count()))
+                            @foreach($account_branch->users as $user)
+                            <li class="list-group-item p-1">
+                                <b>{{$user->name}}</b>
+                                <span class="float-right">
+                                    {{$user->email}}
+                                </span>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="list-group-item text-center">
+                                No data available.
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+                <div class="card-footer">
 
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <div>
-    <div class="card">
+    <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">CUSTOMER SALES</h3>
         </div>

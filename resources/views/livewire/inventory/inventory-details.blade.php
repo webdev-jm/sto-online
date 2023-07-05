@@ -1,6 +1,6 @@
 <div>
 
-    <div class="card">
+    <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">INVENTORIES</h3>
         </div>
