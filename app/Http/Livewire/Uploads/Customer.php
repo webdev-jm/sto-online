@@ -32,59 +32,13 @@ class Customer extends Component
 
     public $perPage = 10;
 
+    public $upload_triggered = false;
+
     public function uploadData() {
-        // foreach($this->customer_data as $data) {
-        //     // get salesman
-        //     $salesman = Salesman::where('account_id', $this->account->id)
-        //         ->where('account_branch_id', $this->account_branch->id)
-        //         ->where('code', $data['salesman'])
-        //         ->first();
-            
-        //     // check
-        //     $customer = Cust::where('account_id', $this->account->id)
-        //         ->where('account_branch_id', $this->account_branch->id)
-        //         ->where('code', $data['code'])
-        //         ->where('name', $data['name'] ?? '-')
-        //         ->first();
-        //     if(empty($customer)) {
-        //         $customer = new Cust([
-        //             'account_id' => $this->account->id,
-        //             'account_branch_id' => $this->account_branch->id,
-        //             'code' => $data['code'],
-        //             'name' => $data['name'] ?? '-',
-        //             'address' => $data['address'] ?? '-',
-        //         ]);
-        //         $customer->save();
-        //     }
-
-        //     // add salesman
-        //     if(!empty($salesman) && $customer->salesman_id != $salesman->id) {
-        //         // update previous salesan history record
-        //         $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
-        //             ->where('customer_id', $customer->id)
-        //             ->first();
-                
-        //         if(!empty($salesman_customer)) {
-        //             $salesman_customer->update([
-        //                 'end_date' => date('Y-m-d')
-        //             ]);
-        //         }
-
-        //         // update salesman
-        //         $customer->update([
-        //             'salesman_id' => $salesman->id
-        //         ]);
-
-        //         // record new salesman history
-        //         $salesman_customer = new SalesmanCustomer([
-        //             'salesman_id' => $salesman->id,
-        //             'customer_id' => $customer->id,
-        //             'start_date' => date('Y-m-d'),
-        //         ]);
-        //         $salesman_customer->save();
-        //     }
-            
-        // }
+        // avoid duplicate uploads
+        if ($this->upload_triggered) {
+            return;
+        }
 
         $total = 0;
         foreach($this->customer_data as $data) {
@@ -99,6 +53,8 @@ class Customer extends Component
         ];
 
         CustomerImportJob::dispatch($this->customer_data, $this->account->id, $this->account_branch->id);
+
+        $this->upload_triggered = true;
 
         // logs
         activity('upload')

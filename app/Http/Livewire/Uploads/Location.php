@@ -28,7 +28,14 @@ class Location extends Component
 
     public $perPage = 10;
 
+    public $upload_triggered = false;
+
     public function uploadData() {
+        // avoid duplicate uploads
+        if ($this->upload_triggered) {
+            return;
+        }
+
         foreach($this->location_data as $data) {
             if($data['check'] == 0) {
                 $location = new Loc([
@@ -40,6 +47,8 @@ class Location extends Component
                 $location->save();
             }
         }
+
+        $this->upload_triggered = true;
 
         // logs
         activity('upload')

@@ -58,76 +58,13 @@ class SalesUpload extends Component
     }
 
     public function saveUpload() {
+        // avoid duplicate uploads
         if ($this->upload_triggered) {
             return;
         }
 
         if(!empty($this->sales_data)) {
-
-            // $upload = new Upload([
-            //     'account_id' => $this->account->id,
-            //     'account_branch_id' => $this->account_branch->id,
-            //     'user_id' => auth()->user()->id,
-            //     'sku_count' => 0,
-            //     'total_quantity' => 0,
-            //     'total_price_vat' => 0,
-            //     'total_amount' => 0,
-            //     'total_amount_vat' => 0,
-            // ]);
-            // $upload->save();
-
-            // $sku_count = 0;
-            // $total_quantity = 0;
-            // $total_price_vat = 0;
-            // $total_amount = 0;
-            // $total_amount_vat = 0;
-            // $num = 0;
-            // foreach($this->sales_data as $data) {
-            //     // check data
-            //     if($data['check'] == 0) { // no error
-            //         $sku_count++;
-
-            //         // check if not FG or PROMO and not Credit Memo
-            //         if($data['type'] == 1 && $data['category'] == 0) {
-            //             $total_quantity += $data['quantity'];
-            //             $total_price_vat += $data['price_inc_vat'];
-            //             $total_amount += $data['amount'];
-            //             $total_amount_vat += $data['amount_inc_vat'];
-            //         }
-
-            //         $sale = new Sale([
-            //             'sales_upload_id' => $upload->id,
-            //             'account_id' => $this->account->id,
-            //             'account_branch_id' => $this->account_branch->id,
-            //             'customer_id' => $data['customer_id'],
-            //             'product_id' => $data['product_id'],
-            //             'channel_id' => NULL,
-            //             'salesman_id' => $data['salesman_id'],
-            //             'location_id' => $data['location_id'],
-            //             'user_id' => auth()->user()->id,
-            //             'type' => $data['type'],
-            //             'date' => date('Y-m-d', strtotime($data['date'])),
-            //             'document_number' => $data['document'],
-            //             'category' => $data['category'],
-            //             'uom' => $data['uom'],
-            //             'quantity' => $data['quantity'],
-            //             'price_inc_vat' => $data['price_inc_vat'],
-            //             'amount' => $data['amount'],
-            //             'amount_inc_vat' => $data['amount_inc_vat'],
-            //         ]);
-            //         $sale->save();
-            //     }
-            // }
-
-            // $upload->update([
-            //     'sku_count' => $sku_count,
-            //     'total_quantity' => $total_quantity,
-            //     'total_price_vat' => $total_price_vat,
-            //     'total_amount' => $total_amount,
-            //     'total_amount_vat' => $total_amount_vat,
-            // ]);
-            
-
+        
             $upload = new Upload([
                 'account_id' => $this->account->id,
                 'account_branch_id' => $this->account_branch->id,

@@ -29,7 +29,13 @@ class Salesman extends Component
 
     public $perPage = 10;
 
+    public $upload_triggered = false;
+
     public function uploadData() {
+        if($this->upload_triggered) {
+            return;
+        }
+
         foreach($this->salesman_data as $data) {
             // check
             if($data['check'] == 0) {
@@ -65,6 +71,8 @@ class Salesman extends Component
             }
 
         }
+
+        $this->upload_triggered = true;
 
         // logs
         activity('upload')

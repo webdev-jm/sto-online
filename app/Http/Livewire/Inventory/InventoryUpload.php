@@ -40,51 +40,14 @@ class InventoryUpload extends Component
 
     public $perPage = 20;
 
+    public $upload_triggered = false;
+
     public function uploadData() {
         if(!empty($this->inventory_data)) {
-            // $inventory_upload = new IU([
-            //     'account_id' => $this->account->id,
-            //     'account_branch_id' => $this->account_branch->id,
-            //     'user_id' => auth()->user()->id,
-            //     'date' => date('Y-m-d'),
-            //     'total_inventory' => 0
-            // ]);
-            // $inventory_upload->save();
-
-            // $total_inventory = 0;
-            // foreach($this->inventory_data as $data) {
-
-            //     // check
-            //     if($data['check'] == 0) {
-            //         foreach($this->keys as $key => $location) {
-            //             $total_inventory += $data[$location['id']];
-
-            //             $inventory = new Inventory([
-            //                 'account_id' => $this->account->id,
-            //                 'account_branch_id' => $this->account_branch->id,
-            //                 'inventory_upload_id' => $inventory_upload->id,
-            //                 'location_id' => $location['id'],
-            //                 'product_id' => $data['product_id'],
-            //                 'type' => $data['type'],
-            //                 'uom' => $data['uom'],
-            //                 'inventory' => $data[$location['id']],
-            //             ]);
-            //             $inventory->save();
-            //         }
-            //     }
-            // }
-
-            // $inventory_upload->update([
-            //     'total_inventory' => $total_inventory
-            // ]);
-
-            // // logs
-            // activity('upload')
-            // ->performedOn($inventory_upload)
-            // ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
-
-            // // generate monthly inventory
-            // $this->setMonthlyInventory($this->account, $this->account_branch, date('Y'), (int)date('m'));
+            // avoid duplicate uploads
+            if ($this->upload_triggered) {
+                return;
+            }
 
             $inventory_upload = new IU([
                 'account_id' => $this->account->id,
@@ -109,6 +72,8 @@ class InventoryUpload extends Component
                 'start' => 0,
                 'upload_id' => $inventory_upload->id,
             ];
+
+            $this->upload_triggered = true;
 
             // logs
             activity('upload')
