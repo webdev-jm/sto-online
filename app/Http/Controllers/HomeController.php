@@ -34,7 +34,7 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         Session::forget('account');
 
@@ -43,8 +43,10 @@ class HomeController extends Controller
             ->join(env('DB_DATABASE_2').'.accounts as a', 'a.id', '=', 'au.account_id')
             ->where('au.user_id', auth()->user()->id)
             ->when(!empty($search), function($query) use($search) {
-                $query->where('a.short_name', 'like', '%'.$search.'%')
-                    ->orWhere('a.account_code', 'like', '%'.$search.'%');
+                $query->where(function($qry) use($search) {
+                    $qry->where('a.short_name', 'like', '%'.$search.'%')
+                        ->orWhere('a.account_code', 'like', '%'.$search.'%');
+                });
             })
             ->paginate(16, ['*'], 'account-page')->onEachSide(1);
 
@@ -99,7 +101,7 @@ class HomeController extends Controller
 
         session()->put('account', $account);
 
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $branches = auth()->user()
             ->account_branches()

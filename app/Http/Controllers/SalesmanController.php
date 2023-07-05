@@ -30,7 +30,7 @@ class SalesmanController extends Controller
         }
         $account = Session::get('account');
 
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $salesmen = Salesman::orderBy('created_at', 'DESC')
             ->when(auth()->user()->can('salesman restore'), function($query) {
@@ -39,8 +39,10 @@ class SalesmanController extends Controller
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
-                $query->where('code', 'like', '%'.$search.'%')
-                    ->orWhere('name', 'like', '%'.$search.'%');
+                $query->where(function($qry) use($search) {
+                    $qry->where('code', 'like', '%'.$search.'%')
+                        ->orWhere('name', 'like', '%'.$search.'%');
+                });
             })
             ->paginate(10)->onEachSide(1)
             ->appends(request()->query());

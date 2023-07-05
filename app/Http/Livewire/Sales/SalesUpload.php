@@ -204,12 +204,12 @@ class SalesUpload extends Component
                 ->keyBy('stock_code');
     
             foreach(array_slice($data, 2) as $row) {
-                $customerCode = trim($row[2]);
+                $customerCode = trim($row[2] ?? '');
                 $locationCode = $row[4];
-                $skuCode = trim($row[5]);
+                $skuCode = trim($row[5] ?? '');
 
                 $type = 1;
-                if(strpos(trim($skuCode), '-')) {
+                if(strpos(trim($skuCode ?? ''), '-')) {
                     $sku_arr = explode('-', $skuCode);
                     if($sku_arr[0] == 'FG') { // Free Goods
                         $skuCode = end($sku_arr);
@@ -224,7 +224,7 @@ class SalesUpload extends Component
                 }
 
                 $category = 0;
-                $document = trim($row[1]);
+                $document = trim($row[1] ?? '');
                 if(!empty($document) && strpos($document, '-')) {
                     $document_str_arr = explode('-', $document);
                     if($document_str_arr[0] == 'PSC') { // credit memo

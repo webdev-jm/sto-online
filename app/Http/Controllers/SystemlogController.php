@@ -9,7 +9,7 @@ use Spatie\Activitylog\Models\Activity;
 class SystemlogController extends Controller
 {
     public function index(Request $request) {
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $activities = Activity::with('causer')
             ->where('causer_type', 'App\Models\User')

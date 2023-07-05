@@ -77,7 +77,7 @@ class AssignedBranches extends Component
 
     public function render()
     {
-        $account_ids = auth()->user()->accounts()->pluck('id')->toArray();
+        $account_ids = $this->user->accounts()->pluck('id')->toArray();
 
         $branches = AccountBranch::orderBy('account_id')
             ->whereIn('account_id', $account_ids)

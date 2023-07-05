@@ -15,6 +15,7 @@ var filesToCache = [
     '/images/user2-160x160.jpg',
     '/images/avatar.png',
     '/images/LOGO.jpg',
+    '/images/pexels-gdtography-911738.jpg',
     '/vendor/adminlte/dist/css/adminlte.min.css',
     '/vendor/dropzone/min/dropzone.min.js',
     '/vendor/jquery/jquery.min.js',

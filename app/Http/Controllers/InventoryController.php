@@ -28,7 +28,7 @@ class InventoryController extends Controller
         }
         $account = Session::get('account');
 
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $inventory_uploads = InventoryUpload::orderBy('created_at', 'DESC')
             ->with('user')

@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 trait GenerateMonthlyInventory {
     
-    public function setMonthlyInventory($account, $account_branch, $year, $month) {
+    public function setMonthlyInventory($account_id, $account_branch_id, $year, $month) {
         $inventory_upload = InventoryUpload::with('inventories')
-            ->where('account_id', $account->id)
-            ->where('account_branch_id', $account_branch->id)
+            ->where('account_id', $account_id)
+            ->where('account_branch_id', $account_branch_id)
             ->where(DB::raw('YEAR(date)'), $year)
             ->where(DB::raw('MONTH(date)'), $month)
             ->orderBy('date', 'DESC')
@@ -22,8 +22,8 @@ trait GenerateMonthlyInventory {
 
             foreach($inventory_upload->inventories as $inventory) {
                 // check
-                $monthly_inventory = MonthlyInventory::where('account_id', $account->id)
-                    ->where('account_branch_id', $account_branch->id)
+                $monthly_inventory = MonthlyInventory::where('account_id', $account_id)
+                    ->where('account_branch_id', $account_branch_id)
                     ->where('inventory_id', $inventory->id)
                     ->where('type', $inventory->type)
                     ->where('year', $year)
@@ -32,8 +32,8 @@ trait GenerateMonthlyInventory {
 
                 if(!empty($monthly_inventory)) { // update
                     $monthly_inventory->update([
-                        'account_id' => $account->id,
-                        'account_branch_id' => $account_branch->id,
+                        'account_id' => $account_id,
+                        'account_branch_id' => $account_branch_id,
                         'location_id' => $inventory->location_id,
                         'product_id' => $inventory->product_id, 
                         'inventory_id' => $inventory->id,
@@ -45,8 +45,8 @@ trait GenerateMonthlyInventory {
                     ]);
                 } else { // create new
                     $monthly_inventory = new MonthlyInventory([
-                        'account_id' => $account->id,
-                        'account_branch_id' => $account_branch->id,
+                        'account_id' => $account_id,
+                        'account_branch_id' => $account_branch_id,
                         'location_id' => $inventory->location_id,
                         'product_id' => $inventory->product_id, 
                         'inventory_id' => $inventory->id,

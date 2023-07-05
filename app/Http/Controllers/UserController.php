@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $users = User::orderBy('id', 'DESC')
             ->with('roles')

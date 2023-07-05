@@ -22,7 +22,7 @@ class RoleController extends Controller
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $roles = Role::orderBy('id', 'DESC')
             ->when(!empty($search), function($query) use($search) {

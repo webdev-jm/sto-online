@@ -31,7 +31,7 @@ class CustomerController extends Controller
         }
         $account = Session::get('account');
 
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $customers = Customer::orderBy('created_at', 'DESC')
             ->when(auth()->user()->can('customer restore'), function($query) {
@@ -41,12 +41,14 @@ class CustomerController extends Controller
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
-                $query->where('code', 'like', '%'.$search.'%')
-                    ->orWhere('name', 'like', '%'.$search.'%')
-                    ->orWhere('address', 'like', '%'.$search.'%')
-                    ->orWhereHas('salesman', function($qry) use($search) {
-                        $qry->where('code', 'like', '%'.$search.'%');
-                    });
+                $query->where(function($qry) use($search) {
+                    $qry->where('code', 'like', '%'.$search.'%')
+                        ->orWhere('name', 'like', '%'.$search.'%')
+                        ->orWhere('address', 'like', '%'.$search.'%')
+                        ->orWhereHas('salesman', function($qry1) use($search) {
+                            $qry1->where('code', 'like', '%'.$search.'%');
+                        });
+                });
             })
             ->paginate(10)->onEachSide(1)
             ->appends(request()->query());

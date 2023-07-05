@@ -19,7 +19,7 @@ class AccountBranchController extends Controller
      */
     public function index(Request $request)
     {
-        $search = trim($request->get('search'));
+        $search = trim($request->get('search') ?? '');
 
         $account_branches = AccountBranch::orderBy('created_at', 'DESC')
             ->with('account')

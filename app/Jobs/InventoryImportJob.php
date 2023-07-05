@@ -84,7 +84,7 @@ class InventoryImportJob implements ShouldQueue
             ->log(':causer.name has uploaded inventory data.');
 
             // generate monthly inventory
-            $this->setMonthlyInventory($this->account, $this->account_branch, date('Y'), (int)date('m'));
+            $this->setMonthlyInventory($this->account_id, $this->account_branch_id, date('Y'), (int)date('m'));
         }
     }
 }

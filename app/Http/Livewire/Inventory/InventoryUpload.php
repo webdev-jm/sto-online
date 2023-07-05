@@ -147,7 +147,7 @@ class InventoryUpload extends Component
         if($this->checkHeader($header) == 0) {
             $sku_codes = array_unique(array_map('trim', Collection::make($data)->pluck(0)->slice(1)->toArray()));
             foreach($sku_codes as $key => $code) {
-                if(strpos(trim($code), '-')) {
+                if(strpos(trim($code ?? ''), '-')) {
                     $sku_arr = explode('-', $code);
 
                     $sku_codes[$key] = end($sku_arr);
@@ -174,10 +174,10 @@ class InventoryUpload extends Component
             }
 
             foreach(array_slice($data, 1) as $data_key => $row) {
-                $sku_code = trim($row[0]);
+                $sku_code = trim($row[0] ?? '');
 
                 $type = 1;
-                if(strpos(trim($sku_code), '-')) {
+                if(strpos(trim($sku_code ?? ''), '-')) {
                     $sku_arr = explode('-', $sku_code);
                     if($sku_arr[0] == 'FG') { // Free Goods
                         $sku_code = end($sku_arr);
@@ -237,7 +237,7 @@ class InventoryUpload extends Component
     
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+            if (trim(strtolower($header[$index]) ?? '') !== strtolower($requiredHeader)) {
                 $err++;
             }
         }

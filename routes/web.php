@@ -25,7 +25,7 @@ use App\Http\Controllers\AccountBranchController;
 |
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index']);
 
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 

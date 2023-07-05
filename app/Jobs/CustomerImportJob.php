@@ -88,8 +88,5 @@ class CustomerImportJob implements ShouldQueue
             
         }
 
-        // logs
-        activity('upload')
-        ->log(':causer.name has uploaded customer data.');
     }
 }

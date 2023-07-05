@@ -20,7 +20,7 @@
 
         {{-- Logo --}}
         <div class="{{ $auth_type ?? 'login' }}-logo">
-            <a href="{{ $dashboard_url }}" class="text-white">
+            <a href="{{ $dashboard_url }}">
 
                 
 

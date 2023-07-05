@@ -20,13 +20,6 @@ class UploadProgress extends Component
             ->where('sales_upload_id', $this->upload_data['upload_id'])
             ->count();
         $this->count = $count - $this->upload_data['start'];
-
-        // check if completed
-        if($this->count == $this->total) {
-            return redirect()->route('sales.index')->with([
-                'message_success' => 'Sales data has been uploaded successfully.'
-            ]);
-        }
     }
 
     public function mount($upload_data) {

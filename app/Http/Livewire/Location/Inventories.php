@@ -46,7 +46,7 @@ class Inventories extends Component
 
     public function render()
     {
-        $this->search = trim($this->search);
+        $this->search = trim($this->search ?? '');
         
         $inventories = MonthlyInventory::with(['inventory', 'product'])
             ->where('account_id', $this->account->id)

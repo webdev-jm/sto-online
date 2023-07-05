@@ -1,10 +1,9 @@
 @extends('adminlte::auth.auth-page', ['auth_type' => 'login'])
 
 @section('adminlte_css_pre')
-    <link rel="stylesheet" href="{{ asset('vendor/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <style>
         .login-page {
-            background: #ffffff8e url('/images/pexels-pixabay-247676.jpg') no-repeat center center;
+            background: #ffffff8e url('/images/pexels-gdtography-911738.jpg') no-repeat center center;
 	        background-size: cover;
         }
     </style>

@@ -21,13 +21,6 @@ class UploadProgress extends Component
             ->count();
 
         $this->count = $count - $this->upload_data['start'];
-
-        // check if completed
-        if($this->count == $this->total) {
-            return redirect()->route('inventory.index')->with([
-                'message_success' => 'Inventory data has been uploaded successfully.'
-            ]);
-        }
     }
 
     public function mount($upload_data) {

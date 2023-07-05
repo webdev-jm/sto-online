@@ -103,7 +103,6 @@ class Customer extends Component
         // logs
         activity('upload')
         ->log(':causer.name has uploaded customer data on ['.$this->account->short_name.']');
-
         
         return redirect()->route('customer.index')->with([
             'message_success' => 'Customer data has been added to queue to process.',
