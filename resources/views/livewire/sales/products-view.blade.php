@@ -2,6 +2,9 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">LINE DETAILS</h3>
+            <div class="card-tools">
+                <b>COUNT: {{$sales->total()}}</b>
+            </div>
         </div>
         <div class="card-body p-0 table-responsive">
             <table class="table table-striped table-bordered table-sm">
@@ -24,7 +27,7 @@
                     <tr class="text-center">
                         <td class="align-middle pl-1">{{$sale->date}}</td>
                         <td class="align-middle text-left">[{{$sale->customer->code ?? '-'}}] {{$sale->customer->name ?? '-'}}</td>
-                        <td class="align-middle text-left">[{{$sale->salesman->code ?? '-'}}] {{$sale->name}}</td>
+                        <td class="align-middle text-left">{{$sale->salesman->code ?? ''}} - {{$sale->salesman->name ?? ''}}</td>
                         <td class="align-middle">{{$sale->location->code ?? '-'}}</td>
                         <td class="align-middle">{{$sale->product->stock_code ?? '-'}}</td>
                         <td class="align-middle">{{$sale->product->description ?? '-'}} - {{$sale->product->size ?? '-'}}</td>

@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateSalesReport extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('sales_report', function (Blueprint $table) {
+            $table->unsignedBigInteger('account_id');
+            $table->unsignedBigInteger('account_branch_id');
+            $table->integer('year');
+            $table->integer('month');
+            $table->string('stock_code');
+            $table->string('description')->nullable();
+            $table->string('size')->nullable();
+            $table->decimal('sales', 10, 2)->nullable();
+            $table->decimal('credit_memo', 10, 2)->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('sales_report');
+    }
+}

@@ -12,6 +12,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\SalesUpload;
 use App\Models\Sale;
 
+use Illuminate\Support\Facades\DB;
+
 class SalesImportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -53,6 +55,9 @@ class SalesImportJob implements ShouldQueue
             $total_amount = 0;
             $total_amount_vat = 0;
             $num = 0;
+
+            $report_data = array();
+
             foreach($this->sales_data as $data) {
                 // check data
                 if($data['check'] == 0) { // no error
@@ -87,6 +92,8 @@ class SalesImportJob implements ShouldQueue
                         'amount_inc_vat' => $data['amount_inc_vat'],
                     ]);
                     $sale->save();
+
+                    $report_data[date('Y', strtotime($data['date']))][date('n', strtotime($data['date']))] = date('Y-m-d', strtotime($data['date']));
                 }
             }
 
@@ -102,6 +109,15 @@ class SalesImportJob implements ShouldQueue
             activity('upload')
             ->performedOn($upload)
             ->log(':causer.name has uploaded sales data.');
+
+            // UPDATE SALES REPORTS
+            if(!empty($report_data)) {
+                foreach($report_data as $year => $months) {
+                    foreach($months as $month => $date) {
+                        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
+                    }
+                }
+            }
         }
     }
 }

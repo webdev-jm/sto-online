@@ -11,11 +11,8 @@ class Customers extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $salesman;
-    public $customer_count;
-
     public function mount($salesman) {
         $this->salesman = $salesman;
-        $this->customer_count = $this->salesman->customers()->count();
     }
 
     public function render()

@@ -3,7 +3,7 @@
         <div class="card-header">
             <h3 class="card-title">CUSTOMERS</h3>
             <div class="card-tools">
-                <b>COUNT: {{$customer_count}}</b>
+                <b>COUNT: {{$customers->total()}}</b>
             </div>
         </div>
         <div class="card-body table-responsive p-0">
