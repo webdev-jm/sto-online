@@ -83,11 +83,152 @@
         </div>
         @endcan
     </div>
+
+    <hr>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Dashboard</h3>
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <figure class="highcharts-figure">
+                        <div id="container"></div>
+                        <p class="highcharts-description text-center">
+                            Basic reports of sales data base on uploaded sales data.
+                        </p>
+                    </figure>
+                </div>
+            </div>
+
+        </div>
+    </div>
 @stop
 
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
+    <style>
+        .dark-mode .highcharts-background {
+            fill: black;
+        }
+        .dark-mode .highcharts-title {
+            color: white !important;
+            fill: white !important;
+        }
+        .dark-mode .highcharts-subtitle {
+            color: white !important;
+            fill: white !important;
+        }
+        .dark-mode .highcharts-axis-title,
+        .dark-mode .highcharts-axis-labels > text,
+        .dark-mode .highcharts-legend-item > text {
+            color: white !important;
+            fill: white !important;
+        }
+
+        .dark-mode .highcharts-markers > path {
+            fill: rgb(255, 128, 0) !important;
+            stroke:rgb(235, 148, 17) !important;
+        }
+
+        .dark-mode .highcharts-series > rect {
+            fill:rgb(0, 195, 249) !important;
+        }
+        .dark-mode .highcharts-graph {
+            stroke: rgb(235, 148, 17);
+        }
+
+        .dark-mode .highcharts-series-1 .highcharts-point {
+            fill: rgb(255, 128, 0) !important;
+        }
+        .dark-mode .highcharts-series-0 .highcharts-point {
+            fill:rgb(0, 195, 249) !important;
+        }
+
+
+        .dark-mode .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .dark-mode .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .dark-mode.highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        .dark-mode .highcharts-data-table td,
+        .dark-mode .highcharts-data-table th,
+        .dark-mode .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+
+        .dark-mode .highcharts-data-table thead tr,
+        .dark-mode .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .dark-mode .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+    </style>
 @stop
 
 @section('js')
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+    $(function() {
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Sales',
+                align: 'left'
+            },
+            subtitle: {
+                text: 'Uploaded sales data',
+                align: 'left'
+            },
+            xAxis: {
+                categories: @php echo json_encode($categories); @endphp,
+                crosshair: true,
+                accessibility: {
+                    description: 'Months'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Amount'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' (1000 MT)'
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: @php echo json_encode($chart_data); @endphp,
+        });
+    });
+</script>
 @stop

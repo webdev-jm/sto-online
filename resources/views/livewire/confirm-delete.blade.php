@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit.prevent="submitForm" autocomplete="off">
+    <form wire:submit.prevent="submitForm">
         <div class="modal-content">
             <div class="modal-header bg-danger">
                 <h4 class="modal-title">Confirm Delete</h4>
@@ -13,7 +13,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <label for="password">Please enter password to continue.</label>
-                            <input type="password" class="form-control" wire:model.lazy="password" placeholder="Password">
+                            <input type="password" class="form-control" wire:model.lazy="password" placeholder="Password" autocomplete="off">
                             @error('password') <span class="text-danger">{{ $message }}</span> @enderror
                             <p class="text-danger">{{$error_message}}</p>
                         </div>
