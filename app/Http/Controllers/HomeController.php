@@ -75,29 +75,27 @@ class HomeController extends Controller
 
         session()->put('account_branch', $account_branch);
 
-        // Sales Report Data
-        $results = Sale::select(
-                DB::raw('MONTH(date) as month'),
-                DB::raw('SUM(IF(category = 0, amount, NULL)) as sales_total'),
-                DB::raw('SUM(IF(category = 1, amount, NULL)) as cm_total')
+        $results = DB::table('sales_report')
+            ->select(
+                'month',
+                DB::raw('SUM(sales) as total_sales'),
+                DB::raw('SUM(credit_memo) as total_credit_memo')
             )
             ->where('account_id', $account_branch->account->id)
             ->where('account_branch_id', $account_branch->id)
-            ->where('type', 1) // 1 default 2 FG 3 PROMO
-            ->groupBy('month')
             ->orderBy('month', 'ASC')
+            ->groupBy('month')
+            ->where('year', date('Y'))
             ->get();
-        
+
         $sales_data = array();
         $cm_data = array();
         $categories = array();
         foreach($results as $result) {
-            $sales_data[] = (float)$result->sales_total;
-            $cm_data[] = (float)$result->cm_total;
+            $sales_data[] = (float)$result->total_sales;
+            $cm_data[] = (float)$result->total_credit_memo;
             $categories[] = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
         }
-
-        array_unique($categories);
 
         $chart_data = [
             [

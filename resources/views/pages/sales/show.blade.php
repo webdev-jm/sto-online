@@ -30,10 +30,6 @@
                         <span class="float-right">{{$sales_upload->user->name ?? '-'}}</span>
                     </li>
                     <li class="list-group-item py-1">
-                        <b>COUNT</b>
-                        <span class="float-right">{{number_format($sales_upload->sales()->count()) ?? '-'}}</span>
-                    </li>
-                    <li class="list-group-item py-1">
                         <b>TOTAL AMOUNT</b>
                         <span class="float-right">{{number_format($sales_upload->total_amount, 2) ?? '-'}}</span>
                     </li>

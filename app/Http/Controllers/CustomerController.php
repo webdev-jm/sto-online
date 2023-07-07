@@ -137,7 +137,7 @@ class CustomerController extends Controller
         }
         $account = Session::get('account');
 
-        $customer = Customer::findOrFail(decrypt($id));
+        $customer = Customer::with('salesman')->findOrFail(decrypt($id));
         
         return view('pages.customers.show')->with([
             'account' => $account,
