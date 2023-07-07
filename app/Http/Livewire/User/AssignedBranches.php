@@ -89,7 +89,7 @@ class AssignedBranches extends Component
                             ->where('short_name', 'like', '%'.$this->search.'%');
                     });
             })
-            ->paginate(10, ['*'], 'branh-page')->onEachSide(1);
+            ->paginate(10, ['*'], 'branch-page')->onEachSide(1);
 
         return view('livewire.user.assigned-branches')->with([
             'branches' => $branches

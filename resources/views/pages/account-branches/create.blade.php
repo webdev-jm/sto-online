@@ -54,6 +54,17 @@
 
             </div>
 
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            {!! Form::checkbox('add_new', 1, false, ['class' => 'custom-control-input', 'id' => 'add_new']) !!}
+                            {!! Form::label('add_new', 'Add another', ['class' => 'custom-control-label']) !!}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="card-footer text-right">
             {!! Form::submit('Add Branch', ['class' => 'btn btn-primary btn-sm', 'form' => 'add_branch']) !!}

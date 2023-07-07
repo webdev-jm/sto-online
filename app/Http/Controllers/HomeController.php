@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SMSAccount;
 use App\Models\SMSBranch;
 use App\Models\AccountBranch;
+use App\Models\Sale;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -74,9 +75,46 @@ class HomeController extends Controller
 
         session()->put('account_branch', $account_branch);
 
+        // Sales Report Data
+        $results = Sale::select(
+                DB::raw('MONTH(date) as month'),
+                DB::raw('SUM(IF(category = 0, amount, NULL)) as sales_total'),
+                DB::raw('SUM(IF(category = 1, amount, NULL)) as cm_total')
+            )
+            ->where('account_id', $account_branch->account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->where('type', 1) // 1 default 2 FG 3 PROMO
+            ->groupBy('month')
+            ->orderBy('month', 'ASC')
+            ->get();
+        
+        $sales_data = array();
+        $cm_data = array();
+        $categories = array();
+        foreach($results as $result) {
+            $sales_data[] = (float)$result->sales_total;
+            $cm_data[] = (float)$result->cm_total;
+            $categories[] = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
+        }
+
+        array_unique($categories);
+
+        $chart_data = [
+            [
+                'name' => 'Sales',
+                'data' => $sales_data
+            ],
+            [
+                'name' => 'Credit Memo',
+                'data' => $cm_data
+            ],
+        ];
+
         return view('pages.app-menu.index')->with([
             'account' => $account_branch->account,
             'account_branch' => $account_branch,
+            'categories' => $categories,
+            'chart_data' => $chart_data
         ]);
     }
 

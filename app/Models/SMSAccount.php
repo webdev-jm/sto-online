@@ -19,7 +19,7 @@ class SMSAccount extends Model
     }
 
     public function users() {
-        return $this->belongsToMany(\App\Models\User::class, env('DB_DATABASE').'.account_user', 'account_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'sto_online.account_user', 'account_id', 'user_id');
     }
 
     public function account_branches() {
