@@ -31,6 +31,9 @@ class InventoryController extends Controller
         $search = trim($request->get('search') ?? '');
 
         $inventory_uploads = InventoryUpload::orderBy('created_at', 'DESC')
+            ->when(auth()->user()->can('inventory restore'), function($query) {
+                $query->withTrashed();
+            })
             ->with('user')
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
@@ -162,15 +165,27 @@ class InventoryController extends Controller
     {
         //
     }
+    
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Inventory  $inventory
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Inventory $inventory)
-    {
-        //
+        $inventory_upload = InventoryUpload::withTrashed()->findOrFail(decrypt($id));
+
+        DB::statement("SET SQL_SAFE_UPDATES = 0;");
+        $inventory_upload->restore();
+        $inventory_upload->inventories()->restore();
+        DB::statement("SET SQL_SAFE_UPDATES = 1;");
+
+        activity('restored')
+            ->performedOn($inventory_upload)
+            ->log(':causer.name has restored inventory upload by '.$inventory_upload->user->name);
+
+        return back()->with([
+            'message_success' => 'Inventory upload by '.$inventory_upload->user->name.' has been restored.'
+        ]);
     }
 }
