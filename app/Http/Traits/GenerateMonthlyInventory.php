@@ -25,6 +25,7 @@ trait GenerateMonthlyInventory {
                 $monthly_inventory = MonthlyInventory::where('account_id', $account_id)
                     ->where('account_branch_id', $account_branch_id)
                     ->where('inventory_id', $inventory->id)
+                    ->where('product_id', $inventory->product_id)
                     ->where('type', $inventory->type)
                     ->where('year', $year)
                     ->where('month', $month)

@@ -58,19 +58,25 @@
                         </div>
                         <div class="col-lg-4 text-center">
                             <p class="m-0">
-                                <a href="{{route('inventory.show', encrypt($inventory->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('inventory edit')
-                                    <a href="{{route('inventory.edit', encrypt($inventory->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($inventory->deleted_at))
+                                    <a href="{{route('inventory.show', encrypt($inventory->id))}}" class="btn btn-info btn-xs">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('inventory delete')
-                                    <a href="" class="btn btn-danger btn-xs">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('inventory edit')
+                                        <a href="{{route('inventory.edit', encrypt($inventory->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('inventory delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($inventory->id)}}">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('inventory restore')
+                                        <a href="{{route('inventory.restore', encrypt($inventory->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <b>ACTION</b>
                         </div>
@@ -85,6 +91,14 @@
         </div>
     </div>
 
+    @can('inventory delete')
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <livewire:confirm-delete/>
+            </div>
+        </div>
+    @endcan
+
 @stop
 
 @section('css')
@@ -92,4 +106,16 @@
 @stop
 
 @section('js')
+    @can('inventory delete')
+    <script>
+        $(function() {
+            $('body').on('click', '.btn-delete', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                Livewire.emit('setDeleteModel', 'InventoryUpload', id);
+                $('#modal-delete').modal('show');
+            });
+        });
+    </script>
+    @endcan
 @stop

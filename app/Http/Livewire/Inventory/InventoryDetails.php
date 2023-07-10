@@ -55,13 +55,14 @@ class InventoryDetails extends Component
             ->leftJoin(env('DB_DATABASE_2').'.products as p', 'p.id', '=', 'i.product_id')
             ->where('i.account_id', $this->account->id)
             ->where('i.inventory_upload_id', $this->inventory_upload->id)
+            ->whereNull('i.deleted_at')
             ->groupBy('p.stock_code');
 
         $inventories = $inventories->paginate(15, ['*'], 'inventory-page');
 
         return view('livewire.inventory.inventory-details')->with([
             'inventories' => $inventories,
-            'location_ids' => $location_ids
+            'location_ids' => $location_ids,
         ]);
     }
 }

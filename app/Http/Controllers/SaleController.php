@@ -7,6 +7,7 @@ use App\Models\SalesUpload;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Traits\AccountChecker;
 
@@ -31,6 +32,9 @@ class SaleController extends Controller
 
         $sales_uploads = SalesUpload::orderBy('created_at', 'DESC')
             ->with('user')
+            ->when(auth()->user()->can('sales restore'), function($query) {
+                $query->withTrashed();
+            })
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
@@ -150,14 +154,42 @@ class SaleController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Sale  $sale
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Sale $sale)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $sales_upload = SalesUpload::withTrashed()->findOrFail(decrypt($id));
+
+        DB::statement("SET SQL_SAFE_UPDATES = 0;");
+        $sales_upload->restore();
+        $sales_upload->sales()->restore();
+        DB::statement("SET SQL_SAFE_UPDATES = 1;");
+
+        $dates = $sales_upload->sales()->select('date')->distinct()->pluck('date')->toArray();
+
+        $dates_arr = array();
+        foreach($dates as $date) {
+            $year = date('Y', strtotime($date));
+            $month = date('n', strtotime($date));
+
+            $dates_arr[$year][$month] = $date;
+        }
+
+        foreach($dates_arr as $year => $months) {
+            foreach($months as $month => $date) {
+                DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$account->id, $account_branch->id, $year, $month]);
+            }
+        }
+
+        activity('restored')
+            ->performedOn($sales_upload)
+            ->log(':causer.name has restored sales upload by '.$sales_upload->user->name);
+
+        return back()->with([
+            'message_success' => 'Sales upload by '.$sales_upload->user->name.' has been restored.'
+        ]);
     }
 }

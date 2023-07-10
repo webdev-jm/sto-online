@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inventory.edit')->middleware('permission:inventory edit');
         Route::post('inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update')->middleware('permission:inventory update');
+
+        Route::get('inventory/{id}/restore', [InventoryController::class, 'restore'])->name('inventory.restore')->middleware('permission:inventory restore');
     });
     
     // SALES 
@@ -62,6 +64,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('sales/{id}', [SaleController::class, 'show'])->name('sales.show');
 
         Route::get('sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit')->middleware('permission:sales edit');
+
+        Route::get('sales/{id}/restore', [SaleController::class, 'restore'])->name('sales.restore')->middleware('permission:sales restore');
     });
 
     // CUSTOMERS

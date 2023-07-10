@@ -64,19 +64,25 @@
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">
-                                <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs">
-                                    <i class="fa fa-list"></i>
-                                </a>
-                                @can('sales edit')
-                                    <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs">
-                                        <i class="fa fa-pen"></i>
+                                @if(empty($sale->deleted_at))
+                                    <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs">
+                                        <i class="fa fa-list"></i>
                                     </a>
-                                @endcan
-                                @can('sales delete')
-                                    <a href="" class="btn btn-danger btn-xs">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @endcan
+                                    @can('sales edit')
+                                        <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                    @endcan
+                                    @can('sales delete')
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($sale->id)}}">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('sales restore')
+                                        <a href="{{route('sales.restore', encrypt($sale->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                    @endcan
+                                @endif
                             </p>
                             <b>ACTION</b>
                         </div>
@@ -90,6 +96,14 @@
             {{$sales_uploads->links()}}
         </div>
     </div>
+
+    @can('sales delete')
+    <div class="modal fade" id="modal-delete">
+        <div class="modal-dialog">
+            <livewire:confirm-delete/>
+        </div>
+    </div>
+    @endcan
 @stop
 
 @section('css')
@@ -97,4 +111,16 @@
 @stop
 
 @section('js')
+    @can('sales delete')
+    <script>
+        $(function() {
+            $('body').on('click', '.btn-delete', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                Livewire.emit('setDeleteModel', 'SalesUpload', id);
+                $('#modal-delete').modal('show');
+            });
+        });
+    </script>
+    @endcan
 @stop
