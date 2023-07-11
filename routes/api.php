@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\SaleController;
+use App\Http\Controllers\Api\StoController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => 'api.token'], function() {
+    Route::get('sales', [SaleController::class, 'index']);
+
+    // STO
+    Route::get('sto', [StoController::class, 'index']);
 });
