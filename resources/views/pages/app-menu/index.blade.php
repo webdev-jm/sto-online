@@ -18,7 +18,7 @@
 
         @can('sales access')
         <div class="col-lg-3">
-            <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-warning ml-0">
+            <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-olive ml-0">
                 <i class="fa fa-money-check-alt"></i>
                 Sales
             </a>
@@ -27,7 +27,7 @@
 
         @can('inventory access')
         <div class="col-lg-3">
-            <a href="{{route('inventory.index')}}" class="btn btn-block btn-app bg-secondary ml-0">
+            <a href="{{route('inventory.index')}}" class="btn btn-block btn-app bg-indigo ml-0">
                 <i class="fa fa-warehouse"></i>
                 Inventory
             </a>
@@ -46,15 +46,6 @@
             </a>
         </div>
         @endcan
-
-        {{-- @can('channel access')
-        <div class="col-lg-3">
-            <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-warning ml-0">
-                <i class="fa fa-store"></i>
-                Channels
-            </a>
-        </div>
-        @endcan --}}
 
         @can('location access')
         <div class="col-lg-3">
@@ -79,6 +70,15 @@
             <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-danger ml-0">
                 <i class="fa fa-user-tie"></i>
                 Salesman
+            </a>
+        </div>
+        @endcan
+
+        @can('channel access')
+        <div class="col-lg-3">
+            <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-navy ml-0">
+                <i class="fa fa-route"></i>
+                Channels
             </a>
         </div>
         @endcan
