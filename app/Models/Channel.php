@@ -29,4 +29,8 @@ class Channel extends Model
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }
+
+    public function customers() {
+        return $this->hasMany('App\Models\Customer');
+    }
 }

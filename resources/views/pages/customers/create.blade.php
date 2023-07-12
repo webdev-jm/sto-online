@@ -47,8 +47,17 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('salesman_id', 'Salesman') !!}
-                        {!! Form::select('salesman_id', $salesmen, NULL, ['class' => 'form-control'.($errors->has('salesman_id') ? ' is-invalid' : ''), 'form' => 'add_customer']) !!}
+                        {!! Form::select('salesman_id', $salesmen, NULL, ['class' => 'form-control'.($errors->has('salesman_id') ? ' is-invalid' : ''), 'form' => 'add_customer', 'placeholder' => '- select salesman -']) !!}
                         <p class="text-danger">{{$errors->first('salesman_id')}}</p>
+                    </div>
+                </div>
+
+                {{-- CHANNEL --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('channel_id', 'Channel') !!}
+                        {!! Form::select('channel_id', $channels, NULL, ['class' => 'form-control'.($errors->has('channel_id') ? ' is-invalid' : ''), 'form' => 'add_customer', 'placeholder' => '- select channel -']) !!}
+                        <p class="text-danger">{{$errors->first('channel_id')}}</p>
                     </div>
                 </div>
 

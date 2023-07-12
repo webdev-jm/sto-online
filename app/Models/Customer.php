@@ -15,6 +15,7 @@ class Customer extends Model
         'account_id',
         'account_branch_id',
         'salesman_id',
+        'channel_id',
         'code',
         'name',
         'address',
@@ -30,6 +31,10 @@ class Customer extends Model
 
     public function salesman() {
         return $this->belongsTo('App\Models\Salesman');
+    }
+    
+    public function channel() {
+        return $this->belongsTo('App\Models\Channel');
     }
 
     public function sales() {

@@ -46,6 +46,10 @@
                             </span>
                         </li>
                         <li class="list-group-item p-1">
+                            <b>Channel</b>
+                            <span class="float-right">[{{$customer->channel->code ?? '-'}}] {{$customer->channel->name ?? '-'}}</span>
+                        </li>
+                        <li class="list-group-item p-1">
                             <b>Address</b>
                             <span class="float-right">{{$customer->address ?? '-'}}</span>
                         </li>

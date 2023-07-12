@@ -6,43 +6,50 @@ use App\Models\Channel;
 use App\Http\Requests\ChannelAddRequest;
 use App\Http\Requests\ChannelUpdateRequest;
 
+use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Session;
+
+use App\Http\Traits\AccountChecker;
 
 class ChannelController extends Controller
 {
-    private function checkAccount() {
-        $account = Session::get('account');
-        if(!isset($account) || empty($account)) {
-            return redirect()->route('home')->with([
-                'error_message' => 'Please select an account.'
-            ]);
-        }
-    
-        return $account;
-    }
+    use AccountChecker;
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
+
+        $search = trim($request->get('search'));
 
         $channels = Channel::orderBy('created_at', 'DESC')
+            ->when(auth()->user()->can('channel restore'), function($query) {
+                $query->withTrashed();
+            })
+            ->when(!empty($search), function($query) use($search) {
+                $query->where(function($qry) use($search) {
+                    $qry->where('code', 'like', '%'.$search.'%')
+                        ->orWhere('name', 'like', '%'.$search.'%');
+                });
+            })
             ->where('account_id', $account->id)
             ->paginate(10)->onEachSide(1);
 
         return view('pages.channels.index')->with([
             'channels' => $channels,
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'search' => $search
         ]);
     }
 
@@ -54,15 +61,15 @@ class ChannelController extends Controller
     public function create()
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         return view('pages.channels.create')->with([
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch
         ]);
     }
 
@@ -75,15 +82,15 @@ class ChannelController extends Controller
     public function store(ChannelAddRequest $request)
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $channel = new Channel([
             'account_id' => $account->id,
+            'account_branch_id' => $account_branch->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -108,18 +115,18 @@ class ChannelController extends Controller
     public function show($id)
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $channel = Channel::findOrFail(decrypt($id));
 
         return view('pages.channels.show')->with([
             'channel' => $channel,
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch
         ]);
     }
 
@@ -132,18 +139,18 @@ class ChannelController extends Controller
     public function edit($id)
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $channel = Channel::findOrFail(decrypt($id));
 
         return view('pages.channels.edit')->with([
             'channel' => $channel,
-            'account' => $account
+            'account' => $account,
+            'account_branch' => $account_branch
         ]);
     }
 
@@ -157,12 +164,11 @@ class ChannelController extends Controller
     public function update(ChannelUpdateRequest $request, $id)
     {
         // check account
-        $account = $this->checkAccount();
-        if ($account instanceof \Illuminate\Http\RedirectResponse) {
-            return $account->with([
-                'message_error' => 'Please select an account.'
-            ]);
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
         }
+        $account = Session::get('account');
 
         $channel = Channel::findOrFail(decrypt($id));
         $changes_arr['old'] = $channel->getOriginal();
@@ -185,14 +191,23 @@ class ChannelController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Channel  $channel
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Channel $channel)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $channel = Channel::withTrashed()->findOrFail(decrypt($id));
+
+        $channel->restore();
+
+        activity('restore')
+            ->performedOn($channel)
+            ->log(':causer.name has restored channel '.$channel->name);
+
+        return back()->with([
+            'message_success' => 'Channel '.$channel->name.' has been restored.'
+        ]);
     }
 }
