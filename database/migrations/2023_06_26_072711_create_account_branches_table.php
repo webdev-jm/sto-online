@@ -16,6 +16,7 @@ class CreateAccountBranchesTable extends Migration
         Schema::create('account_branches', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('bevi_area_id')->nullable();
             $table->string('code');
             $table->string('name');
             $table->timestamps();

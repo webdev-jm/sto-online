@@ -43,6 +43,7 @@ class ChannelController extends Controller
                 });
             })
             ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
             ->paginate(10)->onEachSide(1);
 
         return view('pages.channels.index')->with([

@@ -53,6 +53,15 @@
                     </div>
                 </div>
 
+                {{-- AREA --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('bevi_area_id', 'Area') !!}
+                        {!! Form::select('bevi_area_id', $areas, $account_branch->bevi_area_id, ['class' => 'form-control'.($errors->has('bevi_area_id') ? ' is-invalid' : ''), 'form' => 'update_branch', 'placeholder' => '- select area -']) !!}
+                        <small class="text-danger">{{$errors->first('bevi_area_id')}}</small>
+                    </div>
+                </div>
+
             </div>
 
         </div>
