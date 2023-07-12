@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\AccountBranch;
 use App\Models\SalesUpload;
 use App\Models\InventoryUpload;
+use App\Models\Channel;
 
 use Spatie\Permission\Models\Role;
 
@@ -149,6 +150,11 @@ class ConfirmDelete extends Component
                 $this->model = InventoryUpload::findOrFail(decrypt($model_id));
                 $this->name = 'inventory upload '.$this->model->user->name.' inventory: '.$this->model->total_inventory;
                 $this->route = '/inventory';
+                break;
+            case 'Channel':
+                $this->model = Channel::findOrFail(decrypt($model_id));
+                $this->name = 'Channel '.$this->model->name;
+                $this->route = '/channel';
                 break;
         }
     }

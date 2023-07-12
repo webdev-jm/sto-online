@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Salesman;
 use App\Models\SalesmanCustomer;
+use App\Models\Channel;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\CustomerAddRequest;
@@ -75,16 +76,28 @@ class CustomerController extends Controller
         $account = Session::get('account');
 
         // SALESMEN OPTIONS
-        $salesmen = Salesman::where('account_id', $account->id)->get();
+        $salesmen = Salesman::where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->get();
         $salesmen_arr = array();
         foreach($salesmen as $salesman) {
             $salesmen_arr[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
+        }
+
+        // CHANNEL OPTIONS
+        $channels = Channel::where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->get();
+        $channel_arr = array();
+        foreach($channels as $channel) {
+            $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
         }
 
         return view('pages.customers.create')->with([
             'account' => $account,
             'account_branch' => $account_branch,
             'salesmen' => $salesmen_arr,
+            'channels' => $channel_arr
         ]);
     }
 
@@ -106,11 +119,21 @@ class CustomerController extends Controller
             'account_id' => $account->id,
             'account_branch_id' => $account_branch->id,
             'salesman_id' => $request->salesman_id,
+            'channel_id' => $request->channel_id,
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,
         ]);
         $customer->save();
+
+        // add new salesman history
+        $new_history = new SalesmanCustomer([
+            'salesman_id' => $request->salesman_id,
+            'customer_id' => $customer->id,
+            'start_date' => date('Y-m-d'),
+            'end_date' => NULL
+        ]);
+        $new_history->save();
         
         // logs
         activity('create')
@@ -162,18 +185,28 @@ class CustomerController extends Controller
 
         $customer = Customer::findOrFail(decrypt($id));
 
-       // SALESMEN OPTIONS
-       $salesmen = Salesman::where('account_id', $account->id)->get();
-       $salesmen_arr = array();
-       foreach($salesmen as $salesman) {
-           $salesmen_arr[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
-       }
+        // SALESMEN OPTIONS
+        $salesmen = Salesman::where('account_id', $account->id)->get();
+        $salesmen_arr = array();
+        foreach($salesmen as $salesman) {
+            $salesmen_arr[$salesman->id] = '['.$salesman->code.'] '.$salesman->name;
+        }
+
+        // CHANNEL OPTIONS
+        $channels = Channel::where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->get();
+        $channel_arr = array();
+        foreach($channels as $channel) {
+            $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
+        }
 
         return view('pages.customers.edit')->with([
             'account' => $account,
             'account_branch' => $account_branch,
             'customer' => $customer,
-            'salesmen' => $salesmen_arr
+            'salesmen' => $salesmen_arr,
+            'channels' => $channel_arr
         ]);
     }
 
@@ -221,6 +254,7 @@ class CustomerController extends Controller
             'area_id' => $request->area_id,
             'channel_id' => $request->channel_id,
             'salesman_id' => $request->salesman_id,
+            'channel_id' => $request->channel_id,
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,

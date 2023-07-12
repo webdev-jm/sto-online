@@ -27,6 +27,9 @@ class CustomerUpdateRequest extends FormRequest
             'salesman_id' => [
                 'required'
             ],
+            'channel_id' => [
+                'max:20'
+            ],
             'code' => [
                 'required'
             ],

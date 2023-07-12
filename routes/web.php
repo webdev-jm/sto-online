@@ -106,6 +106,8 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('channel/{id}/edit', [ChannelController::class, 'edit'])->name('channel.edit')->middleware('permission:channel edit');
         Route::post('channel/{id}', [ChannelController::class, 'update'])->name('channel.update')->middleware('permission:channel edit');
+
+        Route::get('channel/{id}/restore', [ChannelController::class, 'restore'])->name('channel.restore')->middleware('permission:channel restore');
     });
 
     // AREA
