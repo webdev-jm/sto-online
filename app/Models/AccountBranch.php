@@ -13,6 +13,7 @@ class AccountBranch extends Model
 
     protected $fillable = [
         'account_id',
+        'bevi_area_id',
         'code',
         'name',
     ];
@@ -23,5 +24,9 @@ class AccountBranch extends Model
 
     public function users() {
         return $this->belongsToMany('App\Models\User');
+    }
+
+    public function bevi_area() {
+        return $this->belongsTo('App\Models\BeviArea');
     }
 }

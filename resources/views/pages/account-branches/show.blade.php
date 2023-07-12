@@ -42,6 +42,16 @@
                             <b>NAME</b>
                             <span class="float-right">{{$account_branch->name ?? '-'}}</span>
                         </li>
+                        <li class="list-group-item p-1">
+                            <b>AREA</b>
+                            <span class="float-right">
+                                @if(!empty($account_branch->bevi_area))
+                                    [{{$account_branch->bevi_area->code ?? '-'}}] {{$account_branch->bevi_area->name ?? '-'}}
+                                @else
+                                    -
+                                @endif
+                            </span>
+                        </li>
                     </ul>
 
                 </div>

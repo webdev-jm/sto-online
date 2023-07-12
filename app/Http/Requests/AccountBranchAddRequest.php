@@ -27,6 +27,9 @@ class AccountBranchAddRequest extends FormRequest
             'account_id' => [
                 'required'
             ],
+            'bevi_area_id' => [
+                'required'
+            ],
             'code' => [
                 'required'
             ],

@@ -73,4 +73,29 @@ class StoController extends Controller
             'data' => $data
         ]);
     }
+
+    public function areas(Request $request) {
+        $year = $request->year;
+        $prev_year = $year - 1;
+        $start_month = $request->start_month;
+        $end_month = $request->end_month;
+
+        $filters = $request->filters;
+
+        $validator = Validator::make($request->all(), [
+            'year' => 'required',
+            'start_month' => 'required',
+            'end_month' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation Error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        
+    }
 }

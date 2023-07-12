@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AccountBranch;
 use App\Models\SMSAccount;
+use App\Models\BeviArea;
 
 use App\Http\Requests\AccountBranchAddRequest;
 use App\Http\Requests\AccountBranchEditRequest;
@@ -47,7 +48,15 @@ class AccountBranchController extends Controller
      */
     public function create()
     {
-        return view('pages.account-branches.create');
+        $bevi_areas = BeviArea::get();
+        $areas = array();
+        foreach($bevi_areas as $area) {
+            $areas[$area->id] = '['.$area->code.'] '.$area->name;
+        }
+
+        return view('pages.account-branches.create')->with([
+            'areas' => $areas
+        ]);
     }
 
     /**
@@ -60,6 +69,7 @@ class AccountBranchController extends Controller
     {
         $account_branch = new AccountBranch([
             'account_id' => $request->account_id,
+            'bevi_area_id' => $request->bevi_area_id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -100,8 +110,15 @@ class AccountBranchController extends Controller
     {
         $account_branch = AccountBranch::findOrFail(decrypt($id));
 
+        $bevi_areas = BeviArea::get();
+        $areas = array();
+        foreach($bevi_areas as $area) {
+            $areas[$area->id] = '['.$area->code.'] '.$area->name;
+        }
+
         return view('pages.account-branches.edit')->with([
-            'account_branch' => $account_branch
+            'account_branch' => $account_branch,
+            'areas' => $areas
         ]);
     }
 
@@ -120,6 +137,7 @@ class AccountBranchController extends Controller
 
         $account_branch->update([
             'account_id' => $request->account_id,
+            'bevi_area_id' => $request->bevi_area_id,
             'code' => $request->code,
             'name' => $request->name
         ]);

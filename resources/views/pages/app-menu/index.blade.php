@@ -219,7 +219,7 @@
                 }
             },
             tooltip: {
-                valueSuffix: ' (1000 MT)'
+                valueSuffix: ''
             },
             plotOptions: {
                 column: {

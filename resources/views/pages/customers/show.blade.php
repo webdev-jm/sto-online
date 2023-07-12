@@ -47,7 +47,13 @@
                         </li>
                         <li class="list-group-item p-1">
                             <b>Channel</b>
-                            <span class="float-right">[{{$customer->channel->code ?? '-'}}] {{$customer->channel->name ?? '-'}}</span>
+                            <span class="float-right">
+                                @if(!empty($$customer->channel))
+                                    [{{$customer->channel->code ?? '-'}}] {{$customer->channel->name ?? '-'}}
+                                @else
+                                    -
+                                @endif
+                            </span>
                         </li>
                         <li class="list-group-item p-1">
                             <b>Address</b>

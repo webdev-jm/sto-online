@@ -208,6 +208,7 @@ class SalesUpload extends Component
                         'location_code' => $locationCode,
                         'sku_code' => $row[5],
                         'customer_id' => $customer->id,
+                        'channel_id' => $customer->channel_id,
                         'location_id' => $location->id,
                         'product_id' => $product->id,
                         'salesman_id' => $customer->salesman_id,

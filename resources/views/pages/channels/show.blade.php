@@ -19,11 +19,11 @@
 @section('content')
     <div class="row">
         <div class="col-lg-4">
-            <div class="card">
+            <div class="card card-primary card-outline">
                 <div class="card-header">
                     <h3 class="card-title">CHANNEL DETAILS</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body py-0">
         
                     <ul class="list-group list-group-unbordered">
                         <li class="list-group-item p-1">
@@ -40,6 +40,10 @@
                 <div class="card-footer">
                 </div>
             </div>
+        </div>
+
+        <div class="col-lg-8">
+            <livewire:channel.customers :channel="$channel"/>
         </div>
     </div>
 @stop
