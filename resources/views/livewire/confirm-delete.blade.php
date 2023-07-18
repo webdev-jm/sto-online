@@ -13,7 +13,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <label for="password">Please enter password to continue.</label>
-                            <input type="password" class="form-control" wire:model.lazy="password" placeholder="Password" autocomplete="off">
+                            <input type="password" id="password" class="form-control" wire:model.lazy="password" placeholder="Password" autocomplete="off">
                             @error('password') <span class="text-danger">{{ $message }}</span> @enderror
                             <p class="text-danger">{{$error_message}}</p>
                         </div>

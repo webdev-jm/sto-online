@@ -21,5 +21,7 @@ Route::group(['middleware' => 'api.token'], function() {
     Route::get('sales', [SaleController::class, 'index']);
 
     // STO
-    Route::get('sto', [StoController::class, 'index']);
+    Route::post('sto', [StoController::class, 'index']);
+    // STO AREAS
+    Route::post('sto-areas', [StoController::class, 'areas']);
 });

@@ -19,9 +19,13 @@ class CreateSalesReport extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->integer('year');
             $table->integer('month');
+            $table->unsignedBigInteger('product_id');
             $table->string('stock_code');
             $table->string('description')->nullable();
             $table->string('size')->nullable();
+            $table->string('brand_classification')->nullable();
+            $table->string('brand')->nullable();
+            $table->string('category')->nullable();
             $table->integer('quantity')->nullable();
             $table->decimal('sales', 10, 2)->nullable();
             $table->integer('fg_quantity')->nullable();

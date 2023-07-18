@@ -3,7 +3,7 @@
 @section('adminlte_css_pre')
     <style>
         .login-page {
-            background: #ffffff8e url('/images/pexels-gdtography-911738.jpg') no-repeat center center;
+            background: #ffffff8e url('/images/pexels-johannes-plenio-1103970.jpg') no-repeat center center;
 	        background-size: cover;
         }
     </style>
