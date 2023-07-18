@@ -19,6 +19,13 @@ class SaleController extends Controller
         $start_month = $request->start_month;
         $end_month = $request->end_month;
 
+        // filters
+        if(!empty($request->filters)) {
+            return response()->json([
+                'filters' => $request->filters
+            ]);
+        }
+
         $validator = Validator::make($request->all(), [
             'year' => 'required',
             'start_month' => 'required',

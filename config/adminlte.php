@@ -297,41 +297,51 @@ return [
         ],
 
         // Sidebar items:
+        // maintenance
         [
-            'text'      => 'Users',
-            'url'       => '/user',
-            'icon'      => 'fa fa-fw fa-users',
-            'can'       => 'user access',
-            'active'    => ['user*']
+            'text'  => 'Settings',
+            'url'   => '#',
+            'icon'  => 'fa fa-fw fa-cog',
+            'can'   => ['user access', 'role access', 'account branch access', 'systemlog', 'logs'],
+            'submenu' => [
+                [
+                    'text'      => 'Users',
+                    'url'       => '/user',
+                    'icon'      => 'fa fa-fw fa-users',
+                    'can'       => 'user access',
+                    'active'    => ['user*']
+                ],
+                [
+                    'text'      => 'Roles',
+                    'url'       => '/role',
+                    'icon'      => 'fa fa-fw fa-user-tag',
+                    'can'       => 'role access',
+                    'active'    => ['role*']
+                ],
+                [
+                    'text'      => 'Branches',
+                    'url'       => '/account-branch',
+                    'icon'      => 'fa fa-fw fa-sitemap',
+                    'can'       => 'account branch access',
+                    'active'    => ['account-branch*']
+                ],
+                [
+                    'text'      => 'Systemlog',
+                    'url'       => '/systemlog',
+                    'icon'      => 'fa fa-fw fa-history',
+                    'can'       => 'systemlog',
+                    'active'    => ['systemlog']
+                ],
+                [
+                    'text'      => 'Error Logs',
+                    'url'       => '/logs',
+                    'icon'      => 'fa fa-fw fa-exclamation-triangle',
+                    'can'       => 'error logs',
+                    'active'    => ['logs']
+                ]
+            ],
         ],
-        [
-            'text'      => 'Roles',
-            'url'       => '/role',
-            'icon'      => 'fa fa-fw fa-user-tag',
-            'can'       => 'role access',
-            'active'    => ['role*']
-        ],
-        [
-            'text'      => 'Branches',
-            'url'       => '/account-branch',
-            'icon'      => 'fa fa-fw fa-sitemap',
-            'can'       => 'account branch access',
-            'active'    => ['account-branch*']
-        ],
-        [
-            'text'      => 'Systemlog',
-            'url'       => '/systemlog',
-            'icon'      => 'fa fa-fw fa-history',
-            'can'       => 'systemlog',
-            'active'    => ['systemlog']
-        ],
-        [
-            'text'      => 'Error Logs',
-            'url'       => '/logs',
-            'icon'      => 'fa fa-fw fa-exclamation-triangle',
-            'can'       => 'error logs',
-            'active'    => ['logs']
-        ]
+
     ],
 
     /*
