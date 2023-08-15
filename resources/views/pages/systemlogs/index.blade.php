@@ -53,7 +53,7 @@
                                         @foreach($updates[$activity->id] as $column => $data)
                                         <li class="list-group-item p-1">
                                             <b>{{$column}}:</b> {{$data['old']}}
-                                            <p class="mb-0">
+                                            <p class="m-0 p-0 d-inline">
                                                 <b>to:</b> {{$data['new']}}
                                             </p>
                                         </li>

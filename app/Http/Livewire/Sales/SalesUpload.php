@@ -20,6 +20,9 @@ use App\Models\SalesUpload as Upload;
 
 use App\Jobs\SalesImportJob;
 
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 class SalesUpload extends Component
 {
     use WithFileUploads;
@@ -38,6 +41,8 @@ class SalesUpload extends Component
     public $upload_data;
 
     public $upload_triggered = false;
+
+    public $header_err;
 
     protected $listeners = [
         'checkData' => 'updateData'
@@ -184,6 +189,12 @@ class SalesUpload extends Component
                 $amount = (float)trim(str_replace(',', '', $row[12]));
                 $amount_inc_vat = (float)trim(str_replace(',', '', $row[13]));
                 $line_discount = (float)trim(str_replace(',', '', $row[14]));
+
+                $date = $row[0];
+                if (is_int($date)) {
+                    // Convert the value to a date instance if it looks like a date.
+                    $date = Date::excelToDateTimeObject($date)->format('Y-m-d');
+                }
     
                 if($customers->has($customerCode) && $locations->has($locationCode) && $products->has($skuCode)) {
                     $customer = $customers->get($customerCode);
@@ -201,7 +212,7 @@ class SalesUpload extends Component
                     $this->sales_data[] = [
                         'type' => $type,
                         'check' => (!empty($exist)) ? 4 : 0,
-                        'date' => $row[0],
+                        'date' => $date,
                         'document' => $row[1],
                         'category' => $category,
                         'customer_code' => $customerCode,
@@ -227,7 +238,7 @@ class SalesUpload extends Component
                     $this->sales_data[] = [
                         'type' => $type,
                         'check' => ($customers->has($customerCode)) ? ($locations->has($locationCode) ? 3 : 2) : 1,
-                        'date' => $row[0],
+                        'date' => $date,
                         'document' => $row[1],
                         'category' => $category,
                         'customer_code' => $customerCode,
@@ -257,6 +268,10 @@ class SalesUpload extends Component
 
     }
 
+    private function isExcelDate(Cell $cell) {
+        return Date::isDateTime($cell);
+    }
+
     private function paginateArray($data, $perPage)
     {
         $currentPage = $this->page ?: 1;
@@ -279,10 +294,10 @@ class SalesUpload extends Component
         $requiredHeaders = [
             'Posting Date',
             'Document No.',
-            'Customer Code',
+            'Sell-to Customer No.',
             'Type',
             'Location Code',
-            'Sku Code',
+            'No.',
             'Description',
             'Description 2',
             'Item Category Code',
@@ -295,9 +310,11 @@ class SalesUpload extends Component
         ];
     
         $err = 0;
+        $this->header_err = array();
         foreach ($requiredHeaders as $index => $requiredHeader) {
             if(empty($header[$index]) || trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
                 $err++;
+                $this->header_err[] = '<b>'.($header[$index] ?? '-').'</b> should be <b>'. $requiredHeader.'</b>';
             }
         }
     

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 class StoController extends Controller
 {
     public function index(Request $request) {
-
         $year = $request->year;
         $prev_year = $year - 1;
         $start_month = $request->start_month;

@@ -21,8 +21,26 @@
                         @if(!empty($err_msg))
                             <small class="text-danger">{{$err_msg}}</small>
                         @endif
+                        
                     </div>
                 </div>
+                
+                @if(!empty($header_err))
+                    <div class="col-12 mb-2">
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fa fa-exclamation-triangle"></i> Invalid Format!</h5>
+                            <ul class="list-unstyled mb-0">
+                            @foreach($header_err as $err)
+                                <li class="py-0 text-sm border-0">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    {!!$err!!}
+                                </li>
+                            @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @endif
 
                 {{-- UPLOAD COLUMNS --}}
                 <div class="col-lg-12">
@@ -34,7 +52,7 @@
                             <b>DOCUMENT NO.</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>CUSTOMER CODE</b> - <span>Required</span>
+                            <b>SELL-TO CUSTOMER NO.</b> - <span>Required, Customer Code</span>
                         </li>
                         <li>
                             <b>TYPE</b> - <span>Optional</span>
@@ -43,13 +61,13 @@
                             <b>LOCATION CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>SKU CODE</b> - <span>Required</span>
+                            <b>NO.</b> - <span>Required, SKU Code</span>
                         </li>
                         <li>
-                            <b>DESCRIPTION</b> - <span>Optional</span>
+                            <b>DESCRIPTION</b> - <span>Optional, SKU Description</span>
                         </li>
                         <li>
-                            <b>DESCRIPTION 2</b> - <span>Optional</span>
+                            <b>DESCRIPTION 2</b> - <span>Optional, SKU size</span>
                         </li>
                         <li>
                             <b>ITEM CATEGORY CODE</b> - <span>Optional</span>
@@ -70,7 +88,7 @@
                             <b>AMOUNT INCLUDING VAT</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>LINE DISCOUNT</b> - <span>Optional</span>
+                            <b>LINE DISCOUNT %</b> - <span>Optional</span>
                         </li>
                     </ul>
 
