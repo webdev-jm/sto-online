@@ -28,7 +28,7 @@
             <div class="row">
                 @foreach($branches as $branch)
                     <div class="col-lg-3">
-                        <a href="{{route('menu', encrypt($branch->id))}}" class="btn btn-block btn-app bg-default ml-0 font-weight-bold">
+                        <a href="{{route('menu', encrypt($branch->id))}}" class="btn btn-block btn-app bg-gradient-warning ml-0 font-weight-bold">
                             <i class="fa fa-store"></i>
                             [{{$branch->code}}] {{$branch->name}}
                         </a>

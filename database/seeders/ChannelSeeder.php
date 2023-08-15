@@ -13,6 +13,25 @@ class ChannelSeeder extends Seeder
      */
     public function run()
     {
-        //
+        $channel_arr = [
+            'SMKT'      => 'SUPERMARKET',
+            'GRO'       => 'GROCERY',
+            'DEPT'      => 'DEPARTMENT STORE',
+            'WS'        => 'WHOLESALER',
+            'SSS'       => 'SARI-SARI STORE',
+            'ECOM'      => 'E-COMMERCE',
+            'CVS'       => 'CONVENIENCE STORE',
+            'DS-SS'     => 'DRUGSTORE SELF SERVICE',
+            'DS-OTC'    => 'DRUGSTORE OVER THE COUNTER',
+            'HO'        => 'HEAD OFFICE',
+            'MS'        => 'MARKET STALLS/PUBLIC MARKET',
+            'HYPER'     => 'HYPERMARKET',
+            'MINI'      => 'MINIMART',
+            'DS-IDS'    => 'DRUGSTORE INDEPENDENT',
+            'SPEC'      => 'SPECIALTY STORE',
+            'INSTI'     => 'INSTITUTIONAL',
+            'SUBD'      => 'SUB DISTRIBUTOR',
+            'OT'        => 'OTHER',
+        ];
     }
 }

@@ -18,12 +18,11 @@ return [
     'paths' => [
         'api/*',
         'sanctum/csrf-cookie',
-        'http://sto-online.test/', // URL
     ],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['*', 'http://localhost:3000/'],
 
     'allowed_origins_patterns' => [],
 

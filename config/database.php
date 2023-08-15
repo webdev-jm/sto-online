@@ -68,7 +68,6 @@ return [
                 'max_idle_time' => 30,
             ],
         ],
-
         
         'sms_db' => [
             'driver' => 'mysql',
