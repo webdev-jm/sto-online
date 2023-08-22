@@ -50,10 +50,17 @@ class SalesImportJob implements ShouldQueue
             $upload = SalesUpload::find($this->upload_id);
 
             $sku_count = 0;
+
             $total_quantity = 0;
             $total_price_vat = 0;
             $total_amount = 0;
             $total_amount_vat = 0;
+
+            $total_cm_quantity = 0;
+            $total_cm_price_vat = 0;
+            $total_cm_amount = 0;
+            $total_cm_amount_vat = 0;
+
             $num = 0;
 
             $report_data = array();
@@ -63,12 +70,19 @@ class SalesImportJob implements ShouldQueue
                 if($data['check'] == 0) { // no error
                     $sku_count++;
 
-                    // check if not FG or PROMO and not Credit Memo
-                    if($data['type'] == 1 && $data['category'] == 0) {
-                        $total_quantity += $data['quantity'];
-                        $total_price_vat += $data['price_inc_vat'];
-                        $total_amount += $data['amount'];
-                        $total_amount_vat += $data['amount_inc_vat'];
+                    // check if not FG or PROMO
+                    if($data['type'] == 1) {
+                        if($data['category'] == 1) { // Credit Memo
+                            $total_cm_quantity += $data['quantity'];
+                            $total_cm_price_vat += $data['price_inc_vat'];
+                            $total_cm_amount += $data['amount'];
+                            $total_cm_amount_vat += $data['amount_inc_vat'];
+                        } else { // Invoice
+                            $total_quantity += $data['quantity'];
+                            $total_price_vat += $data['price_inc_vat'];
+                            $total_amount += $data['amount'];
+                            $total_amount_vat += $data['amount_inc_vat'];
+                        }
                     }
 
                     $sale = new Sale([
@@ -103,6 +117,10 @@ class SalesImportJob implements ShouldQueue
                 'total_price_vat' => $total_price_vat,
                 'total_amount' => $total_amount,
                 'total_amount_vat' => $total_amount_vat,
+                'total_cm_quantity' => $total_cm_quantity,
+                'total_cm_price_vat' => $total_cm_price_vat,
+                'total_cm_amount' => $total_cm_amount,
+                'total_cm_amount_vat' => $total_cm_amount_vat,
             ]);
 
             // logs

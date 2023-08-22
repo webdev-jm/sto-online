@@ -37,6 +37,14 @@
                         <b>TOTAL AMOUNT INC VAT</b>
                         <span class="float-right">{{number_format($sales_upload->total_amount_vat, 2) ?? '-'}}</span>
                     </li>
+                    <li class="list-group-item py-1">
+                        <b>TOTAL CM AMOUNT</b>
+                        <span class="float-right">{{number_format($sales_upload->total_cm_amount, 2) ?? '-'}}</span>
+                    </li>
+                    <li class="list-group-item py-1">
+                        <b>TOTAL CM AMOUNT INC VAT</b>
+                        <span class="float-right">{{number_format($sales_upload->total_cm_amount_vat, 2) ?? '-'}}</span>
+                    </li>
                 </ul>
             </div>
             <div class="card-footer">

@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Traits\AccountChecker;
 
+use App\Exports\SalesLineExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class SaleController extends Controller
 {
     use AccountChecker;
@@ -191,5 +194,17 @@ class SaleController extends Controller
         return back()->with([
             'message_success' => 'Sales upload by '.$sales_upload->user->name.' has been restored.'
         ]);
+    }
+
+    public function export($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $sales_upload = SalesUpload::findOrFail(decrypt($id));
+
+        return Excel::download(new SalesLineExport($sales_upload), 'STO Sales-'.time().'.xlsx');
     }
 }
