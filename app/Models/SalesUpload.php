@@ -20,6 +20,10 @@ class SalesUpload extends Model
         'total_price_vat',
         'total_amount',
         'total_amount_vat',
+        'total_cm_quantity',
+        'total_cm_price_vat',
+        'total_cm_amount',
+        'total_cm_amount_vat',
     ];
 
     public function user() {

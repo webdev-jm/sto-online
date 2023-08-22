@@ -66,6 +66,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit')->middleware('permission:sales edit');
 
         Route::get('sales/{id}/restore', [SaleController::class, 'restore'])->name('sales.restore')->middleware('permission:sales restore');
+
+        Route::get('sales/{id}/export', [SaleController::class, 'export'])->name('sales.export');
     });
 
     // CUSTOMERS

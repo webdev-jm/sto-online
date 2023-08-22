@@ -50,7 +50,7 @@
                             <p class="m-0 font-weight-bold">{{date('Y-m-d H:i:s a', strtotime($sale->created_at))}}</p>
                             <small class="font-weight-bold text-muted">CREATED AT</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$sale->user->name ?? '-'}}</p>
                             <small class="font-weight-bold text-muted">USER</small>
                         </div>
@@ -58,15 +58,22 @@
                             <p class="m-0 font-weight-bold">{{number_format($sale->sku_count) ?? 0}}</p>
                             <small class="font-weight-bold text-muted">COUNT</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{number_format($sale->total_amount, 2) ?? 0}}</p>
                             <small class="font-weight-bold text-muted">AMOUNT</small>
+                        </div>
+                        <div class="col-lg-2 text-center">
+                            <p class="m-0 font-weight-bold">{{number_format($sale->total_cm_amount, 2) ?? 0}}</p>
+                            <small class="font-weight-bold text-muted">CM AMOUNT</small>
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">
                                 @if(empty($sale->deleted_at))
                                     <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs">
                                         <i class="fa fa-list"></i>
+                                    </a>
+                                    <a href="{{route('sales.export', encrypt($sale->id))}}" class="btn btn-primary btn-xs">
+                                        <i class="fa fa-download"></i>
                                     </a>
                                     @can('sales edit')
                                         <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs">

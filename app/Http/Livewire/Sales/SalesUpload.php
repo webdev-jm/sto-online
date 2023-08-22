@@ -119,7 +119,7 @@ class SalesUpload extends Component
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
     
-        $path1 = $this->file->store('sales-uploads');
+        $path1 = $this->file->storeAs('sales-uploads', $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
         $this->data = Excel::toArray([], $path)[0];
 
