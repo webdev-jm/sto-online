@@ -104,12 +104,14 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">NOTE:</h3>
-            <div class="card-tools" wire:loading.remove >
-                <button class="btn btn-primary btn-sm" wire:click.prevent="saveUpload"><i class="fa fa-save mr-1"></i>Save Data</button>
-            </div>
-            <div class="card-tools" wire:loading>
-                <button class="btn btn-primary btn-sm"><i class="fa fa-spinner fa-spin mr-1"></i>Loading..</button>
-            </div>
+            @if(!empty($sales_data))
+                <div class="card-tools" wire:loading.remove >
+                    <button class="btn btn-primary btn-sm" wire:click.prevent="saveUpload"><i class="fa fa-save mr-1"></i>Save Data</button>
+                </div>
+                <div class="card-tools" wire:loading>
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-spinner fa-spin mr-1"></i>Loading..</button>
+                </div>
+            @endif
         </div>
         <div class="card-body">
             <p class="mb-0">
