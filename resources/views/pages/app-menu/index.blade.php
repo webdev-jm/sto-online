@@ -189,6 +189,7 @@
 
 @section('js')
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/drilldown.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
@@ -207,11 +208,7 @@
                 align: 'left'
             },
             xAxis: {
-                categories: @php echo json_encode($categories); @endphp,
-                crosshair: true,
-                accessibility: {
-                    description: 'Months'
-                }
+                type: 'category'
             },
             yAxis: {
                 min: 0,
@@ -229,6 +226,9 @@
                 }
             },
             series: @php echo json_encode($chart_data); @endphp,
+            drilldown: {
+                series: @php echo json_encode($drilldown); @endphp
+            }
         });
     });
 </script>

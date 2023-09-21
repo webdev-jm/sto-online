@@ -79,6 +79,7 @@ class HomeController extends Controller
             ->select(
                 'month',
                 DB::raw('SUM(sales) as total_sales'),
+                DB::raw('SUM(promo_sales) as total_promo'),
                 DB::raw('SUM(credit_memo) as total_credit_memo')
             )
             ->where('account_id', $account_branch->account->id)
@@ -89,12 +90,31 @@ class HomeController extends Controller
             ->get();
 
         $sales_data = array();
+        $sales_drilldown = array();
         $cm_data = array();
         $categories = array();
         foreach($results as $result) {
-            $sales_data[] = (float)$result->total_sales;
+            $month = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
+            $sales_val = $result->total_sales + $result->total_promo;
+            $categories[] = $month;
+
+            $sales_data[] = (float)$sales_val;
+
+            $sales_data[] = [
+                'name' => $month,
+                'y' => $sales_val,
+                'drilldown' => $month
+            ];
+
+            $sales_drilldown[] = [
+                'id' => $month,
+                'data' => [
+                    ['Sales', (float)$result->total_sales],
+                    ['Promo', (float)$result->total_promo]
+                ]
+            ];
+
             $cm_data[] = (float)$result->total_credit_memo;
-            $categories[] = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
         }
 
         $chart_data = [
@@ -112,7 +132,8 @@ class HomeController extends Controller
             'account' => $account_branch->account,
             'account_branch' => $account_branch,
             'categories' => $categories,
-            'chart_data' => $chart_data
+            'chart_data' => $chart_data,
+            'drilldown' => $sales_drilldown
         ]);
     }
 

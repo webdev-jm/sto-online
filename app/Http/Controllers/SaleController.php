@@ -18,6 +18,38 @@ class SaleController extends Controller
 {
     use AccountChecker;
 
+    public function dashboard(Request $request) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $year = trim($request->get('year'));
+        $month = trim($request->get('month'));
+
+        $sales = DB::table('sales')
+            ->select(
+                DB::raw('YEAR(date) as year'),
+                DB::raw('MONTH(date) as month'),
+                DB::raw('SUM(IF(category = 0, amount_inc_vat, 0)) as si_total'),
+                DB::raw('SUM(IF(category = 1, amount_inc_vat, 0)) as cm_total')
+            )
+            ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->groupBy('year', 'month')
+            ->orderByDesc('year')
+            ->orderByDesc('month')
+            ->get();
+
+        return view('pages.sales.dashboard')->with([
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'sales' => $sales,
+        ]);
+
+    }
+
     /**
      * Display a listing of the resource.
      *
