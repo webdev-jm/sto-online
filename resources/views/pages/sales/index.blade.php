@@ -12,6 +12,7 @@
         @can('sales upload')
             <a href="{{route('sales.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload mr-1"></i>Upload Sales</a>
         @endcan
+        <a href="{{route('sales.dashboard')}}" class="btn btn-success btn-sm"><i class="fa fa-tachometer-alt mr-1"></i>Sales Dashboard</a>
     </div>
 </div>
 @stop
@@ -59,11 +60,11 @@
                             <small class="font-weight-bold text-muted">COUNT</small>
                         </div>
                         <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{number_format($sale->total_amount, 2) ?? 0}}</p>
+                            <p class="m-0 font-weight-bold">{{number_format($sale->total_amount_vat, 2) ?? 0}}</p>
                             <small class="font-weight-bold text-muted">AMOUNT</small>
                         </div>
                         <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{number_format($sale->total_cm_amount, 2) ?? 0}}</p>
+                            <p class="m-0 font-weight-bold">{{number_format($sale->total_cm_amount_vat, 2) ?? 0}}</p>
                             <small class="font-weight-bold text-muted">CM AMOUNT</small>
                         </div>
                         <div class="col-lg-2 text-center">

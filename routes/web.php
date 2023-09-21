@@ -57,7 +57,9 @@ Route::group(['middleware' => 'auth'], function() {
     
     // SALES 
     Route::group(['middleware' => 'permission:sales access'], function() {
+        Route::get('sales/dashboard', [SaleController::class, 'dashboard'])->name('sales.dashboard');
         Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
+
         Route::get('sales/create', [SaleController::class, 'create'])->name('sales.create')->middleware('permission:sales upload');
         Route::post('sales/upload', [SaleController::class, 'store'])->name('sales.upload')->middleware('permission:sales upload');
 
