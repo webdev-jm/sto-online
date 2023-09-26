@@ -308,11 +308,29 @@ class SalesUpload extends Component
             'Amount Including VAT',
             'Line Discount %'
         ];
+
+        $requiredHeadersAlt = [
+            'Posting Date',
+            'Document No.',
+            'Customer Code',
+            'Type',
+            'Location Code',
+            'Sku Code',
+            'Description',
+            'Description 2',
+            'Item Category Code',
+            'Quantity',
+            'Unit of Measure Code',
+            'Unit Price Incl. VAT',
+            'Amount',
+            'Amount Including VAT',
+            'Line Discount %'
+        ];
     
         $err = 0;
         $this->header_err = array();
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if(empty($header[$index]) || trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+            if(empty($header[$index]) || (trim(strtolower($header[$index])) !== strtolower($requiredHeader) && trim(strtolower($header[$index])) !== strtolower($requiredHeadersAlt[$index]))) {
                 $err++;
                 $this->header_err[] = '<b>'.($header[$index] ?? '-').'</b> should be <b>'. $requiredHeader.'</b>';
             }
