@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Customer as Cust;
 use App\Models\Salesman;
 use App\Models\SalesmanCustomer;
+use App\Models\CustomerUbo;
+use App\Models\CustomerUboDetail;
 
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -88,16 +90,32 @@ class Customer extends Component
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get()
                 ->keyBy('code');
+
+            $customer_ubos = CustomerUbo::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->get();
             
-            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers) {
-                $customer = $current_customers->get($row[0]);
-            
+            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers, $customer_ubos) {
+                $code = trim($row[0]);
+                $name = trim($row[1]);
+                $address = trim($row[2]);
+                $salesman = trim($row[3]);
+
+                $customer = $current_customers->get($code);
+
+                $check = $customer_ubos->filter(function ($item) use ($name, $address) {
+                    return $this->checkSimilarity($item->name, $name) >= 90
+                        && $this->checkSimilarity($item->address, $address) >= 90;
+                })->first();
+                
                 return [
+                    'similar' => !empty($check) ? $check->toArray() : [],
                     'check' => empty($customer) ? 0 : 1,
-                    'code' => $row[0],
-                    'name' => $row[1],
-                    'address' => $row[2],
-                    'salesman' => $row[3],
+                    'code' => $code,
+                    'name' => $name,
+                    'address' => $address,
+                    'salesman' => $salesman,
+                    'status' => ''
                 ];
             })->toArray();
         } else {
@@ -139,6 +157,30 @@ class Customer extends Component
         }
     
         return $err;
+    }
+
+    public function differentCustomer($customer_key) {
+        $customer_key = decrypt($customer_key);
+        $this->customer_data[$customer_key]['status'] = 'different';
+        $this->customer_data[$customer_key]['check'] = 0;
+    }
+
+    public function sameCustomer($customer_key) {
+        $customer_key = decrypt($customer_key);
+        $this->customer_data[$customer_key]['status'] = 'same';
+        $this->customer_data[$customer_key]['check'] = 0;
+    }
+
+    private function checkSimilarity($str1, $str2) {
+        $similarity = 0;
+        if(strlen($str1) > 0 && strlen($str2) > 0) {
+            $distance = levenshtein(strtoupper($str1), strtoupper($str2));
+            $max_length = max(strlen($str1), strlen($str2));
+            $similarity = 1 - ($distance / $max_length);
+            $similarity = $similarity * 100;
+        }
+
+        return $similarity;
     }
 
     public function mount() {

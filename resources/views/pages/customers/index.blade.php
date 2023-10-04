@@ -25,6 +25,9 @@
             <h3 class="card-title">CUSTOMER LIST</h3>
             @can('customer upload')
                 <div class="card-tools">
+                    @can('customer parked')
+                    <a href="{{route('customer.parked')}}" class="btn btn-warning btn-sm"><i class="fa fa-handshake-slash mr-1"></i>Parked Customers</a>
+                    @endcan
                     <button class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
                 </div>
             @endcan
@@ -111,7 +114,7 @@
     @can('customer upload')
         {{-- MODAL --}}
         <div class="modal fade" id="modal-upload">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <livewire:uploads.customer/>
             </div>
         </div>

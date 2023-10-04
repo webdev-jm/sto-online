@@ -107,6 +107,7 @@ class HomeController extends Controller
             ];
 
             $sales_drilldown[] = [
+                'name' => $month,
                 'id' => $month,
                 'data' => [
                     ['Sales', (float)$result->total_sales],

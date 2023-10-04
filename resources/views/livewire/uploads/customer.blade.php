@@ -67,10 +67,11 @@
                                 <th>NAME</th>
                                 <th>ADDRESS</th>
                                 <th>SALESMAN</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($paginatedData as $data)
+                            @foreach($paginatedData as $key => $data)
                             <tr>
                                 <td class="text-center align-middle">
                                     @switch($data['check'])
@@ -83,10 +84,27 @@
                                         @break
                                     @endswitch
                                 </td>
-                                <td>{{$data['code'] ?? '-'}}</td>
-                                <td>{{$data['name'] ?? '-'}}</td>
-                                <td>{{$data['address'] ?? '-'}}</td>
-                                <td>{{$data['salesman'] ?? '-'}}</td>
+                                <td class="align-middle">{{$data['code'] ?? '-'}}</td>
+                                <td class="align-middle">{{$data['name'] ?? '-'}}</td>
+                                <td class="align-middle">{{$data['address'] ?? '-'}}</td>
+                                <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
+                                <td>
+                                    @if(!empty($data['similar']))
+                                        @php
+                                        $ubo = $data['similar'];
+                                        @endphp
+                                        <small class="text-danger">This customer possibly already exist please verify the details.</small>
+                                        <br>
+                                        <b>ID:</b>{{$ubo['ubo_id']}} <b>NAME:</b>{{$ubo['name']}} <b>ADDRESS:</b>{{$ubo['address']}}
+                                        <br>
+                                        @if(empty($data['status'])) 
+                                            <button class="btn btn-info btn-sm" wire:click.prevent="differentCustomer('{{encrypt($key)}}')">Different account</button>
+                                            <button class="btn btn-primary btn-sm" wire:click.prevent="sameCustomer('{{encrypt($key)}}')">Same account</button>
+                                        @else
+                                            <button class="btn btn{{$data['status'] == 'different' ? '-info' : '-primary'}} btn-sm">{{ucwords($data['status'])}}</button>
+                                        @endif
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
