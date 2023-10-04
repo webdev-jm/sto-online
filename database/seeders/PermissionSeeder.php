@@ -35,12 +35,14 @@ class PermissionSeeder extends Seeder
                 'sales restore'     => 'Allow user to restore sales.'
             ],
             'Customers' => [
-                'customer access'   => 'Allow user to access customer list and details',
-                'customer create'   => 'Allow user to add customer.',
-                'customer edit'     => 'Allow user to edit customer.',
-                'customer delete'   => 'Allow user to delete customer.',
-                'customer upload'   => 'Allow user to upload customer data.',
-                'customer restore'  => 'Allow user to restore customer data.',
+                'customer access'               => 'Allow user to access customer list and details',
+                'customer create'               => 'Allow user to add customer.',
+                'customer edit'                 => 'Allow user to edit customer.',
+                'customer delete'               => 'Allow user to delete customer.',
+                'customer upload'               => 'Allow user to upload customer data.',
+                'customer restore'              => 'Allow user to restore customer data.',
+                'customer parked'               => 'Allow user to view parked customers',
+                'customer parked validation'    => 'Allow user to validate parked customers.',
             ],
             'Salesman' => [
                 'salesman access'   => 'Allow user to access salesman list and details',

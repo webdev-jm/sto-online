@@ -22,6 +22,11 @@ class CreateCustomersTable extends Migration
             $table->string('code');
             $table->string('name');
             $table->string('address');
+            $table->string('brgy');
+            $table->string('city');
+            $table->string('province');
+            $table->string('country');
+            $table->integer('status')->default(0);
             $table->timestamps();
 
             $table->softDeletes();

@@ -6,6 +6,11 @@ use App\Models\Customer;
 use App\Models\Salesman;
 use App\Models\SalesmanCustomer;
 use App\Models\Channel;
+use App\Models\CustomerUbo;
+use App\Models\CustomerUboDetail;
+
+use Illuminate\Support\Facades\DB;
+
 use Illuminate\Http\Request;
 
 use App\Http\Requests\CustomerAddRequest;
@@ -18,6 +23,27 @@ use App\Http\Traits\AccountChecker;
 class CustomerController extends Controller
 {
     use AccountChecker;
+
+    public function parked() {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $customers = Customer::orderBy('created_at', 'DESC')
+            ->where('account_id', $account->id)
+            ->where('account_branch_id', $account_branch->id)
+            ->where('status', 1)
+            ->with('salesman')
+            ->paginate(10);
+
+        return view('pages.customers.parked')->with([
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'customers' => $customers
+        ]);
+    }
 
     /**
      * Display a listing of the resource.
@@ -291,5 +317,76 @@ class CustomerController extends Controller
         return back()->with([
             'message_success' => 'Customer '.$customer->name.' has been restored.'
         ]);
+    }
+
+    public function generateUBO($account_id, $branch_id) {
+        // Get customers with eager-loaded relationships
+        $customers = Customer::where('account_id', $account_id)
+            ->where('account_branch_id', $branch_id)
+            ->with('ubo')
+            ->get();
+
+        foreach ($customers as $customer) {
+            if(empty($customer->ubo->count())) { // Check if UBO does not exist
+                // Find potential duplicates with high similarity
+                $potential_duplicate = CustomerUbo::whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$customer->name])
+                    ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$customer->address])
+                    ->where('customer_id', '<>', $customer->id)
+                    ->where('account_id', $customer->account_id)
+                    ->where('account_branch_id', $customer->account_branch_id)
+                    ->first();
+
+                if(!empty($potential_duplicate)) {
+                    $ubo_id = $potential_duplicate->ubo_id;
+                    
+                    $percent = $this->checkSimilarity($potential_duplicate->name, $customer->name) * 100;
+                    $address_pc = $this->checkSimilarity($potential_duplicate->address, $customer->address) * 100;
+
+                    CustomerUboDetail::updateOrInsert(
+                        [
+                            'account_id' => $customer->account_id,
+                            'account_branch_id' => $customer->account_branch_id,
+                            'customer_ubo_id' => $potential_duplicate->id,
+                            'customer_id' => $customer->id,
+                            'ubo_id' => $ubo_id,
+                        ],
+                        [
+                            'name' => $customer->name,
+                            'address' => $customer->address,
+                            'similarity' => $percent,
+                            'address_similarity' => $address_pc,
+                        ]
+                    );
+                } else {
+                    // Insert and assign UBO ID for similar customers
+                    $last_ubo_id = CustomerUbo::max('ubo_id');
+                    $ubo_id = $last_ubo_id ? $last_ubo_id + 1 : 1;
+
+                    // Create a new UBO
+                    CustomerUbo::updateOrInsert([
+                            'account_id' => $customer->account_id,
+                            'account_branch_id' => $customer->account_branch_id,
+                            'customer_id' => $customer->id,
+                        ],
+                        [
+                            'ubo_id' => $ubo_id ?? 1,
+                            'name' => $customer->name,
+                            'address' => $customer->address,
+                        ]
+                    );
+                }
+            }
+        }
+
+        return 'UBO has been generated.';
+    }
+
+    private function checkSimilarity($str1, $str2) {
+        $distance = levenshtein(strtoupper($str1), strtoupper($str2));
+        $max_length = max(strlen($str1), strlen($str2));
+        $similarity = 1 - ($distance / $max_length);
+        $similarity * 100;
+
+        return $similarity;
     }
 }

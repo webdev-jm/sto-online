@@ -30,6 +30,8 @@ Route::get('/', [HomeController::class, 'index']);
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 Route::group(['middleware' => 'auth'], function() {
+
+    Route::get('generate-ubo/{account_id}/{branch_id}', [CustomerController::class, 'generateUBO']);
     
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
@@ -77,6 +79,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('customer', [CustomerController::class, 'index'])->name('customer.index');
         Route::get('customer/create', [CustomerController::class, 'create'])->name('customer.create')->middleware('permission:customer create');
         Route::post('customer', [CustomerController::class, 'store'])->name('customer.store')->middleware('permission:customer create');
+
+        Route::get('customer/parked', [CustomerController::class, 'parked'])->name('customer.parked')->middleware('permission:customer parked');
 
         Route::get('customer/{id}', [CustomerController::class, 'show'])->name('customer.show');
 

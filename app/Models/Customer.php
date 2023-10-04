@@ -44,4 +44,8 @@ class Customer extends Model
     public function customer_salesmen() {
         return $this->hasMany('App\Models\SalesmanCustomer');
     }
+
+    public function ubo() {
+        return $this->hasMany('App\Models\CustomerUbo');
+    }
 }
