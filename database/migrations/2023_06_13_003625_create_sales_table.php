@@ -33,6 +33,7 @@ class CreateSalesTable extends Migration
             $table->decimal('price_inc_vat', 10,2)->default(0);
             $table->decimal('amount', 10,2)->default(0);
             $table->decimal('amount_inc_vat', 10,2)->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
 
             $table->softDeletes();

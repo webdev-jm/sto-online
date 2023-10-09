@@ -30,6 +30,7 @@ class Sale extends Model
         'price_inc_vat',
         'amount',
         'amount_inc_vat',
+        'status',
     ];
 
     public function sales_upload() {

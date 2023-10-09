@@ -22,10 +22,10 @@ class CustomerUboDetail extends Model
     ];
 
     public function customer_ubo() {
-        return $this->belongsTo('App\Model\CustomerUbo');
+        return $this->belongsTo('App\Models\CustomerUbo');
     }
 
     public function customer() {
-        return $this->belongsTo('App\Model\Customer');
+        return $this->belongsTo('App\Models\Customer');
     }
 }

@@ -115,7 +115,11 @@ class Customer extends Component
                     'name' => $name,
                     'address' => $address,
                     'salesman' => $salesman,
-                    'status' => ''
+                    'brgy' => '',
+                    'city' => '',
+                    'province' => '',
+                    'country' => '',
+                    'status' => !empty($check) ? 1 : 0
                 ];
             })->toArray();
         } else {

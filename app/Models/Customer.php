@@ -19,6 +19,11 @@ class Customer extends Model
         'code',
         'name',
         'address',
+        'brgy',
+        'city',
+        'province',
+        'country',
+        'status',
     ];
 
     public function account() {
@@ -38,7 +43,7 @@ class Customer extends Model
     }
 
     public function sales() {
-        return $this->hasMany('App\Models\Sales');
+        return $this->hasMany('App\Models\Sale');
     }
 
     public function customer_salesmen() {
@@ -47,5 +52,9 @@ class Customer extends Model
 
     public function ubo() {
         return $this->hasMany('App\Models\CustomerUbo');
+    }
+
+    public function ubo_detail() {
+        return $this->hasMany('App\Models\CustomerUboDetail');
     }
 }

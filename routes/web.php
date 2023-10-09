@@ -88,6 +88,11 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('customer/{id}', [CustomerController::class, 'update'])->name('customer.update')->middleware('permission:customer edit');
 
         Route::get('customer/{id}/restore', [CustomerController::class, 'restore'])->name('customer.restore')->middleware('permission:customer restore');
+
+        Route::get('customer/{id}/validate', [CustomerController::class, 'validate_customer'])->name('customer.validate')->middleware('permission:customer parked validation');
+
+        Route::get('customer/{id}/same-customer', [CustomerController::class, 'sames_customer'])->name('customer.same-customer')->middleware('permission:customer parked validation');
+        Route::get('customer/{id}/different-customer', [CustomerController::class, 'different_customer'])->name('customer.different-customer')->middleware('permission:customer parked validation');
     });
 
     // SALESMEN

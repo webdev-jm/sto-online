@@ -33,11 +33,11 @@
                             <p class="m-0 font-weight-bold">{{$customer->code}}</p>
                             <small class="font-weight-bold text-muted">CODE</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->name}}</p>
                             <small class="font-weight-bold text-muted">NAME</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->address}}</p>
                             <small class="font-weight-bold text-muted">ADDRESS</small>
                         </div>
@@ -46,13 +46,19 @@
                             <small class="font-weight-bold text-muted">SALESMAN</small>
                         </div>
                         <div class="col-lg-2 text-center">
+                            <p class="m-0 font-weight-bold"><span class="badge badge-warning">PARKED</span></p>
+                            <small class="font-weight-bold text-muted">STATUS</small>
+                        </div>
+                        <div class="col-lg-2 text-center">
                             <p class="m-0">
                                 <a href="{{route('customer.show', encrypt($customer->id))}}" class="btn btn-info btn-xs" title="view details">
                                     <i class="fa fa-list"></i>
                                 </a>
-                                <a href="" class="btn btn-success btn-xs" data-id="{{encrypt($customer->id)}}" title="validate">
-                                    <i class="fa fa-user-check"></i>
-                                </a>
+                                @can('customer parked validation')
+                                    <a href="{{route('customer.validate', encrypt($customer->id))}}" class="btn btn-success btn-xs" data-id="{{encrypt($customer->id)}}" title="validate">
+                                        <i class="fa fa-user-check"></i>
+                                    </a>
+                                @endcan
                             </p>
                             <small class="font-weight-bold text-muted">ACTION</small>
                         </div>
