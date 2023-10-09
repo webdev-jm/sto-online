@@ -231,6 +231,7 @@ class SalesUpload extends Component
                         'amount' => $amount,
                         'amount_inc_vat' => $amount_inc_vat,
                         'line_discount' => $line_discount,
+                        'status' => $customer->status,
                     ];
                     
                 } else {
@@ -252,6 +253,7 @@ class SalesUpload extends Component
                         'amount' => $amount,
                         'amount_inc_vat' => $amount_inc_vat,
                         'line_discount' => $line_discount,
+                        'status' => 2
                     ];
                 }
             }

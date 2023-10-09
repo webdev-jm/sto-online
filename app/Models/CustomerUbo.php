@@ -23,6 +23,6 @@ class CustomerUbo extends Model
     }
 
     public function ubo_details() {
-        return $this->hasMany('App\Model\CustomerUboDetail');
+        return $this->hasMany('App\Models\CustomerUboDetail');
     }
 }

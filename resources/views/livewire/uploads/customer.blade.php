@@ -93,16 +93,9 @@
                                         @php
                                         $ubo = $data['similar'];
                                         @endphp
-                                        <small class="text-danger">This customer possibly already exist please verify the details.</small>
+                                        <small class="text-warning font-weight-bold">This customer may already exist. Please review the details below. This customer will be automatically designated as a parked customer.</small>
                                         <br>
-                                        <b>ID:</b>{{$ubo['ubo_id']}} <b>NAME:</b>{{$ubo['name']}} <b>ADDRESS:</b>{{$ubo['address']}}
-                                        <br>
-                                        @if(empty($data['status'])) 
-                                            <button class="btn btn-info btn-sm" wire:click.prevent="differentCustomer('{{encrypt($key)}}')">Different account</button>
-                                            <button class="btn btn-primary btn-sm" wire:click.prevent="sameCustomer('{{encrypt($key)}}')">Same account</button>
-                                        @else
-                                            <button class="btn btn{{$data['status'] == 'different' ? '-info' : '-primary'}} btn-sm">{{ucwords($data['status'])}}</button>
-                                        @endif
+                                        <b>UBO ID: </b>{{$ubo['ubo_id']}} <b>NAME: </b>{{$ubo['name']}} <b>ADDRESS: </b>{{$ubo['address']}}
                                     @endif
                                 </td>
                             </tr>

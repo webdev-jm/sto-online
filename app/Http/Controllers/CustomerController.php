@@ -45,6 +45,38 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function validate_customer($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $customer = Customer::findOrFail(decrypt($id));
+        $customer_ubo = $customer->ubo->first();
+        if(empty($customer_ubo)) {
+            $customer_ubo_details = $customer->ubo_detail;
+            $ubo = $customer_ubo_details->first();
+            $customer_ubo = $ubo->customer_ubo ?? [];
+        }
+
+        return view('pages.customers.validate')->with([
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'customer' => $customer,
+            'customer_ubo' => $customer_ubo,
+            'customer_ubo_details' => $customer_ubo->ubo_details ?? []
+        ]);
+    }
+
+    public function same_customer($customer_id) {
+
+    }
+
+    public function different_customer($customer_id) {
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -67,6 +99,7 @@ class CustomerController extends Controller
             ->with('salesman')
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
+            ->where('status', 0)
             ->when(!empty($search), function($query) use($search) {
                 $query->where(function($qry) use($search) {
                     $qry->where('code', 'like', '%'.$search.'%')
@@ -339,8 +372,8 @@ class CustomerController extends Controller
                 if(!empty($potential_duplicate)) {
                     $ubo_id = $potential_duplicate->ubo_id;
                     
-                    $percent = $this->checkSimilarity($potential_duplicate->name, $customer->name) * 100;
-                    $address_pc = $this->checkSimilarity($potential_duplicate->address, $customer->address) * 100;
+                    $percent = $this->checkSimilarity($potential_duplicate->name, $customer->name);
+                    $address_pc = $this->checkSimilarity($potential_duplicate->address, $customer->address);
 
                     CustomerUboDetail::updateOrInsert(
                         [
@@ -357,6 +390,14 @@ class CustomerController extends Controller
                             'address_similarity' => $address_pc,
                         ]
                     );
+
+                    $customer->update([
+                        'status' => 1
+                    ]);
+
+                    $customer->sales()->update([
+                        'status' => 1
+                    ]);
                 } else {
                     // Insert and assign UBO ID for similar customers
                     $last_ubo_id = CustomerUbo::max('ubo_id');
@@ -374,6 +415,14 @@ class CustomerController extends Controller
                             'address' => $customer->address,
                         ]
                     );
+
+                    $customer->update([
+                        'status' => 0
+                    ]);
+
+                    $customer->sales()->update([
+                        'status' => 0
+                    ]);
                 }
             }
         }
@@ -382,10 +431,14 @@ class CustomerController extends Controller
     }
 
     private function checkSimilarity($str1, $str2) {
+        // remove spaces before comparing
+        $str1 = str_replace(' ', '', $str1);
+        $str2 = str_replace(' ', '', $str2);
+
         $distance = levenshtein(strtoupper($str1), strtoupper($str2));
         $max_length = max(strlen($str1), strlen($str2));
         $similarity = 1 - ($distance / $max_length);
-        $similarity * 100;
+        $similarity = $similarity * 100;
 
         return $similarity;
     }

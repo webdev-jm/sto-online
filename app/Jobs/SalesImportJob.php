@@ -104,6 +104,7 @@ class SalesImportJob implements ShouldQueue
                         'price_inc_vat' => $data['price_inc_vat'],
                         'amount' => $data['amount'],
                         'amount_inc_vat' => $data['amount_inc_vat'],
+                        'status' => $data['status'],
                     ]);
                     $sale->save();
 
@@ -125,8 +126,8 @@ class SalesImportJob implements ShouldQueue
 
             // logs
             activity('upload')
-            ->performedOn($upload)
-            ->log(':causer.name has uploaded sales data.');
+                ->performedOn($upload)
+                ->log(':causer.name has uploaded sales data.');
 
             // UPDATE SALES REPORTS
             if(!empty($report_data)) {
