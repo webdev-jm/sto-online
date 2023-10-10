@@ -69,7 +69,7 @@ class CustomerImportJob implements ShouldQueue
 
             // add salesman
             if(!empty($salesman) && !empty($customer) && $customer->salesman_id != $salesman->id) {
-                // update previous salesan history record
+                // update previous salesman history record
                 $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
                     ->where('customer_id', $customer->id)
                     ->first();
@@ -98,32 +98,40 @@ class CustomerImportJob implements ShouldQueue
     }
 
     private function checkCustomerSimilarity($customer) {
-        if(empty($customer->ubo->count())) { // Check if UBO does not exist
+        if($customer->ubo->isEmpty()) { // Check if UBO does not exist
+
+            $name = $customer->name;
+            $address = $customer->address;
+            $account_id = $customer->account_id;
+            $account_branch_id = $customer->account_branch_id;
+
             // Find potential duplicates with high similarity
-            $potential_duplicate = CustomerUbo::whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$customer->name])
-                ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$customer->address])
+            $potential_duplicate = CustomeUbo::where(function($query) use($name, $address) {
+                    $query->whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$name])
+                        ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$address]);
+                })
                 ->where('customer_id', '<>', $customer->id)
-                ->where('account_id', $customer->account_id)
-                ->where('account_branch_id', $customer->account_branch_id)
+                ->where('account_id', $account_id)
+                ->where('account_branch_id', $account_branch_id)
                 ->first();
 
             if(!empty($potential_duplicate)) {
                 $ubo_id = $potential_duplicate->ubo_id;
                 
-                $percent = $this->checkSimilarity($potential_duplicate->name, $customer->name);
-                $address_pc = $this->checkSimilarity($potential_duplicate->address, $customer->address);
+                $percent = $this->checkSimilarity($potential_duplicate->name, $name);
+                $address_pc = $this->checkSimilarity($potential_duplicate->address, $address);
 
                 CustomerUboDetail::updateOrInsert(
                     [
-                        'account_id' => $customer->account_id,
-                        'account_branch_id' => $customer->account_branch_id,
+                        'account_id' => $account_id,
+                        'account_branch_id' => $account_branch_id,
                         'customer_ubo_id' => $potential_duplicate->id,
                         'customer_id' => $customer->id,
                         'ubo_id' => $ubo_id,
                     ],
                     [
-                        'name' => $customer->name,
-                        'address' => $customer->address,
+                        'name' => $name,
+                        'address' => $address,
                         'similarity' => $percent,
                         'address_similarity' => $address_pc,
                     ]
@@ -138,15 +146,16 @@ class CustomerImportJob implements ShouldQueue
                 $ubo_id = $last_ubo_id ? $last_ubo_id + 1 : 1;
 
                 // Create a new UBO
-                CustomerUbo::updateOrInsert([
-                        'account_id' => $customer->account_id,
-                        'account_branch_id' => $customer->account_branch_id,
+                CustomerUbo::updateOrInsert(
+                    [
+                        'account_id' => $account_id,
+                        'account_branch_id' => $account_branch_id,
                         'customer_id' => $customer->id,
                     ],
                     [
                         'ubo_id' => $ubo_id ?? 1,
-                        'name' => $customer->name,
-                        'address' => $customer->address,
+                        'name' => $name,
+                        'address' => $address,
                     ]
                 );
 

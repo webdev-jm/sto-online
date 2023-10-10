@@ -12,7 +12,7 @@
         @can('sales upload')
             <a href="{{route('sales.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload mr-1"></i>Upload Sales</a>
         @endcan
-        <a href="{{route('sales.dashboard')}}" class="btn btn-success btn-sm"><i class="fa fa-tachometer-alt mr-1"></i>Sales Dashboard</a>
+        {{-- <a href="{{route('sales.dashboard')}}" class="btn btn-success btn-sm"><i class="fa fa-tachometer-alt mr-1"></i>Sales Dashboard</a> --}}
     </div>
 </div>
 @stop
