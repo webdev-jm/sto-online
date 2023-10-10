@@ -69,11 +69,94 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function same_customer($customer_id) {
+    public function same_customer($customer_id, $ubo_id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
 
+        $customer_id = decrypt($customer_id);
+        $customer = Customer::findOrFail($customer_id);
+        $ubo = CustomerUbo::where('ubo_id', $ubo_id)->first();
+        // check if already exists as UBO child
+        $ubo_detail = CustomerUboDetail::where('customer_id', $customer_id)
+            ->first();
+        if(empty($ubo_detail)) { // add
+            $similarity = $this->checkSimilarity($ubo->name, $customer->name);
+            $address_similarity = $this->checkSimilarity($ubo->address, $customer->address);
+
+            $ubo_detail = new CustomerUboDetail([
+                'account_id' => $account->id,
+                'account_branch_id' => $account_branch->id,
+                'customer_ubo_id' => $ubo->id,
+                'customer_id' => $customer->id,
+                'ubo_id' => $ubo->ubo_id,
+                'name' => $customer->name,
+                'address' => $customer->address,
+                'similarity' => $similarity,
+                'address_similarity' => $address_similarity
+            ]);
+            $ubo_detail->save();
+        }
+
+        // update customer status
+        $customer->update([
+            'status' => 0
+        ]);
+
+        // update sales status
+        $customer->sales()->update([
+            'status' => 0
+        ]);
+
+        return redirect()->route('customer.parked')->with([
+            'message_success' => 'Customer UBO has been updated.'
+        ]);
     }
 
     public function different_customer($customer_id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $customer_id = decrypt($customer_id);
+        $customer = Customer::findOrFail($customer_id);
+        // remove from ubo details
+        $ubo_detail = CustomerUboDetail::where('customer_id', $customer->id)
+            ->delete();
+
+        // get last UBO ID and increment by 1
+        $last_ubo_id = CustomerUbo::max('ubo_id');
+        $ubo_id = $last_ubo_id ? $last_ubo_id + 1 : 1;
+        
+        // add or update customer ubo
+        $ubo = CustomerUbo::updateOrInsert(
+            [
+                'account_id' => $account->id,
+                'account_branch_id' => $account_branch->id,
+                'customer_id' => $customer->id,
+                'ubo_id' => $ubo_id
+            ],
+            [
+                'name' => $customer->name,
+                'address' => $customer->address
+            ]
+        );
+
+        $customer->update([
+            'status' => 0
+        ]);
+
+        $customer->sales()->update([
+            'status' => 0
+        ]);
+
+        return redirect()->route('customer.parked')->with([
+            'message_success' => 'Customer UBO has been updated.'
+        ]);
 
     }
 

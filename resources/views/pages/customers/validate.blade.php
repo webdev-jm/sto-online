@@ -21,7 +21,7 @@
                 <h3 class="card-title">CUSTOMER DETAILS</h3>
                 @can('customer parked validation')
                     <div class="card-tools">
-                        <a href="{{route('customer.same-customer', encrypt($customer->id))}}" class="btn btn-info btn-sm"><i class="fa fa-clone mr-1"></i>Same Customer</a>
+                        <a href="{{route('customer.same-customer', [encrypt($customer->id), $customer_ubo->ubo_id ?? 0])}}" class="btn btn-info btn-sm"><i class="fa fa-clone mr-1"></i>Same Customer</a>
                         <a href="{{route('customer.different-customer', encrypt($customer->id))}}" class="btn btn-danger btn-sm"><i class="fa fa-store-slash mr-1"></i>Different Customer</a>
                     </div>
                 @endcan

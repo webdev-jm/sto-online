@@ -91,7 +91,7 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('customer/{id}/validate', [CustomerController::class, 'validate_customer'])->name('customer.validate')->middleware('permission:customer parked validation');
 
-        Route::get('customer/{id}/same-customer', [CustomerController::class, 'sames_customer'])->name('customer.same-customer')->middleware('permission:customer parked validation');
+        Route::get('customer/{id}/{ubo_id}/same-customer', [CustomerController::class, 'same_customer'])->name('customer.same-customer')->middleware('permission:customer parked validation');
         Route::get('customer/{id}/different-customer', [CustomerController::class, 'different_customer'])->name('customer.different-customer')->middleware('permission:customer parked validation');
     });
 
