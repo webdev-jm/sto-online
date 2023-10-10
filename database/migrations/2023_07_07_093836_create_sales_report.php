@@ -33,6 +33,8 @@ class CreateSalesReport extends Migration
             $table->integer('promo_quantity')->nullable();
             $table->decimal('promo_sales', 10, 2)->nullable();
             $table->decimal('credit_memo', 10, 2)->nullable();
+            $table->decimal('parked_quantity', 10, 2)->nullable();
+            $table->decimal('parked_amount', 10, 2)->nullable();
         });
     }
 

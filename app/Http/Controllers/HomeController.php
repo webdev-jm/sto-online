@@ -80,7 +80,8 @@ class HomeController extends Controller
                 'month',
                 DB::raw('SUM(sales) as total_sales'),
                 DB::raw('SUM(promo_sales) as total_promo'),
-                DB::raw('SUM(credit_memo) as total_credit_memo')
+                DB::raw('SUM(credit_memo) as total_credit_memo'),
+                DB::raw('SUM(parked_amount) as total_parked_amount')
             )
             ->where('account_id', $account_branch->account->id)
             ->where('account_branch_id', $account_branch->id)
@@ -92,13 +93,12 @@ class HomeController extends Controller
         $sales_data = array();
         $sales_drilldown = array();
         $cm_data = array();
+        $parked_data = array();
         $categories = array();
         foreach($results as $result) {
             $month = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
             $sales_val = $result->total_sales + $result->total_promo;
             $categories[] = $month;
-
-            $sales_data[] = (float)$sales_val;
 
             $sales_data[] = [
                 'name' => $month,
@@ -116,12 +116,18 @@ class HomeController extends Controller
             ];
 
             $cm_data[] = (float)$result->total_credit_memo;
+
+            $parked_data[] = (float)$result->total_parked_amount;
         }
 
         $chart_data = [
             [
                 'name' => 'Sales',
                 'data' => $sales_data
+            ],
+            [
+                'name' => 'Parked Sales',
+                'data' => $parked_data
             ],
             [
                 'name' => 'Credit Memo',
