@@ -89,7 +89,7 @@
                                 <td class="align-middle">{{$data['address'] ?? '-'}}</td>
                                 <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
                                 <td>
-                                    @if(!empty($data['similar']))
+                                    @if(!empty($data['similar']) && $data['check'] == 0)
                                         @php
                                         $ubo = $data['similar'];
                                         @endphp
