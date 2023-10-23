@@ -65,7 +65,7 @@ class CustomerController extends Controller
             'account_branch' => $account_branch,
             'customer' => $customer,
             'customer_ubo' => $customer_ubo,
-            'customer_ubo_details' => $customer_ubo->ubo_details ?? []
+            'customer_ubo_details' => $customer_ubo_details ?? []
         ]);
     }
 

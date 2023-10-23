@@ -79,13 +79,21 @@ class CustomerImportJob implements ShouldQueue
                         'end_date' => date('Y-m-d')
                     ]);
                 } else {
-                    // record new salesman history
-                    $salesman_customer = new SalesmanCustomer([
-                        'salesman_id' => $salesman->id,
-                        'customer_id' => $customer->id,
-                        'start_date' => date('Y-m-d'),
-                    ]);
-                    $salesman_customer->save();
+                    // check if already exists
+                    $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
+                        ->where('customer_id', $customer->id)
+                        ->whereNull('end_date')
+                        ->first();
+
+                    if(empty($salesman_customer)) {
+                        // record new salesman history
+                        $salesman_customer = new SalesmanCustomer([
+                            'salesman_id' => $salesman->id,
+                            'customer_id' => $customer->id,
+                            'start_date' => date('Y-m-d'),
+                        ]);
+                        $salesman_customer->save();
+                    }
                 }
 
                 // update salesman

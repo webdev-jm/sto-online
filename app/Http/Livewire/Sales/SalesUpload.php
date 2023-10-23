@@ -22,6 +22,7 @@ use App\Jobs\SalesImportJob;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SalesUpload extends Component
 {
@@ -121,7 +122,20 @@ class SalesUpload extends Component
     
         $path1 = $this->file->storeAs('sales-uploads', $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
-        $this->data = Excel::toArray([], $path)[0];
+        // $this->data = Excel::toArray([], $path)[0];
+        $spreadsheet = IOFactory::load($path);
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $data = [];
+        foreach ($worksheet->getRowIterator() as $row) {
+            $rowResults = []; // Array to store results for this row
+            foreach ($row->getCellIterator() as $cell) {
+                $rowResults[] = $cell->getCalculatedValue(); // Store the result of the formula
+            }
+            $data[] = $rowResults; // Store the results for this row in the main results array
+        }
+
+        $this->data = $data;
 
         $this->checkData($this->data);
 
