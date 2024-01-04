@@ -47,6 +47,18 @@
 
             </div>
 
+            <label class="mb-0 text-primary">PASSWORD</label>
+            <hr class="mt-0 bg-primary">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('password', 'New Password') !!}
+                        {!! Form::password('password', ['class' => 'form-control'.($errors->has('password') ? ' is-invalid' : ''), 'form' => 'edit_user']) !!}
+                        <p class="text-danger mt-1">{{$errors->first('password')}}</p>
+                    </div>
+                </div>
+            </div>
+
             <label class="mb-0 text-primary">ROLES</label>
             @if($errors->has('role_ids'))
                 <span class="badge badge-danger">required</span>

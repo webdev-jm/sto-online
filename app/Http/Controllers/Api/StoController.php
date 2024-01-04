@@ -66,7 +66,7 @@ class StoController extends Controller
         }
 
         $divisor = DB::connection('mysql')
-            ->table('sto_online.sales_view')
+            ->table('sto_online_db.sales_view')
             ->select('month')->distinct()
             ->where('year', $year)
             ->where('month', '>=', $start_month)
@@ -102,7 +102,7 @@ class StoController extends Controller
             ->count('month');
 
         $sales = DB::connection('mysql')
-            ->table('sto_online.sales_view')
+            ->table('sto_online_db.sales_view')
             ->select(
                 'month',
                 DB::raw('SUM(IF(year = '.$prev_year.', sales, NULL)) as previous'),
@@ -183,7 +183,7 @@ class StoController extends Controller
         }
 
         $divisor = DB::connection('mysql')
-            ->table('sto_online.sales_view')
+            ->table('sto_online_db.sales_view')
             ->select('month')->distinct()
             ->where('year', $year)
             ->where('month', '>=', $start_month)
@@ -192,7 +192,7 @@ class StoController extends Controller
 
         DB::statement('SET sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""));');
 
-        $sales = DB::table('sto_online.sales_view')
+        $sales = DB::table('sto_online_db.sales_view')
             ->select(
                 'area_code',
                 'area_name',
