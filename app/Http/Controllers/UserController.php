@@ -140,9 +140,15 @@ class UserController extends Controller
         $changes_arr['old'] = $user->getOriginal();
         $changes_arr['old']['arr'] = $user->roles->pluck('name');
 
+        $password = $user->password;
+        if(!empty($request->password)) {
+            $password = Hash::make($request->password);
+        }
+
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => $password
         ]);
 
         $role_ids = explode(',', $request->role_ids);
