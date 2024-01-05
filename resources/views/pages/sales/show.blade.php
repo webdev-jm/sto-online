@@ -27,7 +27,10 @@
                 <ul class="list-group list-group-unbordered">
                     <li class="list-group-item py-1">
                         <b>USER</b>
-                        <span class="float-right">{{$sales_upload->user->name ?? '-'}}</span>
+                        <span class="float-right">
+                            <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($sales_upload->user->profile_picture_url) ? $sales_upload->user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="20px" height="20px">
+                            {{$sales_upload->user->name ?? '-'}}
+                        </span>
                     </li>
                     <li class="list-group-item py-1">
                         <b>TOTAL AMOUNT</b>

@@ -46,7 +46,10 @@
                             <tr>
                                 <td>{{$activity->log_name}}</td>
                                 <td>{{$activity->description}}</td>
-                                <td>{{$activity->causer->name}}</td>
+                                <td>
+                                    <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($activity->causer->profile_picture_url) ? $activity->causer->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="25px" height="25px">
+                                    {{$activity->causer->name}}
+                                </td>
                                 <td class="p-1 text-xs">
                                     @if($activity->log_name == 'update' && !empty($updates[$activity->id]))
                                     <ul class="list-group">

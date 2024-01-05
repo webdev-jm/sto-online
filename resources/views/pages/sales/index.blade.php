@@ -52,7 +52,10 @@
                             <small class="font-weight-bold text-muted">CREATED AT</small>
                         </div>
                         <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$sale->user->name ?? '-'}}</p>
+                            <p class="m-0 font-weight-bold">
+                                <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($sale->user->profile_picture_url) ? $sale->user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="30px" height="30px">
+                                {{$sale->user->name ?? '-'}}
+                            </p>
                             <small class="font-weight-bold text-muted">USER</small>
                         </div>
                         <div class="col-lg-2 text-center">
