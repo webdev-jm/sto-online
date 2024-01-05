@@ -22,10 +22,10 @@ class CreateCustomersTable extends Migration
             $table->string('code');
             $table->string('name');
             $table->string('address');
-            $table->string('brgy');
-            $table->string('city');
-            $table->string('province');
-            $table->string('country');
+            $table->string('brgy')->nullable();
+            $table->string('city')->nullable();
+            $table->string('province')->nullable();
+            $table->string('country')->nullable();
             $table->integer('status')->default(0);
             $table->timestamps();
 

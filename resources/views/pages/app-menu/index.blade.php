@@ -93,6 +93,27 @@
         </div>
         <div class="card-body">
 
+            {{ Form::open(['method' => 'GET', 'route' => ['menu', encrypt($account_branch->id)], 'id' => 'chart-form']) }}
+
+            <div class="row">
+                <div class="col-lg-3 col-sm-8">
+                    <div class="row">
+                        <div class="col-2 align-middle text-center">
+                            {{ Form::label('year', 'YEAR') }}
+                        </div>
+                        <div class="col-10 col-sm-4">
+                            {{ Form::number('year', $year, ['class' => 'form-control', 'form' => 'chart-form', 'placeholder' => 'Year'])}}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <button type="submit" class="btn btn-primary" form="chart-form">
+                        <i class="fa fa-filter mr-1"></i>
+                        FILTER
+                    </button>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-lg-12">
                     <figure class="highcharts-figure">

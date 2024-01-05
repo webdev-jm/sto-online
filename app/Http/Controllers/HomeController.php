@@ -63,7 +63,7 @@ class HomeController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function appMenu($id)
+    public function appMenu(Request $request, $id)
     {
         $account_branch = AccountBranch::findOrFail(decrypt($id));
         $check = auth()->user()->account_branches()->where('account_branch_id', $account_branch->id)->exists();
@@ -74,6 +74,11 @@ class HomeController extends Controller
         }
 
         session()->put('account_branch', $account_branch);
+
+        $year = date('Y');
+        if(!empty($request->get('year'))) {
+            $year = $request->get('year');
+        }
 
         $results = DB::table('sales_report')
             ->select(
@@ -87,7 +92,7 @@ class HomeController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->orderBy('month', 'ASC')
             ->groupBy('month')
-            ->where('year', date('Y'))
+            ->where('year', $year)
             ->get();
 
         $sales_data = array();
@@ -96,7 +101,7 @@ class HomeController extends Controller
         $parked_data = array();
         $categories = array();
         foreach($results as $result) {
-            $month = date('F', strtotime('2023-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
+            $month = date('F', strtotime($year.'-'.($result->month < 10 ? '0'.(int)$result->month : $result->month).'-01'));
             $sales_val = $result->total_sales + $result->total_promo;
             $categories[] = $month;
 
@@ -140,7 +145,8 @@ class HomeController extends Controller
             'account_branch' => $account_branch,
             'categories' => $categories,
             'chart_data' => $chart_data,
-            'drilldown' => $sales_drilldown
+            'drilldown' => $sales_drilldown,
+            'year' => $year
         ]);
     }
 
