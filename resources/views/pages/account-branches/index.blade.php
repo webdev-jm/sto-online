@@ -40,7 +40,7 @@
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$account_branch->account->short_name ?? '-'}}</p>
+                            <p class="m-0">{{$account_branch->account->account_code}} - {{$account_branch->account->short_name ?? '-'}}</p>
                             <b>ACCOUNT</b>
                         </div>
                         <div class="col-lg-3 text-center">

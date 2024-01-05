@@ -41,7 +41,7 @@
                     <div class="row">
                         <div class="col-lg-2 text-center align-middle">
                             <p class="m-0 align-middle">
-                                    <img class="img-circle elevation-2" src="{{asset(!empty($user->profile_picture_url) ? $user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="30px" height="30px">
+                                <img class="img-circle elevation-2" src="{{asset(!empty($user->profile_picture_url) ? $user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="30px" height="30px">
 
                                 @if(Cache::has('user-is-online-' . $user->id))
                                     <span class="text-success ml-1">Online</span>

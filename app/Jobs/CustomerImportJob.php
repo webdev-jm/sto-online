@@ -114,7 +114,7 @@ class CustomerImportJob implements ShouldQueue
             $account_branch_id = $customer->account_branch_id;
 
             // Find potential duplicates with high similarity
-            $potential_duplicate = CustomeUbo::where(function($query) use($name, $address) {
+            $potential_duplicate = CustomerUbo::where(function($query) use($name, $address) {
                     $query->whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$name])
                         ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$address]);
                 })
