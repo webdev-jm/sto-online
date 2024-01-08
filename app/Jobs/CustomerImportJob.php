@@ -179,8 +179,18 @@ class CustomerImportJob implements ShouldQueue
         $str1 = str_replace(' ', '', $str1);
         $str2 = str_replace(' ', '', $str2);
 
+        // Calculate Levenshtein distance
         $distance = levenshtein(strtoupper($str1), strtoupper($str2));
+
+        // Calculate maximum length
         $max_length = max(strlen($str1), strlen($str2));
+
+        // Check if the maximum length is zero to avoid division by zero
+        if ($max_length == 0) {
+            return 0; // or any other appropriate value
+        }
+
+        // Calculate similarity percentage
         $similarity = 1 - ($distance / $max_length);
         $similarity = $similarity * 100;
 

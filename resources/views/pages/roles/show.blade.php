@@ -45,6 +45,10 @@
         </div>
     </div>
 
+    <div class="col-lg-8">
+        <livewire:roles.users :role="$role"/>
+    </div>
+
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
