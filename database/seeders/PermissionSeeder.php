@@ -82,6 +82,10 @@ class PermissionSeeder extends Seeder
                 'account branch delete'     =>  'Allow user to delete account branch',
                 'account branch restore'    => 'Allow user to restore account branch.',
             ],
+            'Customer Ubo Job' => [
+                'customer ubo access'   => 'Allow user to access customer ubo jobs',
+                'customer ubo job'      => 'Allow user to run customer ubo job'
+            ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',
                 'user create'           =>  'Allow user to add user',

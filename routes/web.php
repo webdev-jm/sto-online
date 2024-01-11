@@ -43,6 +43,11 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('account/ajax', [AccountBranchController::class, 'ajax'])->name('account.ajax');
     Route::get('account/get-ajax/{id}', [AccountBranchController::class, 'getAjax'])->name('account.get-ajax');
 
+    // CUSTOMER UBO
+    Route::group(['middleware' => 'permission:customer ubo access'], function() {
+        Route::get('ubo-job', [CustomerController::class, 'uboJob'])->name('ubo-job.index');
+    });
+
     // INVENTORIES
     Route::group(['middleware' => 'permission:inventory access'], function() {
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');

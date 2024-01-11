@@ -9,6 +9,9 @@ use App\Models\Channel;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
 
+use App\Models\SMSAccount;
+use App\Models\AccountBranch;
+
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
@@ -441,7 +444,8 @@ class CustomerController extends Controller
         // Get customers with eager-loaded relationships
         $customers = Customer::where('account_id', $account_id)
             ->where('account_branch_id', $branch_id)
-            ->with('ubo')
+            ->doesntHave('ubo')
+            ->doesntHave('ubo_detail')
             ->get();
 
         foreach ($customers as $customer) {
@@ -540,5 +544,13 @@ class CustomerController extends Controller
         $similarity = $similarity * 100;
 
         return $similarity;
+    }
+
+    public function uboJob() {
+        return view('pages.ubo-jobs.index');
+    }
+
+    public function uboJobRun() {
+
     }
 }
