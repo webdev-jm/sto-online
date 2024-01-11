@@ -305,6 +305,13 @@ return [
             'can'   => ['user access', 'role access', 'account branch access', 'systemlog', 'logs'],
             'submenu' => [
                 [
+                    'text'      => 'Ubo Job',
+                    'url'       => '/ubo-job',
+                    'icon'      => 'fa fa-fw fa-clock',
+                    'can'       => 'customer ubo access',
+                    'active'    => ['ubo-job*']
+                ],
+                [
                     'text'      => 'Users',
                     'url'       => '/user',
                     'icon'      => 'fa fa-fw fa-users',

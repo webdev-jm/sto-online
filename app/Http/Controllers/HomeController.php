@@ -8,6 +8,8 @@ use App\Models\SMSBranch;
 use App\Models\AccountBranch;
 use App\Models\Sale;
 
+use App\Models\Customer;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
