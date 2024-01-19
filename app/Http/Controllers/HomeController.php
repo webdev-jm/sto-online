@@ -132,10 +132,10 @@ class HomeController extends Controller
                 'name' => 'Sales',
                 'data' => $sales_data
             ],
-            [
-                'name' => 'Parked Sales',
-                'data' => $parked_data
-            ],
+            // [
+            //     'name' => 'Parked Sales',
+            //     'data' => $parked_data
+            // ],
             [
                 'name' => 'Credit Memo',
                 'data' => $cm_data
