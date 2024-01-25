@@ -164,8 +164,11 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('account-branch/{id}', [AccountBranchController::class, 'show'])->name('account-branch.show');
 
+        Route::get('account-branch/{id}/generateToken', [AccountBranchController::class, 'generateToken'])->name('account-branch.generateToken')->middleware('permission:account branch generate token');
+
         Route::get('account-branch/{id}/edit', [AccountBranchController::class, 'edit'])->name('account-branch.edit')->middleware('permission:account branch edit');
         Route::post('account-branch/{id}', [AccountBranchController::class, 'update'])->name('account-branch.update')->middleware('permission:account branch edit');
+
     });
 
     // ROLES

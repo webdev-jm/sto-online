@@ -39,6 +39,12 @@
                         <li>
                             <b>SALESMAN CODE</b> - <span>Optional, Fourth column in the excel</span>
                         </li>
+                        <li>
+                            <b>CHANNEL CODE</b> - <span>Required, Fifth column in the excel</span>
+                        </li>
+                        <li>
+                            <b>CHANNEL NAME</b> - <span>Optional, Sixth column in the excel</span>
+                        </li>
                     </ul>
 
                     <p>
@@ -67,6 +73,7 @@
                                 <th>NAME</th>
                                 <th>ADDRESS</th>
                                 <th>SALESMAN</th>
+                                <th>CHANNEL</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -82,12 +89,17 @@
                                             <i class="fa fa-times-circle text-danger d-block"></i>
                                             <small class="text-danger">exists</small>
                                         @break
+                                        @case(2)
+                                            <i class="fa fa-times-circle text-danger d-block"></i>
+                                            <small class="text-danger">Channel</small>
+                                        @break
                                     @endswitch
                                 </td>
                                 <td class="align-middle">{{$data['code'] ?? '-'}}</td>
                                 <td class="align-middle">{{$data['name'] ?? '-'}}</td>
                                 <td class="align-middle">{{$data['address'] ?? '-'}}</td>
                                 <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
+                                <td class="align-middle">{{!empty($data['channel']) ? '['.$data['channel']['code'].'] '.$data['channel']['name'] : '-'}}</td>
                                 <td>
                                     @if(!empty($data['similar']) && $data['check'] == 0)
                                         @php

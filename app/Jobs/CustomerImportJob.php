@@ -53,6 +53,7 @@ class CustomerImportJob implements ShouldQueue
                 $customer = new Customer([
                     'account_id' => $this->account_id,
                     'account_branch_id' => $this->account_branch_id,
+                    'channel_id' => $data['channel']['id'],
                     'code' => $data['code'],
                     'name' => $data['name'] ?? '-',
                     'address' => $data['address'] ?? '-',
