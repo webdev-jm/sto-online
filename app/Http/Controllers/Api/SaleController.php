@@ -69,6 +69,7 @@ class SaleController extends Controller
                 'start_month' => $start_month,
                 'end_month' => $end_month
             ],
+            'divisor' => $divisor,
             'sql' => $sql,
             'data' => $data
         ], 200);

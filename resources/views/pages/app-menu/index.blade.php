@@ -214,11 +214,11 @@
                 type: 'column'
             },
             title: {
-                text: 'Sales',
+                text: 'STO',
                 align: 'left'
             },
             subtitle: {
-                text: 'Uploaded sales data',
+                text: 'Uploaded sales to outlet',
                 align: 'left'
             },
             xAxis: {

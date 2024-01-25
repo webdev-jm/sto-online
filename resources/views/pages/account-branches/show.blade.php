@@ -90,6 +90,25 @@
             </div>
         </div>
 
+        <div class="col-12">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">TOKEN</h3>
+                    <div class="card-tools">
+                        @can('account branch generate token')
+                        <a href="{{route('account-branch.generateToken', encrypt($account_branch->id))}}" class="btn btn-primary btn-sm">
+                            <i class="fa fa-refresh mr-1"></i>
+                            Generate New Token
+                        </a>
+                        @endcan
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4>TOKEN:</h4> <b class="border p-2">{{$account_branch->branch_token ?? "-"}}</b>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     @can('account branch delete')

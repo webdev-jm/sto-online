@@ -13,6 +13,8 @@ class UploadProgress extends Component
     public $upload_data;
     public $total;
     public $count;
+    public $account;
+    public $account_branch;
 
     public function checkProgress() {
         $count = Customer::where('account_id', $this->account->id)

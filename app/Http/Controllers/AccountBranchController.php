@@ -175,4 +175,15 @@ class AccountBranchController extends Controller
         $account = SMSAccount::findOrFail($id);
         return response()->json($account);
     }
+
+    public function generateToken($id) {
+        $id = decrypt($id);
+        $account_branch = AccountBranch::findOrFail($id);
+
+        $account_branch->generateBranchToken();
+
+        return redirect()->route('account-branch.show', encrypt($account_branch->id))->with([
+            'message_success' => 'New token has been generated. '
+        ]);
+    }
 }

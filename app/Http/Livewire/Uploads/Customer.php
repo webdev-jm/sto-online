@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 
 use App\Models\Customer as Cust;
 use App\Models\Salesman;
+use App\Models\Channel;
 use App\Models\SalesmanCustomer;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
@@ -95,32 +96,59 @@ class Customer extends Component
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get();
             
-            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers, $customer_ubos) {
+            $channels = Channel::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->get();
+            
+            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers, $customer_ubos, $channels) {
                 $code = trim($row[0]);
                 $name = trim($row[1]);
                 $address = trim($row[2]);
                 $salesman = trim($row[3]);
+                $channel_code = trim($row[4] ?? '');
+                $channel_name = trim($row[5] ?? '');
 
                 $customer = $current_customers->get($code);
+                $channel = $channels->where('code', $channel_code)
+                    ->first();
 
                 $check = $customer_ubos->filter(function ($item) use ($name, $address) {
                     return $this->checkSimilarity($item->name, $name) >= 90
                         && $this->checkSimilarity($item->address, $address) >= 90;
                 })->first();
+
+                if(empty($channel)) {
+                    return [
+                        'similar' => !empty($check) ? $check->toArray() : [],
+                        'check' => 2,
+                        'code' => $code,
+                        'name' => $name,
+                        'address' => $address,
+                        'salesman' => $salesman,
+                        'channel' => $channel ?? [],
+                        'brgy' => '',
+                        'city' => '',
+                        'province' => '',
+                        'country' => '',
+                        'status' => !empty($check) ? 1 : 0
+                    ];
+                } else {
+                    return [
+                        'similar' => !empty($check) ? $check->toArray() : [],
+                        'check' => empty($customer) ? 0 : 1,
+                        'code' => $code,
+                        'name' => $name,
+                        'address' => $address,
+                        'salesman' => $salesman,
+                        'channel' => $channel ?? [],
+                        'brgy' => '',
+                        'city' => '',
+                        'province' => '',
+                        'country' => '',
+                        'status' => !empty($check) ? 1 : 0
+                    ];
+                }
                 
-                return [
-                    'similar' => !empty($check) ? $check->toArray() : [],
-                    'check' => empty($customer) ? 0 : 1,
-                    'code' => $code,
-                    'name' => $name,
-                    'address' => $address,
-                    'salesman' => $salesman,
-                    'brgy' => '',
-                    'city' => '',
-                    'province' => '',
-                    'country' => '',
-                    'status' => !empty($check) ? 1 : 0
-                ];
             })->toArray();
         } else {
             $this->err_msg = 'Invalid format. please provide an excel with the correct format.';
@@ -151,11 +179,13 @@ class Customer extends Component
             'name',
             'address',
             'salesman code',
+            'channel code',
+            'channel name',
         ];
     
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
+            if (empty($header[$index]) || trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
                 $err++;
             }
         }
