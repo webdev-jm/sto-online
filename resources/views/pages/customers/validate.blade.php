@@ -75,8 +75,8 @@
             </div>
         </div>
     </div>
-
-    <div class="col-lg-12">
+     
+    {{-- <div class="col-lg-12">
         <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title">CHILD CUSTOMERS</h3>
@@ -117,7 +117,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 @stop
