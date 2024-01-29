@@ -184,7 +184,7 @@ class CustomerController extends Controller
             ->when(auth()->user()->can('customer restore'), function($query) {
                 $query->withTrashed();
             })
-            ->with('salesman')
+            ->with('salesman', 'channel')
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->where('status', 0)

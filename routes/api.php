@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StoController;
+use App\Http\Controllers\Api\LocationController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -19,8 +20,10 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 Route::post('login', [AuthController::class, 'login']);
-Route::group(['middleware' => 'auth:sanctum'], function() {
+Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
+
+    Route::post('location', [LocationController::class, 'create'])->middleware('permission:location create');
 });
 
 Route::group(['middleware' => 'api.token'], function() {

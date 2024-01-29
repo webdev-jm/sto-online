@@ -64,17 +64,21 @@
                             <p class="m-0 font-weight-bold">{{$customer->code}}</p>
                             <small class="font-weight-bold text-muted">CODE</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->name}}</p>
                             <small class="font-weight-bold text-muted">NAME</small>
                         </div>
-                        <div class="col-lg-3 text-center">
+                        <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->address}}</p>
                             <small class="font-weight-bold text-muted">ADDRESS</small>
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0 font-weight-bold">{{$customer->salesman->code ?? '-'}}</p>
                             <small class="font-weight-bold text-muted">SALESMAN</small>
+                        </div>
+                        <div class="col-lg-2 text-center">
+                            <p class="m-0 font-weight-bold">{{$customer->channel->code ?? '-'}}</p>
+                            <small class="font-weight-bold text-muted">CHANNEL</small>
                         </div>
                         <div class="col-lg-2 text-center">
                             <p class="m-0">
@@ -94,7 +98,9 @@
                                     @endcan
                                 @else
                                     @can('customer restore')
-                                        <a href="{{route('customer.restore', encrypt($customer->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('customer.restore', encrypt($customer->id))}}" class="btn btn-warning btn-xs"  title="restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
                             </p>
