@@ -107,6 +107,9 @@ class PermissionSeeder extends Seeder
                 'systemlog'   =>  'Allow user to access systemlog.',
                 'error logs'  =>  'Allow user to view error logs.'
             ],
+            'Report' => [
+                'report access' => 'Allow user to access reports',
+            ]
         ];
 
         foreach($permissions_arr as $module => $permissions) {
