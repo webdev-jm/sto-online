@@ -23,6 +23,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
 
+    Route::get('location', [LocationController::class, 'index']);
     Route::post('location', [LocationController::class, 'create'])->middleware('permission:location create');
 });
 

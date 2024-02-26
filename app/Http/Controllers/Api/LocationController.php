@@ -9,8 +9,24 @@ use Illuminate\Http\Request;
 use App\Models\AccountBranch;
 use App\Models\Location;
 
+use App\Http\Traits\ApiBranchKeyChecker;
+
 class LocationController extends Controller
 {
+    use ApiBranchKeyChecker;
+
+    public function index(Request $request) {
+        return response()->json([$request->header('BRANCH_KEY')]);
+        $err = $this->checkBranchKey($request->BRANCH_KEY);
+    
+        if(!empty($err)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation Error',
+                'error' => $err,
+            ], 422);
+        }
+    }
     
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
