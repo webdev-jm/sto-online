@@ -13,6 +13,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SystemlogController;
 use App\Http\Controllers\AccountBranchController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -199,6 +200,12 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:systemlog'], function() {
         Route::get('systemlog', [SystemlogController::class, 'index'])->name('systemlog');
     });
+
+    // REPORTS
+    Route::group(['middleware' => 'permission:report access'], function() {
+        Route::get('report', [ReportController::class, 'index']);
+    });
+
     // ERROR LOGS
     Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('error-logs')->middleware('permission:error logs');
 });
