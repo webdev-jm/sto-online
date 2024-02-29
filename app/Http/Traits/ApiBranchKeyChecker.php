@@ -20,6 +20,10 @@ trait ApiBranchKeyChecker {
             $err['INVALID_BRANCH_KEY'] = 'The provided BRANCH KEY is invalid.';
         }
 
-        return $err;
+        return [
+            'status' => !empty($err),
+            'account_branch' => $account_branch,
+            'error' => $err,
+        ];
     }
 }
