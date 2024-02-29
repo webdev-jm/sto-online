@@ -24,7 +24,9 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
 
     Route::get('location', [LocationController::class, 'index']);
-    Route::post('location', [LocationController::class, 'create'])->middleware('permission:location create');
+    Route::post('location/create', [LocationController::class, 'create'])->middleware('permission:location create');
+    Route::get('location/get', [LocationController::class, 'show'])->middleware('permission:location access');
+    Route::post('location/{id}/update', [LocationController::class, 'update'])->middleware('permission:location update');
 });
 
 Route::group(['middleware' => 'api.token'], function() {

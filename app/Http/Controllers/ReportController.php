@@ -12,17 +12,17 @@ class ReportController extends Controller
     public function index() {
         $results = DB::table('sales as s')
             ->select(
-                'c.name',
-                'c.code',
-                DB::raw('COUNT(DISTINCT s.document_number) as UBO'),
-                DB::raw('SUM(amount_inc_vat) as STO'),
+                's.account_id',
+                's.account_branch_id',
                 DB::raw('YEAR(date) as year'),
                 DB::raw('MONTH(date) as month'),   
+                DB::raw('COUNT(DISTINCT c.code) as UBO'),
+                DB::raw('SUM(amount_inc_vat) as STO'),
             )
             ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
-            ->where('s.account_id', 245)
-            ->where('category', 0)
-            ->groupBy('c.name', 'c.code', 'year', 'month')
+            ->where('s.category', 0)
+            ->where('s.status', 0)
+            ->groupBy('account_id', 's.account_branch_id', 'year', 'month')
             ->get();
 
         $data = array();

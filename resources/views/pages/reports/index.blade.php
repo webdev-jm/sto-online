@@ -140,7 +140,7 @@
                     lineWidth: 0
                 }
             },
-            enableMouseTracking: true
+            enableMouseTracking: false
         }];
 
         Highcharts.chart('container', {

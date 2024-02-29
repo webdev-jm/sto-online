@@ -19,7 +19,7 @@ class CreateAccountBranchesTable extends Migration
             $table->unsignedBigInteger('bevi_area_id')->nullable();
             $table->string('code');
             $table->string('name');
-            $table->string('branch_token');
+            $table->string('branch_token')->nullable();
             $table->timestamps();
             
             $table->softDeletes();
