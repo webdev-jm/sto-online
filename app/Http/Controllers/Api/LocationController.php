@@ -48,7 +48,8 @@ class LocationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'code' => [
-                'required'
+                'required',
+                Rule::unique((new Salesman)->getTable())
             ],
             'name' => [
                 'required'
@@ -136,7 +137,8 @@ class LocationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'code' => [
-                'required'
+                'required',
+                Rule::unique((new Salesman)->getTable())->ignore($id)
             ],
             'name' => [
                 'required'

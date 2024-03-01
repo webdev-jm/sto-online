@@ -28,12 +28,14 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::get('location', [LocationController::class, 'index']);
         Route::post('location/create', [LocationController::class, 'create'])->middleware('permission:location create');
         Route::get('location/{id}/get', [LocationController::class, 'show'])->middleware('permission:location access');
-        Route::post('location/{id}/update', [LocationController::class, 'update'])->middleware('permission:location update');
+        Route::post('location/{id}/update', [LocationController::class, 'update'])->middleware('permission:location edit');
     });
 
     Route::group(['middleware' => 'permission:salesman access'], function() {
         Route::get('salesman', [SalesmanController::class, 'index']);
         Route::post('salesman/create', [SalesmanController::class, 'create'])->middleware('permission:salesman create');
+        Route::get('salesman/{id}/get', [SalesmanController::class, 'show']);
+        Route::post('salesman/{id}/update', [SalesmanController::class, 'update'])->middleware('permission:salesman edit');
     });
 });
 
