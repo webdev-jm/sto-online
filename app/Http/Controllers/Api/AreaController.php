@@ -5,16 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
-use App\Models\AccountBranch;
-use App\Models\Salesman;
-
-use App\Http\Traits\ApiBranchKeyChecker;
-use App\Http\Resources\SalesmanResource;
-
 use Illuminate\Validation\Rule;
 
-class SalesmanController extends Controller
+use App\Models\Area;
+use App\Http\Resources\AreaResource;
+
+use App\Http\Traits\ApiBranchKeyChecker;
+
+class AreaController extends Controller
 {
     use ApiBranchKeyChecker;
 
@@ -26,17 +24,17 @@ class SalesmanController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $sales = Salesman::select(
+        $areas = Area::select(
                 'id',
                 'code',
                 'name',
                 'created_at',
-                'updated_at'
+                'updated_at',
             )
             ->where('account_branch_id', $account_branch->id)
             ->get();
-
-        return $this->successResponse($sales);
+        
+        return $this->successResponse($areas);
     }
 
     public function create(Request $request) {
@@ -47,10 +45,11 @@ class SalesmanController extends Controller
         }
 
         $account_branch = $check['account_branch'];
+        
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique((new Area)->getTable())->where('account_branch_id', $account_branch->id)
             ],
             'name' => [
                 'required'
@@ -61,26 +60,15 @@ class SalesmanController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        // check for duplicate
-        $check = Salesman::where('account_branch_id', $account_branch->id)
-            ->where('code', $request->code)
-            ->first();
-        if(empty($check)) {
-            $salesman = new Salesman([
-                'account_id' => $account_branch->account_id,
-                'account_branch_id' => $account_branch->id,
-                'code' => $request->code,
-                'name' => $request->name,
-            ]);
-            $salesman->save();
+        $area = new Area([
+            'account_id' => $account_branch->account_id,
+            'account_branch_id' => $account_branch->id,
+            'code' => $request->code,
+            'name' => $request->name,
+        ]);
+        $area->save();
 
-            $salesman_data = new SalesmanResource($salesman);
-        } else {
-            $salesman_data = 'Salesman code already exists.';
-        }
-
-        return $this->successResponse($salesman_data);
-        
+        return $this->successResponse(new AreaResource($area));
     }
 
     public function show(Request $request, $id) {
@@ -90,18 +78,19 @@ class SalesmanController extends Controller
             return $this->validationError($check['error']);
         }
 
+        if(empty($id)) {
+            return $this->validationError('id is required.');
+        }
+
         $account_branch = $check['account_branch'];
-
-        if(!empty($id)) {
-            
-            $salesman = Salesman::where('account_branch_id', $account_branch->id)
-                ->where('id', $id)
-                ->first();
-            
-                return $this->successResponse(new SalesmanResource($salesman));
-
+        $area = Area::where('account_branch_id', $account_branch->id)
+            ->where('id', $id)
+            ->first();
+        
+        if(!empty($area)) {
+            return $this->successResponse(new AreaResource($area));
         } else {
-            return $this->validationError('id is required');
+            return $this->validationError('data not found');
         }
     }
 
@@ -112,11 +101,15 @@ class SalesmanController extends Controller
             return $this->validationError($check['error']);
         }
 
+        if(empty($id)) {
+            return $this->validationError('id is required');
+        }
+
         $account_branch = $check['account_branch'];
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique((new Area)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
             ],
             'name' => [
                 'required'
@@ -127,22 +120,18 @@ class SalesmanController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        if(empty($id)) {
-            return $this->validationError('id is required');
-        }
-
-        $salesman = Salesman::where('account_branch_id', $account_branch->id)
+        $area = Area::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
-        if(!empty($salesman)) {
-            $salesman->update([
+        if(!empty($area)) {
+            $area->update([
                 'code' => $request->code,
-                'name' => $request->name
+                'name' => $request->name,
             ]);
-            
-            return $this->successResponse(new SalesmanResource($salesman));
+
+            return $this->successResponse(new AreaResource($area));
         } else {
-            return $this->validationError('data not found.');
+            return $this->validationError('data not found');
         }
     }
 }

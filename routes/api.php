@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StoController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\SalesmanController;
+use App\Http\Controllers\Api\AreaController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -36,6 +37,13 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::post('salesman/create', [SalesmanController::class, 'create'])->middleware('permission:salesman create');
         Route::get('salesman/{id}/get', [SalesmanController::class, 'show']);
         Route::post('salesman/{id}/update', [SalesmanController::class, 'update'])->middleware('permission:salesman edit');
+    });
+
+    Route::group(['middleware' => 'permission:area access'], function() {
+        Route::get('area', [AreaController::class, 'index']);
+        Route::post('area/create', [AreaController::class, 'create'])->middleware('permission:area create');
+        Route::get('area/{id}/get', [AreaController::class, 'show']);
+        Route::post('area/{id}/update', [AreaController::class, 'update'])->middleware('permission:area edit');
     });
 });
 
