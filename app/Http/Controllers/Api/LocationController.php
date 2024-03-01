@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 use App\Models\AccountBranch;
 use App\Models\Location;
@@ -45,11 +46,12 @@ class LocationController extends Controller
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
-
+        
+        $account_branch = $check['account_branch'];
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())
+                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)
             ],
             'name' => [
                 'required'
@@ -59,8 +61,6 @@ class LocationController extends Controller
         if($validator->fails()) {
             return $this->validationError($validator->errors());
         }
-
-        $account_branch = $check['account_branch'];
 
         // check for duplication
         $check = Location::where('code', $request->code)
@@ -135,10 +135,11 @@ class LocationController extends Controller
             return $this->validationError($check['error']);
         }
 
+        $account_branch = $check['account_branch'];
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->ignore($id)
+                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
             ],
             'name' => [
                 'required'
@@ -150,7 +151,6 @@ class LocationController extends Controller
         }
 
         // check if exists
-        $account_branch = $check['account_branch'];
         if(!empty($account_branch)) {
             $location = Location::where('account_branch_id', $account_branch->id)
                 ->where('id', $id)
