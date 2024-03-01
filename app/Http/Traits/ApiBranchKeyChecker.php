@@ -26,4 +26,19 @@ trait ApiBranchKeyChecker {
             'error' => $err,
         ];
     }
+
+    public function validationError($error) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation Error',
+            'error' => $error,
+        ], 422);
+    }
+
+    public function successResponse($data) {
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ], 200);
+    }
 }
