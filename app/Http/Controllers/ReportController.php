@@ -10,20 +10,37 @@ use Illuminate\Support\Facades\DB;
 class ReportController extends Controller
 {
     public function index() {
-        $results = DB::table('sales as s')
+
+        $results = DB::connection('sto_db')
+            ->table('rep_sales_sku1')
             ->select(
-                's.account_id',
-                's.account_branch_id',
-                DB::raw('YEAR(date) as year'),
-                DB::raw('MONTH(date) as month'),   
-                DB::raw('COUNT(DISTINCT c.code) as UBO'),
-                DB::raw('SUM(amount_inc_vat) as STO'),
+                'new_code',
+                'short_name',
+                'account_id',
+                'month',
+                DB::raw('SUM(c2023) as STO'),
+                DB::raw('COUNT(DISTINCT branch_id) as UBO'),
             )
-            ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
-            ->where('s.category', 0)
-            ->where('s.status', 0)
-            ->groupBy('account_id', 's.account_branch_id', 'year', 'month')
+            ->whereNotNull('c2023')
+            ->where('type', 'STT')
+            ->where('vendor', 'BEVA')
+            ->groupBy('new_code', 'short_name', 'account_id', 'month')
             ->get();
+
+        // $results = DB::table('sales as s')
+        //     ->select(
+        //         's.account_id',
+        //         's.account_branch_id',
+        //         DB::raw('YEAR(date) as year'),
+        //         DB::raw('MONTH(date) as month'),   
+        //         DB::raw('COUNT(DISTINCT c.code) as UBO'),
+        //         DB::raw('SUM(amount_inc_vat) as STO'),
+        //     )
+        //     ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
+        //     ->where('s.category', 0)
+        //     ->where('s.status', 0)
+        //     ->groupBy('account_id', 's.account_branch_id', 'year', 'month')
+        //     ->get();
 
         $data = array();
         $total_sto = 0;
@@ -31,9 +48,12 @@ class ReportController extends Controller
         $min_ubo = NULL;
         $max_ubo = NULL;
         foreach($results as $result) {
+            $sty = $result->STO / $result->UBO;
+            $sto = (float)$result->STO;
+
             $data[] = [
                 $result->UBO,
-                (float)$result->STO
+                $sto
             ];
 
              // Update min UBO
@@ -46,7 +66,7 @@ class ReportController extends Controller
                 $max_ubo = $result->UBO;
             }
 
-            $total_sto += (float)$result->STO;
+            $total_sto += $sto;
             $total_sto_count++;
         }
 
