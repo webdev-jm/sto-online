@@ -28,8 +28,6 @@
         <div class="card-footer">
         </div>
     </div>
-
-    
 @stop
 
 @section('css')
