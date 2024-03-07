@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\SalesmanController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\ChannelController;
+use App\Http\Controllers\Api\CustomerController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -52,6 +53,13 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::post('channel/create', [ChannelController::class, 'create'])->middleware('permission:channel create');
         Route::get('channel/{id}/get', [ChannelController::class, 'show']);
         Route::post('channel/{id}/update', [ChannelController::class, 'update'])->middleware('permission:channel edit');
+    });
+
+    Route::group(['middleware' => 'permission:customer access'], function() {
+        Route::get('customer', [CustomerController::class, 'index']);
+        Route::post('customer/create', [CustomerController::class, 'create'])->middleware('permission:customer create');
+        Route::get('customer/{id}/get', [CustomerController::class, 'show']);
+        Route::post('customer/{id}/update', [CustomerController::class, 'update'])->middleware('permission:customer edit');
     });
 });
 
