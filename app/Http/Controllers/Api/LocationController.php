@@ -26,18 +26,10 @@ class LocationController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $locations = Location::where('account_branch_id', $account_branch->id)
-            ->select(
-                'id',
-                'code',
-                'name',
-                'created_at',
-                'updated_at',
-            )
-            ->where('account_id', $account_branch->account_id)
+        $locations = Location::where('account_id', $account_branch->account_id)
             ->get();
 
-        return $this->successResponse($locations);
+        return $this->successResponse(LocationResource::collection($locations));
     }
     
     public function create(Request $request) {
@@ -51,7 +43,7 @@ class LocationController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique((new Location)->getTable())->where('account_branch_id', $account_branch->id)
             ],
             'name' => [
                 'required'

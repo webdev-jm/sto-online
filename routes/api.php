@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\SalesmanController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\SalesController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -61,13 +62,20 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::get('customer/{id}/get', [CustomerController::class, 'show']);
         Route::post('customer/{id}/update', [CustomerController::class, 'update'])->middleware('permission:customer edit');
     });
+
+    Route::group(['middleware' => 'permission:sales access'], function() {
+        Route::get('sales', [SalesController::class, 'index']);
+        Route::post('sales/create', [SalesController::class, 'create'])->middleware('permission:sales create');
+        Route::get('sales/{id}/get', [SalesController::class, 'show']);
+        Route::post('sales/{id}/update', [SalesController::class, 'update'])->middleware('permission:sales update');
+    });
 });
 
-Route::group(['middleware' => 'api.token'], function() {
-    Route::get('sales', [SaleController::class, 'index']);
+// Route::group(['middleware' => 'api.token'], function() {
+//     Route::get('sales', [SaleController::class, 'index']);
 
-    // STO
-    Route::post('sto', [StoController::class, 'index']);
-    // STO AREAS
-    Route::post('sto-areas', [StoController::class, 'areas']);
-});
+//     // STO
+//     Route::post('sto', [StoController::class, 'index']);
+//     // STO AREAS
+//     Route::post('sto-areas', [StoController::class, 'areas']);
+// });

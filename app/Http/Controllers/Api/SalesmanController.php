@@ -26,17 +26,10 @@ class SalesmanController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $sales = Salesman::select(
-                'id',
-                'code',
-                'name',
-                'created_at',
-                'updated_at'
-            )
-            ->where('account_branch_id', $account_branch->id)
+        $sales = Salesman::where('account_branch_id', $account_branch->id)
             ->get();
 
-        return $this->successResponse($sales);
+        return $this->successResponse(SalesmanResource::collection($sales));
     }
 
     public function create(Request $request) {

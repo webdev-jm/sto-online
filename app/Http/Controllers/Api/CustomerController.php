@@ -28,23 +28,10 @@ class CustomerController extends Controller
 
         $account_branch = $check['account_branch'];
 
-        $customers = Customer::select(
-                'id',
-                'code',
-                'name',
-                'address',
-                'brgy',
-                'city',
-                'province',
-                'country',
-                'status',
-                'created_at',
-                'updated_at'
-            )
-            ->where('account_branch_id', $account_branch->id)
+        $customers = Customer::where('account_branch_id', $account_branch->id)
             ->get();
 
-        return $this->successResponse($customers);
+        return $this->successResponse(CustomerResource::collection($customers));
     }
 
     public function create(Request $request) {
