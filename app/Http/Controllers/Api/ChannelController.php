@@ -24,17 +24,10 @@ class ChannelController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $channels = Channel::select(
-                'id',
-                'code',
-                'name',
-                'created_at',
-                'updated_at'
-            )
-            ->where('account_branch_id', $account_branch->id)
+        $channels = Channel::where('account_branch_id', $account_branch->id)
             ->get();
 
-        return $this->successResponse($channels);
+        return $this->successResponse(ChannelResource::collection($channels));
     }
 
     public function create(Request $request) {
