@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SalesController;
+use App\Http\Controllers\Api\InventoryController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -68,6 +69,13 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::post('sales/create', [SalesController::class, 'create'])->middleware('permission:sales create');
         Route::get('sales/{id}/get', [SalesController::class, 'show']);
         Route::post('sales/{id}/update', [SalesController::class, 'update'])->middleware('permission:sales update');
+    });
+
+    Route::group(['middleware' => 'permission:inventory access'], function() {
+        Route::get('inventory', [InventoryController::class, 'index']);
+        Route::post('inventory/create', [InventoryController::class, 'create'])->middleware('permission:inventory create');
+        Route::get('inventory/{id}/get', [InventoryController::class, 'show']);
+        Route::post('inventory/{id}/update', [InventoryController::class, 'update'])->middleware('permission:inventory edit');
     });
 });
 
