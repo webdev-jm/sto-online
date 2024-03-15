@@ -20,6 +20,12 @@ trait ApiBranchKeyChecker {
             $err['INVALID_BRANCH_KEY'] = 'The provided BRANCH KEY is invalid.';
         }
 
+        // check if account branch is assigned to the user
+        $check = $account_branch->users()->where('id', auth()->user()->id)->first();
+        if(empty($check)) {
+            $err['USER_ASSIGNED'] = 'Branch was not assigned to the user';
+        }
+
         return [
             'status' => !empty($err),
             'account_branch' => $account_branch,
