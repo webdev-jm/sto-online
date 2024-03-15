@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SalesController;
 use App\Http\Controllers\Api\InventoryController;
+use App\Http\Controllers\Api\AccountBranchController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -28,6 +29,9 @@ use App\Http\Controllers\Api\AuthController;
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
+
+    Route::get('branches', [AccountBranchController::class, 'index']);
+    Route::get('branch/generateKey', [AccountBranchController::class, 'generateKey']);
 
     Route::group(['middleware' => 'permission:location access'], function() {
         Route::get('location', [LocationController::class, 'index']);
@@ -77,6 +81,7 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::get('inventory/{id}/get', [InventoryController::class, 'show']);
         Route::post('inventory/{id}/update', [InventoryController::class, 'update'])->middleware('permission:inventory edit');
     });
+
 });
 
 // Route::group(['middleware' => 'api.token'], function() {
