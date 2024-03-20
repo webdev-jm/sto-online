@@ -29,9 +29,9 @@ class CustomerController extends Controller
         $account_branch = $check['account_branch'];
 
         $customers = Customer::where('account_branch_id', $account_branch->id)
-            ->get();
+            ->paginate(10);
 
-        return $this->successResponse(CustomerResource::collection($customers));
+        return CustomerResource::collection($customers);
     }
 
     public function create(Request $request) {
@@ -239,5 +239,17 @@ class CustomerController extends Controller
         } else {
             return $this->validationError('data not found.');
         }
+    }
+
+    private function checkSimilarity($str1, $str2) {
+        $similarity = 0;
+        if(strlen($str1) > 0 && strlen($str2) > 0) {
+            $distance = levenshtein(strtoupper($str1), strtoupper($str2));
+            $max_length = max(strlen($str1), strlen($str2));
+            $similarity = 1 - ($distance / $max_length);
+            $similarity = $similarity * 100;
+        }
+
+        return $similarity;
     }
 }

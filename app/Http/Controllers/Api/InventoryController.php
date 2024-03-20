@@ -29,9 +29,9 @@ class InventoryController extends Controller
         $account_branch = $check['account_branch'];
 
         $inventories = Inventory::where('account_branch_id', $account_branch->id)
-            ->get();
+            ->paginate(10);
 
-        return $this->successResponse(InventoryResource::collection($inventories));
+        return InventoryResource::collection($inventories);
     }
 
     public function create(Request $request) {

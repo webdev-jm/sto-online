@@ -27,9 +27,9 @@ class LocationController extends Controller
 
         $account_branch = $check['account_branch'];
         $locations = Location::where('account_id', $account_branch->account_id)
-            ->get();
+            ->paginate(10);
 
-        return $this->successResponse(LocationResource::collection($locations));
+        return LocationResource::collection($locations);
     }
     
     public function create(Request $request) {

@@ -40,9 +40,9 @@ class SalesController extends Controller
                 $query->where(DB::raw('MONTH(date)'), $request->month);
             })
             ->where(DB::raw('YEAR(date)'), $request->year)
-            ->get();
+            ->paginate(10);
 
-        return $this->successResponse(SalesResource::collection($sales));
+        return SalesResource::collection($sales);
     }
 
     public function create(Request $request) {
