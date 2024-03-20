@@ -25,9 +25,9 @@ class AreaController extends Controller
 
         $account_branch = $check['account_branch'];
         $areas = Area::where('account_branch_id', $account_branch->id)
-            ->get();
+            ->paginate(10);
         
-        return $this->successResponse(AreaResource::collection($areas));
+        return AreaResource::collection($areas);
     }
 
     public function create(Request $request) {

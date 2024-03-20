@@ -25,9 +25,9 @@ class ChannelController extends Controller
 
         $account_branch = $check['account_branch'];
         $channels = Channel::where('account_branch_id', $account_branch->id)
-            ->get();
+            ->paginate(10);
 
-        return $this->successResponse(ChannelResource::collection($channels));
+        return ChannelResource::collection($channels);
     }
 
     public function create(Request $request) {

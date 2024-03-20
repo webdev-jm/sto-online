@@ -15,9 +15,10 @@ class AccountBranchController extends Controller
     use ApiBranchKeyChecker;
 
     public function index(Request $request) {
-        $branches = auth()->user()->account_branches;
+        $branches = auth()->user()->account_branches()
+            ->paginate(10);
 
-        return $this->successResponse(AccountBranchResource::collection($branches));
+        return AccountBranchResource::collection($branches);
     }
 
     public function generateKey(Request $request) {
