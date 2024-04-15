@@ -10,6 +10,8 @@ use App\Http\Requests\AccountBranchAddRequest;
 use App\Http\Requests\AccountBranchEditRequest;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 
 class AccountBranchController extends Controller
 {
@@ -74,6 +76,37 @@ class AccountBranchController extends Controller
             'name' => $request->name
         ]);
         $account_branch->save();
+
+        $schema = 'kojiesanadmin_sto_online_'.$request->account_id.'_db';
+
+        // create database
+        DB::statement('CREATE DATABASE IF NOT EXISTS '.$schema);
+
+        \Config::set('database.connections.account_'.$request->account_id.'_db', [
+            'driver' => 'mysql',
+            'url' => NULL,
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'database' => $schema,
+            'username' => 'root',
+            'password' => '',
+            'unix_socket' => '',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'pool' => [
+                'min_connections' => 1,
+                'max_connections' => 10,
+                'max_idle_time' => 30,
+            ],
+        ]);
+
+        DB::setDefaultConnection('account_'.$request->account_id.'_db');
+        Artisan::call('migrate');
+        DB::setDefaultConnection(config('database.default'));
 
         // logs
         activity('create')

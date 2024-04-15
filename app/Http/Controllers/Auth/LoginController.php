@@ -41,4 +41,9 @@ class LoginController extends Controller
     public function username() {
         return 'username';
     }
+
+    // custom login
+    public function validateLogin() {
+        
+    }
 }
