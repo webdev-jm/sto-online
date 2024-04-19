@@ -14,6 +14,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SystemlogController;
 use App\Http\Controllers\AccountBranchController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -157,6 +158,16 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('location/{id}/restore', [LocationController::class, 'restore'])->name('location.restore')->middleware('permission:location restore');
     });
 
+    // ACCOUNT
+    Route::group(['middleware' => 'permission:account access'], function() {
+        Route::get('account', [AccountController::class, 'index'])->name('account.index');
+        Route::get('account/create', [AccountController::class, 'create'])->name('account.create')->middleware('permission:account create');
+        Route::post('account', [AccountController::class, 'store'])->name('account.store')->middleware('permission:account create');
+        Route::get('account/{id}', [AccountController::class, 'show'])->name('account.show');
+        Route::get('account/{id}/edit', [AccountController::class, 'edit'])->name('account.edit')->middleware('permission:account edit');
+        Route::post('account/{id}', [AccountController::class, 'update'])->name('account.update')->middleware('permission:account edit');
+    });
+
     // ACCOUNT BRANCH
     Route::group(['middleware' => 'permission:account branch access'], function() {
         Route::get('account-branch', [AccountBranchController::class, 'index'])->name('account-branch.index');
@@ -169,7 +180,6 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('account-branch/{id}/edit', [AccountBranchController::class, 'edit'])->name('account-branch.edit')->middleware('permission:account branch edit');
         Route::post('account-branch/{id}', [AccountBranchController::class, 'update'])->name('account-branch.update')->middleware('permission:account branch edit');
-
     });
 
     // ROLES

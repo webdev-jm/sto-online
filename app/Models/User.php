@@ -27,6 +27,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'account_id',
         'company_id',
         'department_id',
         'position_id',
@@ -78,10 +79,14 @@ class User extends Authenticatable
     }
 
     public function accounts() {
-        return $this->belongsToMany('App\Models\SMSAccount', 'sto_online_db.account_user', 'user_id', 'account_id');
+        return $this->belongsToMany('App\Models\Account', 'account_user', 'user_id', 'account_id');
     }
 
     public function account_branches() {
         return $this->belongsToMany('App\Models\AccountBranch');
+    }
+
+    public function account_logged() {
+        return $this->belongsTo('App\Models\Account');
     }
 }
