@@ -17,7 +17,7 @@
         </div>
         <div class="col-lg-6 text-right">
             <a href="{{route('role.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
-            <a href="{{route('role.show', encrypt($role->id))}}" class="btn btn-info btn-sm"><i class="fa fa-list mr-1"></i>Details</a>
+            <a href="{{route('role.show', encrypt($role->id))}}" class="btn btn-info btn-sm"><i class="fa fa-list mr-1"></i>DETAILS</a>
         </div>
     </div>
 @stop

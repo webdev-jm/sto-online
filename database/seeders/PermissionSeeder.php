@@ -75,17 +75,24 @@ class PermissionSeeder extends Seeder
                 'location upload'   => 'Allow user to upload location data.',
                 'location restore'  => 'Allow user to restore location data.',
             ],
+            'Account' => [
+                'account access'    => 'Allow user to access account list and details',
+                'account create'    => 'Allow user to add account',
+                'account edit'      => 'Allow user to edit account',
+                'account delete'    => 'Allow user to delete account',
+                'account restore'   => 'Allow user to restore account',
+            ],
             'Account Branch' => [
                 'account branch access'         =>  'Allow user to access account branch list and details',
                 'account branch create'         =>  'Allow user to add account branch',
                 'account branch edit'           =>  'Allow user to edit account branch',
                 'account branch delete'         =>  'Allow user to delete account branch',
                 'account branch restore'        =>  'Allow user to restore account branch.',
-                'account branch generate token' =>  'Allow user to generate account branch token.'
+                'account branch generate token' =>  'Allow user to generate account branch token.',
             ],
             'Customer Ubo Job' => [
                 'customer ubo access'   => 'Allow user to access customer ubo jobs',
-                'customer ubo job'      => 'Allow user to run customer ubo job'
+                'customer ubo job'      => 'Allow user to run customer ubo job',
             ],
             'User' => [
                 'user access'           =>  'Allow user to access users list and details',

@@ -326,6 +326,13 @@ return [
                     'active'    => ['role*']
                 ],
                 [
+                    'text'      => 'Account',
+                    'url'       => '/account',
+                    'icon'      => 'fa fa-fw fa-building',
+                    'can'       => 'account access',
+                    'active'    => ['account*']
+                ],
+                [
                     'text'      => 'Branches',
                     'url'       => '/account-branch',
                     'icon'      => 'fa fa-fw fa-sitemap',

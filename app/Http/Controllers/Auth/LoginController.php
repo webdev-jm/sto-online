@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\Account;
 
 class LoginController extends Controller
 {
@@ -43,7 +47,33 @@ class LoginController extends Controller
     }
 
     // custom login
-    public function validateLogin() {
-        
+    public function login(Request $request) {
+
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+            'account_code' => 'required',
+            'account_password' => 'required'
+        ]);
+
+        $user_credentials = $request->only('username', 'password');
+        $account_credentials = $request->only('account_code', 'account_password');
+
+        // check user credentials
+        if(Auth::attempt($user_credentials)) {
+            // check account credentials
+            $account = Account::where('account_code', $request->account_code)->first();
+            if(!empty($account)) {
+                // check password of account_password to user input
+                if(Hash::check($request->account_password, $account->account_password)) {
+
+                } else { // invalid password
+                    // return with invalid message to input
+                    return back()->withInput($request->only('account_code'))->withErrors(['account_password' => 'Invalid password']);
+                }
+            }
+        }
+
+        return $this->sendFailedLoginResponse($request);
     }
 }

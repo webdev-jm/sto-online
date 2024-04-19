@@ -29,6 +29,8 @@
     <form action="{{ $login_url }}" method="post">
         @csrf
 
+        <strong>USER</strong>
+
         {{-- Email field --}}
         <div class="input-group mb-3">
             <input type="text" name="username" class="form-control @error('username') is-invalid @enderror"
@@ -65,7 +67,7 @@
             @enderror
         </div>
 
-        <hr>
+        <strong>ACCOUNT</strong>
 
         {{-- account code --}}
         <div class="input-group mb-3">
