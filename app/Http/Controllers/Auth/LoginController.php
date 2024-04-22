@@ -7,7 +7,9 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
+use App\Models\User;
 use App\Models\Account;
 
 class LoginController extends Controller
@@ -59,21 +61,41 @@ class LoginController extends Controller
         $user_credentials = $request->only('username', 'password');
         $account_credentials = $request->only('account_code', 'account_password');
 
-        // check user credentials
-        if(Auth::attempt($user_credentials)) {
-            // check account credentials
-            $account = Account::where('account_code', $request->account_code)->first();
-            if(!empty($account)) {
-                // check password of account_password to user input
-                if(Hash::check($request->account_password, $account->account_password)) {
+        $user = User::where('username', $request->username)->first();
+        if(!empty($user)) {
+            if (Hash::check($request->password, $user->password)) {
+                // check if account was assigned to user
+                Auth::attempt($user_credentials);
+                // if(auth()->user()->hasRole('superadmin')) {
+                //     return redirect()->intended($this->redirectPath());
+                // }
 
-                } else { // invalid password
-                    // return with invalid message to input
-                    return back()->withInput($request->only('account_code'))->withErrors(['account_password' => 'Invalid password']);
+                $account = Account::where('account_code', $request->account_code)->first();
+                if (!empty($account)) {
+                    if (Hash::check($request->account_password, $account->account_password)) {
+                        // Authentication passed for both user and account
+                        $assigned = auth()->user()->accounts()->where('id', $account->id)->first();
+                        if(!empty($assigned)) {
+                            auth()->user()->update([
+                                'account_id' => $account->id
+                            ]);
+
+                            return redirect()->intended($this->redirectPath()); // Redirect to intended page
+                        }
+
+                        return back()->withInput($request->only('account_code'))->withErrors(['account_code' => 'Account is not assigned to the user']);
+                    } else {
+                        // Invalid account password
+                        return back()->withInput($request->only('account_code'))->withErrors(['account_password' => 'Invalid password']);
+                    }
+                } else {
+                    // Account not found
+                    return back()->withInput($request->only('account_code'))->withErrors(['account_code' => 'Account code not found!']);
                 }
             }
         }
 
+        // Authentication failed for user
         return $this->sendFailedLoginResponse($request);
     }
 }
