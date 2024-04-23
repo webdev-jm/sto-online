@@ -11,6 +11,8 @@ class Channel extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'account_id',
         'account_branch_id',
@@ -33,4 +35,5 @@ class Channel extends Model
     public function customers() {
         return $this->hasMany('App\Models\Customer');
     }
+    
 }

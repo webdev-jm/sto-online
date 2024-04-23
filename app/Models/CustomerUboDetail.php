@@ -21,6 +21,10 @@ class CustomerUboDetail extends Model
         'address_similarity',
     ];
 
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
+
     public function customer_ubo() {
         return $this->belongsTo('App\Models\CustomerUbo');
     }

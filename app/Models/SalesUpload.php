@@ -26,6 +26,10 @@ class SalesUpload extends Model
         'total_cm_amount_vat',
     ];
 
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
+
     public function user() {
         return $this->belongsTo('App\Models\User');
     }

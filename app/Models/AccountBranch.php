@@ -37,7 +37,7 @@ class AccountBranch extends Model
     }
 
     public function account() {
-        return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
+        return $this->belongsTo('App\Models\Account', 'account_id', 'id');
     }
 
     public function users() {

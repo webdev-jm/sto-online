@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SMSAccount;
+use App\Models\Account;
 use App\Models\SMSBranch;
 use App\Models\AccountBranch;
 use App\Models\Sale;
@@ -40,10 +40,13 @@ class HomeController extends Controller
         $search = trim($request->get('search') ?? '');
 
         Session::forget('account');
+        auth()->user()->update([
+            'account_id' => NULL
+        ]);
 
         $accounts = DB::connection('mysql')
             ->table('account_user as au')
-            ->join(env('DB_DATABASE_2').'.accounts as a', 'a.id', '=', 'au.account_id')
+            ->join('accounts as a', 'a.id', '=', 'au.account_id')
             ->where('au.user_id', auth()->user()->id)
             ->when(!empty($search), function($query) use($search) {
                 $query->where(function($qry) use($search) {
@@ -163,7 +166,11 @@ class HomeController extends Controller
     {
         Session::forget('account_branch');
 
-        $account = SMSAccount::findOrFail(decrypt($id));
+        $account = Account::findOrFail(decrypt($id));
+        auth()->user()->update([
+            'account_id' => $account->id
+        ]);
+
         $check = auth()->user()->accounts()->where('id', $account->id)->exists();
         if (!$check) {
             return redirect()->route('home')->with([

@@ -86,7 +86,7 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\AccountBranch');
     }
 
-    public function account_logged() {
+    public function account() {
         return $this->belongsTo('App\Models\Account');
     }
 }

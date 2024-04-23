@@ -109,7 +109,7 @@
 
         $('#sms_account_id').select2({
             ajax: { 
-                url: '{{route("account.ajax")}}',
+                url: '{{route("sms-account.ajax")}}',
                 type: "POST",
                 dataType: 'json',
                 delay: 50,
@@ -130,7 +130,7 @@
         var user_select = $('#sms_account_id');
         $.ajax({
             type:'GET',
-            url: '/account/get-ajax/{{$account->sms_account_id}}'
+            url: '/sms-account/get-ajax/{{$account->sms_account_id}}'
         }).then(function(data) {
             var option = new Option('['+data.account_code+'] '+data.short_name, data.id, true, true);
             user_select.append(option).trigger('change');

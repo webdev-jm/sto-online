@@ -17,6 +17,7 @@ class CreateAccountDatabasesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->string('database_name');
+            $table->string('connection_name');
             $table->timestamps();
 
             $table->softDeletes();
