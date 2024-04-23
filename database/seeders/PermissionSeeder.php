@@ -52,6 +52,13 @@ class PermissionSeeder extends Seeder
                 'salesman upload'   => 'Allow user to upload salesman data.',
                 'salesman restore'  => 'Allow user to restore salesman data.',
             ],
+            'District' => [
+                'district access'   => 'Allow user to access ditrict list and details',
+                'district create'   => 'Allow user to add district',
+                'district edit'     => 'Allow user to edit district',
+                'district delete'   => 'Allow user to delete district',
+                'district restore'  => 'Allow user to restore district data',
+            ],
             'Channel' => [
                 'channel access'   => 'Allow user to access channel list and details',
                 'channel create'   => 'Allow user to add channel.',

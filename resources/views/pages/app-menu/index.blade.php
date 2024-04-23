@@ -66,6 +66,15 @@
         </div>
         @endcan
 
+        @can('district access')
+        <div class="col-lg-3">
+            <a href="{{route('district.index')}}" class="btn btn-block btn-app bg-warning ml-0">
+                <i class="fa fa-map"></i>
+                DISTRICT
+            </a>
+        </div>
+        @endcan
+
         @can('channel access')
         <div class="col-lg-3">
             <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-navy ml-0">

@@ -37,4 +37,8 @@ class Area extends Model
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }
+
+    public function districts() {
+        return $this->belongsToMany('App\Models\District');
+    }
 }
