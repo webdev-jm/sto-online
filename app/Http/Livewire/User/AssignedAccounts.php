@@ -5,7 +5,7 @@ namespace App\Http\Livewire\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-use App\Models\SMSAccount;
+use App\Models\Account;
 
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +33,7 @@ class AssignedAccounts extends Component
     }
 
     public function selectAll() {
-        $accounts = SMSAccount::orderBy('account_code')
+        $accounts = Account::orderBy('account_code')
             ->when(!empty($this->search), function($query) {
                 $query->where('account_code', 'like', '%'.$this->search.'%')
                     ->orWhere('short_name', 'like', '%'.$this->search.'%');
@@ -79,7 +79,7 @@ class AssignedAccounts extends Component
 
     public function render()
     {
-        $accounts = SMSAccount::orderBy('account_code')
+        $accounts = Account::orderBy('account_code')
             ->when(!empty($this->search), function($query) {
                 $query->where('account_code', 'like', '%'.$this->search.'%')
                     ->orWhere('short_name', 'like', '%'.$this->search.'%');

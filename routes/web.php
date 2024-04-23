@@ -44,6 +44,8 @@ Route::group(['middleware' => 'auth'], function() {
     // AJAX
     Route::post('account/ajax', [AccountBranchController::class, 'ajax'])->name('account.ajax');
     Route::get('account/get-ajax/{id}', [AccountBranchController::class, 'getAjax'])->name('account.get-ajax');
+    Route::post('sms-account/ajax', [AccountController::class, 'smsAjax'])->name('sms-account.ajax');
+    Route::get('sms-account/get-ajax/{id}', [AccountController::class, 'smsGetAjax'])->name('sms-account.get-ajax');
 
     // CUSTOMER UBO
     Route::group(['middleware' => 'permission:customer ubo access'], function() {

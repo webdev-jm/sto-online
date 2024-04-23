@@ -33,6 +33,10 @@ class Sale extends Model
         'status',
     ];
 
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
+
     public function sales_upload() {
         return $this->belongsTo('App\Models\SalesUpload');
     }

@@ -108,7 +108,7 @@
 
         $('#sms_account_id').select2({
             ajax: { 
-                url: '{{route("account.ajax")}}',
+                url: '{{route("sms-account.ajax")}}',
                 type: "POST",
                 dataType: 'json',
                 delay: 50,

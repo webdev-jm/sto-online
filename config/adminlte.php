@@ -330,7 +330,7 @@ return [
                     'url'       => '/account',
                     'icon'      => 'fa fa-fw fa-building',
                     'can'       => 'account access',
-                    'active'    => ['account*']
+                    'active'    => ['account', 'account/*']
                 ],
                 [
                     'text'      => 'Branches',

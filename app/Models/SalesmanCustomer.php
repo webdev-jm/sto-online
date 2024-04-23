@@ -18,6 +18,10 @@ class SalesmanCustomer extends Model
         'end_date'
     ];
 
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
+
     public function salesman() {
         return $this->belongsTo('App\Models\Salesman');
     }

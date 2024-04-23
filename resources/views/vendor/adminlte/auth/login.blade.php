@@ -29,8 +29,6 @@
     <form action="{{ $login_url }}" method="post">
         @csrf
 
-        <strong>USER</strong>
-
         {{-- Email field --}}
         <div class="input-group mb-3">
             <input type="text" name="username" class="form-control @error('username') is-invalid @enderror"
@@ -61,44 +59,6 @@
             </div>
 
             @error('password')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
-
-        <strong>ACCOUNT</strong>
-
-        {{-- account code --}}
-        <div class="input-group mb-3">
-            <input type="text" name="account_code" class="form-control @error('account_code') is-invalid @enderror"
-                   placeholder="Account code">
-
-            <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-warehouse"></span>
-                </div>
-            </div>
-
-            @error('account_code')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
-
-        {{-- account password --}}
-        <div class="input-group mb-3">
-            <input type="password" name="account_password" class="form-control @error('account_password') is-invalid @enderror"
-                   placeholder="Account password">
-
-            <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-key"></span>
-                </div>
-            </div>
-
-            @error('account_password')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>

@@ -26,6 +26,10 @@ class Customer extends Model
         'status',
     ];
 
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
+
     public function account() {
         return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
     }

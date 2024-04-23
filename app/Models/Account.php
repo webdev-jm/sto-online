@@ -26,4 +26,27 @@ class Account extends Model
     public function users() {
         return $this->belongsToMany('App\Models\User');
     }
+
+    public function db_data() {
+        return $this->hasOne('\App\Models\AccountDatabase');
+    }
+
+    public function scopeAccountAjax($query, $search) {
+        $accounts = $query->select('id', 'account_code', 'short_name')
+            ->when(!empty($search), function($qry) use($search) {
+                $qry->where('account_code', 'like', '%'.$search.'%')
+                    ->orWhere('short_name', 'like', '%'.$search.'%');
+            })
+            ->limit(5)->get();
+
+        $response = [];
+        foreach($accounts as $account) {
+            $response[] = [
+                'id' => $account->id,
+                'text' => '['.$account->account_code.'] '.$account->short_name
+            ];
+        }
+
+        return $response;
+    }
 }

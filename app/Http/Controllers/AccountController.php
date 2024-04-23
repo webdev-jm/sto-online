@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\AccountDatabase;
 use App\Models\SMSAccount;
 use Illuminate\Http\Request;
 use App\Http\Requests\AccountAddRequest;
@@ -91,6 +92,14 @@ class AccountController extends Controller
         Artisan::call('migrate', ['--path' => '\database/migrations/account_migrations']);
 
         DB::setDefaultConnection('mysql');
+
+        $account_db = new AccountDatabase([
+            'account_id' => $account->id,
+            'database_name' => $schema,
+            'connection_name' => 'account_'.$account->id.'_db',
+        ]);
+        $account_db->save();
+
         // logs
         activity('create')
             ->performedOn($account)
@@ -184,4 +193,16 @@ class AccountController extends Controller
     {
         //
     }
+
+    public function smsAjax(Request $request) {
+        $search = $request->search;
+        $response = SMSAccount::AccountAjax($search);
+        return response()->json($response);
+    }
+
+    public function smsGetAjax($id) {
+        $account = SMSAccount::findOrFail($id);
+        return response()->json($account);
+    }
+
 }
