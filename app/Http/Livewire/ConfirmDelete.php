@@ -15,6 +15,7 @@ use App\Models\AccountBranch;
 use App\Models\SalesUpload;
 use App\Models\InventoryUpload;
 use App\Models\Channel;
+use App\Models\District;
 
 use Spatie\Permission\Models\Role;
 
@@ -155,6 +156,11 @@ class ConfirmDelete extends Component
                 $this->model = Channel::findOrFail(decrypt($model_id));
                 $this->name = 'Channel '.$this->model->name;
                 $this->route = '/channel';
+                break;
+            case 'District':
+                $this->model = District::findOrFail(decrypt($model_id));
+                $this->name = 'District '.$this->model->code;
+                $this->route = '/district';
                 break;
         }
     }

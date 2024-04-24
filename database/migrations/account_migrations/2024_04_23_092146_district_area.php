@@ -13,9 +13,9 @@ class DistrictArea extends Migration
      */
     public function up()
     {
-        Schema::create('district_area', function (Blueprint $table) {
-            $table->unsignedBigInteger('district_id')->nullable();
+        Schema::create('area_district', function (Blueprint $table) {
             $table->unsignedBigInteger('area_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
 
             $table->foreign('district_id')
                 ->references('id')->on('districts')
@@ -30,6 +30,6 @@ class DistrictArea extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('district_area');
+        Schema::dropIfExists('area_district');
     }
 }
