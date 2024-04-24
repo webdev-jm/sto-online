@@ -17,8 +17,10 @@ class CreateSalesmenTable extends Migration
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->unsignedBigInteger('account_branch_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
             $table->string('code');
             $table->string('name');
+            $table->string('type');
             $table->timestamps();
 
             $table->softDeletes();

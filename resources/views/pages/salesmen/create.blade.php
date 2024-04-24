@@ -41,24 +41,22 @@
                     </div>
                 </div>
 
-            </div>
-
-            <hr>
-
-            <div class="row">
-                <div class="col-12">
+                <div class="col-lg-4">
                     <div class="form-group">
-                        <label>Areas</label> 
-                        @if($errors->has('area_ids'))
-                            <span class="badge badge-danger">{{$errors->first('area_ids')}}</span>
-                        @endif
-                        {!! Form::hidden('area_ids', '', ['id' => 'area_ids', 'form' => 'add_salesman']) !!}
-                        <br>
-                        @foreach($areas as $area)
-                            <button class="btn btn-default mb-2 btn-area" data-id="{{$area->id}}">[{{$area->code}}] {{$area->name}}</button>
-                        @endforeach
+                        {!! Form::label('district_id', 'District') !!}
+                        {!! Form::select('district_id', $districts, NULL, ['class' => 'form-control'.($errors->has('district_id') ? ' is-invalid' : ''), 'form' => 'add_salesman']) !!}
+                        <p class="text-danger">{{$errors->first('district_id')}}</p>
                     </div>
                 </div>
+
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('type', 'Type of Salesman') !!}
+                        {!! Form::select('type', $salesman_types_arr, NULL, ['class' => 'form-control'.($errors->has('type') ? ' is-invalid' : ''), 'form' => 'add_salesman']) !!}
+                        <p class="text-danger">{{$errors->first('type')}}</p>
+                    </div>
+                </div>
+
             </div>
             
         </div>
@@ -75,23 +73,6 @@
 @section('js')
 <script>
     $(function() {
-        // AREA
-        $('body').on('click', '.btn-area', function(e) {
-            e.preventDefault();
-            $(this).toggleClass('btn-success').toggleClass('btn-default');
-
-            // get all selected
-            var area_ids = [];
-            $('body').find('.btn-area').each(function() {
-                var id = $(this).data('id');
-                if($(this).hasClass('btn-success')) {
-                    area_ids.push(id);
-                }
-            });
-
-            var areas = area_ids.join(',');
-            $('#area_ids').val(areas);
-        });
     });
 </script>
 @stop

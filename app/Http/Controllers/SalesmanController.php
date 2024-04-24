@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Salesman;
-use App\Models\Area;
+use App\Models\District;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\SalesmanAddRequest;
@@ -16,6 +16,12 @@ use App\Http\Traits\AccountChecker;
 class SalesmanController extends Controller
 {
     use AccountChecker;
+
+    public $salesman_types_arr = [
+        'DIRECT BOOKING' => 'DIRECT BOOKING',
+        'VAN SALESMAN' => 'VAN SALESMAN',
+        'PRE-BOOKING' => 'PRE-BOOKING',
+    ];
 
     /**
      * Display a listing of the resource.
@@ -68,12 +74,17 @@ class SalesmanController extends Controller
         }
         $account = Session::get('account');
 
-        $areas = Area::where('account_id', $account->id)->get();
+        $districts = District::where('account_branch_id', $account_branch->id)->get();
+        $districts_arr = array();
+        foreach($districts as $district) {
+            $districts_arr[$district->id] = $district->district_code;
+        }
 
         return view('pages.salesmen.create')->with([
             'account' => $account,
             'account_branch' => $account_branch,
-            'areas' => $areas
+            'districts' => $districts_arr,
+            'salesman_types_arr' => $this->salesman_types_arr
         ]);
 
     }
@@ -95,18 +106,17 @@ class SalesmanController extends Controller
         $salesman = new Salesman([
             'account_id' => $account->id,
             'account_branch_id' => $account_branch->id,
+            'district_id' => $request->district_id,
             'code' => $request->code,
-            'name' => $request->name
+            'name' => $request->name,
+            'type' => $request->type
         ]);
         $salesman->save();
 
-        $area_ids = explode(',', $request->area_ids);
-        $salesman->areas()->sync($area_ids);
-
         // logs
         activity('create')
-        ->performedOn($salesman)
-        ->log(':causer.name has created saleman ['.$account->short_name.'] :subject.code :subject.name');
+            ->performedOn($salesman)
+            ->log(':causer.name has created saleman ['.$account->short_name.'] :subject.code :subject.name');
 
         return redirect()->route('salesman.index')->with([
             'message_success' => 'Salesman '.$salesman->name.' was created.'
@@ -152,16 +162,18 @@ class SalesmanController extends Controller
 
         $salesman = Salesman::findOrFail(decrypt($id));
 
-        $areas = Area::where('account_id', $account->id)->get();
-
-        $salesman_areas = $salesman->areas->pluck('id')->toArray();
+        $districts = District::where('account_branch_id', $account_branch->id)->get();
+        $districts_arr = array();
+        foreach($districts as $district) {
+            $districts_arr[$district->id] = $district->district_code;
+        }
 
         return view('pages.salesmen.edit')->with([
             'account' => $account,
             'account_branch' => $account_branch,
             'salesman' => $salesman,
-            'areas' => $areas,
-            'salesman_areas' => $salesman_areas
+            'districts' => $districts_arr,
+            'salesman_types_arr' => $this->salesman_types_arr
         ]);
     }
 
@@ -182,24 +194,21 @@ class SalesmanController extends Controller
 
         $salesman = Salesman::findOrFail(decrypt($id));
         $changes_arr['old'] = $salesman->getOriginal();
-        $changes_arr['old']['arr'] = $salesman->areas->pluck('name');
         
         $salesman->update([
+            'district_id' => $request->district_id,
             'code' => $request->code,
-            'name' => $request->name
+            'name' => $request->name,
+            'type' => $request->type
         ]);
 
-        $area_ids = explode(',', $request->area_ids);
-        $salesman->areas()->sync($area_ids);
-
         $changes_arr['changes'] = $salesman->getChanges();
-        $changes_arr['changes']['arr'] = $salesman->areas()->pluck('name');
 
         // logs
         activity('update')
-        ->performedOn($salesman)
-        ->withProperties($changes_arr)
-        ->log(':causer.name has updated salesman ['.$account->short_name.'] :subject.code :subject.name');
+            ->performedOn($salesman)
+            ->withProperties($changes_arr)
+            ->log(':causer.name has updated salesman ['.$account->short_name.'] :subject.code :subject.name');
 
         return redirect()->route('salesman.show', encrypt($salesman->id))->with([
             'message_success' => 'Salesman '.$salesman->name.' was updated.'

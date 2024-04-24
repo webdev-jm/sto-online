@@ -23,4 +23,8 @@ class District extends Model
     public function areas() {
         return $this->belongsToMany('App\Models\Area');
     }
+
+    public function sales_people() {
+        return $this->hasMany('App\Models\Salesman');
+    }
 }

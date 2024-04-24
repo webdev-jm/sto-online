@@ -34,7 +34,10 @@
                             <b>NAME</b> - <span>Required, Second column in the excel</span>
                         </li>
                         <li>
-                            <b>AREA</b> - <span>Optional, Third column in the excel</span>
+                            <b>TYPE</b> - <span>Required, Fourth column in the excel</span>
+                        </li>
+                        <li>
+                            <b>DSITRICT CODE</b> - <span>Optional, Fifth column in the excel</span>
                         </li>
                     </ul>
 
@@ -56,7 +59,8 @@
                                 <th></th>
                                 <th>CODE</th>
                                 <th>NAME</th>
-                                <th>AREA</th>
+                                <th>TYPE</th>
+                                <th>DISTRICT CODE</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +79,8 @@
                                 </td>
                                 <td>{{$data['code'] ?? '-'}}</td>
                                 <td>{{$data['name'] ?? '-'}}</td>
-                                <td>{{$data['area'] ?? '-'}}</td>
+                                <td>{{$data['type'] ?? '-'}}</td>
+                                <td>{{$data['district_code'] ?? '-'}}</td>
                             </tr>
                             @endforeach
                         </tbody>

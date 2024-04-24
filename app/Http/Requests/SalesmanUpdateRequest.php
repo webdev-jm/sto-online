@@ -30,7 +30,10 @@ class SalesmanUpdateRequest extends FormRequest
             'name' => [
                 'required'
             ],
-            'area_ids' => [
+            'district_id' => [
+                'required'
+            ],
+            'type' => [
                 'required'
             ]
         ];

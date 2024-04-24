@@ -30,10 +30,6 @@ class Area extends Model
         return $this->belongsTo('App\Models\AccountBranch');
     }
 
-    public function salesmen() {
-        return $this->belongsToMany('App\Models\Salesman');
-    }
-
     public function sales() {
         return $this->hasMany('App\Models\Sales');
     }

@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 
 use App\Models\Salesman as Sale;
-use App\Models\Area;
+use App\Models\District;
 
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -44,32 +44,20 @@ class Salesman extends Component
                     'account_branch_id' => $this->account_branch->id,
                     'code' => $data['code'],
                     'name' => $data['name'],
+                    'type' => $data['type'],
                 ]);
                 $salesman->save();
-                
-                if(!empty($data['area'])) {
-                    // assign area
-                    $area = Area::where('account_id', $this->account->id)
-                        ->where('account_branch_id', $this->account_branch->id)
-                        ->where(function($query) use($data) {
-                            $query->where('code', $data['area'])
-                                ->orWhere('name', $data['area']);
-                        })
+
+                if(!empty($data['district_code'])) {
+                    $district = District::where('district_code', $data['district_code'])
                         ->first();
-                    if(empty($area)) {
-                        $area = new Area([
-                            'account_id' => $this->account->id,
-                            'account_branch_id' => $this->account_branch->id,
-                            'code' => $data['area'],
-                            'name' => $data['area']
+                    if(empty($district)) {
+                        $salesman->update([
+                            'district_id' => $district->id
                         ]);
-                        $area->save();
                     }
-        
-                    $salesman->areas()->syncWithoutDetaching($area->id);
                 }
             }
-
         }
 
         $this->upload_triggered = true;
@@ -104,12 +92,15 @@ class Salesman extends Component
                 if($key > 0) {
                     $check = $current_salesmen->get($row[0]);
 
-                    $this->salesman_data[] = [
-                        'check' => empty($check) ? 0 : 1,
-                        'code' => $row[0],
-                        'name' => $row[1],
-                        'area' => $row[2],
-                    ];
+                    if(!empty($row[0])) {
+                        $this->salesman_data[] = [
+                            'check' => empty($check) ? 0 : 1,
+                            'code' => $row[0],
+                            'name' => $row[1],
+                            'type' => $row[2],
+                            'district_code' => $row[3]
+                        ];
+                    }
                 }
             }
         } else {
@@ -138,7 +129,8 @@ class Salesman extends Component
         $requiredHeaders = [
             'code',
             'name',
-            'area',
+            'type of salesman',
+            'district code'
         ];
     
         $err = 0;
