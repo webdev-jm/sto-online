@@ -1,25 +1,26 @@
 @extends('adminlte::page')
 
-@section('title', 'Add District - '.$account->short_name)
+@section('title', 'Edit District - '.$account->short_name)
 
 @section('content_header')
 <div class="row">
     <div class="col-lg-6">
-        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - ADD DISTRICT</h1>
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - EDIT DISTRICT</h1>
     </div>
     <div class="col-lg-6 text-right">
         <a href="{{route('district.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
+        <a href="{{route('district.show', encrypt($district->id))}}" class="btn btn-info btn-sm"><i class="fa fa-list mr-1"></i>DETAILS</a>
     </div>
 </div>
 @stop
 
 @section('content')
-    {!! Form::open(['method' => 'POST', 'route' => ['district.store'], 'id' => 'add_district', 'autocomplete' => 'off']) !!}
+    {!! Form::open(['method' => 'POST', 'route' => ['district.update', encrypt($district->id)], 'id' => 'update_district', 'autocomplete' => 'off']) !!}
     {!! Form::close() !!}
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">ADD DISTRICT</h3>
+            <h3 class="card-title">EDIT DISTRICT</h3>
         </div>
         <div class="card-body">
 
@@ -28,7 +29,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('district_code', 'District Code') !!}
-                        {!! Form::text('district_code', '', ['class' => 'form-control'.($errors->has('district_code') ? ' is-invalid' : ''), 'form' => 'add_district']) !!}
+                        {!! Form::text('district_code', $district->district_code, ['class' => 'form-control'.($errors->has('district_code') ? ' is-invalid' : ''), 'form' => 'update_district']) !!}
                         <p class="text-danger">{{$errors->first('district_code')}}</p>
                     </div>
                 </div>
@@ -39,7 +40,7 @@
                 <div class="col-12">
                     <label>AREAS</label>
                     @if($errors->has('areas'))
-                    <span class="badge badge-danger ml-1">Required</span>
+                        <span class="badge badge-danger ml-1">Required</span>
                     @endif
                 </div>
                 <div class="col-12">
@@ -47,7 +48,7 @@
                         @foreach($areas as $area)
                             <div class="col-12">
                                 <div class="custom-control custom-switch">
-                                    {!! Form::checkbox('areas[]', $area->id, false, ['class' => 'custom-control-input', 'id' => 'area'.$area->id, 'form' => 'add_district']) !!}
+                                    {!! Form::checkbox('areas[]', $area->id, in_array($area->id, $district->areas()->pluck('id')->toArray()), ['class' => 'custom-control-input', 'id' => 'area'.$area->id, 'form' => 'update_district']) !!}
                                     {!! Form::label('area'.$area->id, $area->name, ['class' => 'custom-control-label']) !!}
                                 </div>
                             </div>
@@ -58,7 +59,7 @@
             
         </div>
         <div class="card-footer text-right">
-            {!! Form::submit('Add District', ['class' => 'btn btn-primary', 'form' => 'add_district']) !!}
+            {!! Form::submit('Edit District', ['class' => 'btn btn-primary', 'form' => 'update_district']) !!}
         </div>
     </div>
 @stop

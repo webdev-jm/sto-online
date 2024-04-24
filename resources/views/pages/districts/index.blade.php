@@ -38,13 +38,13 @@
             <b>{{$districts->total()}} total result{{$districts->total() > 1 ? 's' : ''}}</b>
             <ul class="list-group">
                 @foreach($districts as $district)
-                5<li class="list-group-item">
+                <li class="list-group-item">
                     <div class="row">
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-6 text-center">
                             <p class="m-0 font-weight-bold">{{$district->district_code}}</p>
                             <small class="font-weight-bold text-muted">DISTRICT CODE</small>
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-6 text-center">
                             <p class="m-0">
                                 @if(empty($district->deleted_at))
                                     <a href="{{route('district.show', encrypt($district->id))}}" class="btn btn-info btn-xs">

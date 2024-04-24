@@ -112,9 +112,21 @@ class DistrictController extends Controller
      * @param  \App\Models\District  $district
      * @return \Illuminate\Http\Response
      */
-    public function show(District $district)
+    public function show($id)
     {
-        //
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $district = District::findOrFail(decrypt($id));
+
+        return view('pages.districts.show')->with([
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'district' => $district
+        ]);
     }
 
     /**
@@ -123,9 +135,24 @@ class DistrictController extends Controller
      * @param  \App\Models\District  $district
      * @return \Illuminate\Http\Response
      */
-    public function edit(District $district)
+    public function edit($id)
     {
-        //
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $district = District::findOrFail(decrypt($id));
+
+        $areas = Area::get();
+
+        return view('pages.districts.edit')->with([
+            'district' => $district,
+            'account' => $account,
+            'account_branch' => $account_branch,
+            'areas' => $areas,
+        ]);
     }
 
     /**
@@ -135,19 +162,54 @@ class DistrictController extends Controller
      * @param  \App\Models\District  $district
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, District $district)
+    public function update(DistrictEditRequest $request, $id)
     {
-        //
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $district = District::findOrFail(decrypt($id));
+        $changes_arr['old'] = $district->getOriginal();
+        $changes_arr['old']['arr'] = $district->areas()->pluck('id');
+
+        $district->update([
+            'district_code' => $request->district_code,
+        ]);
+        $district->areas()->sync($request->areas);
+
+        $changes_arr['changes'] = $district->getChanges();
+        $changes_arr['changes']['arr'] = $district->areas()->pluck('id');
+
+        // log
+        activity('update')
+            ->performedOn($district)
+            ->withProperties($changes_arr)
+            ->log(':causer.name has updated district :subject.district_code');
+
+        return redirect()->route('district.show', encrypt($district->id))->with([
+            'message_success' => 'District '.$district->district_code.' has been updated.'
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\District  $district
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(District $district)
-    {
-        //
+    public function restore($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $district = District::withTrashed()->findOrFail(decrypt($id));
+
+        $district->restore();
+
+        activity('restore')
+            ->performedOn($district)
+            ->log(':causer.name has restored district '.$district->district_code);
+
+        return back()->with([
+            'message_success' => 'District '.$district->district_code.' has been restored.'
+        ]);
     }
 }
