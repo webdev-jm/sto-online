@@ -45,15 +45,19 @@
                 @foreach($salesmen as $salesman)
                 <li class="list-group-item">
                     <div class="row">
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-3 text-center">
                             <p class="m-0 font-weight-bold">{{$salesman->code}}</p>
                             <small class="font-weight-bold text-muted">CODE</small>
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-3 text-center">
                             <p class="m-0 font-weight-bold">{{$salesman->name}}</p>
                             <small class="font-weight-bold text-muted">NAME</small>
                         </div>
-                        <div class="col-lg-4 text-center">
+                        <div class="col-lg-3 text-center">
+                            <p class="m-0 font-weight-bold">{{$salesman->type ?? '-'}}</p>
+                            <small class="font-weight-bold text-muted">TYPE OF SALESMAN</small>
+                        </div>
+                        <div class="col-lg-3 text-center">
                             <p class="m-0">
                                 @if(empty($salesman->deleted_at))
                                     <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">

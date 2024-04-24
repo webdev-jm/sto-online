@@ -14,8 +14,10 @@ class Salesman extends Model
     protected $fillable = [
         'account_id',
         'account_branch_id',
+        'district_id',
         'code',
         'name',
+        'type',
     ];
 
     public function getConnectionName() {
@@ -30,10 +32,6 @@ class Salesman extends Model
         return $this->belongsTo('App\Models\AccountBranch');
     }
 
-    public function areas() {
-        return $this->belongsToMany('App\Models\Area');
-    }
-
     public function customers() {
         return $this->hasMany('App\Models\Customer');
     }
@@ -44,5 +42,9 @@ class Salesman extends Model
 
     public function sales() {
         return $this->hasMany('App\Models\Sales');
+    }
+
+    public function district() {
+        return $this->belongsTo('App\Models\District');
     }
 }
