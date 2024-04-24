@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\AccountBranch;
+use App\Models\AccountDatabase;
 
 class GenerateDatabaseConnection
 {
@@ -17,10 +17,10 @@ class GenerateDatabaseConnection
      */
     public function handle(Request $request, Closure $next)
     {
-        $branches = AccountBranch::all();
-        foreach($branches as $branch) {
-            $schema = 'kojiesanadmin_sto_online_'.$branch->account_id.'_db';
-            \Config::set('database.connections.account_'.$branch->account_id.'_db', [
+        $connections = AccountDatabase::all();
+        foreach($connections as $connection) {
+            $schema = $connection->database_name;
+            \Config::set('database.connections.'.$connection->connection_name, [
                 'driver' => 'mysql',
                 'url' => NULL,
                 'host' => '127.0.0.1',

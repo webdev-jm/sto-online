@@ -15,6 +15,7 @@ use App\Http\Controllers\SystemlogController;
 use App\Http\Controllers\AccountBranchController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\DistrictController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,6 +117,17 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('salesman/{id}', [SalesmanController::class, 'update'])->name('salesman.update')->middleware('permission:salesman edit');
 
         Route::get('salesman/{id}/restore', [SalesmanController::class, 'restore'])->name('salesman.restore')->middleware('permission:salesman restore');
+    });
+
+    // DISTRICT
+    Route::group(['middleware' => 'permission:district access'], function() {
+        Route::get('district', [DistrictController::class, 'index'])->name('district.index');
+        Route::get('district/create', [DistrictController::class, 'create'])->name('district.create')->middleware('permission:district create');
+        Route::post('district', [DistrictController::class, 'store'])->name('district.store')->middleware('permission:district create');
+        Route::get('district/{id}', [DistrictController::class, 'show'])->name('district.show');
+        Route::get('district/{id}/edit', [DistrictController::class, 'edit'])->name('district.edit')->middleware('permission:district edit');
+        Route::post('district/{id}', [DistrictController::class, 'update'])->name('district.update')->middleware('permission:district edit');
+        Route::get('district/{id}/restore', [DistrictController::class, 'restore'])->name('district.restore')->middleware('permission:district restore');
     });
 
     // CHANNEL
