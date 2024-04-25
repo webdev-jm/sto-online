@@ -9,11 +9,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+use App\Models\Account;
 use App\Models\Salesman;
 use App\Models\Customer;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
 use App\Models\SalesmanCustomer;
+
+use Illuminate\Support\Facades\DB;
 
 class CustomerImportJob implements ShouldQueue
 {
@@ -42,6 +45,31 @@ class CustomerImportJob implements ShouldQueue
      */
     public function handle()
     {
+        $account = Account::findOrFail($this->account_id);
+        \Config::set('database.connections.'.$account->db_data->connection_name, [
+            'driver' => 'mysql',
+            'url' => NULL,
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'database' => $account->db_data->database_name,
+            'username' => 'root',
+            'password' => '',
+            'unix_socket' => '',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'pool' => [
+                'min_connections' => 1,
+                'max_connections' => 10,
+                'max_idle_time' => 30,
+            ],
+        ]);
+
+        DB::setDefaultConnection($account->db_data->connection_name);
+
         foreach($this->customer_data as $data) {
             // get salesman
             $salesman = Salesman::where('account_id', $this->account_id)
@@ -105,6 +133,8 @@ class CustomerImportJob implements ShouldQueue
                 
             }
         }
+
+        DB::setDefaultConnection('mysql');
     }
 
     private function checkCustomerSimilarity($customer) {
