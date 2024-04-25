@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Models\SalesUpload;
 use App\Models\Sale;
+use App\Models\Account;
 
 use Illuminate\Support\Facades\DB;
 
@@ -45,6 +46,31 @@ class SalesImportJob implements ShouldQueue
      */
     public function handle()
     {
+        $account = Account::findOrFail($this->account_id);
+        \Config::set('database.connections.'.$account->db_data->connection_name, [
+            'driver' => 'mysql',
+            'url' => NULL,
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'database' => $account->db_data->database_name,
+            'username' => 'root',
+            'password' => '',
+            'unix_socket' => '',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'pool' => [
+                'min_connections' => 1,
+                'max_connections' => 10,
+                'max_idle_time' => 30,
+            ],
+        ]);
+
+        DB::setDefaultConnection($account->db_data->connection_name);
+
         if(!empty($this->sales_data)) {
 
             $upload = SalesUpload::find($this->upload_id);
@@ -124,19 +150,22 @@ class SalesImportJob implements ShouldQueue
                 'total_cm_amount_vat' => $total_cm_amount_vat,
             ]);
 
+            DB::setDefaultConnection('mysql');
+
             // logs
             activity('upload')
                 ->performedOn($upload)
                 ->log(':causer.name has uploaded sales data.');
 
             // UPDATE SALES REPORTS
-            if(!empty($report_data)) {
-                foreach($report_data as $year => $months) {
-                    foreach($months as $month => $date) {
-                        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
-                    }
-                }
-            }
+            // if(!empty($report_data)) {
+            //     foreach($report_data as $year => $months) {
+            //         foreach($months as $month => $date) {
+            //             DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
+            //         }
+            //     }
+            // }
         }
+        
     }
 }
