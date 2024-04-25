@@ -270,6 +270,10 @@ class CustomerController extends Controller
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,
+            'street' => $request->street,
+            'brgy' => $request->barangay,
+            'city' => $request->city,
+            'province' => $request->province
         ]);
         $customer->save();
 
@@ -284,8 +288,8 @@ class CustomerController extends Controller
         
         // logs
         activity('create')
-        ->performedOn($customer)
-        ->log(':causer.name has created customer ['.$account->short_name.'] :subject.code :subject.name');
+            ->performedOn($customer)
+            ->log(':causer.name has created customer ['.$account->short_name.'] :subject.code :subject.name');
 
         return redirect()->route('customer.index')->with([
             'message_success' => 'Customer '.$customer->name.' was created.'
@@ -405,6 +409,10 @@ class CustomerController extends Controller
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,
+            'street' => $request->street,
+            'brgy' => $request->barangay,
+            'city' => $request->city,
+            'province' => $request->province,
         ]);
 
         $changes_arr['changes'] = $customer->getChanges();

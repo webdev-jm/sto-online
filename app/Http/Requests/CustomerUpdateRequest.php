@@ -38,6 +38,18 @@ class CustomerUpdateRequest extends FormRequest
             ],
             'address' => [
                 'max:255'
+            ],
+            'street' => [
+                'required'
+            ],
+            'barangay' => [
+                'required'
+            ],
+            'city' => [
+                'required'
+            ],
+            'province' => [
+                'required'
             ]
         ];
     }

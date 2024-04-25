@@ -107,6 +107,10 @@ class Customer extends Component
                 $salesman = trim($row[3]);
                 $channel_code = trim($row[4] ?? '');
                 $channel_name = trim($row[5] ?? '');
+                $province = trim($row[6] ?? '');
+                $city = trim($row[7] ?? '');
+                $brgy = trim($row[8] ?? '');
+                $street = trim($row[9] ?? '');
 
                 $customer = $current_customers->get($code);
                 $channel = $channels->where('code', $channel_code)
@@ -117,38 +121,60 @@ class Customer extends Component
                         && $this->checkSimilarity($item->address, $address) >= 90;
                 })->first();
 
-                if(empty($channel)) {
-                    return [
-                        'similar' => !empty($check) ? $check->toArray() : [],
-                        'check' => 2,
-                        'code' => $code,
-                        'name' => $name,
-                        'address' => $address,
-                        'salesman' => $salesman,
-                        'channel' => $channel ?? [],
-                        'brgy' => '',
-                        'city' => '',
-                        'province' => '',
-                        'country' => '',
-                        'status' => !empty($check) ? 1 : 0
-                    ];
+                if(!empty($code) && !empty($name) && !empty($channel_code) && !empty($province) && !empty($city) && !empty($brgy)) {
+
+                    if(empty($channel)) {
+                        return [
+                            'similar' => !empty($check) ? $check->toArray() : [],
+                            'check' => 2,
+                            'code' => $code,
+                            'name' => $name,
+                            'address' => $address,
+                            'salesman' => $salesman,
+                            'channel' => $channel ?? [],
+                            'street' => $street,
+                            'brgy' => $brgy,
+                            'city' => $city,
+                            'province' => $province,
+                            'country' => '',
+                            'status' => !empty($check) ? 1 : 0
+                        ];
+                    } else {
+                        return [
+                            'similar' => !empty($check) ? $check->toArray() : [],
+                            'check' => empty($customer) ? 0 : 1,
+                            'code' => $code,
+                            'name' => $name,
+                            'address' => $address,
+                            'salesman' => $salesman,
+                            'channel' => $channel ?? [],
+                            'street' => $street,
+                            'brgy' => $brgy,
+                            'city' => $city,
+                            'province' => $province,
+                            'country' => '',
+                            'status' => !empty($check) ? 1 : 0
+                        ];
+                    }
+
                 } else {
                     return [
-                        'similar' => !empty($check) ? $check->toArray() : [],
-                        'check' => empty($customer) ? 0 : 1,
+                        'similar' => [],
+                        'check' => 3,
                         'code' => $code,
                         'name' => $name,
                         'address' => $address,
                         'salesman' => $salesman,
                         'channel' => $channel ?? [],
-                        'brgy' => '',
-                        'city' => '',
-                        'province' => '',
+                        'street' => $street,
+                        'brgy' => $brgy,
+                        'city' => $city,
+                        'province' => $province,
                         'country' => '',
-                        'status' => !empty($check) ? 1 : 0
+                        'status' => 1
                     ];
                 }
-                
+
             })->toArray();
         } else {
             $this->err_msg = 'Invalid format. please provide an excel with the correct format.';
@@ -181,6 +207,10 @@ class Customer extends Component
             'salesman code',
             'channel code',
             'channel name',
+            'province',
+            'city/town',
+            'barangay',
+            'street',
         ];
     
         $err = 0;

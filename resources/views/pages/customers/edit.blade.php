@@ -62,15 +62,49 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="row">
                 {{-- ADDRESS --}}
-                <div class="col-lg-8">
+                <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('address', 'Address') !!}
                         {!! Form::text('address', $customer->address, ['class' => 'form-control'.($errors->has('address') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
                         <p class="text-danger">{{$errors->first('address')}}</p>
                     </div>
                 </div>
-
+                {{-- STREET --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('street', 'Street') !!}
+                        {!! Form::text('street', $customer->street, ['class' => 'form-control'.($errors->has('street') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('street')}}</p>
+                    </div>
+                </div>
+                {{-- BARANGAY --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('barangay', 'Barangay') !!}
+                        {!! Form::text('barangay', $customer->brgy, ['class' => 'form-control'.($errors->has('barangay') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('barangay')}}</p>
+                    </div>
+                </div>
+                {{-- CITY --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('city', 'City/Town') !!}
+                        {!! Form::text('city', $customer->city, ['class' => 'form-control'.($errors->has('city') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('city')}}</p>
+                    </div>
+                </div>
+                {{-- PROVINCE --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('province', 'Province') !!}
+                        {!! Form::text('province', $customer->province, ['class' => 'form-control'.($errors->has('province') ? ' is-invalid' : ''), 'form' => 'update_customer']) !!}
+                        <p class="text-danger">{{$errors->first('province')}}</p>
+                    </div>
+                </div>
             </div>
 
         </div>
