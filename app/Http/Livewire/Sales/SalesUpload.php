@@ -151,10 +151,11 @@ class SalesUpload extends Component
         $header = $data[1];
     
         if($this->checkHeader($header) == 0) {
+
             // get customers
             $customers = Customer::where('account_id', $this->account->id)
                 ->where('account_branch_id', $this->account_branch->id)
-                ->whereIn('code', array_unique(array_map('trim', Collection::make($data)->pluck(2)->slice(2)->toArray())))
+                ->whereIn('code', array_unique(array_map('trim', Collection::make($data)->pluck(1)->slice(2)->toArray())))
                 ->get()
                 ->keyBy('code');
             // get locations
@@ -169,51 +170,58 @@ class SalesUpload extends Component
                 ->keyBy('stock_code');
     
             foreach(array_slice($data, 2) as $row) {
-                $customerCode = trim($row[2] ?? '');
-                $locationCode = $row[4];
-                $skuCode = trim($row[5] ?? '');
+                $invoice_date = $row[0];
+                $customer_code = trim($row[1]);
+                $salesman_code = trim($row[2]);
+                $invoice_number = trim($row[3]);
+                $warehouse_code = trim($row[4]);
+                $sku_code = trim($row[5]);
+                $quantity = trim($row[6]);
+                $uom = trim($row[7]);
+                $unit_price_inc_vat = trim($row[8]);
+                $amount = trim($row[9]);
+                $amount_inc_vat = trim($row[10]);
+                $line_discount = trim($row[11]);
 
                 $type = 1;
-                if(strpos(trim($skuCode ?? ''), '-')) {
-                    $sku_arr = explode('-', $skuCode);
+                if(strpos(trim($sku_code ?? ''), '-')) {
+                    $sku_arr = explode('-', $sku_code);
                     if($sku_arr[0] == 'FG') { // Free Goods
-                        $skuCode = end($sku_arr);
+                        $sku_code = end($sku_arr);
                         // process when free goods
                         $type = 2;
                     }
                     if($sku_arr[0] == 'PRM') { // Promo
-                        $skuCode = end($sku_arr);
+                        $sku_code = end($sku_arr);
                         // process when promo
                         $type = 3;
                     }
                 }
 
                 $category = 0;
-                $document = trim($row[1] ?? '');
-                if(!empty($document) && strpos($document, '-')) {
-                    $document_str_arr = explode('-', $document);
-                    if($document_str_arr[0] == 'PSC') { // credit memo
+                if(!empty($invoice_number) && strpos($invoice_number, '-')) {
+                    $invoice_number_str_arr = explode('-', $invoice_number);
+                    if($invoice_number_str_arr[0] == 'PSC') { // credit memo
                         $category = 1;
                     }
                 }
 
                 // remove comma and convert to float from values
-                $quantity = (float)trim(str_replace(',', '', $row[9]));
-                $price_inc_vat = (float)trim(str_replace(',', '', $row[11]));
-                $amount = (float)trim(str_replace(',', '', $row[12]));
-                $amount_inc_vat = (float)trim(str_replace(',', '', $row[13]));
-                $line_discount = (float)trim(str_replace(',', '', $row[14]));
+                $quantity = (float)trim(str_replace(',', '', $quantity));
+                $price_inc_vat = (float)trim(str_replace(',', '', $unit_price_inc_vat));
+                $amount = (float)trim(str_replace(',', '', $amount));
+                $amount_inc_vat = (float)trim(str_replace(',', '', $amount_inc_vat));
+                $line_discount = (float)trim(str_replace(',', '', $line_discount));
 
-                $date = $row[0];
-                if (is_int($date)) {
+                if (is_int($invoice_date)) {
                     // Convert the value to a date instance if it looks like a date.
-                    $date = Date::excelToDateTimeObject($date)->format('Y-m-d');
+                    $invoice_date = Date::excelToDateTimeObject($invoice_date)->format('Y-m-d');
                 }
     
-                if($customers->has($customerCode) && $locations->has($locationCode) && $products->has($skuCode)) {
-                    $customer = $customers->get($customerCode);
-                    $location = $locations->get($locationCode);
-                    $product = $products->get($skuCode);
+                if($customers->has($customer_code) && $locations->has($warehouse_code) && $products->has($sku_code)) {
+                    $customer = $customers->get($customer_code);
+                    $location = $locations->get($warehouse_code);
+                    $product = $products->get($sku_code);
 
                     // check if already exists
                     $exist = Sale::where('account_id', $this->account->id)
@@ -226,21 +234,21 @@ class SalesUpload extends Component
                     $this->sales_data[] = [
                         'type' => $type,
                         'check' => (!empty($exist)) ? 4 : 0,
-                        'date' => $date,
-                        'document' => $row[1],
+                        'date' => $invoice_date,
+                        'document' => $invoice_number,
                         'category' => $category,
-                        'customer_code' => $customerCode,
-                        'location_code' => $locationCode,
-                        'sku_code' => $row[5],
+                        'customer_code' => $customer_code,
+                        'location_code' => $warehouse_code,
+                        'sku_code' => $sku_code,
                         'customer_id' => $customer->id,
                         'channel_id' => $customer->channel_id,
                         'location_id' => $location->id,
                         'product_id' => $product->id,
                         'salesman_id' => $customer->salesman_id,
-                        'description' => $row[6],
-                        'size' => $row[7],
+                        'description' => $product->description,
+                        'size' => $product->size,
                         'quantity' => $quantity,
-                        'uom' => $row[10],
+                        'uom' => $uom,
                         'price_inc_vat' => $price_inc_vat,
                         'amount' => $amount,
                         'amount_inc_vat' => $amount_inc_vat,
@@ -252,17 +260,15 @@ class SalesUpload extends Component
 
                     $this->sales_data[] = [
                         'type' => $type,
-                        'check' => ($customers->has($customerCode)) ? ($locations->has($locationCode) ? 3 : 2) : 1,
-                        'date' => $date,
-                        'document' => $row[1],
+                        'check' => ($customers->has($customer_code)) ? ($locations->has($warehouse_code) ? 3 : 2) : 1,
+                        'date' => $invoice_date,
+                        'document' => $invoice_number,
                         'category' => $category,
-                        'customer_code' => $customerCode,
-                        'location_code' => $locationCode,
-                        'sku_code' => $row[5],
-                        'description' => $row[6],
-                        'size' => $row[7],
+                        'customer_code' => $customer_code,
+                        'location_code' => $warehouse_code,
+                        'sku_code' => $sku_code,
                         'quantity' => $quantity,
-                        'uom' => $row[10],
+                        'uom' => $uom,
                         'price_inc_vat' => $price_inc_vat,
                         'amount' => $amount,
                         'amount_inc_vat' => $amount_inc_vat,
@@ -308,15 +314,12 @@ class SalesUpload extends Component
 
     private function checkHeader($header) {
         $requiredHeaders = [
-            'Posting Date',
-            'Document No.',
-            'Sell-to Customer No.',
-            'Type',
-            'Location Code',
-            'No.',
-            'Description',
-            'Description 2',
-            'Item Category Code',
+            'Invoice Date',
+            'Customer Code',
+            'Salesman Code',
+            'Document No./Invoice Number/CM Number',
+            'Warehouse Code',
+            'BEVI Sku Code',
             'Quantity',
             'Unit of Measure Code',
             'Unit Price Incl. VAT',
@@ -326,21 +329,18 @@ class SalesUpload extends Component
         ];
 
         $requiredHeadersAlt = [
-            'Posting Date',
-            'Document No.',
+            'Invoice Date',
             'Customer Code',
-            'Type',
-            'Location Code',
-            'Sku Code',
-            'Description',
-            'Description 2',
-            'Item Category Code',
+            'Salesman Code',
+            'Invoice Number',
+            'Warehouse Code',
+            'BEVI Sku Code',
             'Quantity',
             'Unit of Measure Code',
-            'Unit Price Incl. VAT',
+            'Unit Price Incl VAT',
             'Amount',
             'Amount Including VAT',
-            'Line Discount %'
+            'Line Discount'
         ];
     
         $err = 0;
