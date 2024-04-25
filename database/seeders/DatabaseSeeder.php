@@ -19,5 +19,10 @@ class DatabaseSeeder extends Seeder
         $this->call([UserSeeder::class]);
         $this->call([BeviAreaSeeder::class]);
         // $this->call([AreaSeeder::class]);
+
+        $this->call([RegionSeeder::class]);
+        $this->call([ProvinceSeeder::class]);
+        $this->call([MunicipalitySeeder::class]);
+        $this->call([BarangaySeeder::class]);
     }
 }
