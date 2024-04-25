@@ -19,7 +19,7 @@ class Customer extends Model
         'code',
         'name',
         'address',
-        'steet',
+        'street',
         'brgy',
         'city',
         'province',
