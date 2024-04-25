@@ -46,31 +46,22 @@
                 <div class="col-lg-12">
                     <ul>
                         <li>
-                            <b>POSTING DATE</b> - <span>Required</span>
+                            <b>INVOICE DATE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>DOCUMENT NO.</b> - <span>Required</span>
+                            <b>CUSTOMER CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>SELL-TO CUSTOMER NO.</b> - <span>Required, Customer Code</span>
+                            <b>SALESMAN CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>TYPE</b> - <span>Optional</span>
+                            <b>DOCUMENT NO./INVOICE NUMBER/CM NUMBER</b> - <span>required</span>
                         </li>
                         <li>
-                            <b>LOCATION CODE</b> - <span>Required</span>
+                            <b>WAREHOUSE CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>NO.</b> - <span>Required, SKU Code</span>
-                        </li>
-                        <li>
-                            <b>DESCRIPTION</b> - <span>Optional, SKU Description</span>
-                        </li>
-                        <li>
-                            <b>DESCRIPTION 2</b> - <span>Optional, SKU size</span>
-                        </li>
-                        <li>
-                            <b>ITEM CATEGORY CODE</b> - <span>Optional</span>
+                            <b>BEVI SKU CODE</b> - <span>Required, SKU Code</span>
                         </li>
                         <li>
                             <b>QUANTITY</b> - <span>Required</span>
