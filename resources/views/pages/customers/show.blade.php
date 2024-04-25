@@ -59,6 +59,22 @@
                             <b>Address</b>
                             <span class="float-right">{{$customer->address ?? '-'}}</span>
                         </li>
+                        <li class="list-group-item p-1">
+                            <b>Street</b>
+                            <span class="float-right">{{$customer->street ?? '-'}}</span>
+                        </li>
+                        <li class="list-group-item p-1">
+                            <b>Barangay</b>
+                            <span class="float-right">{{$customer->brgy ?? '-'}}</span>
+                        </li>
+                        <li class="list-group-item p-1">
+                            <b>City</b>
+                            <span class="float-right">{{$customer->city ?? '-'}}</span>
+                        </li>
+                        <li class="list-group-item p-1">
+                            <b>Province</b>
+                            <span class="float-right">{{$customer->province ?? '-'}}</span>
+                        </li>
                     </ul>
                     
                 </div>

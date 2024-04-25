@@ -34,7 +34,7 @@
                             <b>NAME</b> - <span>Required, Second column in the excel</span>
                         </li>
                         <li>
-                            <b>ADDRESS</b> - <span>Required, Third column in the excel</span>
+                            <b>ADDRESS</b> - <span>Option, Third column in the excel</span>
                         </li>
                         <li>
                             <b>SALESMAN CODE</b> - <span>Optional, Fourth column in the excel</span>
@@ -44,6 +44,18 @@
                         </li>
                         <li>
                             <b>CHANNEL NAME</b> - <span>Optional, Sixth column in the excel</span>
+                        </li>
+                        <li>
+                            <b>PROVINCE</b> - <span>Required, Seventh column in the excel</span>
+                        </li>
+                        <li>
+                            <b>CITY/TOWN</b> - <span>Required, Eight column in the excel</span>
+                        </li>
+                        <li>
+                            <b>BARANGAY</b> - <span>Required, Ninth column in the excel</span>
+                        </li>
+                        <li>
+                            <b>STREET</b> - <span>Optional, Tenth column in the excel</span>
                         </li>
                     </ul>
 
@@ -74,43 +86,57 @@
                                 <th>ADDRESS</th>
                                 <th>SALESMAN</th>
                                 <th>CHANNEL</th>
+                                <th>STREET</th>
+                                <th>BRGY</th>
+                                <th>CITY</th>
+                                <th>PROVINCE</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($paginatedData as $key => $data)
-                            <tr>
-                                <td class="text-center align-middle">
-                                    @switch($data['check'])
-                                        @case(0)
-                                            <i class="fa fa-check-circle text-success"></i>
-                                        @break
-                                        @case(1)
-                                            <i class="fa fa-times-circle text-danger d-block"></i>
-                                            <small class="text-danger">exists</small>
-                                        @break
-                                        @case(2)
-                                            <i class="fa fa-times-circle text-danger d-block"></i>
-                                            <small class="text-danger">Channel</small>
-                                        @break
-                                    @endswitch
-                                </td>
-                                <td class="align-middle">{{$data['code'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['name'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['address'] ?? '-'}}</td>
-                                <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
-                                <td class="align-middle">{{!empty($data['channel']) ? '['.$data['channel']['code'].'] '.$data['channel']['name'] : '-'}}</td>
-                                <td>
-                                    @if(!empty($data['similar']) && $data['check'] == 0)
-                                        @php
-                                        $ubo = $data['similar'];
-                                        @endphp
-                                        <small class="text-warning font-weight-bold">This customer may already exist. Please review the details below. This customer will be automatically designated as a parked customer.</small>
-                                        <br>
-                                        <b>UBO ID: </b>{{$ubo['ubo_id']}} <b>NAME: </b>{{$ubo['name']}} <b>ADDRESS: </b>{{$ubo['address']}}
-                                    @endif
-                                </td>
-                            </tr>
+                                @if(isset($data['check']) && !empty(strlen($data['check'])))
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            @switch($data['check'])
+                                                @case(0)
+                                                    <i class="fa fa-check-circle text-success"></i>
+                                                @break
+                                                @case(1)
+                                                    <i class="fa fa-times-circle text-danger d-block"></i>
+                                                    <small class="text-danger">Exists</small>
+                                                @break
+                                                @case(2)
+                                                    <i class="fa fa-times-circle text-danger d-block"></i>
+                                                    <small class="text-danger">Channel</small>
+                                                @break
+                                                @case(3)
+                                                    <i class="fa fa-times-circle text-danger d-block"></i>
+                                                    <small class="text-danger">Empty fields</small>
+                                                @break
+                                            @endswitch
+                                        </td>
+                                        <td class="align-middle">{{$data['code'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['name'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['address'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
+                                        <td class="align-middle">{{!empty($data['channel']) ? '['.$data['channel']['code'].'] '.$data['channel']['name'] : '-'}}</td>
+                                        <td class="align-middle">{{$data['street'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['brgy'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['city'] ?? '-'}}</td>
+                                        <td class="align-middle">{{$data['province'] ?? '-'}}</td>
+                                        <td>
+                                            @if(!empty($data['similar']) && $data['check'] == 0)
+                                                @php
+                                                $ubo = $data['similar'];
+                                                @endphp
+                                                <small class="text-warning font-weight-bold">This customer may already exist. Please review the details below. This customer will be automatically designated as a parked customer.</small>
+                                                <br>
+                                                <b>UBO ID: </b>{{$ubo['ubo_id']}} <b>NAME: </b>{{$ubo['name']}} <b>ADDRESS: </b>{{$ubo['address']}}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>
