@@ -96,9 +96,7 @@ class Customer extends Component
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get();
             
-            $channels = Channel::where('account_id', $this->account->id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->get();
+            $channels = Channel::get();
             
             $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers, $customer_ubos, $channels) {
                 $code = trim($row[0]);

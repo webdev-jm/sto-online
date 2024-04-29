@@ -14,19 +14,9 @@ class Channel extends Model
     protected $connection = 'mysql';
 
     protected $fillable = [
-        'account_id',
-        'account_branch_id',
         'code',
         'name',
     ];
-
-    public function account() {
-        return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
-    }
-
-    public function account_branch() {
-        return $this->belongsTo('App\Models\AccountBranch');
-    }
 
     public function sales() {
         return $this->hasMany('App\Models\Sales');

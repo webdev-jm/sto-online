@@ -42,8 +42,6 @@ class ChannelController extends Controller
                         ->orWhere('name', 'like', '%'.$search.'%');
                 });
             })
-            ->where('account_id', $account->id)
-            ->where('account_branch_id', $account_branch->id)
             ->paginate(10)->onEachSide(1);
 
         return view('pages.channels.index')->with([

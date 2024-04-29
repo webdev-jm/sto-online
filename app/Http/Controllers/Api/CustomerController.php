@@ -48,8 +48,7 @@ class CustomerController extends Controller
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
-                    $check = Channel::where('account_branch_id', $account_branch->id)
-                        ->where('code', $value)
+                    $check = Channel::where('code', $value)
                         ->first();
                     if(empty($check)) {
                         $fail('Channel code '.$value.' is not in the system.');
@@ -96,8 +95,7 @@ class CustomerController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        $channel = Channel::where('account_branch_id', $account_branch->id)
-            ->where('code', $request->channel_code)
+        $channel = Channel::where('code', $request->channel_code)
             ->first();
         $salesman = Salesman::where('account_branch_id', $account_branch->id)
             ->where('code', $request->salesman_code)
@@ -163,8 +161,7 @@ class CustomerController extends Controller
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
-                    $check = Channel::where('account_branch_id', $account_branch->id)
-                        ->where('code', $value)
+                    $check = Channel::where('code', $value)
                         ->first();
                     if(empty($check)) {
                         $fail('Channel code '.$value.' is not in the system.');
@@ -216,8 +213,7 @@ class CustomerController extends Controller
             ->first();
 
         if(!empty($customer)) {
-            $channel = Channel::where('account_branch_id', $account_branch->id)
-                ->where('code', $request->channel_code)
+            $channel = Channel::where('code', $request->channel_code)
                 ->first();
             $salesman = Salesman::where('account_branch_id', $account_branch->id)
                 ->where('code', $request->salesman_code)

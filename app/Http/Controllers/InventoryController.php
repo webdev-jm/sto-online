@@ -98,12 +98,12 @@ class InventoryController extends Controller
 
         $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
 
-        $inventory_locations = DB::table('inventories as i')
+        $inventory_locations = DB::table($account->db_data->database_name.'.inventories as i')
             ->select(
                 'l.code',
                 DB::raw('SUM(i.inventory) as total')
             )
-            ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+            ->leftJoin($account->db_data->database_name.'.locations as l', 'l.id', '=', 'i.location_id')
             ->where('i.account_id', $account->id)
             ->where('i.account_branch_id', $account_branch->id)
             ->where('i.inventory_upload_id', $inventory_upload->id)
@@ -134,12 +134,12 @@ class InventoryController extends Controller
 
         $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
 
-        $inventory_locations = DB::table('inventories as i')
+        $inventory_locations = DB::table($account->db_data->database_name.'.inventories as i')
             ->select(
                 'l.code',
                 DB::raw('SUM(i.inventory) as total')
             )
-            ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+            ->leftJoin($account->db_data->database_name.'.locations as l', 'l.id', '=', 'i.location_id')
             ->where('i.account_id', $account->id)
             ->where('i.account_branch_id', $account_branch->id)
             ->where('i.inventory_upload_id', $inventory_upload->id)

@@ -82,8 +82,7 @@ class SalesController extends Controller
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
-                    $check = Channel::where('account_branch_id', $account_branch->id)
-                        ->where('code', $value)
+                    $check = Channel::where('code', $value)
                         ->first();
                     if(empty($check)) {
                         $fail('Channel code '.$value.' is not in the system.');
@@ -157,7 +156,6 @@ class SalesController extends Controller
             ->first();
         // Channel
         $channel = Channel::where('code', $request->channel_code)
-            ->where('account_branch_id', $account_branch->id)
             ->first();
         // Salesman
         $salesman = Salesman::where('code', $request->salesman_code)
@@ -257,8 +255,7 @@ class SalesController extends Controller
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
-                    $check = Channel::where('account_branch_id', $account_branch->id)
-                        ->where('code', $value)
+                    $check = Channel::where('code', $value)
                         ->first();
                     if(empty($check)) {
                         $fail('Channel code '.$value.' is not in the system.');
@@ -332,7 +329,6 @@ class SalesController extends Controller
             ->first();
         // Channel
         $channel = Channel::where('code', $request->channel_code)
-            ->where('account_branch_id', $account_branch->id)
             ->first();
         // Salesman
         $salesman = Salesman::where('code', $request->salesman_code)

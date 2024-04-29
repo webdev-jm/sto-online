@@ -232,9 +232,7 @@ class CustomerController extends Controller
         }
 
         // CHANNEL OPTIONS
-        $channels = Channel::where('account_id', $account->id)
-            ->where('account_branch_id', $account_branch->id)
-            ->get();
+        $channels = Channel::get();
         $channel_arr = array();
         foreach($channels as $channel) {
             $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
@@ -344,9 +342,7 @@ class CustomerController extends Controller
         }
 
         // CHANNEL OPTIONS
-        $channels = Channel::where('account_id', $account->id)
-            ->where('account_branch_id', $account_branch->id)
-            ->get();
+        $channels = Channel::get();
         $channel_arr = array();
         foreach($channels as $channel) {
             $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
