@@ -69,6 +69,7 @@
                                     <th class="align-middle">{{$loc['code']}}</th>
                                 @endforeach
                             @endif
+                            <th class="p-0 align-middle">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,11 +89,20 @@
                             </td>
                             <td class="align-middle">{{$inv_data['sku_code']}}</td>
                             <td class="align-middle">{{$inv_data['description']}}</td>
+                            @php
+                                $total = 0;
+                            @endphp
                             @if(!empty($keys))
                                 @foreach($keys as $key => $loc)
+                                    @php
+                                        $total += $inv_data[$loc['id']];
+                                    @endphp
                                     <td class="text-right align-middle">{{number_format($inv_data[$loc['id']])}}</td>
                                 @endforeach
                             @endif
+                            <td class="text-right">
+                                {{number_format($total)}}
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>

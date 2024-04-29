@@ -64,7 +64,7 @@ class AccountController extends Controller
         $schema = 'kojiesanadmin_sto_online_'.$account->id.'_db';
 
         // create database
-        DB::statement('CREATE DATABASE IF NOT EXISTS '.$schema);
+        DB::statement('CREATE DATABASE IF NOT EXISTS '.$schema.' COLLATE utf8_general_ci');
 
         \Config::set('database.connections.account_'.$account->id.'_db', [
             'driver' => 'mysql',
@@ -72,8 +72,8 @@ class AccountController extends Controller
             'host' => '127.0.0.1',
             'port' => 3306,
             'database' => $schema,
-            'username' => 'root',
-            'password' => '',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
             'unix_socket' => '',
             'charset' => 'utf8',
             'collation' => 'utf8_general_ci',
@@ -104,7 +104,6 @@ class AccountController extends Controller
         activity('create')
             ->performedOn($account)
             ->log(':causer.name has created account :subject.account_code');
-        
 
         return redirect()->route('account.index')->with([
             'message_success' => 'Account '.$account->account_code.' has been created successfully.'

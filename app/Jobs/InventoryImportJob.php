@@ -9,10 +9,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+use Illuminate\Support\Facades\DB;
+
 use App\Http\Traits\GenerateMonthlyInventory;
 
 use App\Models\Inventory;
 use App\Models\InventoryUpload;
+use App\Models\Account;
 
 class InventoryImportJob implements ShouldQueue
 {
@@ -48,6 +51,31 @@ class InventoryImportJob implements ShouldQueue
      */
     public function handle()
     {
+        $account = Account::findOrFail($this->account_id);
+        \Config::set('database.connections.'.$account->db_data->connection_name, [
+            'driver' => 'mysql',
+            'url' => NULL,
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'database' => $account->db_data->database_name,
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => '',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'pool' => [
+                'min_connections' => 1,
+                'max_connections' => 10,
+                'max_idle_time' => 30,
+            ],
+        ]);
+
+        DB::setDefaultConnection($account->db_data->connection_name);
+
         if(!empty($this->inventory_data)) {
             $inventory_upload = InventoryUpload::find($this->upload_id);
 
@@ -78,13 +106,17 @@ class InventoryImportJob implements ShouldQueue
                 'total_inventory' => $total_inventory
             ]);
 
-            // logs
-            activity('upload')
-            ->performedOn($inventory_upload)
-            ->log(':causer.name has uploaded inventory data.');
-
             // generate monthly inventory
             $this->setMonthlyInventory($this->account_id, $this->account_branch_id, date('Y'), (int)date('m'));
+
+            DB::setDefaultConnection('mysql');
+
+            // logs
+            activity('upload')
+                ->performedOn($inventory_upload)
+                ->log(':causer.name has uploaded inventory data.');
+
         }
+        
     }
 }

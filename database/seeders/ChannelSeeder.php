@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Channel;
 
 class ChannelSeeder extends Seeder
 {
@@ -33,5 +34,13 @@ class ChannelSeeder extends Seeder
             'SUBD'      => 'SUB DISTRIBUTOR',
             'OT'        => 'OTHER',
         ];
+
+        foreach($channel_arr as $key => $val) {
+            $channel = new Channel([
+                'code' => $key,
+                'name' => $val
+            ]);
+            $channel->save();
+        }
     }
 }

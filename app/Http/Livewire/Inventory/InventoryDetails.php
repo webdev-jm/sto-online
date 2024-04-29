@@ -39,7 +39,7 @@ class InventoryDetails extends Component
 
         DB::statement("SET sql_mode = ''");
 
-        $inventories = DB::table('inventories as i')
+        $inventories = DB::table($this->account->db_data->database_name.'.inventories as i')
             ->select(
                 'i.product_id',
                 'p.stock_code',
@@ -50,14 +50,14 @@ class InventoryDetails extends Component
         foreach($location_ids as $location_id) {
             $inventories->selectRaw('SUM(IF(l.id = ?, i.inventory, NULL)) as location_'.$location_id->location_id, [$location_id->location_id]);
         }
-        $inventories->leftJoin('inventory_uploads as iu', 'iu.id', '=', 'i.inventory_upload_id')
-            ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+        $inventories->leftJoin($this->account->db_data->database_name.'.inventory_uploads as iu', 'iu.id', '=', 'i.inventory_upload_id')
+            ->leftJoin($this->account->db_data->database_name.'.locations as l', 'l.id', '=', 'i.location_id')
             ->leftJoin(env('DB_DATABASE_2').'.products as p', 'p.id', '=', 'i.product_id')
             ->where('i.account_id', $this->account->id)
             ->where('i.inventory_upload_id', $this->inventory_upload->id)
             ->whereNull('i.deleted_at')
             ->groupBy('p.stock_code');
-
+        
         $inventories = $inventories->paginate(15, ['*'], 'inventory-page');
 
         return view('livewire.inventory.inventory-details')->with([

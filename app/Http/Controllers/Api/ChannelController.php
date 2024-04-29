@@ -24,8 +24,7 @@ class ChannelController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $channels = Channel::where('account_branch_id', $account_branch->id)
-            ->paginate(10);
+        $channels = Channel::paginate(10);
 
         return ChannelResource::collection($channels);
     }
@@ -42,7 +41,7 @@ class ChannelController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Channel)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique((new Channel)->getTable())
             ],
             'name' => [
                 'required'
@@ -54,8 +53,6 @@ class ChannelController extends Controller
         }
 
         $channel = new Channel([
-            'account_id' => $account_branch->account_id,
-            'account_branch_id' => $account_branch->id,
             'code' => $request->code,
             'name' => $request->name
         ]);
@@ -77,8 +74,7 @@ class ChannelController extends Controller
             return $this->validationError('id is required.');
         }
 
-        $channel = Channel::where('account_branch_id', $account_branch->id)
-            ->where('id', $id)
+        $channel = Channel::where('id', $id)
             ->first();
         
         if(!empty($channel)) {
@@ -104,15 +100,14 @@ class ChannelController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Channel)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique((new Channel)->getTable())->ignore($id)
             ],
             'name' => [
                 'required'
             ]
         ]);
 
-        $channel = Channel::where('account_branch_id', $account_branch->id)
-            ->where('id', $id)
+        $channel = Channel::where('id', $id)
             ->first();
         if(!empty($channel)) {
             $channel->update([
