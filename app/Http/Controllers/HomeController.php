@@ -85,7 +85,7 @@ class HomeController extends Controller
             $year = $request->get('year');
         }
 
-        $results = DB::table('sales_report')
+        $results = DB::table($account_branch->account->db_data->database_name.'.sales_report')
             ->select(
                 'month',
                 DB::raw('SUM(sales) as total_sales'),

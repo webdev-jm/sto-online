@@ -150,21 +150,21 @@ class SalesImportJob implements ShouldQueue
                 'total_cm_amount_vat' => $total_cm_amount_vat,
             ]);
 
+            // UPDATE SALES REPORTS
+            if(!empty($report_data)) {
+                foreach($report_data as $year => $months) {
+                    foreach($months as $month => $date) {
+                        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
+                    }
+                }
+            }
+
             DB::setDefaultConnection('mysql');
 
             // logs
             activity('upload')
                 ->performedOn($upload)
                 ->log(':causer.name has uploaded sales data.');
-
-            // UPDATE SALES REPORTS
-            // if(!empty($report_data)) {
-            //     foreach($report_data as $year => $months) {
-            //         foreach($months as $month => $date) {
-            //             DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
-            //         }
-            //     }
-            // }
         }
         
     }
