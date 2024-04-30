@@ -54,18 +54,18 @@
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('channel edit')
-                                        <a href="{{route('channel.edit', encrypt($channel->id))}}" class="btn btn-success btn-xs">
+                                        {{-- <a href="{{route('channel.edit', encrypt($channel->id))}}" class="btn btn-success btn-xs">
                                             <i class="fa fa-pen"></i>
-                                        </a>
+                                        </a> --}}
                                     @endcan
                                     @can('channel delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($channel->id)}}">
+                                        {{-- <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($channel->id)}}">
                                             <i class="fa fa-trash"></i>
-                                        </a>
+                                        </a> --}}
                                     @endcan
                                 @else
                                     @can('channel restore')
-                                        <a href="{{route('channel.restore', encrypt($channel->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        {{-- <a href="{{route('channel.restore', encrypt($channel->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a> --}}
                                     @endcan
                                 @endif
                             </p>
