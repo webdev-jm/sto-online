@@ -10,7 +10,7 @@
     <div class="col-lg-6 text-right">
         <a href="{{route('channel.index')}}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-left mr-1"></i>Back</a>
         @can('channel edit')
-            <a href="{{route('area.edit', encrypt($channel->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Area</a>
+            {{-- <a href="{{route('area.edit', encrypt($channel->id))}}" class="btn btn-success btn-sm"><i class="fa fa-pen-alt mr-1"></i>Edit Area</a> --}}
         @endcan
     </div>
 </div>

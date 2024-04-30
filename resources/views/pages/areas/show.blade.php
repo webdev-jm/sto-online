@@ -48,21 +48,18 @@
         <div class="col-lg-8">
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">SALESMEN</h3>
+                    <h3 class="card-title">DISTRICTS</h3>
                 </div>
                 <div class="card-body py-0">
                     <ul class="list-group list-group-unbordered">
-                        @if(!empty($area->salesmen->count()))
-                            @foreach($area->salesmen as $salesman)
+                        @if(!empty($area->districts->count()))
+                            @foreach($area->districts as $district)
                             <li class="list-group-item p-1">
                                 <b>
-                                    <a href="{{route('salesman.show', encrypt($salesman->id))}}">
-                                        {{$salesman->code}}
+                                    <a href="{{route('district.show', encrypt($district->id))}}">
+                                        {{$district->district_code}}
                                     </a>
                                 </b>
-                                <span class="float-right">
-                                        {{$salesman->name}}
-                                </span>
                             </li>
                             @endforeach
                         @else
