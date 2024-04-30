@@ -122,9 +122,24 @@
                                         <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
                                         <td class="align-middle">{{!empty($data['channel']) ? '['.$data['channel']['code'].'] '.$data['channel']['name'] : '-'}}</td>
                                         <td class="align-middle">{{$data['street'] ?? '-'}}</td>
-                                        <td class="align-middle">{{$data['brgy'] ?? '-'}}</td>
-                                        <td class="align-middle">{{$data['city'] ?? '-'}}</td>
-                                        <td class="align-middle">{{$data['province'] ?? '-'}}</td>
+                                        <td class="align-middle">
+                                            {{$data['brgy'] ?? '-'}}
+                                            @if(!empty($data['brgy_id']))
+                                                <i class="fa fa-check-circle text-success"></i>
+                                            @endif
+                                        </td>
+                                        <td class="align-middle">
+                                            {{$data['city'] ?? '-'}}
+                                            @if(!empty($data['city_id']))
+                                                <i class="fa fa-check-circle text-success"></i>
+                                            @endif
+                                        </td>
+                                        <td class="align-middle">
+                                            {{$data['province'] ?? '-'}}
+                                            @if(!empty($data['province_id']))
+                                                <i class="fa fa-check-circle text-success"></i>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if(!empty($data['similar']) && $data['check'] == 0)
                                                 @php

@@ -13,4 +13,8 @@ class Region extends Model
         'region_name',
         'description'
     ];
+
+    public function provinces() {
+        return $this->hasMany('App\Models\Province');
+    }
 }

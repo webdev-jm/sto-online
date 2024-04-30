@@ -13,4 +13,12 @@ class Municipality extends Model
         'province_id',
         'municipality_name'
     ];
+
+    public function barangays() {
+        return $this->hasMany('App\Models\Barangay');
+    }
+
+    public function province() {
+        return $this->belongsTo('App\Models\Province');
+    }
 }

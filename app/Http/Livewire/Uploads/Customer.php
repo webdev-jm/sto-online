@@ -17,6 +17,11 @@ use App\Models\SalesmanCustomer;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
 
+use App\Models\Barangay;
+use App\Models\Municipality;
+use App\Models\Province;
+use App\Models\Region;
+
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Jobs\CustomerImportJob;
@@ -121,6 +126,14 @@ class Customer extends Component
 
                 if(!empty($code) && !empty($name) && !empty($channel_code) && !empty($province) && !empty($city) && !empty($brgy)) {
 
+                    // validate address
+                    $barangay = Barangay::where('barangay_name', $brgy)
+                        ->first();
+                    $municipality = Municipality::where('municipality_name', $city)
+                        ->first();
+                    $prov = Province::where('province_name', $province)
+                        ->first();
+
                     if(empty($channel)) {
                         return [
                             'similar' => !empty($check) ? $check->toArray() : [],
@@ -135,7 +148,10 @@ class Customer extends Component
                             'city' => $city,
                             'province' => $province,
                             'country' => '',
-                            'status' => !empty($check) ? 1 : 0
+                            'status' => !empty($check) ? 1 : 0,
+                            'brgy_id' => $barangay->barangay_name ?? NULL,
+                            'city_id' => $municipality->municipality_name ?? NULL,
+                            'province_id' => $prov->province_name ?? NULL,
                         ];
                     } else {
                         return [
@@ -151,7 +167,10 @@ class Customer extends Component
                             'city' => $city,
                             'province' => $province,
                             'country' => '',
-                            'status' => !empty($check) ? 1 : 0
+                            'status' => !empty($check) ? 1 : 0,
+                            'brgy_id' => $barangay->id ?? NULL,
+                            'city_id' => $municipality->id ?? NULL,
+                            'province_id' => $prov->id ?? NULL,
                         ];
                     }
 
@@ -169,7 +188,10 @@ class Customer extends Component
                         'city' => $city,
                         'province' => $province,
                         'country' => '',
-                        'status' => 1
+                        'status' => 1,
+                        'brgy_id' => NULL,
+                        'city_id' => NULL,
+                        'province_id' => NULL,
                     ];
                 }
 

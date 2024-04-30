@@ -13,4 +13,12 @@ class Province extends Model
         'region_id',
         'province_name',
     ];
+
+    public function municipalities() {
+        return $this->hasMany('App\Models\Municipality');
+    }
+
+    public function region() {
+        return $this->belongsTo('App\Models\Region');
+    }
 }

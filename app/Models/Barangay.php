@@ -13,4 +13,8 @@ class Barangay extends Model
         'municipality_id',
         'barangay_name',
     ];
+
+    public function city() {
+        return $this->belongsTo('App\Models\Municipality');
+    }
 }
