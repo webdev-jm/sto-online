@@ -20,7 +20,7 @@
         <div class="col-lg-3">
             <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-olive ml-0">
                 <i class="fa fa-money-check-alt"></i>
-                Sales
+                SALES
             </a>
         </div>
         @endcan
@@ -29,7 +29,7 @@
         <div class="col-lg-3">
             <a href="{{route('inventory.index')}}" class="btn btn-block btn-app bg-indigo ml-0">
                 <i class="fa fa-warehouse"></i>
-                Inventory
+                INVENTORY
             </a>
         </div>
         @endcan
@@ -43,16 +43,7 @@
         <div class="col-lg-3">
             <a href="{{route('location.index')}}" class="btn btn-block btn-app bg-info ml-0">
                 <i class="fa fa-truck-loading"></i>
-                Location
-            </a>
-        </div>
-        @endcan
-
-        @can('salesman access')
-        <div class="col-lg-3">
-            <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-danger ml-0">
-                <i class="fa fa-user-tie"></i>
-                Salesman
+                LOCATION
             </a>
         </div>
         @endcan
@@ -61,7 +52,7 @@
         <div class="col-lg-3">
             <a href="{{route('area.index')}}" class="btn btn-block btn-app bg-success ml-0">
                 <i class="fa fa-map-marked-alt"></i>
-                Areas
+                AREAS
             </a>
         </div>
         @endcan
@@ -75,11 +66,11 @@
         </div>
         @endcan
 
-        @can('channel access')
+        @can('salesman access')
         <div class="col-lg-3">
-            <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-navy ml-0">
-                <i class="fa fa-route"></i>
-                Channels
+            <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-danger ml-0">
+                <i class="fa fa-user-tie"></i>
+                SALESMAN
             </a>
         </div>
         @endcan
@@ -88,10 +79,20 @@
         <div class="col-lg-3">
             <a href="{{route('customer.index')}}" class="btn btn-block btn-app bg-primary ml-0">
                 <i class="fa fa-people-carry"></i>
-                Customers
+                CUSTOMERS
             </a>
         </div>
         @endcan
+        
+        @can('channel access')
+        <div class="col-lg-3">
+            <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-navy ml-0">
+                <i class="fa fa-route"></i>
+                CHANNELS
+            </a>
+        </div>
+        @endcan
+        
     </div>
 
     <hr>

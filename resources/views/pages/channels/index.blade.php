@@ -10,7 +10,7 @@
     <div class="col-lg-6 text-right">
         <a href="{{route('menu', encrypt($account_branch->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
         @can('channel create')
-            <a href="{{route('channel.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>Add Channel</a>
+            {{-- <a href="{{route('channel.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>Add Channel</a> --}}
         @endcan
     </div>
 </div>

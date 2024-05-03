@@ -37,37 +37,24 @@
                             <b>Salesman Name</b>
                             <span class="float-right">{{$salesman->name ?? '-'}}</span>
                         </li>
+                        <li class="list-group-item p-1">
+                            <b>Type of Salesman</b>
+                            <span class="float-right">{{$salesman->type ?? '-'}}</span>
+                        </li>
+                        <li class="list-group-item p-1">
+                            <b>District</b>
+                            <span class="float-right">
+                                <a href="">
+                                    {{$salesman->district->district_code ?? '-'}}
+                                </a>
+                            </span>
+                        </li>
                     </ul>
                     
                 </div>
                 <div class="card-footer">
                 </div>
             </div>
-
-            @if(!empty($salesman->areas))
-                <div class="card card-outline card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">SALESMAN AREAS</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-unbordered">
-                            @foreach($salesman->areas as $area)
-                            <li class="list-group-item p-1">
-                                <b>{{$area->code}}</b>
-                                <span class="float-right">
-                                    <a href="{{route('area.show', encrypt($area->id))}}">
-                                        {{$area->name ?? '-'}}
-                                    </a>
-                                </span>
-                            </li>
-                            @endforeach
-                        </ul>
-                        
-                    </div>
-                    <div class="card-footer">
-                    </div>
-                </div>
-            @endif
         </div>
 
         <div class="col-lg-8">

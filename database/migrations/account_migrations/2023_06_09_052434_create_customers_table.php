@@ -19,6 +19,9 @@ class CreateCustomersTable extends Migration
             $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->unsignedBigInteger('salesman_id')->nullable();
             $table->unsignedBigInteger('channel_id')->nullable();
+            $table->unsignedBigInteger('province_id')->nullable();
+            $table->unsignedBigInteger('municipality_id')->nullable();
+            $table->unsignedBigInteger('barangay_id')->nullable();
             $table->string('code');
             $table->string('name');
             $table->string('address');

@@ -18,11 +18,13 @@ class ProvinceSeeder extends Seeder
         $data = json_decode($province_json, true);
 
         foreach($data as $row) {
-            $province = new Province([
-                'region_id' => $row['region_id'],
-                'province_name' => $row['province_name'],
-            ]);
-            $province->save();
+            if(!empty($row['province_name'])) {
+                $province = new Province([
+                    'region_id' => $row['region_id'],
+                    'province_name' => $row['province_name'],
+                ]);
+                $province->save();
+            }
         }
     }
 }

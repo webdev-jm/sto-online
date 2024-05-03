@@ -18,11 +18,13 @@ class BarangaySeeder extends Seeder
         $data = json_decode($barangay_json, true);
 
         foreach($data as $row) {
-            $barangay_json = new Barangay([
-                'municipality_id' => $row['municipality_id'],
-                'barangay_name' => $row['barangay_name']
-            ]);
-            $barangay_json->save();
+            if(!empty($row['barangay_name'])) {
+                $barangay_json = new Barangay([
+                    'municipality_id' => $row['municipality_id'],
+                    'barangay_name' => $row['barangay_name']
+                ]);
+                $barangay_json->save();
+            }
         }
     }
 }
