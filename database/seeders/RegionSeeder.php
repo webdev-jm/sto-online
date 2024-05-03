@@ -18,11 +18,13 @@ class RegionSeeder extends Seeder
         $data = json_decode($region_json, 'true');
 
         foreach($data as $row) {
-            $region = new Region([
-                'region_name' => $row['region_name'],
-                'description' => $row['region_description'],
-            ]);
-            $region->save();
+            if(!empty($row['region_name'])) {
+                $region = new Region([
+                    'region_name' => $row['region_name'],
+                    'description' => $row['region_description'],
+                ]);
+                $region->save();
+            }
         }
     }
 }

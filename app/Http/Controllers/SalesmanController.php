@@ -137,7 +137,7 @@ class SalesmanController extends Controller
         }
         $account = Session::get('account');
 
-        $salesman = Salesman::with('customers')->findOrFail(decrypt($id));
+        $salesman = Salesman::findOrFail(decrypt($id));
 
         return view('pages.salesmen.show')->with([
             'account' => $account,

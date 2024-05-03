@@ -30,17 +30,6 @@
                         </div>
                     </div>
 
-                    {{-- ADDRESS --}}
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label for="customer_address">Address</label>
-                            <input type="text" class="form-control{{$errors->has('customer_address') ? ' is-invalid' : ''}}" wire:model="customer_address">
-                            @error('customer_address')
-                                <small class="text-danger">{{$message}}</small>
-                            @enderror
-                        </div>
-                    </div>
-
                     {{-- SALESMAN --}}
                     <div class="col-lg-6">
                         <div class="form-group">
@@ -59,6 +48,108 @@
                         </div>
                     </div>
 
+                    {{-- CHANNEL --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="channel_id">Salesman</label>
+                            <select id="channel_id" class="form-control{{$errors->has('channel_id') ? ' is-invalid' : ''}}" wire:model="channel_id">
+                                <option value="">- select channels -</option>
+                                @if(!empty($channels))
+                                    @foreach($channels as $id => $channel)
+                                        <option value="{{$id}}">{{$channel}}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('channel_id')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <hr>
+                
+                <div class="row">
+                    {{-- PROVINCE --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="province_id">Province</label>
+                            <select id="province_id" class="form-control{{$errors->has('province_id') ? ' is-invalid' : ''}}" wire:model="province_id">
+                                <option value="">- select province -</option>
+                                @if(!empty($provinces))
+                                    @foreach($provinces as $id => $province_name)
+                                        <option value="{{$id}}">{{$province_name}}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('province_id')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- CITY/TOWN --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">City/Town</label>
+                            @if(empty($province_id))
+                                <input type="text" class="form-control{{$errors->has('city_id') ? ' is-invalid' : ''}}" disabled>
+                            @else
+                                <select id="city_id" class="form-control{{$errors->has('city_id') ? ' is-invalid' : ''}}" wire:model="city_id">
+                                    <option value="">- select city -</option>
+                                    @if(!empty($cities))
+                                        @foreach($cities as $id => $city_name)
+                                            <option value="{{$id}}">{{$city_name}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            @endif
+                            @error('city_id')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- BARANGAY --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Barangay</label>
+                            @if(empty($city_id))
+                                <input type="text" class="form-control{{$errors->has('barangay_id') ? ' is-invalid' : ''}}" disabled>
+                            @else
+                                <select id="barangay_id" class="form-control{{$errors->has('barangay_id') ? ' is-invalid' : ''}}" wire:model="barangay_id">
+                                    <option value="">- select barangay -</option>
+                                    @if(!empty($barangays))
+                                        @foreach($barangays as $id => $barangay_name)
+                                            <option value="{{$id}}">{{$barangay_name}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            @endif
+                            @error('barangay_id')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- STREET --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Street</label>
+                            <input type="text" class="form-control{{$errors->has('street') ? ' is-invalid' : ''}}" wire:model="street">
+                            @error('street')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- ADDRESS --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="customer_address">Address</label>
+                            <input type="text" class="form-control{{$errors->has('customer_address') ? ' is-invalid' : ''}}" wire:model="customer_address">
+                            @error('customer_address')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
             </div>

@@ -18,11 +18,13 @@ class MunicipalitySeeder extends Seeder
         $data = json_decode($municipality_json, true);
 
         foreach($data as $row) {
-            $municipality = new Municipality([
-                'province_id' => $row['province_id'],
-                'municipality_name' => $row['municipality_name'],
-            ]);
-            $municipality->save();
+            if(!empty($row['municipality_name'])) {
+                $municipality = new Municipality([
+                    'province_id' => $row['province_id'],
+                    'municipality_name' => $row['municipality_name'],
+                ]);
+                $municipality->save();
+            }
         }
     }
 }
