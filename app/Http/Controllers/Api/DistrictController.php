@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
+use App\Models\District;
 use App\Models\Area;
-use App\Http\Resources\AreaResource;
+use App\Http\Resources\DistrictResource;
 
 use App\Http\Traits\ApiBranchKeyChecker;
 
-class AreaController extends Controller
+class DistrictController extends Controller
 {
     use ApiBranchKeyChecker;
 
@@ -24,10 +25,11 @@ class AreaController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $areas = Area::where('account_branch_id', $account_branch->id)
+
+        $districts = District::where('account_branch_id', $account_branch->id)
             ->paginate(10);
-        
-        return AreaResource::collection($areas);
+
+        return DistrictResource::collection($districts);
     }
 
     public function create(Request $request) {
@@ -40,11 +42,11 @@ class AreaController extends Controller
         $account_branch = $check['account_branch'];
         
         $validator = Validator::make($request->all(), [
-            'code' => [
+            'district_code' => [
                 'required',
-                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new District)->getTable())->where('account_branch_id', $account_branch->id)
             ],
-            'name' => [
+            'area_codes' => [
                 'required'
             ]
         ]);
@@ -53,15 +55,26 @@ class AreaController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        $area = new Area([
-            'account_id' => $account_branch->account_id,
-            'account_branch_id' => $account_branch->id,
-            'code' => $request->code,
-            'name' => $request->name,
-        ]);
-        $area->save();
+        // check areas codes
+        $area_codes_arr = explode(',', $request->area_codes);
+        $area_ids = array();
+        foreach($area_codes_arr as $code) {
+            $area = Area::where('account_branch_id', $account_branch->id)
+                ->where('code', $code)
+                ->first();
+            if(!empty($area)) {
+                $area_ids[] = $area->id;
+            }
+        }
 
-        return $this->successResponse(new AreaResource($area));
+        $district = new District([
+            'account_branch_id' => $account_branch->id,
+            'district_code' => $request->district_code,
+        ]);
+        $district->save();
+        $district->areas()->sync($area_ids);
+
+        return $this->successResponse(new DistrictResource($district));
     }
 
     public function show(Request $request, $id) {
@@ -76,14 +89,14 @@ class AreaController extends Controller
         }
 
         $account_branch = $check['account_branch'];
-        $area = Area::where('account_branch_id', $account_branch->id)
+        $district = District::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
-        
-        if(!empty($area)) {
-            return $this->successResponse(new AreaResource($area));
+
+        if(!empty($district)) {
+            return $this->successResponse(new DistrictResource($district));
         } else {
-            return $this->validationError('data not found');
+            return $this->validationError('Data not found.');
         }
     }
 
@@ -100,11 +113,11 @@ class AreaController extends Controller
 
         $account_branch = $check['account_branch'];
         $validator = Validator::make($request->all(), [
-            'code' => [
+            'district_code' => [
                 'required',
-                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new District)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
             ],
-            'name' => [
+            'area_codes' => [
                 'required'
             ]
         ]);
@@ -113,18 +126,30 @@ class AreaController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        $area = Area::where('account_branch_id', $account_branch->id)
+        // check areas codes
+        $area_codes_arr = explode(',', $request->area_codes);
+        $area_ids = array();
+        foreach($area_codes_arr as $code) {
+            $area = Area::where('account_branch_id', $account_branch->id)
+                ->where('code', $code)
+                ->first();
+            if(!empty($area)) {
+                $area_ids[] = $area->id;
+            }
+        }
+
+        $district = District::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
-        if(!empty($area)) {
-            $area->update([
-                'code' => $request->code,
-                'name' => $request->name,
+        if(!empty($district)) {
+            $district->update([
+                'district_code' => $request->district_code,
             ]);
+            $district->areas()->sync($area_ids);
 
-            return $this->successResponse(new AreaResource($area));
+            return $this->successResponse(new DistrictResource($district));
         } else {
-            return $this->validationError('data not found');
+            return $this->validationError('data not found.');
         }
     }
 }
