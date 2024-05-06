@@ -47,6 +47,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\HandleSanctumAuthFailure::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \App\Http\Middleware\GenerateDatabaseConnection::class,
         ],
     ];
 

@@ -43,7 +43,7 @@ class LocationController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Location)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Location)->getTable())->where('account_branch_id', $account_branch->id)
             ],
             'name' => [
                 'required'
@@ -78,11 +78,11 @@ class LocationController extends Controller
             'created_at' => $account_branch->created_at,
             'updated_at' => $account_branch->updated_at,
             'account' => [
-                'account_code' => $account->account_code,
-                'account_name' => $account->account_name,
-                'short_name'   => $account->short_name,
-                'created_at' => $account->created_at,
-                'updated_at' => $account->updated_at,
+                'account_code' => $account_branch->account->account_code,
+                'account_name' => $account_branch->account->account_name,
+                'short_name'   => $account_branch->account->short_name,
+                'created_at' => $account_branch->account->created_at,
+                'updated_at' => $account_branch->account->updated_at,
             ],
             'location' => $location_data
         ];
@@ -131,7 +131,10 @@ class LocationController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Location)
+                    ->getTable())
+                    ->where('account_branch_id', $account_branch->id)
+                    ->ignore($id)
             ],
             'name' => [
                 'required'
