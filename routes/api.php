@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SalesController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\AccountBranchController;
+use App\Http\Controllers\Api\DistrictController;
 
 use App\Http\Controllers\Api\AuthController;
 
@@ -80,6 +81,13 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::post('inventory/create', [InventoryController::class, 'create'])->middleware('permission:inventory create');
         Route::get('inventory/{id}/get', [InventoryController::class, 'show']);
         Route::post('inventory/{id}/update', [InventoryController::class, 'update'])->middleware('permission:inventory edit');
+    });
+
+    Route::group(['middleware' => 'permission:district access'], function() {
+        Route::get('districts', [DistrictController::class, 'index']);
+        Route::post('district/create', [DistrictController::class, 'create'])->middleware('permission:district create');
+        Route::get('district/{id}/get', [DistrictController::class, 'show']);
+        Route::post('district/{id}/update', [DistrictController::class, 'update'])->middleware('permission:district edit');
     });
 
 });
