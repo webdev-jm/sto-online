@@ -101,7 +101,7 @@ class SalesController extends Controller
                     }
                 }
             ],
-            'location_code' => [
+            'warehouse_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
@@ -113,16 +113,10 @@ class SalesController extends Controller
                     }
                 }
             ],
-            'type' => [
-                'required'
-            ],
             'date' => [
                 'required'
             ],
-            'document_number' => [
-                'required'
-            ],
-            'category' => [
+            'invoice_number' => [
                 'required'
             ],
             'uom' => [
@@ -162,7 +156,7 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
         // Location
-        $location = Location::where('code', $request->location_code)
+        $location = Location::where('code', $request->warehouse_code)
             ->where('account_branch_id', $account_branch->id)
             ->first();
 
@@ -176,10 +170,8 @@ class SalesController extends Controller
             'salesman_id' => $salesman->id,
             'location_id' => $location->id,
             'user_id' => auth()->user()->id,
-            'type' => $request->type,
             'date' => $request->date,
-            'document_number' => $request->document_number,
-            'category' => $request->category,
+            'document_number' => $request->invoice_number,
             'uom' => $request->uom,
             'quantity' => $request->quantity,
             'price_inc_vat' => $request->price_inc_vat,
@@ -274,7 +266,7 @@ class SalesController extends Controller
                     }
                 }
             ],
-            'location_code' => [
+            'warehouse_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     // check if existed
@@ -286,16 +278,10 @@ class SalesController extends Controller
                     }
                 }
             ],
-            'type' => [
-                'required'
-            ],
             'date' => [
                 'required'
             ],
-            'document_number' => [
-                'required'
-            ],
-            'category' => [
+            'invoice_number' => [
                 'required'
             ],
             'uom' => [
@@ -335,7 +321,7 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
         // Location
-        $location = Location::where('code', $request->location_code)
+        $location = Location::where('code', $request->warehouse_code)
             ->where('account_branch_id', $account_branch->id)
             ->first();
 
@@ -350,10 +336,8 @@ class SalesController extends Controller
                 'channel_id' => $channel->id,
                 'salesman_id' => $salesman->id,
                 'location_id' => $location->id,
-                'type' => $request->type,
                 'date' => $request->date,
-                'document_number' => $request->document_number,
-                'category' => $request->category,
+                'document_number' => $request->invoice_number,
                 'uom' => $request->uom,
                 'quantity' => $request->quantity,
                 'price_inc_vat' => $request->price_inc_vat,
