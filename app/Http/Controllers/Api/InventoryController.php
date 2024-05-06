@@ -44,7 +44,7 @@ class InventoryController extends Controller
         $account_branch = $check['account_branch'];
 
         $validator = Validator::make($request->all(), [
-            'location_code' => [
+            'warehouse_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     $location = Location::where('account_branch_id', $account_branch->id)
@@ -101,7 +101,7 @@ class InventoryController extends Controller
         }
 
         $location = Location::where('account_branch_id', $account_branch->id)
-            ->where('code', $request->location_code)
+            ->where('code', $request->warehouse_code)
             ->first();
         $product = SMSProduct::where('stock_code', $request->sku_code)
             ->first();
@@ -173,7 +173,7 @@ class InventoryController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'location_code' => [
+            'warehouse_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
                     $location = Location::where('account_branch_id', $account_branch->id)
@@ -219,7 +219,7 @@ class InventoryController extends Controller
         if(!empty($inventory)) {
             // location
             $location = Location::where('account_branch_id', $account_branch->id)
-                ->where('code', $request->location_code)
+                ->where('code', $request->warehouse_code)
                 ->first();
             $product = SMSProduct::where('stock_code', $request->sku_code)
                 ->first();
