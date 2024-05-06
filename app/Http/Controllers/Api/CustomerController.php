@@ -13,6 +13,10 @@ use App\Models\Customer;
 use App\Models\Channel;
 use App\Models\Salesman;
 
+use App\Models\Province;
+use App\Models\Municipality;
+use App\Models\Barangay;
+
 use App\Http\Traits\ApiBranchKeyChecker;
 
 class CustomerController extends Controller
@@ -69,7 +73,7 @@ class CustomerController extends Controller
             ],
             'code' => [
                 'required',
-                Rule::unique((new Customer)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Customer)->getTable())->where('account_branch_id', $account_branch->id)
             ],
             'name' => [
                 'required'
@@ -77,16 +81,19 @@ class CustomerController extends Controller
             'address' => [
                 'required'
             ],
+            'street' => [
+                'max:255'
+            ],
             'brgy' => [
+                'required',
                 'max:255'
             ],
             'city' => [
+                'required',
                 'max:255'
             ],
             'province' => [
-                'max:255'
-            ],
-            'country' => [
+                'required',
                 'max:255'
             ],
         ]);
@@ -101,18 +108,39 @@ class CustomerController extends Controller
             ->where('code', $request->salesman_code)
             ->first();
 
+        $province = Province::where('province_name', $request->province)->first();
+        $province_id = NULL;
+        if(!empty($province)) {
+            $province_id = $province->id;
+        }
+    
+        $city = Municipality::where('municipality_name', $request->city)->first();
+        $city_id = NULL;
+        if(!empty($city)) {
+            $city_id = $city->id;
+        }
+
+        $barangay = Barangay::where('barangay_name', $request->brgy)->first();
+        $barangay_id = NULL;
+        if(!empty($barangay)) {
+            $barangay_id = $barangay->id;
+        }
+
         $customer = new Customer([
             'account_id' => $account_branch->account_id,
             'account_branch_id' => $account_branch->id,
             'channel_id' => $channel->id,
             'salesman_id' => $salesman->id,
+            'province_id' => $province_id,
+            'municipality_id' => $city_id,
+            'barangay_id' => $barangay_id,
             'code' => $request->code,
             'name' => $request->name,
             'address' => $request->address,
+            'street' => $request->street,
             'brgy' => $request->brgy,
             'city' => $request->city,
             'province' => $request->province,
-            'country' => $request->country
         ]);
         $customer->save();
 
@@ -182,25 +210,28 @@ class CustomerController extends Controller
             ],
             'code' => [
                 'required',
-                Rule::unique((new Customer)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Customer)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
             ],
             'name' => [
-                'required'
+                'required',
             ],
             'address' => [
-                'required'
+                'required',
+            ],
+            'street' => [
+                'max:255',
             ],
             'brgy' => [
-                'max:255'
+                'required',
+                'max:255',
             ],
             'city' => [
-                'max:255'
+                'required',
+                'max:255',
             ],
             'province' => [
-                'max:255'
-            ],
-            'country' => [
-                'max:255'
+                'required',
+                'max:255',
             ],
         ]);
 
@@ -219,16 +250,41 @@ class CustomerController extends Controller
                 ->where('code', $request->salesman_code)
                 ->first();
 
+            $province = Province::where('province_name', $request->province)->first();
+            $province_id = NULL;
+            if(!empty($province)) {
+                $province_id = $province->id;
+            }
+
+            $city = Municipality::where('municipality_name', $request->city)
+                ->where('province_id', $province_id)
+                ->first();
+            $city_id = NULL;
+            if(!empty($city)) {
+                $city_id = $city->id;
+            }
+
+            $barangay = Barangay::where('barangay_name', $request->brgy)
+                ->where('municipality_id', $city_id)
+                ->first();
+            $barangay_id = NULL;
+            if(!empty($barangay)) {
+                $barangay_id = $barangay->id;
+            }
+
             $customer->update([
                 'channel_id' => $channel->id,
                 'salesman_id' => $salesman->id,
+                'province_id' => $province_id,
+                'municipality_id' => $city_id,
+                'barangay_id' => $barangay_id,
                 'code' => $request->code,
                 'name' => $request->name,
                 'address' => $request->address,
+                'street' => $request->street,
                 'brgy' => $request->brgy,
                 'city' => $request->city,
                 'province' => $request->province,
-                'country' => $request->country
             ]);
 
             return $this->successResponse(new CustomerResource($customer));
