@@ -27,6 +27,7 @@ class CreateSalesUploadsTable extends Migration
             $table->decimal('total_cm_price_vat', 10, 2)->default(0);
             $table->decimal('total_cm_amount', 10, 2)->default(0);
             $table->decimal('total_cm_amount_vat', 10, 2)->default(0);
+            $table->integer('type')->default(0);
             $table->timestamps();
 
             $table->softDeletes();

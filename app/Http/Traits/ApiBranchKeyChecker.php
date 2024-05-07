@@ -32,6 +32,10 @@ trait ApiBranchKeyChecker {
             $err['USER_ASSIGNED'] = 'Branch was not assigned to the user';
         }
 
+        auth()->user()->update([
+            'account_id' => $account_branch->account_id
+        ]);
+
         return [
             'status' => !empty($err),
             'account_branch' => $account_branch,
