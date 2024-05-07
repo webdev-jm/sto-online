@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Sale;
+use App\Models\SalesUpload;
 use App\Models\Customer;
 use App\Models\SMSProduct;
 use App\Models\Channel;
@@ -70,11 +71,17 @@ class SalesController extends Controller
             'sku_code' => [
                 'required',
                 function($attribute, $value, $fail) {
+                    $sku_code = $value;
+                    if(strpos(trim($sku_code ?? ''), '-')) {
+                        $sku_arr = explode('-', $sku_code);
+                        $sku_code = end($sku_arr);
+                    }
+
                     // check if existed
-                    $check = SMSProduct::where('stock_code', $value)
+                    $check = SMSProduct::where('stock_code', $sku_code)
                         ->first();
                     if(empty($check)) {
-                        $fail('SKU code '.$value.' is not in the system.');
+                        $fail('SKU code '.$sku_code.' is not in the system.');
                     }
                 }
             ],
@@ -140,6 +147,21 @@ class SalesController extends Controller
             return $this->validationError($validator->errors());
         }
 
+        $type = 1;
+        if(strpos(trim($request->sku_code ?? ''), '-')) {
+            $sku_arr = explode('-', $request->sku_code);
+            if($sku_arr[0] == 'FG') { // Free Goods
+                $request->sku_code = end($sku_arr);
+                // process when free goods
+                $type = 2;
+            }
+            if($sku_arr[0] == 'PRM') { // Promo
+                $request->sku_code = end($sku_arr);
+                // process when promo
+                $type = 3;
+            }
+        }
+
         // check data
         // Customer
         $customer = Customer::where('code', $request->customer_code)
@@ -160,8 +182,51 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
 
+        $current_date = date('Y-m-d');
+
+        $sales_upload = SalesUpload::where('account_id', $account_branch->account_id)
+            ->where('account_branch_id', $account_branch->id)
+            ->where(DB::raw('DATE(created_at)'), $current_date)
+            ->where('type', 1)
+            ->first();
+        if(empty($sales_upload)) {
+            $sales_upload = new SalesUpload([
+                'account_id' => $account_branch->account_id,
+                'account_branch_id' => $account_branch->id,
+                'user_id' => auth()->user()->id,
+                'sku_count' => 0,
+                'total_quantity' => 0,
+                'total_price_vat' => 0,
+                'total_amount' => 0,
+                'total_amount_vat' => 0,
+                'total_cm_quantity' => 0,
+                'total_cm_price_vat' => 0,
+                'total_cm_amount' => 0,
+                'total_cm_amount_vat' => 0,
+                'type' => 1
+            ]);
+            $sales_upload->save();
+        }
+
+        $total_cm_quantity = $sales_upload->total_cm_quantity;
+        $total_cm_price_vat = $sales_upload->total_cm_price_vat;
+        $total_cm_amount = $sales_upload->total_cm_amount;
+        $total_cm_amount_vat = $sales_upload->total_cm_amount_vat;
+        $total_quantity = $sales_upload->total_quantity;
+        $total_price_vat = $sales_upload->total_price_vat;
+        $total_amount = $sales_upload->total_amount;
+        $total_amount_vat = $sales_upload->total_amount_vat;
+
+        $category = 0;
+        if(!empty($request->invoice_number) && strpos($request->invoice_number, '-')) {
+            $invoice_number_str_arr = explode('-', $request->invoice_number);
+            if($invoice_number_str_arr[0] == 'PSC') { // credit memo
+                $category = 1;
+            }
+        }
+
         $sale = new Sale([
-            'sales_upload_id' => NULL,
+            'sales_upload_id' => $sales_upload->id,
             'account_id' => $account_branch->account_id,
             'account_branch_id' => $account_branch->id,
             'customer_id' => $customer->id,
@@ -177,8 +242,43 @@ class SalesController extends Controller
             'price_inc_vat' => $request->price_inc_vat,
             'amount' => $request->amount,
             'amount_inc_vat' => $request->amount_inc_vat,
+            'type' => $type,
+            'category' => $category
         ]);
         $sale->save();
+        
+        // check if not FG or PROMO
+        if($type == 1) {
+            if($category == 1) { // Credit Memo
+                $total_cm_quantity += $request->quantity;
+                $total_cm_price_vat += $request->price_inc_vat;
+                $total_cm_amount += $request->amount;
+                $total_cm_amount_vat += $request->amount_inc_vat;
+            } else { // Invoice
+                $total_quantity += $request->quantity;
+                $total_price_vat += $request->price_inc_vat;
+                $total_amount += $request->amount;
+                $total_amount_vat += $request->amount_inc_vat;
+            }
+        }
+
+        $sales_upload->update([
+            'sku_count' => $sales_upload->sku_count + 1,
+            'total_quantity' => $total_quantity,
+            'total_price_vat' => $total_price_vat,
+            'total_amount' => $total_amount,
+            'total_amount_vat' => $total_amount_vat,
+            'total_cm_quantity' => $total_cm_quantity,
+            'total_cm_price_vat' => $total_cm_price_vat,
+            'total_cm_amount' => $total_cm_amount,
+            'total_cm_amount_vat' => $total_cm_amount_vat,
+        ]);
+
+        DB::setDefaultConnection($account_branch->account->db_data->connection_name);
+
+        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$account_branch->account_id, $account_branch->id, date('Y', strtotime($request->date)), date('n', strtotime($request->date))]);
+
+        DB::setDefaultConnection('mysql');
 
         return $this->successResponse(new SalesResource($sale));
     }
@@ -235,11 +335,17 @@ class SalesController extends Controller
             'sku_code' => [
                 'required',
                 function($attribute, $value, $fail) {
+                    $sku_code = $value;
+                    if(strpos(trim($sku_code ?? ''), '-')) {
+                        $sku_arr = explode('-', $sku_code);
+                        $sku_code = end($sku_arr);
+                    }
+
                     // check if existed
-                    $check = SMSProduct::where('stock_code', $value)
+                    $check = SMSProduct::where('stock_code', $sku_code)
                         ->first();
                     if(empty($check)) {
-                        $fail('SKU code '.$value.' is not in the system.');
+                        $fail('SKU code '.$sku_code.' is not in the system.');
                     }
                 }
             ],
@@ -305,6 +411,29 @@ class SalesController extends Controller
             return $this->validationError($validator->errors());
         }
 
+        $type = 1;
+        if(strpos(trim($request->sku_code ?? ''), '-')) {
+            $sku_arr = explode('-', $request->sku_code);
+            if($sku_arr[0] == 'FG') { // Free Goods
+                $request->sku_code = end($sku_arr);
+                // process when free goods
+                $type = 2;
+            }
+            if($sku_arr[0] == 'PRM') { // Promo
+                $request->sku_code = end($sku_arr);
+                // process when promo
+                $type = 3;
+            }
+        }
+
+        $category = 0;
+        if(!empty($request->invoice_number) && strpos($request->invoice_number, '-')) {
+            $invoice_number_str_arr = explode('-', $request->invoice_number);
+            if($invoice_number_str_arr[0] == 'PSC') { // credit memo
+                $category = 1;
+            }
+        }
+
         // check data
         // Customer
         $customer = Customer::where('code', $request->customer_code)
@@ -325,11 +454,48 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
 
+        DB::setDefaultConnection($account_branch->account->db_data->connection_name);
+
         // check
         $sale = Sale::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
+
+        if($sale->date != $request->date) {
+            DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
+                $account_branch->account_id, $account_branch->id, 
+                date('Y', strtotime($sale->date)),
+                date('n', strtotime($sale->date))
+            ]);
+        }
+        
         if(!empty($sale)) {
+            $sales_upload = $sale->sales_upload;
+
+            $total_cm_quantity = $sales_upload->total_cm_quantity;
+            $total_cm_price_vat = $sales_upload->total_cm_price_vat;
+            $total_cm_amount = $sales_upload->total_cm_amount;
+            $total_cm_amount_vat = $sales_upload->total_cm_amount_vat;
+            $total_quantity = $sales_upload->total_quantity;
+            $total_price_vat = $sales_upload->total_price_vat;
+            $total_amount = $sales_upload->total_amount;
+            $total_amount_vat = $sales_upload->total_amount_vat;
+
+            // check if not FG or PROMO
+            if($sale->type == 1) {
+                if($sale->category == 1) { // Credit Memo
+                    $total_cm_quantity -= $sale->quantity;
+                    $total_cm_price_vat -= $sale->price_inc_vat;
+                    $total_cm_amount -= $sale->amount;
+                    $total_cm_amount_vat -= $sale->amount_inc_vat;
+                } else { // Invoice
+                    $total_quantity -= $sale->quantity;
+                    $total_price_vat -= $sale->price_inc_vat;
+                    $total_amount -= $sale->amount;
+                    $total_amount_vat -= $sale->amount_inc_vat;
+                }
+            }
+
             $sale->update([
                 'customer_id' => $customer->id,
                 'product_id' => $product->id,
@@ -344,6 +510,40 @@ class SalesController extends Controller
                 'amount' => $request->amount,
                 'amount_inc_vat' => $request->amount_inc_vat,
             ]);
+
+            // check if not FG or PROMO
+            if($type == 1) {
+                if($category == 1) { // Credit Memo
+                    $total_cm_quantity += $request->quantity;
+                    $total_cm_price_vat += $request->price_inc_vat;
+                    $total_cm_amount += $request->amount;
+                    $total_cm_amount_vat += $request->amount_inc_vat;
+                } else { // Invoice
+                    $total_quantity += $request->quantity;
+                    $total_price_vat += $request->price_inc_vat;
+                    $total_amount += $request->amount;
+                    $total_amount_vat += $request->amount_inc_vat;
+                }
+            }
+
+            $sales_upload->update([
+                'total_quantity' => $total_quantity,
+                'total_price_vat' => $total_price_vat,
+                'total_amount' => $total_amount,
+                'total_amount_vat' => $total_amount_vat,
+                'total_cm_quantity' => $total_cm_quantity,
+                'total_cm_price_vat' => $total_cm_price_vat,
+                'total_cm_amount' => $total_cm_amount,
+                'total_cm_amount_vat' => $total_cm_amount_vat,
+            ]);
+
+            DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
+                $account_branch->account_id, $account_branch->id, 
+                date('Y', strtotime($request->date)), 
+                date('n', strtotime($request->date))
+            ]);
+
+            DB::setDefaultConnection('mysql');
 
             return $this->successResponse(new SalesResource($sale));
         } else {

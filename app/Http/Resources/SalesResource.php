@@ -10,6 +10,7 @@ use App\Http\Resources\SalesmanResource;
 use App\Http\Resources\LocationResource;
 use App\Http\Resources\ChannelResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\SalesUploadResource;
 
 class SalesResource extends JsonResource
 {
@@ -33,12 +34,13 @@ class SalesResource extends JsonResource
             'amount' => $this->amount,
             'amount_inc_vat' => $this->amount_inc_vat,
             'status' => $this->status,
+            'sales_upload' => new SalesUploadResource($this->sales_upload),
             'customer' => new CustomerResource($this->customer),
             'channel' => new ChannelResource($this->channel),
             'salesman' => new SalesmanResource($this->salesman),
             'location' => new LocationResource($this->location),
             'product' => new ProductResource($this->product),
-            'user' => new UserResource($this->user)
+            'user' => new UserResource($this->user),
         ];
     }
 }

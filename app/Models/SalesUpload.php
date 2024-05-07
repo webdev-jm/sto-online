@@ -24,6 +24,7 @@ class SalesUpload extends Model
         'total_cm_price_vat',
         'total_cm_amount',
         'total_cm_amount_vat',
+        'type',
     ];
 
     public function getConnectionName() {
