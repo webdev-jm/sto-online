@@ -27,5 +27,18 @@ class UserSeeder extends Seeder
 
         // Assign superadmin role
         $user->assignRole('superadmin');
+
+        $user = new User([
+            'name' => 'API User',
+            'email' => 'api@test',
+            'username' => 'api-user',
+            'password' => Hash::make('password'),
+            'status' => 0,
+            'dark_mode' => 1
+        ]);
+        $user->save();
+
+        // Assign superadmin role
+        $user->assignRole('api-users');
     }
 }
