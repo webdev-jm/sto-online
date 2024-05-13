@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\DistrictResource;
 
 class SalesmanResource extends JsonResource
 {
@@ -18,6 +19,8 @@ class SalesmanResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'name' => $this->name,
+            'type' => $this->type,
+            'district' => new DistrictResource($this->district),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

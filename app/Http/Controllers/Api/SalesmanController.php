@@ -104,9 +104,12 @@ class SalesmanController extends Controller
             $salesman = Salesman::where('account_branch_id', $account_branch->id)
                 ->where('id', $id)
                 ->first();
-            
-                return $this->successResponse(new SalesmanResource($salesman));
 
+            if(!empty($salesman)) {
+                return $this->successResponse(new SalesmanResource($salesman));
+            } else {
+                return $this->validationError('Data not found');
+            }
         } else {
             return $this->validationError('id is required');
         }
@@ -123,7 +126,7 @@ class SalesmanController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique((new Salesman)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Salesman)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
             ],
             'name' => [
                 'required'

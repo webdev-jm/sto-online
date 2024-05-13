@@ -58,17 +58,25 @@ class InventoryController extends Controller
             'sku_code' => [
                 'required',
                 function($attribute, $value, $fail) {
-                    $product = SMSProduct::where('stock_code', $value)
+                    $sku_code = $value;
+                    if(strpos(trim($sku_code ?? ''), '-')) {
+                        $sku_arr = explode('-', $sku_code);
+                        if($sku_arr[0] == 'FG') { // Free Goods
+                            $sku_code = end($sku_arr);
+                        }
+                        if($sku_arr[0] == 'PRM') { // Promo
+                            $sku_code = end($sku_arr);
+                        }
+                    }
+
+                    $product = SMSProduct::where('stock_code', $sku_code)
                         ->first();
                     if(empty($product)) {
-                        $fail('Stock Code '.$value.' does not exist in the system.');
+                        $fail('Stock Code '.$sku_code.' does not exist in the system.');
                     }
                 }
             ],
             'inventory_date' => [
-                'required',
-            ],
-            'type' => [
                 'required',
             ],
             'uom' => [
@@ -100,6 +108,21 @@ class InventoryController extends Controller
             $inventory_upload->save();
         }
 
+        $type = 1;
+        if(strpos(trim($request->sku_code ?? ''), '-')) {
+            $sku_arr = explode('-', $request->sku_code);
+            if($sku_arr[0] == 'FG') { // Free Goods
+                $request->sku_code = end($sku_arr);
+                // process when free goods
+                $type = 2;
+            }
+            if($sku_arr[0] == 'PRM') { // Promo
+                $request->sku_code = end($sku_arr);
+                // process when promo
+                $type = 3;
+            }
+        }
+
         $location = Location::where('account_branch_id', $account_branch->id)
             ->where('code', $request->warehouse_code)
             ->first();
@@ -119,7 +142,7 @@ class InventoryController extends Controller
                 'inventory_upload_id' => $inventory_upload->id,
                 'location_id' => $location->id,
                 'product_id' => $product->id,
-                'type' => $request->type,
+                'type' => $type,
                 'uom' => $request->uom,
                 'inventory' => $request->inventory
             ]);
@@ -187,17 +210,25 @@ class InventoryController extends Controller
             'sku_code' => [
                 'required',
                 function($attribute, $value, $fail) {
-                    $product = SMSProduct::where('stock_code', $value)
+                    $sku_code = $value;
+                    if(strpos(trim($sku_code ?? ''), '-')) {
+                        $sku_arr = explode('-', $sku_code);
+                        if($sku_arr[0] == 'FG') { // Free Goods
+                            $sku_code = end($sku_arr);
+                        }
+                        if($sku_arr[0] == 'PRM') { // Promo
+                            $sku_code = end($sku_arr);
+                        }
+                    }
+
+                    $product = SMSProduct::where('stock_code', $sku_code)
                         ->first();
                     if(empty($product)) {
-                        $fail('Stock Code '.$value.' does not exist in the system.');
+                        $fail('Stock Code '.$sku_code.' does not exist in the system.');
                     }
                 }
             ],
             'inventory_date' => [
-                'required',
-            ],
-            'type' => [
                 'required',
             ],
             'uom' => [
@@ -217,6 +248,22 @@ class InventoryController extends Controller
             ->where('id', $id)
             ->first();
         if(!empty($inventory)) {
+
+            $type = 1;
+            if(strpos(trim($request->sku_code ?? ''), '-')) {
+                $sku_arr = explode('-', $request->sku_code);
+                if($sku_arr[0] == 'FG') { // Free Goods
+                    $request->sku_code = end($sku_arr);
+                    // process when free goods
+                    $type = 2;
+                }
+                if($sku_arr[0] == 'PRM') { // Promo
+                    $request->sku_code = end($sku_arr);
+                    // process when promo
+                    $type = 3;
+                }
+            }
+
             // location
             $location = Location::where('account_branch_id', $account_branch->id)
                 ->where('code', $request->warehouse_code)
@@ -234,7 +281,7 @@ class InventoryController extends Controller
                 $inventory->update([
                     'location_id' => $location->id,
                     'product_id' => $product->id,
-                    'type' => $request->type,
+                    'type' => $type,
                     'uom' => $request->uom,
                     'inventory' => $request->inventory
                 ]);
@@ -269,7 +316,7 @@ class InventoryController extends Controller
                     'inventory_upload_id' => $inventory_upload->id,
                     'location_id' => $location->id,
                     'product_id' => $product->id,
-                    'type' => $request->type,
+                    'type' => $type,
                     'uom' => $request->uom,
                     'inventory' => $request->inventory
                 ]);

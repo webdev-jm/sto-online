@@ -19,7 +19,7 @@ class InventoryResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'type' => $this->type,
+            'id' => $this->id,
             'uom' => $this->uom,
             'inventory' => $this->inventory,
             'created_at' => $this->created_at,
