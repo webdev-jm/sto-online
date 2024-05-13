@@ -73,7 +73,7 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
         Route::get('sales', [SalesController::class, 'index']);
         Route::post('sales/create', [SalesController::class, 'create'])->middleware('permission:sales create');
         Route::get('sales/{id}/get', [SalesController::class, 'show']);
-        Route::post('sales/{id}/update', [SalesController::class, 'update'])->middleware('permission:sales update');
+        Route::post('sales/{id}/update', [SalesController::class, 'update'])->middleware('permission:sales edit');
     });
 
     Route::group(['middleware' => 'permission:inventory access'], function() {
@@ -93,7 +93,7 @@ Route::middleware(['auth:sanctum', 'role:api-users'])->group(function() {
 });
 
 // Route::group(['middleware' => 'api.token'], function() {
-//     Route::get('sales', [SaleController::class, 'index']);
+// Route::get('sales', [SaleController::class, 'index']);
 
 //     // STO
 //     Route::post('sto', [StoController::class, 'index']);

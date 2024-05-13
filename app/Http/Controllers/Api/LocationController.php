@@ -68,24 +68,11 @@ class LocationController extends Controller
             $location->save();
 
             $location_data = new LocationResource($location);
-        } else {
-            $location_data = 'Location '.$request->code.' already exists.';
-        }
 
-        $data = [
-            'code' => $account_branch->code,
-            'name' => $account_branch->name,
-            'created_at' => $account_branch->created_at,
-            'updated_at' => $account_branch->updated_at,
-            'account' => [
-                'account_code' => $account_branch->account->account_code,
-                'account_name' => $account_branch->account->account_name,
-                'short_name'   => $account_branch->account->short_name,
-                'created_at' => $account_branch->account->created_at,
-                'updated_at' => $account_branch->account->updated_at,
-            ],
-            'location' => $location_data
-        ];
+            return $this->successResponse(new LocationResource($location));
+        } else {
+            return $this->validationError('Location '.$request->code.' already exists.');
+        }
 
         return $this->successResponse($data);
     }

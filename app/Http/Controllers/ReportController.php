@@ -9,83 +9,90 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    // public function index() {
+
+    //     $results = DB::connection('sto_db')
+    //         ->table('rep_sales_sku1')
+    //         ->select(
+    //             'new_code',
+    //             'short_name',
+    //             'account_id',
+    //             'month',
+    //             DB::raw('SUM(c2023) as STO'),
+    //             DB::raw('COUNT(DISTINCT branch_id) as UBO'),
+    //         )
+    //         ->whereNotNull('c2023')
+    //         ->where('type', 'STT')
+    //         ->where('vendor', 'BEVA')
+    //         ->groupBy('new_code', 'short_name', 'account_id', 'month')
+    //         ->get();
+
+    //     // $results = DB::table('sales as s')
+    //     //     ->select(
+    //     //         's.account_id',
+    //     //         's.account_branch_id',
+    //     //         DB::raw('YEAR(date) as year'),
+    //     //         DB::raw('MONTH(date) as month'),   
+    //     //         DB::raw('COUNT(DISTINCT c.code) as UBO'),
+    //     //         DB::raw('SUM(amount_inc_vat) as STO'),
+    //     //     )
+    //     //     ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
+    //     //     ->where('s.category', 0)
+    //     //     ->where('s.status', 0)
+    //     //     ->groupBy('account_id', 's.account_branch_id', 'year', 'month')
+    //     //     ->get();
+
+    //     $data = array();
+    //     $total_sto = 0;
+    //     $total_sto_count = 0;
+    //     $min_ubo = NULL;
+    //     $max_ubo = NULL;
+    //     foreach($results as $result) {
+    //         $sty = $result->STO / $result->UBO;
+    //         $sto = (float)$result->STO;
+
+    //         $data[] = [
+    //             $result->UBO,
+    //             $sto
+    //         ];
+
+    //          // Update min UBO
+    //         if ($min_ubo === null || $result->UBO < $min_ubo) {
+    //             $min_ubo = $result->UBO;
+    //         }
+
+    //         // Update max UBO
+    //         if ($max_ubo === null || $result->UBO > $max_ubo) {
+    //             $max_ubo = $result->UBO;
+    //         }
+
+    //         $total_sto += $sto;
+    //         $total_sto_count++;
+    //     }
+
+    //     $ave = $total_sto / $total_sto_count;
+
+    //     $line_data = [
+    //         [
+    //             $min_ubo - 0.5,
+    //             $ave,
+    //         ],
+    //         [
+    //             $max_ubo + 0.5,
+    //             $ave,
+    //         ]
+    //     ];
+
+    //     return view('pages.reports.index')->with([
+    //         'data' => $data,
+    //         'line_data' => $line_data
+    //     ]);
+    // }
+
     public function index() {
 
-        $results = DB::connection('sto_db')
-            ->table('rep_sales_sku1')
-            ->select(
-                'new_code',
-                'short_name',
-                'account_id',
-                'month',
-                DB::raw('SUM(c2023) as STO'),
-                DB::raw('COUNT(DISTINCT branch_id) as UBO'),
-            )
-            ->whereNotNull('c2023')
-            ->where('type', 'STT')
-            ->where('vendor', 'BEVA')
-            ->groupBy('new_code', 'short_name', 'account_id', 'month')
-            ->get();
+        
 
-        // $results = DB::table('sales as s')
-        //     ->select(
-        //         's.account_id',
-        //         's.account_branch_id',
-        //         DB::raw('YEAR(date) as year'),
-        //         DB::raw('MONTH(date) as month'),   
-        //         DB::raw('COUNT(DISTINCT c.code) as UBO'),
-        //         DB::raw('SUM(amount_inc_vat) as STO'),
-        //     )
-        //     ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
-        //     ->where('s.category', 0)
-        //     ->where('s.status', 0)
-        //     ->groupBy('account_id', 's.account_branch_id', 'year', 'month')
-        //     ->get();
-
-        $data = array();
-        $total_sto = 0;
-        $total_sto_count = 0;
-        $min_ubo = NULL;
-        $max_ubo = NULL;
-        foreach($results as $result) {
-            $sty = $result->STO / $result->UBO;
-            $sto = (float)$result->STO;
-
-            $data[] = [
-                $result->UBO,
-                $sto
-            ];
-
-             // Update min UBO
-            if ($min_ubo === null || $result->UBO < $min_ubo) {
-                $min_ubo = $result->UBO;
-            }
-
-            // Update max UBO
-            if ($max_ubo === null || $result->UBO > $max_ubo) {
-                $max_ubo = $result->UBO;
-            }
-
-            $total_sto += $sto;
-            $total_sto_count++;
-        }
-
-        $ave = $total_sto / $total_sto_count;
-
-        $line_data = [
-            [
-                $min_ubo - 0.5,
-                $ave,
-            ],
-            [
-                $max_ubo + 0.5,
-                $ave,
-            ]
-        ];
-
-        return view('pages.reports.index')->with([
-            'data' => $data,
-            'line_data' => $line_data
-        ]);
+        return view('pages.reports.index');
     }
 }
