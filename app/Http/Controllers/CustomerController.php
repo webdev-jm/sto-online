@@ -271,7 +271,8 @@ class CustomerController extends Controller
             'street' => $request->street,
             'brgy' => $request->barangay,
             'city' => $request->city,
-            'province' => $request->province
+            'province' => $request->province,
+            'postal_code' => $request->postal_code,
         ]);
         $customer->save();
 
@@ -409,6 +410,7 @@ class CustomerController extends Controller
             'brgy' => $request->barangay,
             'city' => $request->city,
             'province' => $request->province,
+            'postal_code' => $request->postal_code
         ]);
 
         $changes_arr['changes'] = $customer->getChanges();

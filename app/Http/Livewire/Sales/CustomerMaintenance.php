@@ -31,6 +31,7 @@ class CustomerMaintenance extends Component
     public $city_id;
     public $barangay_id;
     public $street;
+    public $postal_code;
 
     protected $listeners = [
         'maintainCustomer' => 'maintainCustomer',
@@ -82,6 +83,7 @@ class CustomerMaintenance extends Component
             'brgy' => $this->barangays[$this->barangay_id] ?? NULL,
             'city' => $this->cities[$this->city_id] ?? NULL,
             'province' => $this->provinces[$this->province_id] ?? NULL,
+            'postal_code' => $this->postal_code ?? NULL
         ]);
         $customer->save();
 
@@ -99,6 +101,7 @@ class CustomerMaintenance extends Component
             'city_id',
             'barangay_id',
             'street',
+            'postal_code',
         ]);
     }
 

@@ -50,6 +50,9 @@ class CustomerAddRequest extends FormRequest
             ],
             'province' => [
                 'required'
+            ],
+            'postal_code' => [
+                'max:255'
             ]
         ];
     }

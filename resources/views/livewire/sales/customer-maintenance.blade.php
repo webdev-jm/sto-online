@@ -150,6 +150,16 @@
                             @enderror
                         </div>
                     </div>
+                    {{-- POSTAL CODE --}}
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="postal_code">Postal Code</label>
+                            <input type="text" class="form-control{{$errors->has('postal_code') ? ' is-invalid' : ''}}" wire:model="postal_code">
+                            @error('postal_code')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
             </div>

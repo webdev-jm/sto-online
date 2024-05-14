@@ -27,6 +27,7 @@ class Customer extends Model
         'city',
         'province',
         'country',
+        'postal_code',
         'status',
     ];
 
