@@ -114,6 +114,7 @@ class Customer extends Component
                 $city = trim($row[7] ?? '');
                 $brgy = trim($row[8] ?? '');
                 $street = trim($row[9] ?? '');
+                $postal_code = trim($row[10] ?? '');
 
                 $customer = $current_customers->get($code);
                 $channel = $channels->where('code', $channel_code)
@@ -148,10 +149,11 @@ class Customer extends Component
                             'city' => $city,
                             'province' => $province,
                             'country' => '',
+                            'postal_code' => $postal_code,
                             'status' => !empty($check) ? 1 : 0,
-                            'brgy_id' => $barangay->barangay_name ?? NULL,
-                            'city_id' => $municipality->municipality_name ?? NULL,
-                            'province_id' => $prov->province_name ?? NULL,
+                            'brgy_id' => $barangay->id ?? NULL,
+                            'city_id' => $municipality->id ?? NULL,
+                            'province_id' => $prov->id ?? NULL,
                         ];
                     } else {
                         return [
@@ -167,6 +169,7 @@ class Customer extends Component
                             'city' => $city,
                             'province' => $province,
                             'country' => '',
+                            'postal_code' => $postal_code,
                             'status' => !empty($check) ? 1 : 0,
                             'brgy_id' => $barangay->id ?? NULL,
                             'city_id' => $municipality->id ?? NULL,
@@ -187,6 +190,7 @@ class Customer extends Component
                         'brgy' => $brgy,
                         'city' => $city,
                         'province' => $province,
+                        'postal_code' => $postal_code,
                         'country' => '',
                         'status' => 1,
                         'brgy_id' => NULL,
@@ -231,6 +235,7 @@ class Customer extends Component
             'city/town',
             'barangay',
             'street',
+            'postal code',
         ];
     
         $err = 0;

@@ -30,6 +30,7 @@ class CreateCustomersTable extends Migration
             $table->string('city')->nullable();
             $table->string('province')->nullable();
             $table->string('country')->nullable();
+            $table->string('postal_code')->nullable();
             $table->integer('status')->default(0);
             $table->timestamps();
 

@@ -28,34 +28,37 @@
                  <div class="col-12">
                     <ul>
                         <li>
-                            <b>CODE</b> - <span>Required, First column in the excel</span>
+                            <b>CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>NAME</b> - <span>Required, Second column in the excel</span>
+                            <b>NAME</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>ADDRESS</b> - <span>Option, Third column in the excel</span>
+                            <b>ADDRESS</b> - <span>Optional</span>
                         </li>
                         <li>
-                            <b>SALESMAN CODE</b> - <span>Optional, Fourth column in the excel</span>
+                            <b>SALESMAN CODE</b> - <span>Optional</span>
                         </li>
                         <li>
-                            <b>CHANNEL CODE</b> - <span>Required, Fifth column in the excel</span>
+                            <b>CHANNEL CODE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>CHANNEL NAME</b> - <span>Optional, Sixth column in the excel</span>
+                            <b>CHANNEL NAME</b> - <span>Optional</span>
                         </li>
                         <li>
-                            <b>PROVINCE</b> - <span>Required, Seventh column in the excel</span>
+                            <b>PROVINCE</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>CITY/TOWN</b> - <span>Required, Eight column in the excel</span>
+                            <b>CITY/TOWN</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>BARANGAY</b> - <span>Required, Ninth column in the excel</span>
+                            <b>BARANGAY</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>STREET</b> - <span>Optional, Tenth column in the excel</span>
+                            <b>STREET</b> - <span>Optional</span>
+                        </li>
+                        <li>
+                            <b>POSTAL CODE</b> - <span>Optional</span>
                         </li>
                     </ul>
 
@@ -90,6 +93,7 @@
                                 <th>BRGY</th>
                                 <th>CITY</th>
                                 <th>PROVINCE</th>
+                                <th>POSTAL CODE</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -139,6 +143,9 @@
                                             @if(!empty($data['province_id']))
                                                 <i class="fa fa-check-circle text-success"></i>
                                             @endif
+                                        </td>
+                                        <td class="align-middle">
+                                            {{$data['postal_code'] ?? '-'}}
                                         </td>
                                         <td>
                                             @if(!empty($data['similar']) && $data['check'] == 0)

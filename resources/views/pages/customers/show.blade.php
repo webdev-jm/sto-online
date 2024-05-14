@@ -75,6 +75,10 @@
                             <b>Province</b>
                             <span class="float-right">{{$customer->province ?? '-'}}</span>
                         </li>
+                        <li class="list-group-item p-1">
+                            <b>Postal Code</b>
+                            <span class="float-right">{{$customer->postal_code ?? '-'}}</span>
+                        </li>
                     </ul>
                     
                 </div>

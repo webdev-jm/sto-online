@@ -106,6 +106,14 @@
                         <p class="text-danger">{{$errors->first('province')}}</p>
                     </div>
                 </div>
+                {{-- POSTAL CODE --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('postal_code', 'Postal Code') !!}
+                        {!! Form::text('postal_code', '', ['class' => 'form-control'.($errors->has('postal_code') ? ' is-invalid' : ''), 'form' => 'add_customer']) !!}
+                        <p class="text-danger">{{$errors->first('postal_code')}}</p>
+                    </div>
+                </div>
             </div>
 
         </div>
