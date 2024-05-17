@@ -34,7 +34,7 @@
         <div class="card-header py-1">
             <h3 class="card-title">SALES DATA</h3>
             <div class="card-tools">
-                <button class="btn btn-sm btn-success" wire:click.prevent="exportData">
+                <button class="btn btn-sm btn-success" wire:click.prevent="exportData" wire:loading.attr="disabled">
                     <i class="fa fa-download mr-1"></i>
                     EXPORT
                 </button>
