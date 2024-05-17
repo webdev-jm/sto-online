@@ -355,12 +355,6 @@ return [
                 ]
             ],
         ],
-        [
-            'text'  => 'Reports',
-            'url'   => 'report',
-            'icon'  => 'fa fa-fw fa-chart-pie',
-            'can'   => ['report access'],
-        ],
     ],
 
     /*

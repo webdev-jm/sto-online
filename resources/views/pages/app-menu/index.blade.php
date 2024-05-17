@@ -35,7 +35,7 @@
         @endcan
 
         <div class="col-lg-3">
-            <a href="" class="btn btn-block btn-app bg-maroon ml-0">
+            <a href="{{route('report.index')}}" class="btn btn-block btn-app bg-maroon ml-0">
                 <i class="fa fa-chart-line"></i>
                 REPORTS
             </a>

@@ -227,7 +227,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     // REPORTS
     Route::group(['middleware' => 'permission:report access'], function() {
-        Route::get('report', [ReportController::class, 'index']);
+        Route::get('report', [ReportController::class, 'index'])->name('report.index');
     });
 
     // ERROR LOGS
