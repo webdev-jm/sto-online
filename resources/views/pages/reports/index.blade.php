@@ -1,58 +1,20 @@
 @extends('adminlte::page')
 
-@section('title', 'Roles')
+@section('title', 'Reports - '.$account->short_name)
 
 @section('content_header')
-    <div class="row">
-        <div class="col-lg-6">
-            <h1>REPORTS</h1>
-        </div>
-        <div class="col-lg-6 text-right">
-        </div>
+<div class="row">
+    <div class="col-lg-6">
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - REPORTS</h1>
     </div>
+    <div class="col-lg-6 text-right">
+        <a href="{{route('menu', encrypt($account_branch->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
+    </div>
+</div>
 @stop
 
 @section('content')
-
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">REPORTS</h3>
-        </div>
-        <div class="card-body">
-            
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="">DATE FROM</label>
-                        <input type="date" class="form-control">
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="">DATE TO</label>
-                        <input type="date" class="form-control">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="card-footer text-right p-1">
-            <button class="btn btn-primary">
-                <i class="fa fa-filter fa-sm mr-1"></i>
-                FILTER
-            </button>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">SALES DATA</h3>
-        </div>
-        <div class="card-body">
-
-        </div>
-    </div>
+    <livewire:reports.index :account_branch="$account_branch"/>
 @stop
 
 @section('css')
