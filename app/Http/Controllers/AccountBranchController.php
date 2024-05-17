@@ -24,19 +24,37 @@ class AccountBranchController extends Controller
     {
         $search = trim($request->get('search') ?? '');
 
-        $account_branches = AccountBranch::orderBy('created_at', 'DESC')
-            ->with('account')
-            ->when(!empty($search), function($query) use($search) {
-                $query->whereHas('account', function($qry) use($search) {
-                    $qry->where('short_name', 'like', '%'.$search.'%')
-                        ->orWhere('account_code', 'like', '%'.$search.'%');
+        if(auth()->user()->hasRole('superadmin')) {
+            $account_branches = AccountBranch::orderBy('created_at', 'DESC')
+                ->with('account')
+                ->when(!empty($search), function($query) use($search) {
+                    $query->whereHas('account', function($qry) use($search) {
+                        $qry->where('short_name', 'like', '%'.$search.'%')
+                            ->orWhere('account_code', 'like', '%'.$search.'%');
+                    })
+                    ->orWhere('code', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%');
                 })
-                ->orWhere('code', 'like', '%'.$search.'%')
-                ->orWhere('name', 'like', '%'.$search.'%');
-            })
-            ->paginate(10)->onEachSide(1)
-            ->appends(request()->query());
-
+                ->paginate(10)->onEachSide(1)
+                ->appends(request()->query());
+        } else {
+            $account_branches = AccountBranch::orderBy('created_at', 'DESC')
+                ->with('account')
+                ->whereHas('users', function($query) {
+                    $query->where('id', auth()->user()->id);
+                })
+                ->when(!empty($search), function($query) use($search) {
+                    $query->whereHas('account', function($qry) use($search) {
+                        $qry->where('short_name', 'like', '%'.$search.'%')
+                            ->orWhere('account_code', 'like', '%'.$search.'%');
+                    })
+                    ->orWhere('code', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%');
+                })
+                ->paginate(10)->onEachSide(1)
+                ->appends(request()->query());
+        }
+        
         return view('pages.account-branches.index')->with([
             'search' => $search,
             'account_branches' => $account_branches
