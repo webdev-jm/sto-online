@@ -6,7 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\Sale;
-use Illuminate\Support\Facades\DB;
+
+use App\Exports\SalesReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Index extends Component
 {
@@ -16,6 +18,16 @@ class Index extends Component
     public $account_branch;
     public $date_from;
     public $date_to;
+
+    public function exportData() {
+        $sales = Sale::with('customer', 'salesman', 'channel', 'location')
+            ->where('account_branch_id', $this->account_branch->id)
+            ->where('date', '>=', $this->date_from)
+            ->where('date', '<=', $this->date_to)
+            ->get();
+
+        return Excel::download(new SalesReportExport($sales), 'STO Sales Data-'.time().'.xlsx');
+    }
 
     public function updatedDateFrom() {
         $this->resetPage('sales-page');
