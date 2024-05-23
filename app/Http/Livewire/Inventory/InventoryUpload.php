@@ -124,6 +124,7 @@ class InventoryUpload extends Component
                 ->keyBy('stock_code');
 
             // check header
+            $this->keys = array();
             foreach($header as $key => $val) {
                 $location = Location::where('account_id', $this->account->id)
                     ->where('account_branch_id', $this->account_branch->id)
@@ -155,7 +156,6 @@ class InventoryUpload extends Component
                         $type = 3;
                     }
                 }
-
                 
                 if($products->has($sku_code)) {
                     $product = $products->get($sku_code);
@@ -176,11 +176,15 @@ class InventoryUpload extends Component
                         'description' => $row[1],
                         'product_id' => $product->id ?? NULL,
                         'uom' => 'PCS'
-                    ]; 
+                    ];
                 }
 
-                foreach($this->keys as $key => $location) {
-                    $this->inventory_data[$data_key][$location->id] = $row[$key];
+                if(!empty($this->keys)) {
+                    foreach($this->keys as $key => $location) {
+                        $this->inventory_data[$data_key][$location->id] = $row[$key];
+                    }
+                } else {
+                    unset($this->inventory_data[$data_key]);
                 }
             }
 

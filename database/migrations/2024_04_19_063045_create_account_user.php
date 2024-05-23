@@ -20,6 +20,10 @@ class CreateAccountUser extends Migration
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
+
+            $table->foreign('account_id')
+                ->references('id')->on('accounts')
+                ->onDelete('cascade');
         });
     }
 

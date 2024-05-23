@@ -18,6 +18,10 @@ class CreateBarangaysTable extends Migration
             $table->unsignedBigInteger('municipality_id')->nullable();
             $table->text('barangay_name');
             $table->timestamps();
+
+            $table->foreign('municipality_id')
+                ->references('id')->on('municipalities')
+                ->onDelete('cascade');
         });
     }
 
