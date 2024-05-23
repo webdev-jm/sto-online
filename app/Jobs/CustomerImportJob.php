@@ -92,6 +92,9 @@ class CustomerImportJob implements ShouldQueue
                     'postal_code' => $data['postal_code'],
                     'country' => $data['country'],
                     'status' => $data['status'],
+                    'province_id' => $data['province_id'],
+                    'municipality_id' => $data['city_id'],
+                    'barangay_id' => $data['brgy_id'],
                 ]);
                 $customer->save();
 

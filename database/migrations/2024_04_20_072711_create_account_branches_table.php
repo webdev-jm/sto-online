@@ -21,6 +21,10 @@ class CreateAccountBranchesTable extends Migration
             $table->string('name');
             $table->string('branch_token')->nullable();
             $table->timestamps();
+
+            $table->foreign('account_id')
+                ->references('id')->on('accounts')
+                ->onDelete('cascade');
             
             $table->softDeletes();
         });

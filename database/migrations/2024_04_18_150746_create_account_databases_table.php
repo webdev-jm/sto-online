@@ -19,6 +19,10 @@ class CreateAccountDatabasesTable extends Migration
             $table->string('database_name');
             $table->string('connection_name');
             $table->timestamps();
+            
+            $table->foreign('account_id')
+                ->references('id')->on('accounts')
+                ->onDelete('cascade');
 
             $table->softDeletes();
         });

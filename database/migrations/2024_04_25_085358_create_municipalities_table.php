@@ -18,6 +18,10 @@ class CreateMunicipalitiesTable extends Migration
             $table->unsignedBigInteger('province_id')->nullable();
             $table->text('municipality_name');
             $table->timestamps();
+
+            $table->foreign('province_id')
+                ->references('id')->on('provinces')
+                ->onDelete('cascade');
         });
     }
 
