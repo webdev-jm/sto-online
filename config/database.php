@@ -121,6 +121,32 @@ return [
             ],
         ],
 
+        'sto_online_db' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL_4'),
+            'host' => env('DB_HOST_4', '127.0.0.1'),
+            'port' => env('DB_PORT_4', '3306'),
+            'database' => env('DB_DATABASE_4', 'forge'),
+            'username' => env('DB_USERNAME_4', 'forge'),
+            'password' => env('DB_PASSWORD_4', ''),
+            'unix_socket' => env('DB_SOCKET_4', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'options' => [
+                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_TIMEOUT => 5,
+            ],
+            'pool' => [
+                'min_connections' => 1,
+                'max_connections' => 10,
+                'max_idle_time' => 30,
+            ],
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
