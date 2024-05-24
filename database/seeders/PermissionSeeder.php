@@ -123,6 +123,7 @@ class PermissionSeeder extends Seeder
             ],
             'Report' => [
                 'report access' => 'Allow user to access reports',
+                'report vmi'    => 'Allow user to access vmi reports'
             ]
         ];
 

@@ -29,4 +29,18 @@ class ReportController extends Controller
             'account' => $account
         ]);
     }
+
+    public function vmi_report() {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        return view('pages.reports.vmi')->with([
+            'account_branch' => $account_branch,
+            'account' => $account
+        ]);
+
+    }
 }
