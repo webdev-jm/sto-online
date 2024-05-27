@@ -41,6 +41,5 @@ class ReportController extends Controller
             'account_branch' => $account_branch,
             'account' => $account
         ]);
-
     }
 }

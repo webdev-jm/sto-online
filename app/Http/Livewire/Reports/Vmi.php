@@ -6,8 +6,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\SMSProduct;
+use App\Models\MonthlyInventory;
+use App\Models\Sale;
 
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class Vmi extends Component
 {
@@ -15,146 +18,172 @@ class Vmi extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $account_branch;
-    public $year, $month, $parameter;
+    public $year, $month, $parameter, $month_param;
+    public $search;
+
+    public $months_arr = [
+        1 => '1 MONTH',
+        2 => '2 MONTHS',
+        3 => '3 MONTHS',
+    ];
+
+    public function updatedMonth() {
+        if($this->month > 12) {
+            $this->month = 12;
+        } else if($this->month < 1) {
+            $this->month = 1;
+        }
+    }
 
     public function mount($account_branch) {
         $this->account_branch = $account_branch;
 
         $this->year = date('Y');
-        $this->month = date('n');
+        // $this->month = date('n');
+         $this->month = 4;
 
         $this->parameter = 4;
+        $this->month_param = 1;
     }
 
-    private function csConversion($product_id, $uom, $quantity) {
-        // UOM CONVERSION
+    private function csConversion($product, $uom, $quantity) {
+        // Normalize UOM to standard codes
         $uom = trim(strtoupper($uom));
-        switch ($uom) {
-            case 'CAS':
-                $uom = 'CS';
-                break;
-            
-            case 'CASE':
-                $uom = 'CS';
-                break;
+        $uomMapping = [
+            'CAS' => 'CS',
+            'CASE' => 'CS',
+            'PC' => 'PCS',
+            'PIECES' => 'PCS'
+        ];
+        $uom = $uomMapping[$uom] ?? $uom;
 
-            case 'PC':
-                $uom = 'PCS';
-                break;
-
-            case 'PIECES':
-                $uom = 'PCS';
-                break;
+        // Return null if the product is empty
+        if (empty($product)) {
+            return NULL;
         }
 
-        $product = SMSProduct::find($product_id);
-        if(!empty($product)) {
-            $stock_uom = $product->stock_uom;
-            $order_uom = $product->order_uom;
-            $other_uom = $product->other_uom;
+        // Define the UOMs
+        $stock_uom = $product->stock_uom;
+        $order_uom = $product->order_uom;
+        $other_uom = $product->other_uom;
 
-            if($uom == 'CS') {
-                $quantity = $quantity;
-            } else {
-                if($stock_uom == 'CS') {
-                    if($stock_uom == $uom) {
-                        $quantity = $quantity;
-                    } else if($order_uom == $uom) {
-                        $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, $reverse = true);
-                    } else if($other_uom == $uom) {
-                        $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, $reverse = true);
-                    }
-                } elseif($order_uom == 'CS') {
-                    if($stock_uom == $uom) {
-                        $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, $reverse = true);
-                    } else if($order_uom == $uom) {
-                        $quantity = $quantity;
-                    } else if($other_uom == $uom) {
-                        // convert to stock uom
-                        $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, $reverse = true);
-                         // convert to order uom
-                        $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, $reverse = false);
-                    }
-                } elseif($other_uom == 'CS') {
-                    if($stock_uom == $uom) {
-                        $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, $reverse = true);
-                    } else if($order_uom == $uom) {
-                        // convert to stock uom
-                        $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, $reverse = true);
-                        // convert to other uom
-                        $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, $reverse = false);
-                    } else if($other_uom == $uom) {
-                        $quantity = $quantity;
-                    }
-                }
-            }
-
+        // Direct return if already in 'CS'
+        if ($uom == 'CS') {
             return $quantity;
         }
 
-        return NULL;
-    }
-
-    private function quantityConversion($quantity, $conversion, $operator, $reverse = false) {
-        if($operator == 'M') { // mutiply
-            if($reverse) {
-                return $quantity / $conversion;
-            } else {
-                return $quantity * $conversion;
+        // Conversion logic based on UOM
+        if ($stock_uom == 'CS') {
+            if ($uom == $order_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
+            } elseif ($uom == $other_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
             }
-        } elseif($operator == 'D') { // divide
-            if($reverse) {
-                return $quantity * $conversion;
-            } else {
-                return $quantity / $conversion;
+        } elseif ($order_uom == 'CS') {
+            if ($uom == $stock_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
+            } elseif ($uom == $other_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
+                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, false);
+            }
+        } elseif ($other_uom == 'CS') {
+            if ($uom == $stock_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
+            } elseif ($uom == $order_uom) {
+                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
+                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, false);
             }
         }
 
         return $quantity;
     }
 
+    private function quantityConversion($quantity, $conversion, $operator, $reverse = false) {
+        if ($operator == 'M') { // multiply
+            return $reverse ? $quantity / $conversion : $quantity * $conversion;
+        } elseif ($operator == 'D') { // divide
+            return $reverse ? $quantity * $conversion : $quantity / $conversion;
+        }
+        return $quantity;
+    }
+
     public function render()
     {
 
-        DB::setDefaultConnection('sto_online_db');
+        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
+        $prev_date1 = $curr_date->startOfMonth()->subMonth();
+        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
+        $prev_date2 = $curr_date->startOfMonth()->subMonth(2);
+        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
+        $prev_date3 = $curr_date->startOfMonth()->subMonth(3);
 
-        $inventories = DB::table('monthly_inventories as mi')
-            ->select(
+        $inventories = MonthlyInventory::select(
                 'product_id',
                 'uom',
                 DB::raw('SUM(total) as total'),
             )
             ->where('account_id', 245)
             ->where('account_branch_id', 2)
-            ->where('year', 2024)
-            ->where('month', 3)
+            ->where('year', $prev_date1->year)
+            ->where('month', $prev_date1->month)
             ->where('total', '>', 0)
+            ->when(!empty($this->search), function($query) {
+                $query->whereExists(function($qry) {
+                    $qry->select(DB::raw(1))
+                        ->from('sms_db.products')
+                        ->whereColumn('products.id', 'monthly_inventories.product_id')
+                        ->where(function($qry1) {
+                            $qry1->where('stock_code', 'like', '%'.$this->search.'%')
+                                ->orWhere('description', 'like', '%'.$this->search.'%')
+                                ->orWhere('size', 'like', '%'.$this->search.'%');
+                        });
+                });
+            })
             ->groupBy('product_id', 'uom')
             ->paginate(10, ['*'], 'inventory-page');
+
+        $product_ids = $inventories->pluck('product_id')->toArray();
+
+        $products = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');
+
+        $sales = $sales = Sale::select(
+                'product_id',
+                DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
+                DB::raw('SUM(quantity) / '.$this->month_param.' as total')
+            )
+            ->whereIn('product_id', $product_ids)
+            ->where('account_id', 245)
+            ->where('account_branch_id', 2)
+            ->where(function($query) use($prev_date1, $prev_date2, $prev_date3) {
+                for($i = 1; $i <= $this->month_param; $i++) {
+                    $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
+                        $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
+                            ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+                    });
+                }
+            })
+            ->groupBy('product_id', 'uom')
+            ->get()
+            ->groupBy('product_id');
             
         $data = array();
         foreach($inventories as $inventory) {
             if(!empty($inventory->total)) {
-                $sales = DB::table('sales')
-                    ->select(
-                        'product_id',
-                        'uom',
-                        DB::raw('SUM(quantity) as total')
-                    )
-                    ->where('product_id', $inventory->product_id)
-                    ->where('account_id', 245)
-                    ->where('account_branch_id', 2)
-                    ->where(DB::raw('MONTH(date)'), 2)
-                    ->where(DB::raw('YEAR(date)'), 2024)
-                    ->groupBy('product_id', 'uom')
-                    ->first();
-    
-                $product = SMSProduct::find($inventory->product_id);
-                $cs_total = $this->csConversion($inventory->product_id, $inventory->uom, $inventory->total);
+                $product = $products->get($inventory->product_id);
+                $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
+
+                $sales_data = $sales->get($inventory->product_id);
+                
+                $sales_cs_total = 0;
+                if(!empty($sales_data)) {
+                    foreach($sales_data as $val) {
+                        $sales_cs_total += $this->csConversion($product, $val->uom, $val->total);
+                    }
+                }
 
                 $w_cov = 0;
-                if(!empty($cs_total) && !empty($sales->total)) {
-                    $w_cov = $cs_total / $sales->total;
+                if(!empty($cs_total) && !empty($sales_cs_total)) {
+                    $w_cov = $cs_total / $sales_cs_total;
                 }
 
                 $w_cov_needed = 0;
@@ -163,8 +192,8 @@ class Vmi extends Component
                 }
 
                 $vmi = 0;
-                if(!empty($w_cov_needed) && !empty($sales->total)) {
-                    $vmi = $w_cov_needed * $sales->total;
+                if(!empty($w_cov_needed) && !empty($sales_cs_total)) {
+                    $vmi = $w_cov_needed * $sales_cs_total;
                 }
 
                 $data[] = [
@@ -173,15 +202,13 @@ class Vmi extends Component
                     'uom' => $inventory->uom,
                     'total' => $inventory->total,
                     'cs_total' => $cs_total,
-                    'sto' => $sales->total ?? 0,
+                    'sto' => $sales_cs_total ?? 0,
                     'w_cov' => $w_cov,
                     'w_cov_needed' => $w_cov_needed,
                     'vmi' => $vmi
                 ];
             }
         }
-
-        DB::setDefaultConnection('mysql');
         
         return view('livewire.reports.vmi')->with([
             'data' => $data,

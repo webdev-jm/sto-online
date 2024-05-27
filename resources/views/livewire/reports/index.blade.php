@@ -64,17 +64,17 @@
                         <tr>
                             <td class="align-middle p-0 pl-1 text-center">{{$sale->date}}</td>
                             <td class="align-middle text-center p-0">{{$sale->document_number}}</td>
-                            <td class="align-middle p-0 text-center">[{{$sale->customer->code}}] {{$sale->customer->name}}</td>
-                            <td class="align-middle p-0 text-center">[{{$sale->salesman->code}}] {{$sale->salesman->name}}</td>
-                            <td class="align-middle p-0 text-center">[{{$sale->channel->code}}] {{$sale->channel->name}}</td>
-                            <td class="align-middle p-0 text-center">[{{$sale->location->code}}] {{$sale->location->name}}</td>
-                            <td class="align-middle p-0 text-center">{{$sale->product->stock_code}}</td>
-                            <td class="align-middle p-0 text-center">{{$sale->product->description}} {{$sale->product->size}}</td>
-                            <td class="align-middle p-0 text-center">{{$sale->uom}}</td>
-                            <td class="text-right align-middle">{{$sale->quantity}}</td>
-                            <td class="text-right align-middle">{{$sale->price_inc_vat}}</td>
-                            <td class="text-right align-middle">{{$sale->amount}}</td>
-                            <td class="text-right align-middle">{{$sale->amount_inc_vat}}</td>
+                            <td class="align-middle p-0 text-center">[{{$sale->customer->code ?? ''}}] {{$sale->customer->name ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">[{{$sale->salesman->code ?? ''}}] {{$sale->salesman->name ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">[{{$sale->channel->code ?? ''}}] {{$sale->channel->name ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">[{{$sale->location->code ?? ''}}] {{$sale->location->name ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">{{$sale->product->stock_code ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">{{$sale->product->description ?? ''}} {{$sale->product->size ?? ''}}</td>
+                            <td class="align-middle p-0 text-center">{{$sale->uom ?? ''}}</td>
+                            <td class="text-right align-middle">{{$sale->quantity ?? ''}}</td>
+                            <td class="text-right align-middle">{{$sale->price_inc_vat ?? ''}}</td>
+                            <td class="text-right align-middle">{{$sale->amount ?? ''}}</td>
+                            <td class="text-right align-middle">{{$sale->amount_inc_vat ?? ''}}</td>
                         </tr>
                     @endforeach
                 </tbody>
