@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3">
+                {{-- <div class="col-lg-3">
                     <div class="form-group">
                         <label for="months">MONTHS (AVG.)</label>
                         <select id="months" class="form-control" wire:model="month_param">
@@ -39,7 +39,7 @@
                             @endforeach
                         </select>
                     </div>
-                </div>  
+                </div>   --}}
             </div>
 
             <strong class="text-lg">FILTERS</strong>
@@ -54,7 +54,11 @@
                 </div>
             </div>
 
+            @foreach($months_param as $param)
             <div class="row">
+                <div class="col-12">
+                    <strong>{{$param}} MONTH(s)</strong>
+                </div>
                 <div class="col-lg-12 table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead>
@@ -72,7 +76,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data as $val)
+                            @foreach($param_data[$param] as $val)
                                 <tr>
                                     <td>{{$val['stock_code']}}</td>
                                     <td>{{$val['description']}}</td>
@@ -92,6 +96,7 @@
                     </table>
                 </div>
             </div>
+            @endforeach
 
             
         </div>
