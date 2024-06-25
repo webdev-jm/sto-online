@@ -55,7 +55,7 @@
         </div>
     </div>
     <div class="col-lg-12">
-        <livewire:sales.products-view :sales_upload="$sales_upload"/>
+        <livewire:sales.products-view :sales_upload_id="$sales_upload->id"/>
     </div>
 </div>
     

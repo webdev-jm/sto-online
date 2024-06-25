@@ -54,6 +54,12 @@
                 </div>
             </div>
 
+            <div class="row mb-2">
+                <div class="col-12">
+                    {{$inventories->links()}}
+                </div>
+            </div>
+
             @foreach($months_param as $param)
             <div class="row">
                 <div class="col-12">
@@ -97,7 +103,6 @@
                 </div>
             </div>
             @endforeach
-
             
         </div>
         <div class="card-footer">
