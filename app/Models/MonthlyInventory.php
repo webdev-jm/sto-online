@@ -25,8 +25,8 @@ class MonthlyInventory extends Model
     ];
 
     public function getConnectionName() {
-        // return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
-        return 'sto_online_db';
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+        // return 'sto_online_db';
     }
 
     public function account() {

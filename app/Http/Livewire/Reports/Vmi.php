@@ -27,6 +27,10 @@ class Vmi extends Component
         3 => '3 MONTHS',
     ];
 
+    public function updatedSearch() {
+        $this->resetPage('inventory-page');
+    }
+
     public function updatedMonth() {
         if($this->month > 12) {
             $this->month = 12;
@@ -122,15 +126,15 @@ class Vmi extends Component
                 'uom',
                 DB::raw('SUM(total) as total'),
             )
-            ->where('account_id', 245)
-            ->where('account_branch_id', 2)
+            ->where('account_id', $this->account_branch->account_id)
+            ->where('account_branch_id', $this->account_branch->id)
             ->where('year', $prev_date1->year)
             ->where('month', $prev_date1->month)
             ->where('total', '>', 0)
             ->when(!empty($this->search), function($query) {
                 $query->whereExists(function($qry) {
                     $qry->select(DB::raw(1))
-                        ->from('sms_db.products')
+                        ->from(env('DB_DATABASE_2').'.products')
                         ->whereColumn('products.id', 'monthly_inventories.product_id')
                         ->where(function($qry1) {
                             $qry1->where('stock_code', 'like', '%'.$this->search.'%')
@@ -154,8 +158,8 @@ class Vmi extends Component
                     DB::raw('SUM(quantity) / '.$param.' as total')
                 )
                 ->whereIn('product_id', $product_ids)
-                ->where('account_id', 245)
-                ->where('account_branch_id', 2)
+                ->where('account_id', $this->account_branch->account_id)
+                ->where('account_branch_id', $this->account_branch->id)
                 ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
                     for($i = 1; $i <= $param; $i++) {
                         $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {

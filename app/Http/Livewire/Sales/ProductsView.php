@@ -8,6 +8,8 @@ use Livewire\WithPagination;
 use App\Exports\SalesLineExport;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Models\SalesUpload;
+
 class ProductsView extends Component
 {
     use WithPagination;
@@ -16,8 +18,8 @@ class ProductsView extends Component
     public $sales_upload;
     public $account;
 
-    public function mount($sales_upload) {
-        $this->sales_upload = $sales_upload;
+    public function mount($sales_upload_id) {
+        $this->sales_upload = SalesUpload::where('id', $sales_upload_id)->first();
     }
 
     public function export() {
