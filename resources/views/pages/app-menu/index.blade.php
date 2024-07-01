@@ -43,6 +43,18 @@
     </div>
 
     <hr>
+    <div class="row">
+
+        <div class="col-lg-3">
+            <a href="{{route('report.index')}}" class="btn btn-block btn-app bg-orange ml-0">
+                <i class="fa fa-shopping-cart text-white"></i>
+                <span class="text-white">PURCHASE ORDERS</span>
+            </a>
+        </div>
+
+    </div>
+
+    <hr>
 
     <div class="row">
 

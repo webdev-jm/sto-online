@@ -104,7 +104,11 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <h4>TOKEN:</h4> <b class="border p-2">{{$account_branch->branch_token ?? "-"}}</b>
+                    <h4>TOKEN:</h4> <b class="border p-2" id="token-text">{{$account_branch->branch_token ?? "-"}}</b>
+                    <a href="#" class="btn btn-secondary" id="btn-copy">
+                        <i class="fa fa-copy mr-1"></i>
+                        Copy
+                    </a>
                 </div>
             </div>
         </div>
@@ -133,6 +137,36 @@
                     var id = $(this).data('id');
                     Livewire.emit('setDeleteModel', 'AccountBranch', id);
                     $('#modal-delete').modal('show');
+                });
+
+                $('body').on('click', '#btn-copy', function(e) {
+                    e.preventDefault();
+                    var token = $('#token-text').text();
+                    
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(token)
+                            .then(function() {
+                                alert("Text copied to clipboard!");
+                            })
+                            .catch(function(error) {
+                                console.error("Failed to copy text: ", error);
+                                alert("Failed to copy text to clipboard.");
+                            });
+                    } else {
+                        // Fallback: Create a temporary textarea to copy the text
+                        var textarea = document.createElement('textarea');
+                        textarea.value = token;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            document.execCommand('copy');
+                            alert("Text copied to clipboard!");
+                        } catch (error) {
+                            console.error("Failed to copy text: ", error);
+                            alert("Failed to copy text to clipboard.");
+                        }
+                        document.body.removeChild(textarea);
+                    }
                 });
             });
         </script>
