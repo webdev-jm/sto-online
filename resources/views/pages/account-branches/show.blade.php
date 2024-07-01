@@ -106,7 +106,7 @@
                 <div class="card-body">
                     <h4>TOKEN:</h4> <b class="border p-2" id="token-text">{{$account_branch->branch_token ?? "-"}}</b>
                     <a href="#" class="btn btn-secondary" id="btn-copy">
-                        <i class="fa fa-clipboard mr-1"></i>
+                        <i class="fa fa-copy mr-1"></i>
                         Copy
                     </a>
                 </div>

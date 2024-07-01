@@ -53,6 +53,9 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('ubo-job', [CustomerController::class, 'uboJob'])->name('ubo-job.index');
     });
 
+    // PURCHASE ORDER
+    
+
     // INVENTORIES
     Route::group(['middleware' => 'permission:inventory access'], function() {
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
