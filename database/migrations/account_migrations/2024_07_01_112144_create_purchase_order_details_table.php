@@ -15,7 +15,20 @@ class CreatePurchaseOrderDetailsTable extends Migration
     {
         Schema::create('purchase_order_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('purchase_order_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->string('sku_code')->nullable();
+            $table->string('sku_code_other')->nullable();
+            $table->string('product_name')->nullable();
+            $table->integer('quantity')->nullable();
+            $table->string('unit_of_measure')->nullable();
+            $table->decimal('discount_amount', 15, 2)->default(0);
+            $table->decimal('gross_amount', 15, 2)->default(0);
+            $table->decimal('net_amount', 15, 2)->default(0);
+            $table->decimal('net_amount_per_uom', 15, 2)->default(0);
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 
