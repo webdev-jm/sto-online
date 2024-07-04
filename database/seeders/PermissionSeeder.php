@@ -124,6 +124,13 @@ class PermissionSeeder extends Seeder
             'Report' => [
                 'report access' => 'Allow user to access reports',
                 'report vmi'    => 'Allow user to access vmi reports'
+            ],
+            'Template' => [
+                'template access' => 'Allow user to access templates',
+                'template create' => 'Allow user to create templates',
+                'template edit'   => 'Allow user to edit templates',
+                'template delete' => 'Allow user to delete templates',
+                'template restore' => 'Allow user to restore templates',
             ]
         ];
 

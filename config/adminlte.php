@@ -340,6 +340,13 @@ return [
                     'active'    => ['account-branch*']
                 ],
                 [
+                    'text'      => 'Templates',
+                    'url'       => '/template',
+                    'icon'      => 'fa fa-fw fa-file-excel',
+                    'can'       => 'template access',
+                    'active'    => ['template*']
+                ],
+                [
                     'text'      => 'Systemlog',
                     'url'       => '/systemlog',
                     'icon'      => 'fa fa-fw fa-history',

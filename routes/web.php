@@ -16,6 +16,9 @@ use App\Http\Controllers\AccountBranchController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\UploadTemplateController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Livewire\PurchaseOrder\Upload;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +57,10 @@ Route::group(['middleware' => 'auth'], function() {
     });
 
     // PURCHASE ORDER
-    
+    Route::group(['middleware' => 'permission:purchase order access'], function() {
+        Route::get('purchase-order', [PurchaseOrderController::class, 'index'])->name('purchase-order.index');
+        Route::get('purchase-order/upload', [PurchaseOrderController::class, 'upload'])->name('purchase-order.upload')->middleware('permission:purchase order upload');
+    });
 
     // INVENTORIES
     Route::group(['middleware' => 'permission:inventory access'], function() {
@@ -232,6 +238,20 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:report access'], function() {
         Route::get('report', [ReportController::class, 'index'])->name('report.index');
         Route::get('report/vmi', [ReportController::class, 'vmi_report'])->name('report.vmi')->middleware('permission:report vmi');
+    });
+
+    // TEMPLATES
+    Route::group(['middleware' => 'permission:template access'], function() {
+        Route::get('template', [UploadTemplateController::class, 'index'])->name('template.index');
+        Route::get('template/create', [UploadTemplateController::class, 'create'])->name('template.create')->middleware('permission:template create');
+        Route::post('template', [UploadTemplateController::class, 'store'])->name('template.store')->middleware('permission:template create');
+
+        Route::get('template/{id}', [UploadTemplateController::class, 'show'])->name('template.show');
+
+        Route::get('template/{id}/edit', [UploadTemplateController::class, 'edit'])->name('template.edit')->middleware('permission:template edit');
+        Route::post('template/{id}', [UploadTemplateController::class, 'update'])->name('template.update')->middleware('permission:template edit');
+
+        Route::get('template/{id}/restore', [UploadTemplateController::class, 'restore'])->name('template.restore')->middleware('permission:template restore');
     });
 
     // ERROR LOGS

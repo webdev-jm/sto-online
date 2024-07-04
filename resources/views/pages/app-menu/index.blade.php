@@ -46,7 +46,7 @@
     <div class="row">
 
         <div class="col-lg-3">
-            <a href="{{route('report.index')}}" class="btn btn-block btn-app bg-orange ml-0">
+            <a href="{{route('purchase-order.index')}}" class="btn btn-block btn-app bg-orange ml-0">
                 <i class="fa fa-shopping-cart text-white"></i>
                 <span class="text-white">PURCHASE ORDERS</span>
             </a>
