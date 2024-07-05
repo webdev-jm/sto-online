@@ -13,6 +13,7 @@ use App\Models\SMSProduct;
 use Spatie\SimpleExcel\SimpleExcelReader;
 
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class Upload extends Component
 {
@@ -29,6 +30,7 @@ class Upload extends Component
                 $err = $this->validateData($po_number, $data);
                 if(empty($err)) {
                     $purchase_order = new PurchaseOrder([
+                        'sms_account_id' => $this->account_branch->account->sms_account_id,
                         'account_branch_id' => $this->account_branch->id,
                         'po_number' => $po_number,
                         'order_date' => $data['headers']['order_date'],
@@ -53,7 +55,9 @@ class Upload extends Component
                             $product_reference = AccountProductReference::where('account_id', $this->account_branch->account->sms_account_id)
                                 ->where(function($query) use($product_data) {
                                     $query->where('account_reference', $product_data['sku_code'])
-                                    ->orWhere('account_reference', $product_data['sku_code_other']);
+                                        ->orWhere('account_reference', $product_data['sku_code_other'])
+                                        ->orWhere(DB::raw('CAST(account_reference AS UNSIGNED)'), $product_data['sku_code'])
+                                        ->orWhere(DB::raw('CAST(account_reference AS UNSIGNED)'), $product_data['sku_code_other']);
                                 })
                                 ->first();
                             if(!empty($product_reference)) {

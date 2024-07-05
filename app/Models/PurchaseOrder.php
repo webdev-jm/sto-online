@@ -12,6 +12,7 @@ class PurchaseOrder extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'sms_account_id',
         'account_branch_id',
         'po_number',
         'order_date',
