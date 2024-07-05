@@ -15,6 +15,7 @@ class CreatePurchaseOrdersTable extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('sms_account_id')->nullable();
             $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->string('po_number');
             $table->date('order_date');

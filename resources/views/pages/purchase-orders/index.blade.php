@@ -78,13 +78,13 @@
                                         {{$purchase_order->ship_to_address}}
                                     </td>
                                     <td class="p-0 px-1 align-middle text-right">
-                                        {{$purchase_order->total_quantity}}
+                                        {{number_format($purchase_order->total_quantity)}}
                                     </td>
                                     <td class="p-0 px-1 align-middle text-right">
-                                        {{$purchase_order->total_sales}}
+                                        {{number_format($purchase_order->total_sales, 2)}}
                                     </td>
                                     <td class="p-0 px-1 align-middle text-right">
-                                        {{$purchase_order->grand_total}}
+                                        {{number_format($purchase_order->grand_total, 2)}}
                                     </td>
                                 </tr>
                             @endforeach
