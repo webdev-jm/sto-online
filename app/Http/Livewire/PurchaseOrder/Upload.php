@@ -81,7 +81,7 @@ class Upload extends Component
                         $purchase_order_detail->save();
     
                         $total_quantity += $product_data['quantity'];
-                        $total_gross_amount += $product_data['gross_amount'];
+                        $total_gross_amount += $product_data['total_gross_amount'];
                         $total_net_amount += $product_data['net_amount_per_uom'];
                     }
     
