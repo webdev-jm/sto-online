@@ -14,7 +14,7 @@ class PurchaseOrderController extends Controller
 {
     use AccountChecker;
 
-    public function index() {
+    public function index(Request $request) {
         $account_branch = $this->checkBranch();
         if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
             return $account_branch;
@@ -23,7 +23,17 @@ class PurchaseOrderController extends Controller
 
         Session::forget('po_upload_data');
 
+        $filters = Session::get('po_filters');
+
         $purchase_orders = PurchaseOrder::where('account_branch_id', $account_branch->id)
+            ->when(!empty($filters['date_type']) && !empty($filters['from']) && !empty($filters['to']), function($query) use ($filters) {
+                if ($filters['date_type'] == 'order_date') {
+                    $query->whereBetween('order_date', [$filters['from'], $filters['to']]);
+                } else if ($filters['date_type'] == 'ship_date') {
+                    $query->whereBetween('ship_date', [$filters['from'], $filters['to']]);
+                }
+            })
+            ->orderBy('created_at', 'desc')
             ->paginate(20)->onEachSide(1);
 
         $total_data = PurchaseOrder::select(
@@ -31,6 +41,13 @@ class PurchaseOrderController extends Controller
                 DB::raw('SUM(total_sales) as sales'),
                 DB::raw('SUM(grand_total) as total')
             )
+            ->when(!empty($filters['date_type']) && !empty($filters['from']) && !empty($filters['to']), function($query) use ($filters) {
+                if ($filters['date_type'] == 'order_date') {
+                    $query->whereBetween('order_date', [$filters['from'], $filters['to']]);
+                } else if ($filters['date_type'] == 'ship_date') {
+                    $query->whereBetween('ship_date', [$filters['from'], $filters['to']]);
+                }
+            })
             ->where('account_branch_id', $account_branch->id)
             ->get();
 

@@ -18,10 +18,6 @@
         <div class="card-header">
             <h3 class="card-title">PO LIST</h3>
             <div class="card-tools">
-                <button  class="btn btn-warning btn-xs" disabled="true">
-                    <i class="fa fa-filter"></i>
-                    FILTER
-                </button>
                 <a href="{{route('purchase-order.upload')}}" class="btn btn-primary btn-xs">
                     <i class="fa fa-upload"></i>
                     UPLOAD
@@ -29,6 +25,12 @@
             </div>
         </div>
         <div class="card-body">
+
+            <div class="row">
+                <div class="col-12">
+                    <livewire:purchase-order.filter :account_branch="$account_branch"/>
+                </div>
+            </div>
             
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
