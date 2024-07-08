@@ -18,10 +18,10 @@
         <div class="card-header">
             <h3 class="card-title">PO LIST</h3>
             <div class="card-tools">
-                <a href="" class="btn btn-warning btn-xs">
+                <button  class="btn btn-warning btn-xs" disabled="true">
                     <i class="fa fa-filter"></i>
                     FILTER
-                </a>
+                </button>
                 <a href="{{route('purchase-order.upload')}}" class="btn btn-primary btn-xs">
                     <i class="fa fa-upload"></i>
                     UPLOAD
@@ -56,19 +56,23 @@
                         @else
                             @foreach($purchase_orders as $purchase_order)
                                 <tr>
-                                    <td class="p-0 px-1 align-middle">
-                                        {{$purchase_order->po_number}}
+                                    <td class="p-0 px-1 align-middle text-center">
+                                        <a href="{{route('purchase-order.show', encrypt($purchase_order->id))}}">
+                                            <u>
+                                                {{$purchase_order->po_number}}
+                                            </u>
+                                        </a>
                                     </td>
-                                    <td class="p-0 px-1 align-middle">
+                                    <td class="p-0 px-1 align-middle text-center">
                                         {{$purchase_order->status}}
                                     </td>
-                                    <td class="p-0 px-1 align-middle">
+                                    <td class="p-0 px-1 align-middle text-center">
                                         {{$purchase_order->order_date}}
                                     </td>
-                                    <td class="p-0 px-1 align-middle">
+                                    <td class="p-0 px-1 align-middle text-center">
                                         {{$purchase_order->ship_date}}
                                     </td>
-                                    <td class="p-0 px-1 align-middle">
+                                    <td class="p-0 px-1 align-middle text-center">
                                         {{$purchase_order->shipping_instruction}}
                                     </td>
                                     <td class="p-0 px-1 align-middle">
@@ -90,6 +94,14 @@
                             @endforeach
                         @endif
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="7">TOTAL</th>
+                            <th class="text-right">{{number_format($total_data->quantity)}}</th>
+                            <th class="text-right">{{number_format($total_data->sales, 2)}}</th>
+                            <th class="text-right">{{number_format($total_data->total, 2)}}</th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
 

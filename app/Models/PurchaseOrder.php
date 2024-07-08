@@ -30,4 +30,8 @@ class PurchaseOrder extends Model
     public function getConnectionName() {
         return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
     }
+
+    public function details() {
+        return $this->hasMany('App\Models\PurchaseOrderDetail');
+    }
 }

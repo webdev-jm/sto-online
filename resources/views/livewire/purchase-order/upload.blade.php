@@ -34,7 +34,6 @@
     </div>
 
     @if(!empty($po_data))
-    
         @foreach($po_data as $po_number => $data)
             <div class="card card-outline card-primary">
                 <div class="card-header">
@@ -111,7 +110,7 @@
                             @endphp
                             @foreach($data['products'] as $product)
                                 @php
-                                $gross_amount += $product['total_gross_amount'];
+                                    $gross_amount += $product['total_gross_amount'];
                                     $net_amount += $product['net_amount_per_uom'];
                                     $quantity += $product['quantity'];
                                     $discount_amount += $product['discount_amount'];

@@ -60,6 +60,8 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:purchase order access'], function() {
         Route::get('purchase-order', [PurchaseOrderController::class, 'index'])->name('purchase-order.index');
         Route::get('purchase-order/upload', [PurchaseOrderController::class, 'upload'])->name('purchase-order.upload')->middleware('permission:purchase order upload');
+
+        Route::get('purchase-order/{id}', [PurchaseOrderController::class, 'show'])->name('purchase-order.show');
     });
 
     // INVENTORIES
