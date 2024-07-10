@@ -19,9 +19,6 @@
 
 @section('content')
     <livewire:purchase-order.upload :account_branch="$account_branch"/>
-    @php
-        phpinfo();
-    @endphp
 @stop
 
 @section('css')
