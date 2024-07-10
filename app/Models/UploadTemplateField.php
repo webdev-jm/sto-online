@@ -13,6 +13,12 @@ class UploadTemplateField extends Model
 
     protected $fillable = [
         'upload_template_id',
+        'number',
         'column_name',
+        'column_name_alt'
     ];
+
+    public function template() {
+        return $this->belongsTo('App\Models\UploadTemplate');
+    }
 }

@@ -22,7 +22,7 @@
 @section('content')
     <div class="row">
 
-        <div class="col-lg-5">
+        <div class="col-lg-3">
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">ACCOUNT DETAILS</h3>
@@ -47,6 +47,26 @@
                 </div>
                 <div class="card-footer">
 
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">TEMPLATES</h3>
+                    <div class="card-tools">
+                        <a href="" class="btn btn-primary btn-sm">
+                            <i class="fa fa-plus mr-1"></i>
+                            ADD TEMPLATE
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                </div>
+                <div class="card-footer">
+                    
                 </div>
             </div>
         </div>
@@ -78,5 +98,5 @@
                 });
             });
         </script>
-    @endcan
+    @endcan   
 @stop

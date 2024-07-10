@@ -16,6 +16,7 @@ class CreateUploadTemplateFieldsTable extends Migration
         Schema::create('upload_template_fields', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('upload_template_id')->nullable();
+            $table->integer('number');
             $table->string('column_name');
             $table->string('column_name_alt')->nullable();
             $table->timestamps();
