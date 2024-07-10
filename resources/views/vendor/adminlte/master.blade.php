@@ -114,6 +114,8 @@
                 e.preventDefault();
                 $('body').toggleClass('dark-mode');
                 $(this).find('i').toggleClass('fa-moon').toggleClass('fa-sun');
+                $('body').find('.content-wrapper').toggleClass('bg-light').toggleClass('bg-dark', !$('body').find('.content-wrapper').hasClass('bg-light'));
+                $('body').find('.main-header').toggleClass('navbar-white navbar-light').toggleClass('navbar-secondary navbar-dark', !$('body').find('.main-header').hasClass('navbar-secondary navbar-dark'));
             });
         });
     </script>

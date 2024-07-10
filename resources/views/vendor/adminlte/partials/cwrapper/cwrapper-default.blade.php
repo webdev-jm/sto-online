@@ -7,7 +7,7 @@
 @endif
 
 {{-- Default Content Wrapper --}}
-<div class="content-wrapper {{ config('adminlte.classes_content_wrapper', '') }}">
+<div class="content-wrapper {{ config('adminlte.classes_content_wrapper', '') }} @if(auth()->user()->dark_mode) bg-dark @else bg-light @endif">
 
     {{-- Content Header --}}
     @hasSection('content_header')

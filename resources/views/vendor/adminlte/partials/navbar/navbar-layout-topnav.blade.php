@@ -1,6 +1,7 @@
 <nav class="main-header navbar
     {{ config('adminlte.classes_topnav_nav', 'navbar-expand-md') }}
-    {{ config('adminlte.classes_topnav', 'navbar-white navbar-light') }}">
+    {{-- {{ config('adminlte.classes_topnav', 'navbar-white navbar-light') }}  --}}
+     @if(auth()->user()->dark_mode) navbar-white navbar-light @else navbar-secondary navbar-dark @endif">
 
     <div class="{{ config('adminlte.classes_topnav_container', 'container') }}">
 

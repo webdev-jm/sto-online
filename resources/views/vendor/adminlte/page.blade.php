@@ -20,6 +20,15 @@
         .card-title {
             font-weight: 750;
         }
+
+        .bg-dark {
+            background: #ffffff8e url('/images/pexels-hngstrm-inverted.jpg') no-repeat center center;
+            background-size: cover;
+        }
+        .bg-light {
+            background: #ffffff8e url('/images/pexels-hngstrm-2341290.jpg') no-repeat center center;
+            background-size: cover;
+        }
     </style>
 @stop
 
