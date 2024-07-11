@@ -29,6 +29,30 @@
             background: #ffffff8e url('/images/pexels-hngstrm-2341290.jpg') no-repeat center center;
             background-size: cover;
         }
+
+        .text-bev {
+            font-weight: bold;
+            background: linear-gradient(to right, rgb(255, 76, 76), rgb(156, 1, 1), rgb(255, 76, 76));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .text-portal {
+            font-family: Helvetica, Arial, sans-serif; 
+            display: inline-block;
+            font-weight: bold;
+            background: radial-gradient(circle, rgb(199, 2, 2, 1) 0%, rgba(251, 255, 0, 1) 40%, rgba(55, 0, 255, 1) 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            animation: spin 5s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 @stop
 

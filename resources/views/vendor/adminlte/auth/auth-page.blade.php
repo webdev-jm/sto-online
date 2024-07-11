@@ -11,6 +11,7 @@
 @section('adminlte_css')
     @stack('css')
     @yield('css')
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
         .image-container-gif {
             position: relative;
@@ -28,11 +29,29 @@
             top: -85px;
             left: -40px;
         }
-
-        .overlapping-image:nth-child(3) {
-            top: -70px;
-            left: -22px;
-            width: 250px;
+        .text-bev {
+            font-weight: bold;
+            background: linear-gradient(to right, rgb(255, 76, 76), rgb(156, 1, 1), rgb(255, 76, 76));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .text-portal {
+            font-family: Helvetica, Arial, sans-serif; 
+            display: inline-block;
+            font-size: 50px;
+            font-weight: bold;
+            background: radial-gradient(circle, rgb(199, 2, 2, 1) 0%, rgba(251, 255, 0, 1) 40%, rgba(55, 0, 255, 1) 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            animation: spin 5s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 @stop
@@ -45,15 +64,13 @@
         <div class="image-container-gif">
             <img src="{{asset('/images/X5NX.gif')}}" alt="" class="overlapping-image">
             <img src="{{asset('/images/XDZT.gif')}}" alt="" class="overlapping-image">
-            {{-- <img src="{{asset('/images/YlW9.gif')}}" alt="" class="overlapping-image"> --}}
         </div>
 
         {{-- Logo --}}
         <div class="{{ $auth_type ?? 'login' }}-logo">
             <a href="{{ $dashboard_url }}" class="text-white" style="font-weight: 900; font-size: 50px;">
                 {{-- Logo Label --}}
-                {{-- {!! config('adminlte.logo', 'STO') !!} --}}
-                <b><span class="text-red">BEV</span> PORTAL</b>
+                {!! config('adminlte.logo', 'STO') !!}
             </a>
         </div>
 
