@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>BEV PORTAL</b>',
+    'logo' => '<b><span class="text-bev">BEV</span> P<span class="text-portal"><i class="fa fa-circle"></i></span>RTAL</b>',
     'logo_img' => '/images/STO ONLINE.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,

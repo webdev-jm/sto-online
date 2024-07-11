@@ -83,7 +83,7 @@
                             </tr>
                             <tr>
                                 <th class="border-0">CITY:</th>
-                                <td colspan="5" class="border-0">{{$data['headers']['city']}}</td>
+                                <td colspan="5" class="border-0">{{$data['headers']['city']}}</td> 
                             </tr>
                         </tbody>
                     </table>
