@@ -34,6 +34,16 @@
         @endif
     </div>
 
+    @if(!empty($success_msg))
+    <div class="alert alert-success">
+        <ul class="mb-0">
+            @foreach($success_msg as $msg)
+            <li>{{$msg}}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     @if(!empty($po_data))
         @foreach($po_data as $po_number => $data)
             <div class="card card-outline card-primary">
@@ -60,30 +70,25 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th rowspan="2" class="border-0">VENDOR:</th>
-                                <td rowspan="2" class="border-0">{{$data['headers']['vendor']}}</td>
+                                
                                 <th class="border-0">ORDER DATE:</th>
-                                <td class="border-0">{{$data['headers']['order_date']}}</td>
+                                <td class="border-0">{{$data['headers']['order_date'] ?? ''}}</td>
                                 <th class="border-0">PO NO:</th>
                                 <td class="border-0">{{$po_number}}</td>
                             </tr>
                             <tr>
                                 <th class="border-0">DELIVERY DATE:</th>
-                                <td class="border-0">{{$data['headers']['ship_date']}}</td>
+                                <td class="border-0">{{$data['headers']['ship_date'] ?? ''}}</td>
                                 <th class="border-0">SHIPPING INSTRUCTION:</th>
-                                <td class="border-0">{{$data['headers']['shipping_instruction']}}</td>
+                                <td class="border-0">{{$data['headers']['shipping_instruction'] ?? ''}}</td>
                             </tr>
                             <tr>
                                 <th class="border-0">SHIP TO NAME:</th>
-                                <td colspan="5" class="border-0">{{$data['headers']['ship_to_name']}}</td>
+                                <td colspan="5" class="border-0">{{$data['headers']['ship_to_name'] ?? ''}}</td>
                             </tr>
                             <tr>
                                 <th class="border-0">ADDRESS:</th>
-                                <td colspan="5" class="border-0">{{$data['headers']['ship_to_address']}}</td>
-                            </tr>
-                            <tr>
-                                <th class="border-0">CITY:</th>
-                                <td colspan="5" class="border-0">{{$data['headers']['city']}}</td> 
+                                <td colspan="5" class="border-0">{{$data['headers']['ship_to_address'] ?? ''}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,8 +116,8 @@
                             @endphp
                             @foreach($data['products'] as $product)
                                 @php
-                                    $gross_amount += $product['total_gross_amount'];
-                                    $net_amount += $product['net_amount_per_uom'];
+                                    $gross_amount += $product['gross_amount'];
+                                    $net_amount += $product['net_amount'];
                                     $quantity += $product['quantity'];
                                     $discount_amount += $product['discount_amount'];
                                 @endphp
