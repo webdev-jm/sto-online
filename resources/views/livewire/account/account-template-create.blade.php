@@ -45,7 +45,7 @@
                                 <th class="p-0 align-middle text-center">{{$field->number}}</th>
                                 <th class="p-0 align-middle text-center">{{$field->column_name}}</th>
                                 <td class="p-0">
-                                    <input type="text" class="border-0 form-control" wire:model="account_template_fields.{{$field->id}}.name">
+                                    <input type="text" class="border-0 form-control" wire:model.defer="account_template_fields.{{$field->id}}.name">
                                 </td>
                             </tr>
                             @endforeach

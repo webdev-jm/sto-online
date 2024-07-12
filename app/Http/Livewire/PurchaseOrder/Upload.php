@@ -9,6 +9,8 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use App\Models\AccountProductReference;
 use App\Models\SMSProduct;
+use App\Models\AccountUploadTemplate;
+use App\Models\UploadTemplate;
 
 use Spatie\SimpleExcel\SimpleExcelReader;
 
@@ -23,6 +25,7 @@ class Upload extends Component
     public $files;
     public $po_data;
     public $po_errors = array();
+    public $success_msg = array();
 
     public function uploadData() {
         if(!empty($this->po_data)) {
@@ -81,8 +84,8 @@ class Upload extends Component
                         $purchase_order_detail->save();
     
                         $total_quantity += $product_data['quantity'];
-                        $total_gross_amount += $product_data['total_gross_amount'];
-                        $total_net_amount += $product_data['net_amount_per_uom'];
+                        $total_gross_amount += $product_data['gross_amount'];
+                        $total_net_amount += $product_data['net_amount'];
                     }
     
                     $purchase_order->update([
@@ -93,10 +96,14 @@ class Upload extends Component
 
                     unset($this->po_data[$po_number]);
                     Session::put('po_upload_data', $this->po_data);
+
+                    $this->success_msg[] = 'PO '.$purchase_order->po_number.' has been uploaded.';
                 } else {
                     $this->po_errors[$po_number] = $err;
                 }
             }
+
+
         }
     }
 
@@ -108,69 +115,60 @@ class Upload extends Component
             ]
         ]);
 
-        $this->po_data = array();
+        $this->reset('success_msg');
+
+        $upload_template = UploadTemplate::where('title', 'PO UPLOAD')->first();
+        $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
+            ->where('account_id', $this->account_branch->account_id)
+            ->first();
+
+        $account_template_fields = $account_template->fields()->pluck('file_column_name', 'upload_template_field_id');
+
+        $po_data = array();
         foreach ($this->files as $file) {
             $path1 = $file->storeAs('purchase-order-uploads/account_branch_'.$this->account_branch->id, $file->getClientOriginalName());
             $path = storage_path('app').'/'.$path1;
             
             $rows = $rows = SimpleExcelReader::create($path)->getRows();
+            $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields) {
 
-            $rows->each(function($row) use(&$po_data) {
-                $po_number = $row['PO_NO'];
-                $order_date = date('Y-m-d', strtotime($row['APPROVED_DATE']));
-                $ship_date = date('Y-m-d', strtotime($row['DELIVERY_DATE']));
-                $shipping_instruction = $row['TYPE_OF_ORDER'];
-                $ship_to_name = $row['STORES'];
-                $ship_to_address = $row['ADDREESS'];
-                $status = $row['STATUS'];
-                $total_quantity = 0;
-                $total_amount = $row['TOTAL_GROSS_AMOUNT'];
-                $total_net_amount = $row['TOTAL_NET_COST'];
-                $po_value = $row['TOTAL_NET_COST'];
-                
-                $product_id = NULL;
-                $sku_code = $row['SKU_CODE'];
-                $sku_code_other = $row['UPC_CODE'];
-                $product_name = $row['SKU_DESCRIPTION'];
-                $quantity = $row['QTY_ORDERED'];
-                $unit_of_measure = $row['BUYING_UOM'];
-                $discount = $row['ADDL_DISC'];
-                $discount_amount = $row['TOTAL_DISCOUNT_AMOUNT'];
-                $gross_amount = $row['NET_COST_PER_UOM'];
-                $net_amount = $row['NET_COST_PER_BUYING_UOM'];
-                $net_amount_per_uom = $row['TOTAL_NET_COST'];
-                $total_gross_amount = $row['TOTAL_GROSS_AMOUNT'];
+                foreach($upload_template->fields as $field) {
+                    $column_name = $field->column_name;
+                    $file_column_name = $account_template_fields[$field->id];
+                    ${$column_name} = $row[$file_column_name];
+                }
 
-                $po_data[$row['PO_NO']]['headers'] = [
-                    'vendor' => $row['VENDOR'],
-                    'order_date' => $order_date,
-                    'ship_date' => $ship_date,
+                $po_data[$po_number]['headers'] = [
+                    'vendor' => '',
+                    'order_date' => date('Y-m-d', strtotime($order_date)),
+                    'ship_date' => date('Y-m-d', strtotime($ship_date)),
                     'shipping_instruction' => $shipping_instruction,
                     'ship_to_name' => $ship_to_name,
                     'ship_to_address' => $ship_to_address,
-                    'city' => $row['CITY'],
-                    'status' => $status,
-                    'total_quantity' => $total_quantity,
-                    'total_amount' => $total_amount,
-                    'total_net_amount' => $total_net_amount,
-                    'po_value' => $po_value,
+                    'city' => '',
+                    'status' => '',
+                    'total_quantity' => $quantity,
+                    'total_amount' => $gross_amount,
+                    'total_net_amount' => $net_amount,
+                    'po_value' => $net_amount,
                 ];
-                $po_data[$row['PO_NO']]['products'][] = [
-                    'product_id' => $product_id,
+                $po_data[$po_number]['products'][] = [
+                    'product_id' => NULL,
                     'sku_code' => $sku_code,
                     'sku_code_other' => $sku_code_other,
                     'product_name' => $product_name,
                     'quantity' => $quantity,
                     'unit_of_measure' => $unit_of_measure,
-                    'discount' => $discount,
+                    'discount' => 0,
                     'discount_amount' => $discount_amount,
                     'gross_amount' => $gross_amount,
                     'net_amount' => $net_amount,
                     'net_amount_per_uom' => $net_amount_per_uom,
-                    'total_gross_amount' => $total_gross_amount
+                    'total_gross_amount' => $gross_amount
                 ];
 
             });
+
         }
 
         $this->po_data = $po_data;
