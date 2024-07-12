@@ -52,23 +52,7 @@
         </div>
 
         <div class="col-lg-9">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">TEMPLATES</h3>
-                    <div class="card-tools">
-                        <a href="" class="btn btn-primary btn-sm">
-                            <i class="fa fa-plus mr-1"></i>
-                            ADD TEMPLATE
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
-
-                </div>
-                <div class="card-footer">
-                    
-                </div>
-            </div>
+            <livewire:account.account-template :account="$account"/>
         </div>
 
     </div>

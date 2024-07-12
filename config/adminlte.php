@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b><span class="text-bev">BEV</span> P<span class="text-portal"><i class="fa fa-circle"></i></span>RTAL</b>',
-    'logo_img' => '/images/STO ONLINE.png',
+    'logo_img' => '/images/XDZT.gif',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => '/images/STO ONLINE.png',
+            'path' => '/images/XDZT.gif',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -109,7 +109,7 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => '/images/STO ONLINE.png',
+            'path' => '/images/XDZT.gif',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,

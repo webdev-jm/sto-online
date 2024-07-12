@@ -204,4 +204,12 @@ class AccountController extends Controller
         return response()->json($account);
     }
 
+    public function create_template($id) {
+        $id = decrypt($id);
+        $account = Account::findOrFail($id);
+
+        return view('pages.accounts.create-template')->with([
+            'account' => $account
+        ]);
+    }
 }

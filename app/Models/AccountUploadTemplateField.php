@@ -14,6 +14,7 @@ class AccountUploadTemplateField extends Model
     protected $fillable = [
         'account_upload_template_id',
         'upload_template_field_id',
-        'index_no',
+        'number',
+        'file_column_name',
     ];
 }
