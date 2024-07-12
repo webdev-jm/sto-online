@@ -9,10 +9,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AccountUploadTemplate extends Model
 {
     use HasFactory;
-    use SoftDeletesl;
+    use SoftDeletes;
 
     protected $fillable = [
         'account_id',
         'upload_template_id'
     ];
+
+    public function upload_template() {
+        return $this->belongsTo('App\Models\UploadTemplate');
+    }
 }

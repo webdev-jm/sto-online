@@ -29,10 +29,10 @@
                                         {{$num}}
                                     </td>
                                     <td class="p-0">
-                                        <input type="text" class="form-control border-0" wire:model="lines.{{$key}}.column_name">
+                                        <input type="text" class="form-control border-0" wire:model.defer="lines.{{$key}}.column_name">
                                     </td>
                                     <td class="p-0">
-                                        <input type="text" class="form-control border-0" wire:model="lines.{{$key}}.column_name_alt">
+                                        <input type="text" class="form-control border-0" wire:model.defer="lines.{{$key}}.column_name_alt">
                                     </td>
                                     <td class="p-0 text-center align-middle">
                                         <a href="" class="text-danger" wire:click.prevent="removeLine({{$key}})">
