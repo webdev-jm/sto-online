@@ -23,4 +23,8 @@ class AccountUploadTemplate extends Model
     public function fields() {
         return $this->hasMany('App\Models\AccountUploadTemplateField');
     }
+
+    public function account() {
+        return $this->belongsTo('App\Models\Account');
+    }
 }

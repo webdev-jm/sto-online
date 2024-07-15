@@ -193,6 +193,7 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('account/{id}', [AccountController::class, 'update'])->name('account.update')->middleware('permission:account edit');
 
         Route::get('account/{id}/create-template', [AccountController::class, 'create_template'])->name('account.create-template');
+        Route::get('account/{id}/edit-template', [AccountController::class, 'template_edit'])->name('account.template-edit');
     });
 
     // ACCOUNT BRANCH

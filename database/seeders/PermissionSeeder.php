@@ -131,7 +131,11 @@ class PermissionSeeder extends Seeder
                 'template edit'   => 'Allow user to edit templates',
                 'template delete' => 'Allow user to delete templates',
                 'template restore' => 'Allow user to restore templates',
-            ]
+            ],
+            'Purchase Order' => [
+                'purchase order access' => 'Allow user to access purchase orders',
+                'purchase order upload' => 'Allow user to upload purchase orders',
+            ],
         ];
 
         foreach($permissions_arr as $module => $permissions) {

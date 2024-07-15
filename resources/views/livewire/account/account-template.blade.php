@@ -10,11 +10,11 @@
             </div>
         </div>
         <div class="card-body">
-            <ul class="list-group">
+            <ul class="list-group flex-column">
                 @foreach($account_templates as $template)
-                <li class="list-group-item">
+                <a href="{{route('account.template-edit', encrypt($template->id))}}" class="list-group-item py-1">
                     {{$template->upload_template->title}}
-                </li>
+                </a>
                 @endforeach
             </ul>
         </div>
