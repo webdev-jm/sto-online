@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\AccountDatabase;
 use App\Models\SMSAccount;
+use App\Models\AccountUploadTemplate;
 use Illuminate\Http\Request;
 use App\Http\Requests\AccountAddRequest;
 use App\Http\Requests\AccountEditRequest;
@@ -209,6 +210,17 @@ class AccountController extends Controller
         $account = Account::findOrFail($id);
 
         return view('pages.accounts.create-template')->with([
+            'account' => $account
+        ]);
+    }
+
+    public function template_edit($id) {
+        $id = decrypt($id);
+        $template = AccountUploadTemplate::findOrFail($id);
+        $account = $template->account;
+
+        return view('pages.accounts.edit-template')->with([
+            'template' => $template,
             'account' => $account
         ]);
     }

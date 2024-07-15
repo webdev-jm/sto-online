@@ -17,6 +17,7 @@ class AccountTemplateCreate extends Component
     public $template_fields;
     public $account_template_fields;
     public $err;
+    public $success_msg;
 
     public function save() {
         $this->validate([
@@ -51,6 +52,8 @@ class AccountTemplateCreate extends Component
                     ]);
                     $account_template_field->save();
                 }
+
+                $this->success_msg = 'Account template created successfully';
             }
         }
 

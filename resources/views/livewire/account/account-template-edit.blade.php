@@ -1,7 +1,7 @@
 <div>
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">CREATE TEMPLATE</h3>
+            <h3 class="card-title">EDIT TEMPLATE</h3>
         </div>
         <div class="card-body">
 
@@ -16,13 +16,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">TEMPLATE</label>
-                        <select class="form-control{{$errors->has('template_id') ? ' is-invalid' : ''}}" wire:model="template_id">
-                            <option value="" selected>- SELECT -</option>
-                            @foreach($templates as $template)
-                                <option value="{{$template->id}}">{{$template->title}}</option>
-                            @endforeach
-                        </select>
-                        <small class="text-danger">{{$errors->first('template_id')}}</small>
+                        <p class="text-lg">{{$template->title}}</p>
                     </div>
                 </div>
 
@@ -62,9 +56,9 @@
 
         </div>
         <div class="card-footer text-right">
-            <button class="btn btn-primary btn-sm" wire:click.prevent="save">
+            <button class="btn btn-success btn-sm" wire:click.prevent="update">
                 <i class="fa fa-save mr-1"></i>
-                SAVE
+                UPDATE
             </button>
         </div>
     </div>
