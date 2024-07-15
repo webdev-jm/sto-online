@@ -128,52 +128,69 @@ class Upload extends Component
         foreach ($this->files as $file) {
             $path1 = $file->storeAs('purchase-order-uploads/account_branch_'.$this->account_branch->id, $file->getClientOriginalName());
             $path = storage_path('app').'/'.$path1;
-            
-            $rows = $rows = SimpleExcelReader::create($path)->getRows();
-            $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields) {
 
-                foreach($upload_template->fields as $field) {
-                    $column_name = $field->column_name;
-                    $file_column_name = $account_template_fields[$field->id];
-                    ${$column_name} = $row[$file_column_name];
+            // Get the file extension
+            $extension = $file->getClientOriginalExtension();
+            if(in_array($extension, ['xlsx', 'csv'])) {
+                $rows = $rows = SimpleExcelReader::create($path)->getRows();
+                $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields) {
+                    $this->processRow($row, $po_data, $upload_template, $account_template_fields);
+                });
+            } else if($extension == 'xml') {
+                $xml = simplexml_load_file($path);
+                foreach($xml->children() as $child) {
+                    $row = [];
+                    foreach ($upload_template->fields as $field) {
+                        $file_column_name = $account_template_fields[$field->id];
+                        $row[$file_column_name] = (string)$child->{$file_column_name};
+                    }
+                    $this->processRow($row, $po_data, $upload_template, $account_template_fields);
                 }
-
-                $po_data[$po_number]['headers'] = [
-                    'vendor' => '',
-                    'order_date' => date('Y-m-d', strtotime($order_date)),
-                    'ship_date' => date('Y-m-d', strtotime($ship_date)),
-                    'shipping_instruction' => $shipping_instruction,
-                    'ship_to_name' => $ship_to_name,
-                    'ship_to_address' => $ship_to_address,
-                    'city' => '',
-                    'status' => '',
-                    'total_quantity' => $quantity,
-                    'total_amount' => $gross_amount,
-                    'total_net_amount' => $net_amount,
-                    'po_value' => $net_amount,
-                ];
-                $po_data[$po_number]['products'][] = [
-                    'product_id' => NULL,
-                    'sku_code' => $sku_code,
-                    'sku_code_other' => $sku_code_other,
-                    'product_name' => $product_name,
-                    'quantity' => $quantity,
-                    'unit_of_measure' => $unit_of_measure,
-                    'discount' => 0,
-                    'discount_amount' => $discount_amount,
-                    'gross_amount' => $gross_amount,
-                    'net_amount' => $net_amount,
-                    'net_amount_per_uom' => $net_amount_per_uom,
-                    'total_gross_amount' => $gross_amount
-                ];
-
-            });
-
+            }
         }
 
         $this->po_data = $po_data;
         
         Session::put('po_upload_data', $this->po_data);
+    }
+
+    function processRow($row, &$po_data, $upload_template, $account_template_fields) {
+        $po_number = ''; // Assign or extract $po_number as required
+    
+        foreach ($upload_template->fields as $field) {
+            $column_name = $field->column_name;
+            $file_column_name = $account_template_fields[$field->id];
+            ${$column_name} = $row[$file_column_name];
+        }
+    
+        $po_data[$po_number]['headers'] = [
+            'vendor' => '',
+            'order_date' => date('Y-m-d', strtotime($order_date)),
+            'ship_date' => date('Y-m-d', strtotime($ship_date)),
+            'shipping_instruction' => $shipping_instruction,
+            'ship_to_name' => $ship_to_name,
+            'ship_to_address' => $ship_to_address,
+            'city' => '',
+            'status' => '',
+            'total_quantity' => $quantity,
+            'total_amount' => $gross_amount,
+            'total_net_amount' => $net_amount,
+            'po_value' => $net_amount,
+        ];
+        $po_data[$po_number]['products'][] = [
+            'product_id' => NULL,
+            'sku_code' => $sku_code,
+            'sku_code_other' => $sku_code_other,
+            'product_name' => $product_name,
+            'quantity' => $quantity,
+            'unit_of_measure' => $unit_of_measure,
+            'discount' => 0,
+            'discount_amount' => $discount_amount,
+            'gross_amount' => $gross_amount,
+            'net_amount' => $net_amount,
+            'net_amount_per_uom' => $net_amount_per_uom,
+            'total_gross_amount' => $gross_amount
+        ];
     }
 
     public function validateData($po_number, $data) {
