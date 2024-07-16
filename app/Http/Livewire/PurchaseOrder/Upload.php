@@ -122,7 +122,14 @@ class Upload extends Component
             ->where('account_id', $this->account_branch->account_id)
             ->first();
 
-        $account_template_fields = $account_template->fields()->pluck('file_column_name', 'upload_template_field_id');
+        $account_template_fields = $account_template->fields->mapWithKeys(function($field) {
+            return [
+                $field->upload_template_field_id => [
+                    'file_column_name' => $field->file_column_name,
+                    'file_column_number' => $field->file_column_number,
+                ],
+            ];
+        });
 
         $po_data = array();
         foreach ($this->files as $file) {
@@ -132,19 +139,28 @@ class Upload extends Component
             // Get the file extension
             $extension = $file->getClientOriginalExtension();
             if(in_array($extension, ['xlsx', 'csv'])) {
-                $rows = $rows = SimpleExcelReader::create($path)->getRows();
-                $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields) {
-                    $this->processRow($row, $po_data, $upload_template, $account_template_fields);
+                if($account_template->type == 'name') {
+                    $rows = $rows = SimpleExcelReader::create($path)
+                        ->getRows();
+                } else if($account_template->type == 'number') {
+                    $rows = $rows = SimpleExcelReader::create($path)
+                        ->skip($account_template->start_row - 1)
+                        ->noHeaderRow()
+                        ->getRows();
+                }
+
+                $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
+                    $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
                 });
             } else if($extension == 'xml') {
                 $xml = simplexml_load_file($path);
                 foreach($xml->children() as $child) {
                     $row = [];
                     foreach ($upload_template->fields as $field) {
-                        $file_column_name = $account_template_fields[$field->id];
+                        $file_column_name = $account_template_fields[$field->id]['file_column_name'];
                         $row[$file_column_name] = (string)$child->{$file_column_name};
                     }
-                    $this->processRow($row, $po_data, $upload_template, $account_template_fields);
+                    $this->processRow($row, $po_data, $upload_template, $account_template_fields, 'name');
                 }
             }
         }
@@ -154,12 +170,17 @@ class Upload extends Component
         Session::put('po_upload_data', $this->po_data);
     }
 
-    function processRow($row, &$po_data, $upload_template, $account_template_fields) {
+    function processRow($row, &$po_data, $upload_template, $account_template_fields, $type) {
         $po_number = ''; // Assign or extract $po_number as required
     
         foreach ($upload_template->fields as $field) {
             $column_name = $field->column_name;
-            $file_column_name = $account_template_fields[$field->id];
+            if($type == 'name') {
+                $file_column_name = $account_template_fields[$field->id]['file_column_name'];
+            } else if($type == 'number') {
+                $file_column_name = $account_template_fields[$field->id]['file_column_number'] - 1;
+            }
+
             ${$column_name} = $row[$file_column_name];
         }
     

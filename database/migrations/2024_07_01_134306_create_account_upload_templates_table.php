@@ -17,6 +17,8 @@ class CreateAccountUploadTemplatesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->unsignedBigInteger('upload_template_id')->nullable();
+            $table->string('type');
+            $table->integer('start_row');
             $table->timestamps();
 
             $table->softDeletes();

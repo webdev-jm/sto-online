@@ -18,7 +18,8 @@ class CreateAccountUploadTemplateFieldsTable extends Migration
             $table->unsignedBigInteger('account_upload_template_id')->nullable();
             $table->unsignedBigInteger('upload_template_field_id')->nullable();
             $table->integer('number');
-            $table->string('file_column_name');
+            $table->string('file_column_name')->nullable();
+            $table->integer('file_column_number')->nullable();
             $table->timestamps();
 
             $table->softDeletes();

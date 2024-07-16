@@ -13,7 +13,9 @@ class AccountUploadTemplate extends Model
 
     protected $fillable = [
         'account_id',
-        'upload_template_id'
+        'upload_template_id',
+        'type',
+        'start_row',
     ];
 
     public function upload_template() {

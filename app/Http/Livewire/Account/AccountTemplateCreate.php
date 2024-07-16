@@ -8,6 +8,8 @@ use App\Models\UploadTemplate;
 use App\Models\AccountUploadTemplate;
 use App\Models\AccountUploadTemplateField;
 
+use Illuminate\Validation\Rule;
+
 class AccountTemplateCreate extends Component
 {
     public $account;
@@ -19,19 +21,32 @@ class AccountTemplateCreate extends Component
     public $err;
     public $success_msg;
 
+    public $start_row, $column_type;
+
     public function save() {
         $this->validate([
             'template_id' => [
+                'required',
+                Rule::unique((new AccountUploadTemplate)->getTable(), 'upload_template_id')->where(function($q) {
+                    return $q->where('account_id', $this->account->id);
+                })
+            ],
+            'start_row' => [
                 'required'
             ],
+            'column_type' => [
+                'required'
+            ]
         ]);
 
         // check data
         if(!empty($this->account_template_fields)) {
             $this->err = array();
             foreach($this->template_fields as $field) {
-                if(empty($this->account_template_fields[$field->id])) {
+                if(empty($this->account_template_fields[$field->id]['name']) && $this->column_type == 'name') {
                     $this->err[$field->id] = 'Template field name is required';
+                } else if(empty($this->account_template_fields[$field->id]['number']) && $this->column_type == 'number') {
+                    $this->err[$field->id] = 'Template field number is required';
                 }
             }
 
@@ -40,6 +55,8 @@ class AccountTemplateCreate extends Component
                 $account_template = new AccountUploadTemplate([
                     'account_id' => $this->account->id,
                     'upload_template_id' => $this->template_id,
+                    'type' => $this->column_type,
+                    'start_row' => $this->start_row
                 ]);
                 $account_template->save();
 
@@ -48,7 +65,8 @@ class AccountTemplateCreate extends Component
                         'account_upload_template_id' => $account_template->id,
                         'upload_template_field_id' => $field->id,
                         'number' => $field->number,
-                        'file_column_name' => $this->account_template_fields[$field->id]['name'],
+                        'file_column_name' => $this->account_template_fields[$field->id]['name'] ?? NULL,
+                        'file_column_number' => $this->account_template_fields[$field->id]['number'] ?? NULL,
                     ]);
                     $account_template_field->save();
                 }
@@ -57,6 +75,9 @@ class AccountTemplateCreate extends Component
             }
         }
 
+    }
+
+    public function updatedColumnType() {
     }
 
     public function updatedTemplateId() {

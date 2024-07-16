@@ -31,6 +31,8 @@ class PurchaseOrderController extends Controller
                     $query->whereBetween('order_date', [$filters['from'], $filters['to']]);
                 } else if ($filters['date_type'] == 'ship_date') {
                     $query->whereBetween('ship_date', [$filters['from'], $filters['to']]);
+                } else if($filters['date_type'] == 'created_at') {
+                    $query->whereBetween(DB::raw('DATE(created_at)'), [$filters['from'], $filters['to']]);
                 }
             })
             ->orderBy('created_at', 'desc')
@@ -46,6 +48,8 @@ class PurchaseOrderController extends Controller
                     $query->whereBetween('order_date', [$filters['from'], $filters['to']]);
                 } else if ($filters['date_type'] == 'ship_date') {
                     $query->whereBetween('ship_date', [$filters['from'], $filters['to']]);
+                } else if($filters['date_type'] == 'created_at') {
+                    $query->whereBetween(DB::raw('DATE(created_at)'), [$filters['from'], $filters['to']]);
                 }
             })
             ->where('account_branch_id', $account_branch->id)

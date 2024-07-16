@@ -16,5 +16,6 @@ class AccountUploadTemplateField extends Model
         'upload_template_field_id',
         'number',
         'file_column_name',
+        'file_column_number',
     ];
 }
