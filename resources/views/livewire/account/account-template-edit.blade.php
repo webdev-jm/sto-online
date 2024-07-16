@@ -16,7 +16,27 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">TEMPLATE</label>
-                        <p class="text-lg">{{$template->title}}</p>
+                        <p class="text-lg">{{$accountTemplate->upload_template->title}}</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">START ROW</label>
+                        <input type="number" class="form-control{{$errors->has('start_row') ? ' is-invalid' : ''}}" wire:model="start_row">
+                        <small class="text-danger">{{$errors->first('start_row')}}</small>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">COLUMN TYPE</label>
+                        <select class="form-control{{$errors->has('column_type') ? ' is-invalid' : ''}}" wire:model="column_type">
+                            <option value="" selected>- SELECT -</option>
+                            <option value="name">COLUMN NAME</option>
+                            <option value="number">COLUMN NUMBER</option>
+                        </select>
+                        <small class="text-danger">{{$errors->first('column_type')}}</small>
                     </div>
                 </div>
 
@@ -36,7 +56,12 @@
                             <tr class="text-center">
                                 <th class="p-0 align-middle">#</th>
                                 <th class="p-0 align-middle">FIELD</th>
-                                <th class="p-0 align-middle">FILE COLUMN NAME</th>
+                                <th class="p-0 align-middle">
+                                    FILE COLUMN NAME
+                                </th>
+                                <th class="p-0 align-middle">
+                                    FILE COLUMN NUMBER
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +71,9 @@
                                 <th class="p-0 align-middle text-center">{{$field->column_name}}</th>
                                 <td class="p-0">
                                     <input type="text" class="border-0 form-control" wire:model.defer="account_template_fields.{{$field->id}}.name">
+                                </td>
+                                <td class="p-0">
+                                    <input type="number" class="border-0 form-control" wire:model.defer="account_template_fields.{{$field->id}}.number">
                                 </td>
                             </tr>
                             @endforeach

@@ -38,6 +38,7 @@
                         <tr class="text-center">
                             <th class="align-middle p-0">PO Number</th>
                             <th class="align-middle p-0">Status</th>
+                            <th class="align-middle p-0">Upload Date</th>
                             <th class="align-middle p-0">Order Date</th>
                             <th class="align-middle p-0">Ship Date</th>
                             <th class="align-middle p-0">Shipping Instruction</th>
@@ -69,6 +70,9 @@
                                         {{$purchase_order->status}}
                                     </td>
                                     <td class="p-0 px-1 align-middle text-center">
+                                        {{date('Y-m-d', strtotime($purchase_order->created_at))}}
+                                    </td>
+                                    <td class="p-0 px-1 align-middle text-center">
                                         {{$purchase_order->order_date}}
                                     </td>
                                     <td class="p-0 px-1 align-middle text-center">
@@ -98,7 +102,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="7">TOTAL</th>
+                            <th colspan="8">TOTAL</th>
                             <th class="text-right">{{number_format($total_data->quantity)}}</th>
                             <th class="text-right">{{number_format($total_data->sales, 2)}}</th>
                             <th class="text-right">{{number_format($total_data->total, 2)}}</th>

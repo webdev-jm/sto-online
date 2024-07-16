@@ -21,6 +21,7 @@
                                 <option value="">-SELECT TYPE-</option>
                                 <option value="order_date">ORDER DATE</option>
                                 <option value="ship_date">SHIP DATE</option>
+                                <option value="created_at">UPLOAD DATE</option>
                             </select>
                         </div>
                     </div>
