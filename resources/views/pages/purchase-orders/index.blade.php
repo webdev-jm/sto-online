@@ -18,10 +18,12 @@
         <div class="card-header">
             <h3 class="card-title">PO LIST</h3>
             <div class="card-tools">
-                <a href="{{route('purchase-order.upload')}}" class="btn btn-primary btn-xs">
-                    <i class="fa fa-upload"></i>
-                    UPLOAD
-                </a>
+                @can('purchase order upload')
+                    <a href="{{route('purchase-order.upload')}}" class="btn btn-primary btn-xs">
+                        <i class="fa fa-upload"></i>
+                        UPLOAD
+                    </a>
+                @endcan
             </div>
         </div>
         <div class="card-body">

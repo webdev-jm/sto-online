@@ -45,12 +45,23 @@
     <hr>
     <div class="row">
 
+        @can('purchase order access')
         <div class="col-lg-3">
             <a href="{{route('purchase-order.index')}}" class="btn btn-block btn-app bg-gradient-orange ml-0">
                 <i class="fa fa-shopping-cart text-white"></i>
                 <span class="text-white">PURCHASE ORDERS</span>
             </a>
         </div>
+        @endcan
+
+        @can('stock on hand access')
+        <div class="col-lg-3">
+            <a href="{{route('stock-on-hand.index')}}" class="btn btn-block btn-app bg-gradient-gray ml-0">
+                <i class="fa fa-cubes text-white"></i>
+                <span class="text-white">STOCK ON HAND</span>
+            </a>
+        </div>
+        @endcan
 
     </div>
 

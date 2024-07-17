@@ -18,7 +18,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\UploadTemplateController;
 use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Livewire\PurchaseOrder\Upload;
+use App\Http\Controllers\StockOnHandController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +62,12 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('purchase-order/upload', [PurchaseOrderController::class, 'upload'])->name('purchase-order.upload')->middleware('permission:purchase order upload');
 
         Route::get('purchase-order/{id}', [PurchaseOrderController::class, 'show'])->name('purchase-order.show');
+    });
+
+    // STOCK ON HAND
+    Route::group(['middleware' => 'permission:stock on hand access'], function() {
+        Route::get('stock-on-hand', [StockOnHandController::class, 'index'])->name('stock-on-hand.index');
+        Route::get('stock-on-hand/upload', [StockOnHandController::class, 'upload'])->name('stock-on-hand.upload')->middleware('permission:stock on hand upload');
     });
 
     // INVENTORIES
