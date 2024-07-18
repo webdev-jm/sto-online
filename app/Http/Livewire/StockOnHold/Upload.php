@@ -8,6 +8,11 @@ use Livewire\WithPagination;
 
 use App\Models\UploadTemplate;
 use App\Models\AccountUploadTemplate;
+use App\Models\StockOnHand;
+use App\Models\StockOnHandProduct;
+use App\Models\Customer;
+use App\Models\SMSProduct;
+use App\Models\AccountProductReference;
 
 use Spatie\SimpleExcel\SimpleExcelReader;
 
@@ -24,6 +29,98 @@ class Upload extends Component
     public $upload_file;
     public $data;
     public $perPage = 20;
+    public $year, $month;
+    public $success_msg;
+
+    public function save() {
+        $this->validate([
+            'year' => [
+                'required'
+            ],
+            'month' => [
+                'required'
+            ],
+        ]);
+
+        if(!empty($this->data)) {
+
+            $account_product_references = AccountProductReference::where('account_id', $this->account_branch->account->sms_account_id)->get();
+
+            foreach($this->data as $val) {
+                $customer = $this->checkCustomer($val['customer_code'], $val['customer_name']);
+
+                // check if already exists
+                $stock_on_hand = StockOnHand::where('account_branch_id', $this->account_branch->id)
+                    ->where('customer_id', $customer->id)
+                    ->where('year', $this->year)
+                    ->where('month', $this->month)
+                    ->first();
+                if(empty($stock_on_hand)) {
+                    $stock_on_hand = new StockOnHand([
+                        'account_branch_id' => $this->account_branch->id,
+                        'customer_id' => $customer->id,
+                        'year' => $this->year,
+                        'month' => $this->month,
+                        'total_inventory' => 0
+                    ]);
+                    $stock_on_hand->save();
+                }
+
+                // check product
+                $product = SMSProduct::where('stock_code', $val['sku_code'])
+                    ->orWhere('stock_code', $val['sku_code_other'])
+                    ->first();
+                if(empty($product)) {
+                    $account_product = $account_product_references->filter(function ($reference) use ($val) {
+                            return $reference->account_reference == $val['sku_code'] ||
+                                $reference->account_reference == $val['sku_code_other'] ||
+                                intval($reference->account_reference) == intval($val['sku_code']) ||
+                                intval($reference->account_reference) == intval($val['sku_code_other']);
+                        })->first();
+
+                    if(!empty($account_product)) {
+                        $product = SMSProduct::where('id', $account_product->product_id)
+                            ->first();
+                    }
+                }
+
+                $stock_on_hand_product = new StockOnHandProduct([
+                    'stock_on_hand_id' => $stock_on_hand->id,
+                    'product_id' => $product->id ?? NULL,
+                    'sku_code' => $val['sku_code'],
+                    'sku_code_other' => $val['sku_code_other'],
+                    'inventory' => $val['inventory']
+                ]);
+                $stock_on_hand_product->save();
+
+                $stock_on_hand->update([
+                    'total_inventory' => $stock_on_hand->total_inventory + $val['inventory']
+                ]);
+            }
+
+            $this->reset('data');
+            $this->success_msg = "Stock on hand uploaded successfully.";
+        }
+    }
+
+    public function checkCustomer($customer_code, $customer_name) {
+        // check if already exists
+        $customer = Customer::where('code', $customer_code)
+            ->where('account_branch_id', $this->account_branch->id)
+            ->first();
+        if(empty($customer)) {
+            $customer = new Customer([
+                'account_id' => $this->account_branch->account_id,
+                'account_branch_id' => $this->account_branch->id,
+                'code' => $customer_code,
+                'name' => $customer_name,
+                'address' => '',
+            ]);
+            $customer->save();
+        }
+
+        return $customer;
+    }
 
     public function checkFile() {
         $this->validate([
@@ -131,6 +228,8 @@ class Upload extends Component
 
     public function mount($account_branch) {
         $this->account_branch = $account_branch;
+        $this->year = date('Y');
+        $this->month = date('m');
     }
 
     public function render()
