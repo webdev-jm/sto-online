@@ -6,6 +6,21 @@
         <div class="card-body">
             
             <div class="row">
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">YEAR</label>
+                        <input type="number" class="form-control" placeholder="Year" wire:model="year">
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">MONTH</label>
+                        <input type="number" class="form-control" placeholder="Month" wire:model="month">
+                    </div>
+                </div>
+
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label for="">UPLOAD FILE</label>
@@ -20,17 +35,24 @@
                         CHECK
                     </button>
                 </div>
+                
             </div>
 
         </div>
     </div>
+
+    @if(!empty($success_msg))
+    <div class="alert alert-success">
+        {{$success_msg}}
+    </div>
+    @endif
 
     @if(!empty($data))
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">UPLOAD PREVIEW <i class="fa fa-spinner fa-spin fa-sm" wire:loading></i></h3>
             <div class="card-tools">
-                <button class="btn btn-info btn-sm" wire:loading.attr="disabled" wire:target="checkFile">
+                <button class="btn btn-info btn-sm" wire:loading.attr="disabled" wire:target="checkFile" wire:click.prevent="save">
                     <i class="fa fa-upload fa-sm mr-1"></i>
                     UPLOAD
                 </button>
