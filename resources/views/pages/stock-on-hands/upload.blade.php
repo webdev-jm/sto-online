@@ -20,7 +20,7 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <livewire:stock-on-hold.upload :account_branch="$account_branch"/>
+            <livewire:stock-on-hand.uploads :account_branch="$account_branch"/>
         </div>
     </div>
 @stop

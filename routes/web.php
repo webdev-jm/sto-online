@@ -19,6 +19,7 @@ use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\UploadTemplateController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\StockOnHandController;
+use App\Http\Controllers\StockTransferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +69,12 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:stock on hand access'], function() {
         Route::get('stock-on-hand', [StockOnHandController::class, 'index'])->name('stock-on-hand.index');
         Route::get('stock-on-hand/upload', [StockOnHandController::class, 'upload'])->name('stock-on-hand.upload')->middleware('permission:stock on hand upload');
+    });
+
+    // STOCK TRANSFER
+    Route::group(['middleware' => 'permission:stock transfer access'], function() {
+        Route::get('stock-transfer', [StockTransferController::class, 'index'])->name('stock-transfer.index');
+        Route::get('stock-transfer/upload', [StockTransferController::class, 'upload'])->name('stock-transfer.upload')->middleware('permission:stock transfer upload');
     });
 
     // INVENTORIES

@@ -1,11 +1,11 @@
 @extends('adminlte::page')
 
-@section('title', 'Stock On Hand - '.$account->short_name)
+@section('title', 'Stock Transfer - '.$account->short_name)
 
 @section('content_header')
 <div class="row">
     <div class="col-lg-6">
-        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - STOCK ON HAND</h1>
+        <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - STOCK TRANSFERS</h1>
     </div>
     <div class="col-lg-6 text-right">
         <a href="{{route('menu', encrypt($account_branch->id))}}" class="btn btn-secondary btn-sm"><i class="fa fa-home mr-1"></i>Main Menu</a>
@@ -16,10 +16,10 @@
 @section('content')
     <div class="card card-outline">
         <div class="card-header">
-            <h3 class="card-title">STOCK ON HAND PER STORE</h3>
+            <h3 class="card-title">STOCK TRANSFERS</h3>
             <div class="card-tools">
-                @can('stock on hand upload')
-                    <a href="{{route('stock-on-hand.upload')}}" class="btn btn-info btn-sm">
+                @can('stock transfer upload')
+                    <a href="{{route('stock-transfer.upload')}}" class="btn btn-info btn-sm">
                         <i class="fa fa-upload mr-1"></i>
                         UPLOAD
                     </a>
@@ -46,20 +46,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($stock_on_hands as $soh)
-                        <tr>
-                            <td>
-                                {{$soh->customer->code}}
-                            </td>
-                            <td>
-                                {{$soh->customer->name}}
-                            </td>
-                            <td class="text-center">{{$soh->year}}</td>
-                            <td class="text-center">{{$soh->month}}</td>
-                            <td class="text-center">{{date('Y-m-d H:i:s a', strtotime($soh->created_at))}}</td>
-                            <td class="text-right">{{number_format($soh->total_inventory)}}</td>
-                        </tr>
-                        @endforeach
                     </tbody>
                     <tfoot>
                     </tfoot>
@@ -68,7 +54,6 @@
 
         </div>
         <div class="card-footer">
-            {{$stock_on_hands->links()}}
         </div>
     </div>
 @stop

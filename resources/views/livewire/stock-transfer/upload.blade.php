@@ -1,0 +1,87 @@
+<div>
+    <div class="card card-outline">
+        <div class="card-header">
+            <h3 class="card-title">UPLOAD STOCK TRANSFER</h3>
+            <div class="card-tools">
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">YEAR</label>
+                        <input type="number" class="form-control{{$errors->has('year') ? ' is-invalid' : ''}}" wire:model="year">
+                        <small class="text-danger">{{$errors->first('year')}}</small>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="">MONTH</label>
+                        <input type="number" class="form-control{{$errors->has('month') ? ' is-invalid' : ''}}" wire:model="month">
+                        <small class="text-danger">{{$errors->first('month')}}</small>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">UPLOAD FILE</label>
+                        <input type="file" class="form-control{{$errors->has('upload_file') ? ' is-invalid' : ''}}" wire:model="upload_file">
+                        <small class="text-danger">{{$errors->first('upload_file')}}</small>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary btn-sm" wire:click.prevent="checkFile">
+                        <i class="fa fa-check mr-1"></i>
+                        CHECK
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+
+    @if(!empty($data))
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">UPLOAD DATA PREVIEW</h3>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>CUSTOMER CODE</th>
+                            <th>CUSTOMER NAME</th>
+                            <th>SKU CODE</th>
+                            <th>SKU CODE OTHER</th>
+                            <th>PRODUCT DESCRIPTION</th>
+                            <th>TRANSFER IN UNITS TY</th>
+                            <th>TRANSFER IN UNITS LY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($paginatedData as $val)
+                        <tr>
+                            <td>{{$val['customer_code']}}</td>
+                            <td>{{$val['customer_name']}}</td>
+                            <td>{{$val['sku_code']}}</td>
+                            <td>{{$val['sku_code_other']}}</td>
+                            <td>{{$val['product_description']}}</td>
+                            <td>{{$val['transfer_ty']}}</td>
+                            <td>{{$val['transfer_ly']}}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                {{$paginatedData->links()}}
+            </div>
+        </div>
+    @endif
+
+</div>

@@ -140,6 +140,10 @@ class PermissionSeeder extends Seeder
                 'stock on hand access' => 'Allow user to access stock on hand',
                 'stock on hand upload' => 'Allow user to upload stock on hand',
             ],
+            'Stock Transfer' => [
+                'stock transfer access' => 'Allow user to access stock transfer',
+                'stock transfer upload' => 'Allow user to upload stock transfer',
+            ],
         ];
 
         foreach($permissions_arr as $module => $permissions) {

@@ -14,8 +14,24 @@
 @stop
 
 @section('content')
+    <strong class="text-lg">REPORTS</strong>
+    <hr class="mt-0">
+
     <div class="row">
 
+        <div class="col-lg-3">
+            <a href="{{route('report.index')}}" class="btn btn-block btn-app bg-gradient-maroon ml-0">
+                <i class="fa fa-chart-line"></i>
+                REPORTS
+            </a>
+        </div>
+
+    </div>
+
+    <strong class="text-lg">UPLOADS</strong>
+    <hr class="mt-0">
+
+    <div class="row">
         @can('sales access')
         <div class="col-lg-3">
             <a href="{{route('sales.index')}}" class="btn btn-block btn-app bg-gradient-olive ml-0">
@@ -34,17 +50,6 @@
         </div>
         @endcan
 
-        <div class="col-lg-3">
-            <a href="{{route('report.index')}}" class="btn btn-block btn-app bg-gradient-maroon ml-0">
-                <i class="fa fa-chart-line"></i>
-                REPORTS
-            </a>
-        </div>
-    </div>
-
-    <hr>
-    <div class="row">
-
         @can('purchase order access')
         <div class="col-lg-3">
             <a href="{{route('purchase-order.index')}}" class="btn btn-block btn-app bg-gradient-orange ml-0">
@@ -62,10 +67,18 @@
             </a>
         </div>
         @endcan
+        
+        <div class="col-lg-3">
+            <a href="{{route('stock-transfer.index')}}" class="btn btn-block btn-app bg-gradient-purple ml-0">
+                <i class="fa fa-exchange-alt text-white"></i>
+                <span class="text-white">STOCK TRANSFER</span>
+            </a>
+        </div>
 
     </div>
 
-    <hr>
+    <strong class="text-lg">MAINTENANCE</strong>
+    <hr class="mt-0">
 
     <div class="row">
 
@@ -125,7 +138,8 @@
         
     </div>
 
-    <hr>
+    <strong class="text-lg">DASHBOARD</strong>
+    <hr class="mt-0">
 
     <div class="card">
         <div class="card-header">

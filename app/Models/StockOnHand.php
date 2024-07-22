@@ -30,4 +30,8 @@ class StockOnHand extends Model
     public function products() {
         return $this->hasMany('App\Models\StockOnHandProduct');
     }
+
+    public function customer() {
+        return $this->belongsTo('App\Models\Customer');
+    }
 }
