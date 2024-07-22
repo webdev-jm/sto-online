@@ -1,7 +1,7 @@
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">STOCK ON HOLD UPLOAD</h3>
+            <h3 class="card-title">STOCK ON HAND UPLOAD</h3>
         </div>
         <div class="card-body">
             

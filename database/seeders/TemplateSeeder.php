@@ -1,0 +1,164 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\UploadTemplate;
+use App\Models\UploadTemplateField;
+
+class TemplateSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.a
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $po_template_arr = [
+            [
+                'column' => 'po_number',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'order_date',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_date',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'shipping_instruction',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_to_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_to_address',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code_other',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'product_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'unit_of_measure',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'quantity',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'discount_amount',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'gross_amount',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'net_amount',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'net_amount_per_uom',
+                'column_alt' => ''
+            ],
+        ];
+
+        $stock_on_hand_template = [
+            [
+                'column' => 'customer_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'customer_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code_other',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'product_description',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'inventory',
+                'column_alt' => ''
+            ],
+        ];
+
+        $stock_transfer_template = [
+            [
+                'column' => 'customer_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'customer_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code_other',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'product_description',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'transfer_ty',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'transfer_ly',
+                'column_alt' => ''
+            ],
+        ];
+
+        $templates_arr = [
+            'PO UPLOAD' => $po_template_arr,
+            'STOCK ON HAND UPLOAD' => $stock_on_hand_template,
+            'STOCK TRANSFER UPLOAD' => $stock_transfer_template,
+        ];
+
+        foreach($templates_arr as $title => $data) {
+            $template = new UploadTemplate([
+                'title' => $title
+            ]);
+            $template->save();
+
+            $num = 0;
+            foreach($data as $val) {
+                $num++;
+                $field = new UploadTemplateField([
+                    'upload_template_id' => $template->id,
+                    'number' => $num,
+                    'column_name' => $val['column'],
+                    'column_name_alt' => $val['column_alt'],
+                ]);
+                $field->save();
+            }
+        }
+    }
+}
