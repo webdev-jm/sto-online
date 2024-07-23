@@ -22,6 +22,8 @@ class CreateStockTransferProductsTable extends Migration
             $table->integer('transfer_ty')->default(0);
             $table->integer('transfer_ly')->default(0);
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

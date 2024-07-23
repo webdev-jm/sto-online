@@ -23,4 +23,8 @@ class StockTransferProduct extends Model
     public function getConnectionName() {
         return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
     }
+
+    public function sku() {
+        return $this->belongsTo('App\Models\SMSProduct', 'product_id', 'id');
+    }
 }
