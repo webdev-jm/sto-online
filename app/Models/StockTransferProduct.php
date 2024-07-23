@@ -19,4 +19,8 @@ class StockTransferProduct extends Model
         'transfer_ty',
         'transfer_ly',
     ];
+
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
 }

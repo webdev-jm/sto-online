@@ -33,22 +33,38 @@
                 </div>
 
                 <div class="col-12">
-                    <button class="btn btn-primary btn-sm" wire:click.prevent="checkFile">
-                        <i class="fa fa-check mr-1"></i>
+                    <button class="btn btn-primary btn-sm" wire:click.prevent="checkFile" wire:target="checkFile" wire:loading.attr="disabled">
+                        <i class="fa fa-check fa-sm" wire:loading.remove  wire:target="checkFile"></i>
+                        <i class="fa fa-spinner fa-spin fa-sm" wire:loading  wire:target="checkFile"></i>
                         CHECK
                     </button>
                 </div>
             </div>
 
         </div>
-        <div class="card-footer">
+        <div class="card-footer text-right">
+            @if(!empty($data))
+            <button class="btn btn-info btn-sm" wire:click.prevent="saveData" wire:loading.attr="disabled">
+                <i class="fa fa-upload fa-sm"></i>
+                UPLOAD
+            </button>
+            @endif
         </div>
     </div>
+
+    @if(!empty($success_msg))
+    <div class="alert alert-success">
+        {{$success_msg}}
+    </div>
+    @endif
 
     @if(!empty($data))
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">UPLOAD DATA PREVIEW</h3>
+                <h3 class="card-title">
+                    UPLOAD DATA PREVIEW
+                    <i class="fa fa-spinner fa-spin fa-sm ml-2" wire:loading></i>
+                </h3>
             </div>
             <div class="card-body p-0 table-responsive">
                 <table class="table table-sm table-bordered">
@@ -79,7 +95,7 @@
                 </table>
             </div>
             <div class="card-footer">
-                {{$paginatedData->links()}}
+                {{ $paginatedData->links() }}
             </div>
         </div>
     @endif

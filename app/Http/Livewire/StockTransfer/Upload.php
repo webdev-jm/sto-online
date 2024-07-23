@@ -9,6 +9,10 @@ use Livewire\WithPagination;
 use App\Models\Customer;
 use App\Models\UploadTemplate;
 use App\Models\AccountUploadTemplate;
+use App\Models\AccountProductReference;
+use App\Models\SMSProduct;
+use App\Models\StockTransfer;
+use App\Models\StockTransferProduct;
 
 use Spatie\SimpleExcel\SimpleExcelReader;
 
@@ -26,6 +30,7 @@ class Upload extends Component
     public $year, $month;
     public $data;
     public $perPage = 20;
+    public $success_msg;
 
     public function saveData() {
         $this->validate([
@@ -34,9 +39,67 @@ class Upload extends Component
         ]);
 
         if(!empty($this->data)) {
+            // get account product mapping
+            $account_product_references = AccountProductReference::where('account_id', $this->account_branch->account->sms_account_id)
+                ->get();
+
             foreach($this->data as $val) {
-                
+                $customer = $this->checkCustomer($val['customer_code'], $val['customer_name']);
+
+                // check if already exists
+                $stock_transfer = StockTransfer::where('account_branch_id', $this->account_branch->id)
+                    ->where('customer_id', $customer->id)
+                    ->where('year', $this->year)
+                    ->where('month', $this->month)
+                    ->first();
+                if(empty($stock_transfer)) {
+                    $stock_transfer = new StockTransfer([
+                        'account_branch_id' => $this->account_branch->id,
+                        'customer_id' => $customer->id,
+                        'year' => $this->year,
+                        'month' => $this->month,
+                    ]);
+                    $stock_transfer->save();
+                }
+
+                // check product
+                $product = SMSProduct::where('stock_code', $val['sku_code'])
+                    ->orWhere('stock_code', $val['sku_code_other'])
+                    ->first();
+                if(empty($product)) {
+                    $account_reference = $account_product_references->filter(function($reference) use($val) {
+                            return $reference->account_reference == $val['sku_code'] 
+                            || $reference->account_reference == $val['sku_code_other']
+                            || $reference->account_reference == intval($val['sku_code'])
+                            || $reference->account_reference == intval($val['sku_code_other']);
+                        })
+                        ->first();
+
+                    if(!empty($account_reference)) {
+                        $product = SMSProduct::where('id', $account_reference->product_id)
+                            ->first();
+                    }
+                }
+
+                $stock_transfer_product = new StockTransferProduct([
+                    'stock_transfer_id' => $stock_transfer->id,
+                    'product_id' => !empty($product) ? $product->id : NULL,
+                    'sku_code' => $val['sku_code'],
+                    'sku_code_other' => $val['sku_code_other'],
+                    'transfer_ty' => $val['transfer_ty'],
+                    'transfer_ly' => $val['transfer_ly'],
+                ]);
+                $stock_transfer_product->save();
+
+                // increment total values
+                $stock_transfer->update([
+                    'total_units_transferred_ty' => $stock_transfer->total_units_transferred_ty + $val['transfer_ty'],
+                    'total_units_transferred_ly' => $stock_transfer->total_units_transferred_ly + $val['transfer_ly'],
+                ]);
             }
+
+            $this->reset('data');
+            $this->success_msg = 'Stock transfer data has been uploaded.';
         }
     }
 
@@ -50,10 +113,12 @@ class Upload extends Component
                 'account_branch_id' => $this->account_branch->id,
                 'code' => $customer_code,
                 'name' => $customer_name,
-                'address' => NULL,
+                'address' => '',
             ]);
             $customer->save();
         }
+
+        return $customer;
     }
 
     public function checkFile() {
@@ -96,7 +161,7 @@ class Upload extends Component
             $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template) {
                 $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type);
             });
-        } else if($extension == 'xml') {
+        } else if($extension == 'xml') { // to be updated
             $xml = simplexml_load_file($path);
             foreach($xml->children() as $child) {
                 $row = [];
