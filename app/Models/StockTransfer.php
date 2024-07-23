@@ -14,7 +14,13 @@ class StockTransfer extends Model
     protected $fillable = [
         'account_branch_id',
         'customer_id',
+        'year',
+        'month',
         'total_units_transferred_ty',
         'total_units_transferred_ly',
     ];
+
+    public function getConnectionName() {
+        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+    }
 }

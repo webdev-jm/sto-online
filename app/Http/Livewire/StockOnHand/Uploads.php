@@ -103,7 +103,7 @@ class Uploads extends Component
         }
     }
 
-    public function checkCustomer($customer_code, $customer_name) {
+    private function checkCustomer($customer_code, $customer_name) {
         // check if already exists
         $customer = Customer::where('code', $customer_code)
             ->where('account_branch_id', $this->account_branch->id)
@@ -164,7 +164,7 @@ class Uploads extends Component
             $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template) {
                 $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type);
             });
-        } else if($extension == 'xml') {
+        } else if($extension == 'xml') { // to be updated
             $xml = simplexml_load_file($path);
             foreach($xml->children() as $child) {
                 $row = [];
@@ -182,7 +182,7 @@ class Uploads extends Component
         $this->data = $data;
     }
 
-    function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
+    private function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
         $customer_code = ''; // Assign or extract $customer_code as required
     
         foreach ($upload_template->fields as $field) {

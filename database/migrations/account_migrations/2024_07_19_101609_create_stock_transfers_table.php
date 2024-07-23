@@ -17,6 +17,8 @@ class CreateStockTransfersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('account_branch_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
+            $table->integer('year');
+            $table->integer('month');
             $table->integer('total_units_transferred_ty')->default(0);
             $table->integer('total_units_transferred_ly')->default(0);
             $table->timestamps();
