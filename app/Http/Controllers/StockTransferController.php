@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
+use App\Models\StockTransfer;
+
 use App\Http\Traits\AccountChecker;
 
 class StockTransferController extends Controller
@@ -18,9 +20,14 @@ class StockTransferController extends Controller
         }
         $account = Session::get('account');
 
+        $stock_transfers = StockTransfer::where('account_branch_id', $account_branch->id)
+            ->paginate(20)
+            ->onEachSide(1);
+
         return view('pages.stock-transfers.index')->with([
             'account' => $account,
-            'account_branch' => $account_branch
+            'account_branch' => $account_branch,
+            'stock_transfers' => $stock_transfers
         ]);
     }
 
