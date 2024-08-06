@@ -17,6 +17,9 @@ use Spatie\SimpleExcel\SimpleExcelReader;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 class Upload extends Component
 {
     use WithFileUploads;
@@ -138,12 +141,18 @@ class Upload extends Component
 
             // Get the file extension
             $extension = $file->getClientOriginalExtension();
-            if(in_array($extension, ['xlsx', 'csv'])) {
+            if(in_array($extension, ['xlsx', 'csv', 'bin'])) {
+                // convert xls to xlsx
+                $spreadsheet = IOFactory::load($path);
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $xlsxPath = storage_path('app').'/purchase-order-uploads/account_branch_'.$this->account_branch->id.'/converted-file-'.time().'.xlsx';
+                $writer->save($xlsxPath);
+
                 if($account_template->type == 'name') {
-                    $rows = $rows = SimpleExcelReader::create($path)
+                    $rows = SimpleExcelReader::create($xlsxPath)
                         ->getRows();
                 } else if($account_template->type == 'number') {
-                    $rows = $rows = SimpleExcelReader::create($path)
+                    $rows = SimpleExcelReader::create($xlsxPath)
                         ->skip($account_template->start_row - 1)
                         ->noHeaderRow()
                         ->getRows();
@@ -163,7 +172,7 @@ class Upload extends Component
                     $this->processRow($row, $po_data, $upload_template, $account_template_fields, 'name');
                 }
             }
-        }
+        } 
 
         $this->po_data = $po_data;
         
