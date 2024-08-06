@@ -193,7 +193,7 @@ class Uploads extends Component
                 $file_column_name = $account_template_fields[$field->id]['file_column_number'] - 1;
             }
 
-            ${$column_name} = $row[$file_column_name];
+            ${$column_name} = $row[$file_column_name] ?? NULL;
         }
     
         if(!empty($customer_code) && $inventory > 0) {
