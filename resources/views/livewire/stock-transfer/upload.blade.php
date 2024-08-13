@@ -33,22 +33,14 @@
                 </div>
 
                 <div class="col-12">
-                    <button class="btn btn-primary btn-sm" wire:click.prevent="checkFile" wire:target="checkFile" wire:loading.attr="disabled">
-                        <i class="fa fa-check fa-sm" wire:loading.remove  wire:target="checkFile"></i>
-                        <i class="fa fa-spinner fa-spin fa-sm" wire:loading  wire:target="checkFile"></i>
+                    <button class="btn btn-primary btn-sm" wire:click.prevent="checkFile" wire:loading.attr="disabled">
+                        <i class="fa fa-check fa-sm" wire:loading.remove wire:target="checkFile"></i>
+                        <i class="fa fa-spinner fa-spin fa-sm" wire:loading wire:target="checkFile"></i>
                         CHECK
                     </button>
                 </div>
             </div>
 
-        </div>
-        <div class="card-footer text-right">
-            @if(!empty($data))
-            <button class="btn btn-info btn-sm" wire:click.prevent="saveData" wire:loading.attr="disabled">
-                <i class="fa fa-upload fa-sm"></i>
-                UPLOAD
-            </button>
-            @endif
         </div>
     </div>
 
@@ -65,6 +57,13 @@
                     UPLOAD DATA PREVIEW
                     <i class="fa fa-spinner fa-spin fa-sm ml-2" wire:loading></i>
                 </h3>
+                <div class="card-tools">
+                    <button class="btn btn-info btn-sm" wire:click.prevent="saveData" wire:loading.attr="disabled">
+                        <i class="fa fa-upload fa-sm" wire:loading.remove wire:target="saveData"></i>
+                        <i class="fa fa-spinner fa-spin fa-sm" wire:loading wire:target="saveData"></i>
+                        UPLOAD
+                    </button>
+                </div>
             </div>
             <div class="card-body p-0 table-responsive">
                 <table class="table table-sm table-bordered">

@@ -129,6 +129,14 @@ class Uploads extends Component
 
         $this->reset('data');
 
+        $existing_data = StockOnHand::select('c.code', 'sohp.product_id', 'sohp.sku_code', 'sohp.sku_code_other')
+            ->leftJoin('stock_on_hand_products as sohp', 'sohp.stock_on_hand_id', '=', 'stock_on_hands.id')
+            ->leftJoin('customers as c', 'c.id', '=', 'stock_on_hands.customer_id')
+            ->where('stock_on_hands.account_branch_id', $this->account_branch->id)
+            ->where('year', $this->year)
+            ->where('month', $this->month)
+            ->get();
+
         $upload_template = UploadTemplate::where('title', 'STOCK ON HAND UPLOAD')->first();
         $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
             ->where('account_id', $this->account_branch->account_id)
@@ -152,17 +160,17 @@ class Uploads extends Component
         $data = array();
         if(in_array($extension, ['xlsx', 'csv', 'bin'])) {
             if($account_template->type == 'name') {
-                $rows = $rows = SimpleExcelReader::create($path)
+                $rows  = SimpleExcelReader::create($path)
                     ->getRows();
             } else if($account_template->type == 'number') {
-                $rows = $rows = SimpleExcelReader::create($path)
+                $rows  = SimpleExcelReader::create($path)
                     ->skip($account_template->start_row - 1)
                     ->noHeaderRow()
                     ->getRows();
             }
 
-            $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template) {
-                $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type);
+            $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template, $existing_data) {
+                $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type, $existing_data);
             });
         } else if($extension == 'xml') { // to be updated
             $xml = simplexml_load_file($path);
@@ -182,7 +190,7 @@ class Uploads extends Component
         $this->data = $data;
     }
 
-    private function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
+    private function processRow($row, &$data, $upload_template, $account_template_fields, $type, $existing_data) {
         $customer_code = ''; // Assign or extract $customer_code as required
     
         foreach ($upload_template->fields as $field) {
@@ -197,14 +205,26 @@ class Uploads extends Component
         }
     
         if(!empty($customer_code) && $inventory > 0) {
-            $data[] = [
-                'customer_code' => trim($customer_code),
-                'customer_name' => trim($customer_name),
-                'sku_code' => $sku_code,
-                'sku_code_other' => $sku_code_other,
-                'product_description' => $product_description,
-                'inventory' => $inventory,
-            ];
+
+            // check for duplicates
+            $existing_stock_on_hand = $existing_data->contains(function ($stock_on_hand) use ($customer_code, $sku_code, $sku_code_other) {
+                return $stock_on_hand->code == $customer_code && (
+                    $stock_on_hand->sku_code == $sku_code ||
+                    $stock_on_hand->sku_code_other == $sku_code_other
+                );
+            });
+
+            if(empty($existing_stock_on_hand)) {
+                $data[] = [
+                    'customer_code' => trim($customer_code),
+                    'customer_name' => trim($customer_name),
+                    'sku_code' => $sku_code,
+                    'sku_code_other' => $sku_code_other,
+                    'product_description' => $product_description,
+                    'inventory' => $inventory,
+                ];
+            }
+            
         }
     }
 

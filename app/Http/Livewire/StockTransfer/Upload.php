@@ -126,6 +126,19 @@ class Upload extends Component
             'upload_file' => 'required',
         ]);
 
+        $stock_transfers = StockTransfer::select(
+                'c.code',
+                'product_id',
+                'sku_code',
+                'sku_code_other',
+            )
+            ->leftJoin('stock_transfer_products as stp', 'stp.stock_transfer_id', '=', 'stock_transfers.id')
+            ->leftJoin('customers as c', 'c.id', '=', 'stock_transfers.customer_id')
+            ->where('stock_transfers.account_branch_id', $this->account_branch->id)
+            ->where('year', $this->year)
+            ->where('month', $this->month)
+            ->get();
+
         $upload_template = UploadTemplate::where('title', 'STOCK TRANSFER UPLOAD')->first();
         $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
             ->where('account_id', $this->account_branch->account_id)
@@ -158,8 +171,8 @@ class Upload extends Component
                     ->getRows();
             }
 
-            $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template) {
-                $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type);
+            $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template, $stock_transfers) {
+                $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type, $stock_transfers);
             });
         } else if($extension == 'xml') { // to be updated
             $xml = simplexml_load_file($path);
@@ -175,7 +188,7 @@ class Upload extends Component
         $this->data = $data;
     }
 
-    private function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
+    private function processRow($row, &$data, $upload_template, $account_template_fields, $type, $stock_transfers) {
         $customer_code = ''; // Assign or extract $customer_code as required
     
         foreach ($upload_template->fields as $field) {
@@ -190,15 +203,27 @@ class Upload extends Component
         }
     
         if(!empty($customer_code) && !empty($sku_code)) {
-            $data[] = [
-                'customer_code' => trim($customer_code),
-                'customer_name' => trim($customer_name),
-                'sku_code' => $sku_code,
-                'sku_code_other' => $sku_code_other,
-                'product_description' => $product_description,
-                'transfer_ty' => $transfer_ty,
-                'transfer_ly' => $transfer_ly,
-            ];
+
+            // check for duplicate
+            $isDuplicate = $stock_transfers->contains(function ($stock_transfer) use ($customer_code, $sku_code, $sku_code_other) {
+                return $stock_transfer->code == $customer_code && (
+                        $stock_transfer->sku_code == $sku_code ||
+                        $stock_transfer->sku_code_other == $sku_code_other
+                    );
+            });
+
+            if(empty($isDuplicate)) {
+                $data[] = [
+                    'customer_code' => trim($customer_code),
+                    'customer_name' => trim($customer_name),
+                    'sku_code' => $sku_code,
+                    'sku_code_other' => $sku_code_other,
+                    'product_description' => $product_description,
+                    'transfer_ty' => $transfer_ty,
+                    'transfer_ly' => $transfer_ly,
+                ];
+            }
+
         }
     }
 
