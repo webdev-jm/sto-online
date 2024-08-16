@@ -256,6 +256,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:report access'], function() {
         Route::get('report', [ReportController::class, 'index'])->name('report.index');
         Route::get('report/vmi', [ReportController::class, 'vmi_report'])->name('report.vmi')->middleware('permission:report vmi');
+        Route::get('report/sto', [ReportController::class, 'sto_report'])->name('report.sto')->middleware('permission:report sto');
     });
 
     // TEMPLATES

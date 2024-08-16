@@ -11,4 +11,8 @@ class SMSProduct extends Model
 
     protected $table = 'products';
     protected $connection = 'sms_db';
+
+    public function channel() {
+        return $this->belongsTo('App\Models\SMSClassification');
+    }
 }

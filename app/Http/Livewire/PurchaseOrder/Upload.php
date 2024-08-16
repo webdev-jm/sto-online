@@ -79,10 +79,10 @@ class Upload extends Component
                             'product_name' => $product_data['product_name'],
                             'quantity' => $product_data['quantity'],
                             'unit_of_measure' => $product_data['unit_of_measure'],
-                            'discount_amount' => $product_data['discount_amount'],
-                            'gross_amount' => $product_data['gross_amount'],
-                            'net_amount' => $product_data['net_amount'],
-                            'net_amount_per_uom' => $product_data['net_amount_per_uom'],
+                            'discount_amount' => empty($product_data['discount_amount']) ? 0 : $product_data['discount_amount'],
+                            'gross_amount' => empty($product_data['gross_amount']) ? 0 : $product_data['gross_amount'],
+                            'net_amount' => empty($product_data['net_amount']) ? 0 : $product_data['net_amount'],
+                            'net_amount_per_uom' => empty($product_data['net_amount_per_uom']) ? 0 : $product_data['net_amount_per_uom'],
                         ]);
                         $purchase_order_detail->save();
     
