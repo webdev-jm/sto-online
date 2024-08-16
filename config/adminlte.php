@@ -362,6 +362,13 @@ return [
                 ]
             ],
         ],
+        [
+            'text'      => 'Reports',
+            'url'       => 'report/sto',
+            'icon'      => 'fa fa-fw fa-chart-pie',
+            'can'       => 'reports sto',
+            'active'    => ['report-sto*']
+        ],
     ],
 
     /*
@@ -486,7 +493,7 @@ return [
                     'type' => 'js',
                     'asset' => true,
                     'location' => '/vendor/dropzone/min/dropzone.min.js'
-                ]
+                ],
             ]
         ]
     ],

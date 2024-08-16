@@ -42,4 +42,8 @@ class ReportController extends Controller
             'account' => $account
         ]);
     }
+
+    public function sto_report() {
+        return view('pages.reports.sto');   
+    }
 }

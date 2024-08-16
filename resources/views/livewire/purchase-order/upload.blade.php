@@ -116,6 +116,11 @@
                             @endphp
                             @foreach($data['products'] as $product)
                                 @php
+                                    $product['gross_amount'] = empty($product['gross_amount']) ? 0 : $product['gross_amount'];
+                                    $product['net_amount'] = empty($product['net_amount']) ? 0 : $product['net_amount'];
+                                    $product['quantity'] = empty($product['quantity']) ? 0 : $product['quantity'];
+                                    $product['discount_amount'] = empty($product['discount_amount']) ? 0 : $product['discount_amount'];
+
                                     $gross_amount += $product['gross_amount'];
                                     $net_amount += $product['net_amount'];
                                     $quantity += $product['quantity'];
