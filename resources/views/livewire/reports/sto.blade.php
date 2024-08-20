@@ -1,7 +1,7 @@
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">STO REPORTS</h3>
+            <h3 class="card-title">INVENTORY REPORTS</h3>
         </div>
         <div class="card-body">
 
@@ -61,7 +61,7 @@
         @case('account')
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">PER ACCOUNT PERFORMANCE</h3>
+                    <h3 class="card-title">PER ACCOUNT</h3>
                     <div class="card-tools">
                         
                     </div>
@@ -98,7 +98,7 @@
         @case('channel')
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">PER CHANNEL PERFORMANCE</h3>
+                    <h3 class="card-title">PER CHANNEL</h3>
                 </div>
                 <div class="card-body">
                     
@@ -109,7 +109,7 @@
         @case('brand')
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">PER BRAND PERFORMANCE</h3>
+                    <h3 class="card-title">PER BRAND</h3>
                 </div>
                 <div class="card-body">
 
@@ -154,7 +154,28 @@
                     <h3 class="card-title">PER UBO</h3>
                 </div>
                 <div class="card-body">
-                    {{print_r($ubo_data)}}
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ACCOUNT CODE</th>
+                                    <th>ACCOUNT NAME</th>
+                                    <th>UBO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($ubo_data as $code => $data)
+                                    <tr>
+                                        <td>{{$code}}</td>
+                                        <td>{{$data['short_name']}}</td>
+                                        <td>{{number_format($data['ubo'])}}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         @break
