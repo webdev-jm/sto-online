@@ -369,6 +369,13 @@ return [
             'can'       => 'reports sto',
             'active'    => ['report-sto*']
         ],
+        [
+            'text'      => 'STO',
+            'url'       => 'https://sto.bevi.ph/',
+            'icon'      => 'fa fa-fw fa-chart-bar',
+            'can'       => 'reports sto',
+            'active'    => ['report-sto*']
+        ],
     ],
 
     /*
