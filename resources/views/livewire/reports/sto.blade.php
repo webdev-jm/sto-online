@@ -1,5 +1,26 @@
 <div>
     <div class="card">
+        <div class="card-body">
+
+            <div class="mb-2">
+                <ul class="pagination pagination-month justify-content-center">
+                    <li class="page-item"><a class="page-link" href="#" wire:click.prevent="selectDate({{$month - 1}})">«</a></li>
+                    @for($i = 1; $i <= 12; $i++)
+                        <li class="page-item {{$month == $i ? 'active' : ''}}">
+                            <a class="page-link" href="#" wire:click.prevent="selectDate({{$i}})">
+                                <p class="page-month">{{date('M', strtotime($year.'-'.$i.'-01'))}}</p>
+                                <p class="page-year">{{$year}}</p>
+                            </a>
+                        </li>
+                    @endfor
+                    <li class="page-item"><a class="page-link" href="#" wire:click.prevent="selectDate({{$month + 1}})">»</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">INVENTORY REPORTS</h3>
         </div>
@@ -35,28 +56,7 @@
             
         </div>
     </div>
-
-    <div class="card">
-        <div class="card-body">
-
-            <div class="mb-2">
-                <ul class="pagination pagination-month justify-content-center">
-                    <li class="page-item"><a class="page-link" href="#" wire:click.prevent="selectDate({{$month - 1}})">«</a></li>
-                    @for($i = 1; $i <= 12; $i++)
-                        <li class="page-item {{$month == $i ? 'active' : ''}}">
-                            <a class="page-link" href="#" wire:click.prevent="selectDate({{$i}})">
-                                <p class="page-month">{{date('M', strtotime($year.'-'.$i.'-01'))}}</p>
-                                <p class="page-year">{{$year}}</p>
-                            </a>
-                        </li>
-                    @endfor
-                    <li class="page-item"><a class="page-link" href="#" wire:click.prevent="selectDate({{$month + 1}})">»</a></li>
-                </ul>
-            </div>
-
-        </div>
-    </div>
-
+    
     @switch($report)
         @case('account')
             <div class="card">
@@ -68,28 +68,67 @@
                 </div>
                 <div class="card-body">
                     
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>ACCOUNT</th>
-                                    <th class="text-right">INVENTORY QTY</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($account_data as $code => $data)
+                    @if(empty($drilldown_data) || (!empty($drilldown_data['account']) && $drilldown_data['account']['status'] == 'closed'))
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm table-hover">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            [{{$code}}] {{$data['short_name']}}
-                                        </td>
-                                        <td class="text-right">
-                                            {{number_format($data['total_inventory'])}}
-                                        </td>
+                                        <th>ACCOUNT</th>
+                                        <th class="text-right">INVENTORY QTY</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach($account_data as $code => $data)
+                                        <tr>
+                                            <td>
+                                                <a href="#" wire:click.prevent="loadDrillDown('account', {{$data['account_id']}})">
+                                                    [{{$code}}] {{$data['short_name']}}
+                                                </a>
+                                            </td>
+                                            <td class="text-right">
+                                                {{number_format($data['total_inventory'])}}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <button class="btn btn-xs btn-default mb-2" wire:click.prevent="closeDrillDown('account')">
+                            <i class="fa fa-arrow-left"></i>
+                            BACK
+                        </button>
+
+                        <div class="card card-outline card-primary mb-0">
+                            <div class="card-header">
+                                <h3 class="card-title">{{$drilldown_data['account']['account']['account_code']}} {{$drilldown_data['account']['account']['short_name']}}</h3>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>BRAND</th>
+                                                <th>TOTAL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($drilldown_data['account']['data'] as $brand => $val)
+                                                <tr>
+                                                    <td>{{$brand}}</td>
+                                                    <td>{{number_format($val['total'])}}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <h3></h3>
+                    @endif
 
                 </div>
             </div>

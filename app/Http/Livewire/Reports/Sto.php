@@ -18,6 +18,10 @@ class Sto extends Component
     public $brand_data;
     public $ubo_data;
 
+    public $drilldown_data;
+    public $selected_key;
+    public $selected_type;
+
     public $year, $month;
 
     public function selectReport($report) {
@@ -37,6 +41,7 @@ class Sto extends Component
         }
 
         $this->loadReport();
+        $this->loadDrillDown($this->selected_type, $this->selected_key, $reload = true);
     }
 
     public function loadReport() {
@@ -52,6 +57,7 @@ class Sto extends Component
                         ->where('year', $this->year)
                         ->sum('total_inventory');
                     $this->account_data[$account->account_code] = [
+                        'account_id' => $account->id,
                         'short_name' => $account->short_name,
                         'account_name' => $account->account_name,
                         'total_inventory' => $total_inv
@@ -122,6 +128,59 @@ class Sto extends Component
         }
 
         DB::setDefaultConnection('mysql');
+    }
+
+    public function loadDrillDown($type, $key_id, $reload = false) {
+
+        $this->selected_key = $key_id;
+        $this->selected_type = $type;
+
+        if(!$reload) {
+            if(!empty($this->drilldown_data['status']) && $this->drilldown_data['status'] == 'open') {
+                $this->drilldown_data[$type]['status'] = 'closed';
+            } else {
+                $this->drilldown_data[$type]['status'] = 'open';
+            }
+        }
+
+        switch($type) {
+            case 'account':
+                $account = Account::find($key_id);
+                $this->drilldown_data[$type]['account'] = $account;
+
+                DB::setDefaultConnection($account->db_data->connection_name);
+
+                $products = DB::table('stock_on_hand_products as sohp')
+                    ->select(
+                        DB::raw('SUM(inventory) as total'),
+                        'p.brand',
+                    )
+                    ->leftJoin('stock_on_hands as soh', 'soh.id', '=', 'sohp.stock_on_hand_id')
+                    ->leftJoin(DB::connection('sms_db')->getDatabaseName().'.products as p', 'p.id', '=', 'sohp.product_id')
+                    ->where('soh.month', $this->month)
+                    ->where('soh.year', $this->year)
+                    ->groupBy('p.brand')
+                    ->get();
+                
+                $this->drilldown_data[$type]['data'] = array();
+                foreach($products as $product) {
+                    $this->drilldown_data[$type]['data'][$product->brand] = [
+                        'total' => $product->total
+                    ];
+
+                    $data[] = [
+                        'name' => $product->brand,
+                        'y' => $product->total
+                    ];
+                }
+
+                DB::setDefaultConnection('mysql');
+            break;
+        }
+    }
+
+    public function closeDrillDown($type) {
+        $this->drilldown_data[$type]['status'] = 'closed';
     }
 
     public function mount() {
