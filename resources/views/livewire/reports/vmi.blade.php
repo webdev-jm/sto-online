@@ -71,14 +71,11 @@
                             <tr>
                                 <th>STOCK CODE</th>
                                 <th>DESCRIPTION</th>
-                                <th>UOM</th>
-                                <th class="text-center">INV TOTAL</th>
                                 <th class="text-center">INV TOTAL CS</th>
                                 <th class="text-center">STO CS</th>
                                 <th class="text-center">WEEK COV</th>
-                                <th class="text-center">PARAMETER</th>
                                 <th class="text-center">WEEKS COV NEEDED</th>
-                                <th class="text-center">VMI CS</th>
+                                <th class="text-center">TO ORDER</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,12 +83,9 @@
                                 <tr>
                                     <td>{{$val['stock_code']}}</td>
                                     <td>{{$val['description']}}</td>
-                                    <td>{{$val['uom']}}</td>
-                                    <td class="text-right">{{number_format($val['total'], 2)}}</td>
                                     <td class="text-right">{{number_format($val['cs_total'], 2)}}</td>
                                     <td class="text-right">{{number_format($val['sto'], 2)}}</td>
                                     <td class="text-right">{{number_format($val['w_cov'], 2)}}</td>
-                                    <td class="text-right">{{$parameter}}</td>
                                     <td class="text-right">{{number_format($val['w_cov_needed'], 2)}}</td>
                                     <td class="text-right font-weight-bold{{$val['vmi'] < 1 ? ' text-danger' : ' text-success'}}">
                                         {{number_format($val['vmi'], 2)}}
