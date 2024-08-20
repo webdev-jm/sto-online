@@ -114,7 +114,7 @@ class Sto extends Component
                     $this->ubo_data[$account->account_code] = [
                         'short_name' => $account->short_name,
                         'account_name' => $account->account_name,
-                        'ubo' => $ubo
+                        'ubo' => $ubo->ubo
                     ];
                 }
 
@@ -127,8 +127,6 @@ class Sto extends Component
     public function mount() {
         $this->year = date('Y');
         $this->month = (int)date('m');
-
-        $this->report = 'brand';
     }
 
     public function render()
