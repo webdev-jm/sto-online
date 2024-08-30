@@ -145,6 +145,9 @@ class PermissionSeeder extends Seeder
                 'stock transfer access' => 'Allow user to access stock transfer',
                 'stock transfer upload' => 'Allow user to upload stock transfer',
             ],
+            'Admin' => [
+                'admin access' => 'Allow user to access admin settings',
+            ]
         ];
 
         foreach($permissions_arr as $module => $permissions) {
@@ -152,7 +155,7 @@ class PermissionSeeder extends Seeder
                 Permission::create([
                     'name' => $permission,
                     'module' => $module,
-                    'description' => $description
+                    'description' => $description,
                 ]);
             }
         }

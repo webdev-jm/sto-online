@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->boolean('status')->default(false);
+            $table->boolean('type')->default(0);
             $table->boolean('dark_mode')->default(false);
             $table->string('profile_picture_url')->nullable();
             $table->string('user_signature_url')->nullable();
