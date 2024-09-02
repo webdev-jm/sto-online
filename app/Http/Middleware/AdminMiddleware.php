@@ -17,11 +17,20 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if(Auth::check() && Auth::user()->type == 1) { // user
-            return $next($request);
+        if(Auth::check()) {
+            // admin
+            if(Auth::user()->type == 1) {
+                return $next($request);
+            } else {
+                // user
+                $account = Auth::user()->account;
+                if(!empty($account)) {
+                    return redirect()->route('branches', encrypt($account->id));
+                }
+            }
         }
 
-        // admin
-        
+        // not logged in
+        return redirect('/login');
     }
 }

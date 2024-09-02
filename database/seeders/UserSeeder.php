@@ -21,7 +21,8 @@ class UserSeeder extends Seeder
             'username' => 'admin',
             'password' => Hash::make('p4ssw0rd'),
             'status' => 0,
-            'dark_mode' => 1
+            'dark_mode' => 1,
+            'type' => 1,
         ]);
         $user->save();
 
@@ -34,7 +35,8 @@ class UserSeeder extends Seeder
             'username' => 'api-user',
             'password' => Hash::make('password'),
             'status' => 0,
-            'dark_mode' => 1
+            'dark_mode' => 1,
+            'type' => 0,
         ]);
         $user->save();
 

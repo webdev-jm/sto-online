@@ -40,9 +40,12 @@ class HomeController extends Controller
         $search = trim($request->get('search') ?? '');
 
         Session::forget('account');
-        auth()->user()->update([
-            'account_id' => NULL
-        ]);
+        // if type is admin reset account
+        if(auth()->user()->type == 1) {
+            auth()->user()->update([
+                'account_id' => NULL
+            ]);
+        }
 
         $accounts = DB::connection('mysql')
             ->table('account_user as au')

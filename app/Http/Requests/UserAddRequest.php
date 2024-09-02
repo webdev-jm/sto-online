@@ -26,6 +26,9 @@ class UserAddRequest extends FormRequest
     public function rules()
     {
         return [
+            'account_id' => [
+                'required',
+            ],
             'name' => [
                 'required',
                 'min:2'
@@ -46,6 +49,9 @@ class UserAddRequest extends FormRequest
             'role_ids' => [
                 'required'
             ],
+            'type' => [
+                'required'
+            ]
         ];
     }
 }

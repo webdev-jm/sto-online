@@ -45,6 +45,24 @@
                     </div>
                 </div>
 
+                {{-- ACCOUNT --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('account_id', 'Account') !!}
+                        {!! Form::select('account_id', [], NULL, ['class' => 'form-control'.($errors->has('account_id') ? ' is-invalid' : ''), 'form' => 'edit_user']) !!}
+                        <small class="text-danger">{{$errors->first('account_id')}}</small>
+                    </div>
+                </div>
+
+                {{-- TYPE --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('type', 'Type') !!}
+                        {!! Form::select('type', $types_arr, $user->type, ['class' => 'form-control'.($errors->has('type') ? ' is-invalid' : ''), 'form' => 'edit_user']) !!}
+                        <small class="text-danger">{{$errors->first('type')}}</small>
+                    </div>
+                </div>
+
             </div>
 
             <label class="mb-0 text-primary">PASSWORD</label>
@@ -108,6 +126,49 @@
 
             var roles = role_ids.join(',');
             $('#role_ids').val(roles);
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $('#account_id').select2({
+            ajax: { 
+                url: '{{route("account.ajax")}}',
+                type: "POST",
+                dataType: 'json',
+                delay: 50,
+                data: function (params) {
+                    return {
+                        search: params.term // search term
+                    };
+                },
+                processResults: function (response) {
+                    return {
+                        results: response
+                    };
+                },
+                cache: true
+            }
+        });
+
+        var user_select = $('#account_id');
+        $.ajax({
+            type:'GET',
+            url: '/account/get-ajax/{{$user->account_id}}'
+        }).then(function(data) {
+            console.log(data);
+            var option = new Option('['+data.account_code+'] '+data.short_name, data.id, true, true);
+            user_select.append(option).trigger('change');
+
+            user_select.trigger({
+                type: 'select2:select',
+                params: {
+                    data: data
+                }
+            });
         });
 
     });
