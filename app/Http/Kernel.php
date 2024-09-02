@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         'api.token' => \App\Http\Middleware\ApiTokenMiddleware::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }

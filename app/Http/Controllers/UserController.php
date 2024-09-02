@@ -44,6 +44,10 @@ class UserController extends Controller
      */
     public function create()
     {
+        $types_arr = [
+            0 => 'User',
+            1 => 'Admin',
+        ];
 
         // ROLES
         $roles = Role::orderBy('name', 'ASC')
@@ -51,6 +55,7 @@ class UserController extends Controller
 
         return view('pages.users.create')->with([
             'roles' => $roles,
+            'types_arr' => $types_arr,
         ]);
     }
 
@@ -65,10 +70,12 @@ class UserController extends Controller
         $password = Hash::make($request->password);
 
         $user = new User([
+            'account_id' => $request->account_id,
             'name' => $request->name,
             'email' => $request->email,
             'username' => $request->username,
             'password' => $password,
+            'type' => $request->type,
         ]);
         $user->save();
 
@@ -111,6 +118,11 @@ class UserController extends Controller
         $id = decrypt($id);
         $user = User::findOrFail($id);
 
+        $types_arr = [
+            0 => 'User',
+            1 => 'Admin',
+        ];
+
         // ROLES
         $roles = Role::orderBy('name', 'ASC')
             ->get();
@@ -121,6 +133,7 @@ class UserController extends Controller
             'roles' => $roles,
             'user' => $user,
             'user_roles' => $user_roles,
+            'types_arr' => $types_arr,
         ]);
     }
 
@@ -146,9 +159,11 @@ class UserController extends Controller
         }
 
         $user->update([
+            'account_id' => $request->account_id,
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $password
+            'password' => $password,
+            'type' => $request->type,
         ]);
 
         $role_ids = explode(',', $request->role_ids);

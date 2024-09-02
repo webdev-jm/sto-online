@@ -32,15 +32,30 @@ use App\Http\Controllers\StockTransferController;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', function() {
+    return redirect()->route('home');
+});
 
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
+Route::middleware(['auth', 'admin'])->group(function() {
+    Route::get('generate-ubo/{account_id}/{branch_id}', [CustomerController::class, 'generateUBO']);
+
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
+    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+
+    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+
+    // CUSTOMER UBO
+    Route::group(['middleware' => 'permission:customer ubo access'], function() {
+        Route::get('ubo-job', [CustomerController::class, 'uboJob'])->name('ubo-job.index');
+    });
+});
+
 Route::group(['middleware' => 'auth'], function() {
 
-    Route::get('generate-ubo/{account_id}/{branch_id}', [CustomerController::class, 'generateUBO']);
-    
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    // Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
@@ -52,10 +67,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('sms-account/ajax', [AccountController::class, 'smsAjax'])->name('sms-account.ajax');
     Route::get('sms-account/get-ajax/{id}', [AccountController::class, 'smsGetAjax'])->name('sms-account.get-ajax');
 
-    // CUSTOMER UBO
-    Route::group(['middleware' => 'permission:customer ubo access'], function() {
-        Route::get('ubo-job', [CustomerController::class, 'uboJob'])->name('ubo-job.index');
-    });
+    
 
     // PURCHASE ORDER
     Route::group(['middleware' => 'permission:purchase order access'], function() {

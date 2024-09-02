@@ -41,6 +41,7 @@ class User extends Authenticatable
         'profile_picture_url',
         'user_signature_url',
         'last_activity_time',
+        'type',
     ];
 
     /**

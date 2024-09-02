@@ -28,6 +28,7 @@
 
             <div class="row">
 
+                {{-- NAME --}}
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('name', 'Name') !!}
@@ -36,11 +37,30 @@
                     </div>
                 </div>
 
+                {{-- EMAIL --}}
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('email', 'Email') !!}
                         {!! Form::email('email', '', ['class' => 'form-control'.($errors->has('email') ? ' is-invalid' : ''), 'form' => 'add_user']) !!}
                         <p class="text-danger mt-1">{{$errors->first('email')}}</p>
+                    </div>
+                </div>
+
+                {{-- ACCOUNT --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('account_id', 'Account') !!}
+                        {!! Form::select('account_id', [], NULL, ['class' => 'form-control'.($errors->has('account_id') ? ' is-invalid' : ''), 'form' => 'add_user']) !!}
+                        <small class="text-danger">{{$errors->first('account_id')}}</small>
+                    </div>
+                </div>
+
+                {{-- TYPE --}}
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        {!! Form::label('type', 'Type') !!}
+                        {!! Form::select('type', $types_arr, NULL, ['class' => 'form-control'.($errors->has('type') ? ' is-invalid' : ''), 'form' => 'add_user']) !!}
+                        <small class="text-danger">{{$errors->first('type')}}</small>
                     </div>
                 </div>
 
@@ -51,6 +71,7 @@
 
             <div class="row">
 
+                {{-- USERNAME --}}
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('username', 'Username') !!}
@@ -59,6 +80,7 @@
                     </div>
                 </div>
 
+                {{-- PASSWORD --}}
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('password', 'Password') !!}
@@ -67,6 +89,7 @@
                     </div>
                 </div>
 
+                {{-- CONFIRM PASSWORD --}}
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('password_confirmation', 'Confirm Password') !!}
@@ -76,6 +99,7 @@
 
             </div>
 
+            {{-- ROLES --}}
             <label class="mb-0 text-primary">ROLES</label>
             @if($errors->has('role_ids'))
                 <span class="badge badge-danger">required</span>
@@ -125,6 +149,32 @@
 
             var roles = role_ids.join(',');
             $('#role_ids').val(roles);
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $('#account_id').select2({
+            ajax: { 
+                url: '{{route("account.ajax")}}',
+                type: "POST",
+                dataType: 'json',
+                delay: 50,
+                data: function (params) {
+                    return {
+                        search: params.term // search term
+                    };
+                },
+                processResults: function (response) {
+                    return {
+                        results: response
+                    };
+                },
+                cache: true
+            }
         });
 
     });
