@@ -174,11 +174,14 @@ class HomeController extends Controller
             'account_id' => $account->id
         ]);
 
-        $check = auth()->user()->accounts()->where('id', $account->id)->exists();
-        if (!$check) {
-            return redirect()->route('home')->with([
-                'message_error' => 'This account was not assigned to you. Please message the system admin for assistance.'
-            ]);
+        $msg = NULL;
+        if(empty(auth()->user()->accounts()->count())) {
+            $msg = 'No available data. Please contact the system admin for assistance.';
+        } else {
+            $check = auth()->user()->accounts()->where('id', $account->id)->exists();
+            if (!$check) {
+                $msg = 'This account was not assigned to you. Please message the system admin for assistance.';
+            }
         }
 
         session()->put('account', $account);
@@ -201,6 +204,7 @@ class HomeController extends Controller
             'account' => $account,
             'search' => $search,
             'branches' => $branches,
+            'message_error' => $msg,
         ]);
     }
 
