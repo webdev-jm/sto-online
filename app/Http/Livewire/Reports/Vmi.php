@@ -218,6 +218,28 @@ class Vmi extends Component
 
             $param_data[$param] = $data;
         }
+
+        foreach($inventories as $inventory) {
+            $sales = $sales = Sale::select(
+                    'product_id',
+                    DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
+                    DB::raw('SUM(quantity) / '.$param.' as total')
+                )
+                ->where('product_id', $inventory->product_id)
+                ->where('account_id', $this->account_branch->account_id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
+                    for($i = 1; $i <= $param; $i++) {
+                        $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
+                            $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
+                                ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+                        });
+                    }
+                })
+                ->groupBy('product_id', 'uom')
+                ->get()
+                ->groupBy('product_id');
+        }
         
         return view('livewire.reports.vmi')->with([
             'months_param' => $months_param,
