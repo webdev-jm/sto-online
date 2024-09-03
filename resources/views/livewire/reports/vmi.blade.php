@@ -97,6 +97,8 @@
                 </div>
             </div>
             @endforeach
+
+            {{var_dump($param_data)}}
             
         </div>
         <div class="card-footer">
