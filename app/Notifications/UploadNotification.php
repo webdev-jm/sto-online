@@ -11,14 +11,19 @@ class UploadNotification extends Notification
 {
     use Queueable;
 
+    public $user_notification;
+    public $notification;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_notification)
     {
         $this->afterCommit();
+        $this->user_notification = $user_notification;
+        $this->notification = $user_notification->notification;
     }
 
     /**
@@ -41,11 +46,12 @@ class UploadNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->from('notify@bevi.com.ph', 'BEV SYSTEM')
-            ->subject('BEV SYSTEM UPLOAD REMINDER')
-            ->greeting('Hi! '.$notifiable->fullName())
-            ->line('This is a friendly reminder to upload your data to the BEV System. Ensuring that your data is up-to-date is crucial for the smooth operation and accuracy of our system. Please take a moment to log in and complete the necessary uploads at your earliest convenience. Your prompt attention to this matter is greatly appreciated.')
-            ->action('LOGIN', url('/login'))
+            ->from($this->notification->from_email, $this->notification->from_name)
+            ->subject($this->notification->subject)
+            ->greeting('Hi! '.$notifiable->name)
+            // ->line('This is a friendly reminder to upload your data to the BEV System. Ensuring that your data is up-to-date is crucial for the smooth operation and accuracy of our system. Please take a moment to log in and complete the necessary uploads at your earliest convenience. Your prompt attention to this matter is greatly appreciated.')
+            ->line($this->notification->message)
+            ->action($this->notification->link_name, url($this->notification->link_url))
             ->line('Thank you for using our application!');
     }
 
@@ -59,9 +65,9 @@ class UploadNotification extends Notification
     {
         return [
             'status_code' => 'primary',
-            'message' => 'This is a friendly reminder to upload your data to the BEV System. Ensuring that your data is up-to-date is crucial for the smooth operation and accuracy of our system. Please take a moment to log in and complete the necessary uploads at your earliest convenience. Your prompt attention to this matter is greatly appreciated.',
+            'message' => $this->notification->message,
             'color' => 'primary',
-            'url' => url('/home')
+            'url' => url($this->notification->link_url)
         ];
     }
 }
