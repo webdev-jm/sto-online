@@ -14,7 +14,7 @@ class UserNotification extends Model
     protected $fillable = [
         'user_id',
         'notification_id',
-        'frequency_id',
+        'notification_frequency_id',
     ];
 
     public function user() {
@@ -26,6 +26,6 @@ class UserNotification extends Model
     }
 
     public function frequency() {
-        return $this->belongsTo('App\Models\Frequency');
+        return $this->belongsTo('App\Models\NotificationFrequency', 'notification_frequency_id', 'id');
     }
 }

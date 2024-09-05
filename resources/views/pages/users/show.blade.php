@@ -106,6 +106,15 @@
                 </div>
             </div>
             @endcan
+
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">NOTIFICATIONS</h3>
+                </div>
+                <div class="card-body p-1">
+                    <livewire:user.assigned-notification :user="$user"/>
+                </div>
+            </div>
         </div>
     </div>
 
