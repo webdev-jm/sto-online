@@ -20,6 +20,7 @@ use App\Http\Controllers\UploadTemplateController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\StockOnHandController;
 use App\Http\Controllers\StockTransferController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,11 @@ Route::middleware(['auth', 'admin'])->group(function() {
     // CUSTOMER UBO
     Route::group(['middleware' => 'permission:customer ubo access'], function() {
         Route::get('ubo-job', [CustomerController::class, 'uboJob'])->name('ubo-job.index');
+    });
+
+    // NOTIFICATIONS
+    Route::group(['middleware' => 'permission:notification access'], function() {
+        Route::get('notification', [NotificationController::class, 'index'])->name('notification.index');
     });
 });
 

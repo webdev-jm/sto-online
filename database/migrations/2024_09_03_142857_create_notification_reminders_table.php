@@ -18,7 +18,7 @@ class CreateNotificationRemindersTable extends Migration
             $table->string('subject');
             $table->string('from_email');
             $table->string('from_name');
-            $table->string('message');
+            $table->text('message');
             $table->string('link_name');
             $table->string('link_url');
             $table->timestamps();
