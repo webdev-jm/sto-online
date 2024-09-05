@@ -347,6 +347,13 @@ return [
                     'active'    => ['template*']
                 ],
                 [
+                    'text'      => 'Notifications',
+                    'url'       => '/notification',
+                    'icon'      => 'fa fa-fw fa-bell',
+                    'can'       => 'notification access',
+                    'active'    => ['template*']
+                ],
+                [
                     'text'      => 'Systemlog',
                     'url'       => '/systemlog',
                     'icon'      => 'fa fa-fw fa-history',
