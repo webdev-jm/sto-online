@@ -60,45 +60,65 @@
                 </div>
             </div>
 
-            @foreach($months_param as $param)
             <div class="row">
-                <div class="col-12">
-                    <strong>{{$param}} MONTH(s)</strong>
-                </div>
                 <div class="col-lg-12 table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead>
                             <tr>
-                                <th>STOCK CODE</th>
-                                <th>DESCRIPTION</th>
-                                <th class="text-center">INV TOTAL CS</th>
-                                <th class="text-center">STO CS</th>
-                                <th class="text-center">WEEK COV</th>
-                                <th class="text-center">WEEKS COV NEEDED</th>
-                                <th class="text-center">TO ORDER</th>
+                                <th rowspan="2" class="text-center align-middle p-0 px-1">STOCK CODE</th>
+                                <th rowspan="2" class="text-center align-middle p-0 px-1">DESCRIPTION</th>
+                                <th rowspan="2" class="text-center align-middle p-0 px-1">INV TOTAL CS</th>
+                                <th colspan="4" class="text-center align-middle p-0 bg-info">1 MONTH</th>
+                                <th colspan="4" class="text-center align-middle p-0 bg-info">2 MONTHS</th>
+                                <th colspan="4" class="text-center align-middle p-0 bg-info">3 MOTNHS</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center p-0">STO CS</th>
+                                <th class="text-center p-0">WEEK COV</th>
+                                <th class="text-center p-0">WEEKS COV NEEDED</th>
+                                <th class="text-center p-0">TO ORDER</th>
+                                <th class="text-center p-0">STO CS</th>
+                                <th class="text-center p-0">WEEK COV</th>
+                                <th class="text-center p-0">WEEKS COV NEEDED</th>
+                                <th class="text-center p-0">TO ORDER</th>
+                                <th class="text-center p-0">STO CS</th>
+                                <th class="text-center p-0">WEEK COV</th>
+                                <th class="text-center p-0">WEEKS COV NEEDED</th>
+                                <th class="text-center p-0">TO ORDER</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($param_data[$param] as $val)
+                            @foreach($inventories as $inventory)
                                 <tr>
-                                    <td>{{$val['stock_code']}}</td>
-                                    <td>{{$val['description']}}</td>
-                                    <td class="text-right">{{number_format($val['cs_total'], 2)}}</td>
-                                    <td class="text-right">{{number_format($val['sto'], 2)}}</td>
-                                    <td class="text-right">{{number_format($val['w_cov'], 2)}}</td>
-                                    <td class="text-right">{{number_format($val['w_cov_needed'], 2)}}</td>
-                                    <td class="text-right font-weight-bold{{$val['vmi'] < 1 ? ' text-danger' : ' text-success'}}">
-                                        {{number_format($val['vmi'], 2)}}
+                                    <td class="text-left p-0 pl-1 align-middle">
+                                        {{$data[$inventory->product_id]['stock_code']}}
                                     </td>
+                                    <td class="text-left p-0 pl-1 align-middle">
+                                        {{$data[$inventory->product_id]['description']}}
+                                    </td>
+                                    <td class="text-right p-0 pr-1 align-middle">
+                                        {{number_format($data[$inventory->product_id]['cs_total'], 2)}}
+                                    </td>
+                                    @foreach($data[$inventory->product_id]['months_data'] as $key => $val)
+                                        <td class="text-right p-0 pr-1 align-middle">
+                                            {{number_format($val['sto'], 2)}}
+                                        </td>
+                                        <td class="text-right p-0 pr-1 align-middle">
+                                            {{number_format($val['w_cov'], 2)}}
+                                        </td>
+                                        <td class="text-right p-0 pr-1 align-middle">
+                                            {{number_format($val['w_cov_needed'], 2)}}
+                                        </td>
+                                        <td class="text-right p-0 pr-1 align-middle font-weight-bold{{$val['vmi'] < 1 ? ' text-danger' : ' text-success'}}">
+                                            {{number_format($val['vmi'], 2)}}
+                                        </td>
+                                    @endforeach
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
-            @endforeach
-
-            {{var_dump($param_data)}}
             
         </div>
         <div class="card-footer">
