@@ -149,34 +149,112 @@ class Vmi extends Component
         $product_ids = $inventories->pluck('product_id')->toArray();
         $products = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');
 
-        $months_param = [1, 2, 3];
-        $param_data = array();
-        foreach($months_param as $param) {
-            $sales = $sales = Sale::select(
-                    'product_id',
-                    DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
-                    DB::raw('SUM(quantity) / '.$param.' as total')
-                )
-                ->whereIn('product_id', $product_ids)
-                ->where('account_id', $this->account_branch->account_id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
-                    for($i = 1; $i <= $param; $i++) {
-                        $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
-                            $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
-                                ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
-                        });
-                    }
-                })
-                ->groupBy('product_id', 'uom')
-                ->get()
-                ->groupBy('product_id');
+        // $months_param = [1, 2, 3];
+        // $param_data = array();
+        // foreach($months_param as $param) {
+        //     $sales = Sale::select(
+        //             'product_id',
+        //             DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
+        //             DB::raw('SUM(quantity) / '.$param.' as total')
+        //         )
+        //         ->whereIn('product_id', $product_ids)
+        //         ->where('account_id', $this->account_branch->account_id)
+        //         ->where('account_branch_id', $this->account_branch->id)
+        //         ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
+        //             for($i = 1; $i <= $param; $i++) {
+        //                 $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
+        //                     $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
+        //                         ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+        //                 });
+        //             }
+        //         })
+        //         ->groupBy('product_id', 'uom')
+        //         ->get()
+        //         ->groupBy('product_id');
             
-            $data = array();
-            foreach($inventories as $inventory) {
-                if(!empty($inventory->total)) {
-                    $product = $products->get($inventory->product_id);
-                    $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
+        //     $data = array();
+        //     foreach($inventories as $inventory) {
+        //         if(!empty($inventory->total)) {
+        //             $product = $products->get($inventory->product_id);
+        //             $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
+
+        //             $sales_data = $sales->get($inventory->product_id);
+                    
+        //             $sales_cs_total = 0;
+        //             if(!empty($sales_data)) {
+        //                 foreach($sales_data as $val) {
+        //                     $sales_cs_total += $this->csConversion($product, $val->uom, $val->total);
+        //                 }
+        //             }
+
+        //             $w_cov = 0;
+        //             if(!empty($cs_total) && !empty($sales_cs_total)) {
+        //                 $w_cov = $cs_total / $sales_cs_total;
+        //             }
+
+        //             $w_cov_needed = 0;
+        //             if(!empty($w_cov) && !empty($this->parameter)) {
+        //                 $w_cov_needed = $this->parameter - $w_cov;
+        //             }
+
+        //             $vmi = 0;
+        //             if(!empty($w_cov_needed) && !empty($sales_cs_total)) {
+        //                 $vmi = $w_cov_needed * $sales_cs_total;
+        //             }
+
+        //             $data[] = [
+        //                 'stock_code' => $product->stock_code,
+        //                 'description' => $product->description.' '.$product->size,
+        //                 'uom' => $inventory->uom,
+        //                 'total' => $inventory->total,
+        //                 'cs_total' => $cs_total,
+        //                 'sto' => $sales_cs_total ?? 0,
+        //                 'w_cov' => $w_cov,
+        //                 'w_cov_needed' => $w_cov_needed,
+        //                 'vmi' => $vmi,
+        //             ];
+        //         }
+        //     }
+
+        //     $param_data[$param] = $data;
+        // }
+
+        $data = array();
+        foreach($inventories as $inventory) {
+            if(!empty($inventory->total)) {
+                $product = $products->get($inventory->product_id);
+                $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
+
+                $data[$inventory->product_id] = [
+                    'stock_code' => $product->stock_code,
+                    'description' => $product->description.' '.$product->size,
+                    'uom' => $inventory->uom,
+                    'total' => $inventory->total,
+                    'cs_total' => $cs_total,
+                ];
+
+                $months_param = [1, 2, 3];
+                $months_data = array();
+                foreach($months_param as $param) {
+                    $sales = Sale::select(
+                            'product_id',
+                            DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
+                            DB::raw('SUM(quantity) / '.$param.' as total')
+                        )
+                        ->where('product_id', $inventory->product_id)
+                        ->where('account_id', $this->account_branch->account_id)
+                        ->where('account_branch_id', $this->account_branch->id)
+                        ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
+                            for($i = 1; $i <= $param; $i++) {
+                                $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
+                                    $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
+                                        ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+                                });
+                            }
+                        })
+                        ->groupBy('product_id', 'uom')
+                        ->get()
+                        ->groupBy('product_id');
 
                     $sales_data = $sales->get($inventory->product_id);
                     
@@ -202,48 +280,21 @@ class Vmi extends Component
                         $vmi = $w_cov_needed * $sales_cs_total;
                     }
 
-                    $data[] = [
-                        'stock_code' => $product->stock_code,
-                        'description' => $product->description.' '.$product->size,
-                        'uom' => $inventory->uom,
-                        'total' => $inventory->total,
-                        'cs_total' => $cs_total,
+                    $months_data[$param] = [
                         'sto' => $sales_cs_total ?? 0,
                         'w_cov' => $w_cov,
                         'w_cov_needed' => $w_cov_needed,
                         'vmi' => $vmi,
                     ];
                 }
+
+                $data[$inventory->product_id]['months_data'] = $months_data;
             }
 
-            $param_data[$param] = $data;
-        }
-
-        foreach($inventories as $inventory) {
-            $sales = $sales = Sale::select(
-                    'product_id',
-                    DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
-                    DB::raw('SUM(quantity) / '.$param.' as total')
-                )
-                ->where('product_id', $inventory->product_id)
-                ->where('account_id', $this->account_branch->account_id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
-                    for($i = 1; $i <= $param; $i++) {
-                        $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
-                            $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
-                                ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
-                        });
-                    }
-                })
-                ->groupBy('product_id', 'uom')
-                ->get()
-                ->groupBy('product_id');
         }
         
         return view('livewire.reports.vmi')->with([
-            'months_param' => $months_param,
-            'param_data' => $param_data,
+            'data' => $data,
             'inventories' => $inventories
         ]);
     }
