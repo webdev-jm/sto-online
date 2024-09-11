@@ -141,7 +141,7 @@ class Upload extends Component
 
             // Get the file extension
             $extension = $file->getClientOriginalExtension();
-            if(in_array($extension, ['xlsx', 'csv', 'bin'])) {
+            if(in_array($extension, ['xlsx', 'csv', 'bin', 'xls'])) {
                 // convert xls to xlsx
                 $spreadsheet = IOFactory::load($path);
                 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');

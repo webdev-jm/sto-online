@@ -135,6 +135,15 @@
             </a>
         </div>
         @endcan
+
+        @can('template converter access')
+        <div class="col-lg-3">
+            <a href="{{route('template-converter.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
+                <i class="fa fa-route"></i>
+                TEMPLATE CONVERTER
+            </a>
+        </div>
+        @endcan
         
     </div>
 

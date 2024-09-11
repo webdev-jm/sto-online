@@ -21,6 +21,7 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\StockOnHandController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TemplateConverterControler;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +74,10 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('sms-account/ajax', [AccountController::class, 'smsAjax'])->name('sms-account.ajax');
     Route::get('sms-account/get-ajax/{id}', [AccountController::class, 'smsGetAjax'])->name('sms-account.get-ajax');
 
-    
+    // TEMPLATE CONVERTER
+    Route::group(['middleware' => 'permission:template converter access'], function() {
+        Route::get('template-converter', [TemplateConverterControler::class, 'index'])->name('template-converter.index');
+    });
 
     // PURCHASE ORDER
     Route::group(['middleware' => 'permission:purchase order access'], function() {

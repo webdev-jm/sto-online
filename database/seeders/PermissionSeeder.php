@@ -151,7 +151,10 @@ class PermissionSeeder extends Seeder
                 'notification edit' => 'Allow user to edit notifications',
                 'notification delete' => 'Allow user to delete notifications',
                 'notification restore' => 'Allow user to restore notifications',
-            ]
+            ],
+            'Template Converter' => [
+                'template converter access' => 'Allow user to access template converter',
+            ],
         ];
 
         foreach($permissions_arr as $module => $permissions) {
