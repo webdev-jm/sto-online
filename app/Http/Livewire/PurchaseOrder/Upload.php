@@ -157,10 +157,13 @@ class Upload extends Component
                         ->noHeaderRow()
                         ->getRows();
                 }
+                
+                if(!empty($rows)) {
+                    $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
+                        $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
+                    });
+                }
 
-                $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
-                    $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
-                });
             } else if($extension == 'xml') {
                 $xml = simplexml_load_file($path);
                 foreach($xml->children() as $child) {
