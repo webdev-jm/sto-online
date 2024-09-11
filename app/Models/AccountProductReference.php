@@ -11,4 +11,8 @@ class AccountProductReference extends Model
     
     protected $table = 'account_product_references';
     protected $connection = 'sms_db';
+
+    public function product() {
+        return $this->belongsTo('App\Models\SMSProduct');
+    }
 }
