@@ -124,10 +124,11 @@ class Upload extends Component
         $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
             ->where('account_id', $this->account_branch->account_id)
             ->first();
-
+            
         $account_template_fields = $account_template->fields->mapWithKeys(function($field) {
             return [
                 $field->upload_template_field_id => [
+                    'number' => $field->number,
                     'file_column_name' => $field->file_column_name,
                     'file_column_number' => $field->file_column_number,
                 ],
@@ -159,9 +160,92 @@ class Upload extends Component
                 }
                 
                 if(!empty($rows)) {
-                    $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
-                        $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
-                    });
+
+                    // Setup for Purgold
+                    if($this->account_branch->account->account_code == '1200081') {
+                        $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
+                            if(empty($row[0])) { // Luzon
+                                $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
+                            } else { // Vismin
+                                $custom_template = [
+                                    1 => [
+                                        'col_num' => 2,
+                                        'field' => '',
+                                    ],
+                                    2 => [
+                                        'col_num' => 1,
+                                        'field' => '',
+                                    ],
+                                    3 => [
+                                        'col_num' => 11,
+                                        'field' => '',
+                                    ],
+                                    4 => [
+                                        'col_num' => 4,
+                                        'field' => '',
+                                    ],
+                                    5 => [
+                                        'col_num' => 17,
+                                        'field' => 'dlvLocation',
+                                    ],
+                                    6 => [
+                                        'col_num' => 17,
+                                        'field' => 'dlvAddress',
+                                    ],
+                                    7 => [
+                                        'col_num' => 20,
+                                        'field' => 'sku',
+                                    ],
+                                    8 => [
+                                        'col_num' => 19,
+                                        'field' => '',
+                                    ],
+                                    9 => [
+                                        'col_num' => 20,
+                                        'field' => 'description',
+                                    ],
+                                    10 => [
+                                        'col_num' => 20,
+                                        'field' => 'buyUM',
+                                    ],
+                                    11 => [
+                                        'col_num' => 21,
+                                        'field' => '',
+                                    ],
+                                    12 => [
+                                        'col_num' => 26,
+                                        'field' => '',
+                                    ],
+                                    13 => [
+                                        'col_num' => 20,
+                                        'field' => 'buyCost',
+                                    ],
+                                    14 => [
+                                        'col_num' => 26,
+                                        'field' => '',
+                                    ],
+                                    15 => [
+                                        'col_num' => 26,
+                                        'field' => '',
+                                    ],
+                                ];
+
+                                $custom_vismin_template = [];
+                                foreach($account_template_fields as $field_id => $val) {
+                                    if(!empty($val['number'])) {
+                                        $custom_vismin_template[$field_id] = $custom_template[$val['number']];
+                                    }
+                                }
+
+                                $this->processRow($row, $po_data, $upload_template, $custom_vismin_template, 'number', true);
+                            }
+                        });
+                    } else {
+                        $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
+                            $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);
+                        });
+                    }
+
                 }
 
             } else if($extension == 'xml') {
@@ -175,25 +259,45 @@ class Upload extends Component
                     $this->processRow($row, $po_data, $upload_template, $account_template_fields, 'name');
                 }
             }
-        } 
+            
+        }
 
         $this->po_data = $po_data;
         
         Session::put('po_upload_data', $this->po_data);
     }
 
-    function processRow($row, &$po_data, $upload_template, $account_template_fields, $type) {
+    function processRow($row, &$po_data, $upload_template, $account_template_fields, $type, $custom = false) {
         $po_number = ''; // Assign or extract $po_number as required
     
         foreach ($upload_template->fields as $field) {
             $column_name = $field->column_name;
-            if($type == 'name') {
-                $file_column_name = $account_template_fields[$field->id]['file_column_name'];
-            } else if($type == 'number') {
-                $file_column_name = $account_template_fields[$field->id]['file_column_number'] - 1;
+            if($custom) {
+                $val = $row[$account_template_fields[$field->id]['col_num'] - 1] ?? '';
+                if(!empty($account_template_fields[$field->id]['field'])) {
+                    if(preg_match('/:'.$account_template_fields[$field->id]['field'].':([^:]+)/', $val, $matches)) {
+                        $val = trim($matches[1]);
+                    }
+                }
+                ${$column_name} = $val ?? NULL;
+            } else {
+                if($type == 'name') {
+                    $file_column_name = $account_template_fields[$field->id]['file_column_name'];
+                } else if($type == 'number') {
+                    $file_column_name = $account_template_fields[$field->id]['file_column_number'] - 1;
+                }
+                ${$column_name} = $row[$file_column_name] ?? NULL;
             }
 
-            ${$column_name} = $row[$file_column_name] ?? NULL;
+        }
+
+        if (is_object($order_date)) {
+            $order_date = $order_date->format('Y-m-d'); // or 'Y-m-d H:i:s' if time is also needed
+        }
+    
+        if (is_object($ship_date)) {
+            // Convert DateTimeImmutable to string format
+            $ship_date = $ship_date->format('Y-m-d'); // 'Y-m-d H:i:s' if time is needed
         }
     
         $po_data[$po_number]['headers'] = [
@@ -218,11 +322,11 @@ class Upload extends Component
             'quantity' => $quantity,
             'unit_of_measure' => $unit_of_measure,
             'discount' => 0,
-            'discount_amount' => $discount_amount,
-            'gross_amount' => $gross_amount,
-            'net_amount' => $net_amount,
-            'net_amount_per_uom' => $net_amount_per_uom,
-            'total_gross_amount' => $gross_amount
+            'discount_amount' => $discount_amount ?? 0,
+            'gross_amount' => $gross_amount ?? 0,
+            'net_amount' => $net_amount ?? 0,
+            'net_amount_per_uom' => $net_amount_per_uom ?? 0,
+            'total_gross_amount' => $gross_amount ?? 0
         ];
     }
 
