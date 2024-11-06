@@ -120,20 +120,34 @@ class Upload extends Component
 
         $this->reset('success_msg');
 
+        // $po_data = array();
+        // foreach ($this->files as $file) {
+        //     $path1 = $file->storeAs('purchase-order-uploads/account_branch_'.$this->account_branch->id, $file->getClientOriginalName());
+        //     $path = storage_path('app').'/'.$path1;
+        //     $xml = simplexml_load_file($path);
+        //     $po_data[] = $xml;
+        // }
+
+        // dd($po_data);
+
         $upload_template = UploadTemplate::where('title', 'PO UPLOAD')->first();
         $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
             ->where('account_id', $this->account_branch->account_id)
             ->first();
+        
+        $account_template_fields = array();
+        if(!empty($account_template)) {
+            $account_template_fields = $account_template->fields->mapWithKeys(function($field) {
+                return [
+                    $field->upload_template_field_id => [
+                        'number' => $field->number,
+                        'file_column_name' => $field->file_column_name,
+                        'file_column_number' => $field->file_column_number,
+                    ],
+                ];
+            });
+        }
             
-        $account_template_fields = $account_template->fields->mapWithKeys(function($field) {
-            return [
-                $field->upload_template_field_id => [
-                    'number' => $field->number,
-                    'file_column_name' => $field->file_column_name,
-                    'file_column_number' => $field->file_column_number,
-                ],
-            ];
-        });
 
         $po_data = array();
         foreach ($this->files as $file) {
@@ -249,15 +263,85 @@ class Upload extends Component
                 }
 
             } else if($extension == 'xml') {
-                $xml = simplexml_load_file($path);
-                foreach($xml->children() as $child) {
-                    $row = [];
-                    foreach ($upload_template->fields as $field) {
-                        $file_column_name = $account_template_fields[$field->id]['file_column_name'];
-                        $row[$file_column_name] = (string)$child->{$file_column_name};
+                
+
+                // FOR GOLDEN DEW
+                if($this->account_branch->account->account_code == '1200116') {
+                    $xml = simplexml_load_file($path);
+                    // dd($xml->children());
+                    foreach($xml->children() as $child_data) {
+                        
+                        $header = $child_data->header;
+                        $po_data[(string)$header->DocumentNumber] = [
+                            'headers' => [
+                                'vendor' => '',
+                                'order_date' => date('Y-m-d', strtotime((string)$header->DateEntry)),
+                                'ship_date' => date('Y-m-d', strtotime((string)$header->DateReceipt)),
+                                'shipping_instruction' => (string)$header->DeliveryMessage,
+                                'ship_to_name' => (string)$header->SiteCode,
+                                'ship_to_address' => (string)$header->SiteName .' '. (string)$header->SiteAddress,
+                                'city' => '',
+                                'status' => '',
+                                'total_quantity' => 0,
+                                'total_amount' => (double)$child_data->footer->TotalAmount,
+                                'total_net_amount' => 0,
+                                'po_value' => 0,
+                            ]
+                        ];
+
+                        $body = $child_data->body;
+                        
+                        $products = array();
+                        // check if multiple products
+                        if(is_array($body->article)) {
+                            foreach($body->article as $product) {
+                                $products[] = [
+                                    'product_id' => NULL,
+                                    'sku_code' => (string)$product->SKUMatCode,
+                                    'sku_code_other' => (string)$product->UPC,
+                                    'product_name' =>(string)$product->ArticleDescription->description,
+                                    'quantity' => (int)$product->BuyQty,
+                                    'unit_of_measure' => (string)$product->BuyUM,
+                                    'discount' => '',
+                                    'discount_amount' => '',
+                                    'gross_amount' => $this->convertStringValue($product->BuyCost),
+                                    'net_amount' => $this->convertStringValue($product->BuyCost),
+                                    'net_amount_per_uom' => $this->convertStringValue($product->BuyCost),
+                                    'po_value' => ''
+                                ];
+                            }
+                        } else {
+                            $product = $body->article;
+                            $products[] = [
+                                'product_id' => NULL,
+                                'sku_code' => (string)$product->SKUMatCode,
+                                'sku_code_other' => (string)$product->UPC,
+                                'product_name' => (string)$product->ArticleDescription->description,
+                                'quantity' => (int)$product->BuyQty,
+                                'unit_of_measure' => (string)$product->BuyUM,
+                                'discount' => 0,
+                                'discount_amount' => 0,
+                                'gross_amount' => $this->convertStringValue($product->BuyCost),
+                                'net_amount' => $this->convertStringValue($product->BuyCost),
+                                'net_amount_per_uom' => $this->convertStringValue($product->BuyCost),
+                                'po_value' => 0
+                            ];
+                        }
+
+                        $po_data[(string)$header->DocumentNumber]['products'] = $products;
                     }
-                    $this->processRow($row, $po_data, $upload_template, $account_template_fields, 'name');
+                } else {
+                    $xml = simplexml_load_file($path);
+                    foreach($xml->children() as $child) {
+                        $row = [];
+                        foreach ($upload_template->fields as $field) {
+                            $file_column_name = $account_template_fields[$field->id]['file_column_name'];
+                            $row[$file_column_name] = (string)$child->{$file_column_name};
+                        }
+                        $this->processRow($row, $po_data, $upload_template, $account_template_fields, 'name');
+                    }
                 }
+
             }
             
         }
@@ -265,6 +349,12 @@ class Upload extends Component
         $this->po_data = $po_data;
         
         Session::put('po_upload_data', $this->po_data);
+    }
+
+    private function convertStringValue($value) {
+        $str_val = (string)$value;
+        return (double) str_replace(',', '', $str_val);
+        
     }
 
     function processRow($row, &$po_data, $upload_template, $account_template_fields, $type, $custom = false) {
