@@ -254,6 +254,9 @@ class Upload extends Component
                                 $this->processRow($row, $po_data, $upload_template, $custom_vismin_template, 'number', true);
                             }
                         });
+                        
+                    // } else if($this->account_branch->account->account_code == '1200015') { // Setup for Phil Seven
+
                     } else {
                         $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
                             $this->processRow($row, $po_data, $upload_template, $account_template_fields, $account_template->type);

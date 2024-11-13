@@ -75,6 +75,13 @@
             </a>
         </div>
 
+        <div class="col-lg-3">
+            <a href="{{route('rtv.index')}}" class="btn btn-block btn-app bg-gradient-red ml-0">
+                <i class="fa fa-undo text-white"></i>
+                <span class="text-white">RTV</span>
+            </a>
+        </div>
+
     </div>
 
     <strong class="text-lg">MAINTENANCE</strong>
