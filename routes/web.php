@@ -22,6 +22,7 @@ use App\Http\Controllers\StockOnHandController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TemplateConverterControler;
+use App\Http\Controllers\ReturnToVendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +98,12 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:stock transfer access'], function() {
         Route::get('stock-transfer', [StockTransferController::class, 'index'])->name('stock-transfer.index');
         Route::get('stock-transfer/upload', [StockTransferController::class, 'upload'])->name('stock-transfer.upload')->middleware('permission:stock transfer upload');
+    });
+
+    // RETURN TO VENDOR
+    Route::group(['middleware' => 'permission:rtv access'], function () {
+        Route::get('rtv', [ReturnToVendorController::class, 'index'])->name('rtv.index');
+        Route::get('rtv/create', [ReturnToVendorController::class, 'create'])->name('rtv.create')->middleware('permission:rtv create');
     });
 
     // INVENTORIES
