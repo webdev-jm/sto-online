@@ -11,6 +11,7 @@ use App\Models\AccountProductReference;
 use App\Models\SMSProduct;
 use App\Models\AccountUploadTemplate;
 use App\Models\UploadTemplate;
+use App\Models\AccountBranchProductMapping;
 
 use Spatie\SimpleExcel\SimpleExcelReader;
 
@@ -70,6 +71,20 @@ class Upload extends Component
                                 $product = SMSProduct::find($product_reference->product_id);
                             }
                         }
+                        
+                        //  for phil seven
+                        $uom = $product_data['unit_of_measure'];
+                        if($this->account_branch->account->account_code == '1200015') {
+                            $product_mapping = AccountBranchProductMapping::where('account_branch_id', $this->account_branch->id)
+                                ->where(function($query) use($uom, $product) {
+                                    $query->where('sku_code', $uom)
+                                        ->orWhere('other_sku_code', $uom);
+                                })
+                                ->first();
+                            if(!empty($product_mapping)) {
+                                $uom = $product_mapping->uom;
+                            }
+                        }
     
                         $purchase_order_detail = new PurchaseOrderDetail([
                             'purchase_order_id' => $purchase_order->id,
@@ -78,7 +93,7 @@ class Upload extends Component
                             'sku_code_other' => $product_data['sku_code_other'],
                             'product_name' => $product_data['product_name'],
                             'quantity' => $product_data['quantity'],
-                            'unit_of_measure' => $product_data['unit_of_measure'],
+                            'unit_of_measure' => $uom,
                             'discount_amount' => empty($product_data['discount_amount']) ? 0 : $product_data['discount_amount'],
                             'gross_amount' => empty($product_data['gross_amount']) ? 0 : $product_data['gross_amount'],
                             'net_amount' => empty($product_data['net_amount']) ? 0 : $product_data['net_amount'],
@@ -254,8 +269,6 @@ class Upload extends Component
                                 $this->processRow($row, $po_data, $upload_template, $custom_vismin_template, 'number', true);
                             }
                         });
-                        
-                    // } else if($this->account_branch->account->account_code == '1200015') { // Setup for Phil Seven
 
                     } else {
                         $rows->each(function($row) use(&$po_data, $upload_template, $account_template_fields, $account_template) {
