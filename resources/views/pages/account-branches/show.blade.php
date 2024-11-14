@@ -113,6 +113,28 @@
             </div>
         </div>
 
+        <div class="col-6">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">SHIPPING ADDRESSES MAPPING</h3>
+                </div>
+                <div class="card-body">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">PRODUCT MAPPING</h3>
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
     @can('account branch delete')
