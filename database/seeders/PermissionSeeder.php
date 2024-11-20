@@ -155,6 +155,11 @@ class PermissionSeeder extends Seeder
             'Template Converter' => [
                 'template converter access' => 'Allow user to access template converter',
             ],
+            'RTV' => [
+                'rtv access' => 'Allow user to access return to vendor',
+                'rtv create' => 'Allow user to create return to vendor entry',
+                'rtv upload' => 'Allow user to upload return to vendor',
+            ]
         ];
 
         foreach($permissions_arr as $module => $permissions) {

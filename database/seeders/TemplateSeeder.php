@@ -136,10 +136,70 @@ class TemplateSeeder extends Seeder
             ],
         ];
 
+        $rtv_template = [
+            [
+                'column' => 'rtv_number',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'document_number',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_date',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'entry_date',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'reason',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'remarks',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_to_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'ship_to_address',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'other_sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'description',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'uom',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'quantity',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'cost',
+                'column_alt' => ''
+            ],
+        ];
+
         $templates_arr = [
             'PO UPLOAD' => $po_template_arr,
             'STOCK ON HAND UPLOAD' => $stock_on_hand_template,
             'STOCK TRANSFER UPLOAD' => $stock_transfer_template,
+            'RTV TEMPLATE' => $rtv_template,
         ];
 
         foreach($templates_arr as $title => $data) {
