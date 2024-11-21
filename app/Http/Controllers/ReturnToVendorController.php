@@ -129,4 +129,21 @@ class ReturnToVendorController extends Controller
             ]);
         }
     }
+
+    public function show($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $id = decrypt($id);
+        $rtv = ReturnToVendor::find($id);
+
+        return view('pages.return-to-vendors.show')->with([
+            'account_branch' => $account_branch,
+            'account' => $account,
+            'rtv' => $rtv
+        ]);
+    }
 }

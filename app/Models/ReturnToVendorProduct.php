@@ -25,4 +25,8 @@ class ReturnToVendorProduct extends Model
     public function getConnectionName() {
         return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
     }
+
+    public function rtv() {
+        return $this->belongsTo('App\Models\ReturnToVendor');
+    }
 }
