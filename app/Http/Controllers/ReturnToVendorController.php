@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Session;
 
 use App\Http\Traits\AccountChecker;
 
+use App\Models\ReturnToVendor;
+
 class ReturnToVendorController extends Controller
 {
     use AccountChecker;
@@ -18,9 +20,14 @@ class ReturnToVendorController extends Controller
         }
         $account = Session::get('account');
 
+        $return_to_vendors = ReturnToVendor::where('account_branch_id', $account_branch->id)
+            ->paginate(10)
+            ->onEachSide(1);
+
         return view('pages.return-to-vendors.index')->with([
             'account_branch' => $account_branch,
-            'account' => $account
+            'account' => $account,
+            'return_to_vendors' => $return_to_vendors
         ]);
     }
 
@@ -46,7 +53,11 @@ class ReturnToVendorController extends Controller
 
         return view('pages.return-to-vendors.upload')->with([
             'account' => $account,
-            'account_branch' => $account_branch
+            'account_branch' => $account_branch,
         ]);
+    }
+
+    public function store(Request $request) {
+
     }
 }
