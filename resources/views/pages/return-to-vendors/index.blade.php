@@ -58,7 +58,11 @@
                                 <td class="align-middle">{{$rtv->reason}}</td>
                                 <td class="align-middle">{{$rtv->ship_to_name}}</td>
                                 <td class="align-middle">{{$rtv->ship_to_address}}</td>
-                                <td></td>
+                                <td class="align-middle text-center p-0">
+                                    <a href="{{route('rtv.show', encrypt($rtv->id))}}">
+                                        <i class="fa fa-list-alt text-primary"></i>
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

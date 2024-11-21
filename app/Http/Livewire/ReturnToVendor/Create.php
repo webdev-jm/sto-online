@@ -62,8 +62,6 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.return-to-vendor.create')->with([
-            'rtv_products' => $rtv_products
-        ]);
+        return view('livewire.return-to-vendor.create');
     }
 }
