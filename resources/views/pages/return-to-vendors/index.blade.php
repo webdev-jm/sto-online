@@ -34,6 +34,37 @@
         </div>
         <div class="card-body">
 
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr class="text-center">
+                            <th class="align-middle">RTV NUMBER</th>
+                            <th class="align-middle">DOCUMENT NUMBER</th>
+                            <th class="align-middle">SHIP DATE</th>
+                            <th class="align-middle">ENTRY DATE</th>
+                            <th class="align-middle">REASON</th>
+                            <th class="align-middle">SHIP TO NAME</th>
+                            <th class="align-middle">SHIP TO ADDRESS</th>
+                            <th class="align-middle"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($return_to_vendors as $rtv)
+                            <tr class="text-center">
+                                <td class="align-middle">{{$rtv->rtv_number}}</td>
+                                <td class="align-middle">{{$rtv->document_number}}</td>
+                                <td class="align-middle">{{$rtv->ship_date}}</td>
+                                <td class="align-middle">{{$rtv->entry_date}}</td>
+                                <td class="align-middle">{{$rtv->reason}}</td>
+                                <td class="align-middle">{{$rtv->ship_to_name}}</td>
+                                <td class="align-middle">{{$rtv->ship_to_address}}</td>
+                                <td></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
         </div>
         <div class="card-footer">
         </div>

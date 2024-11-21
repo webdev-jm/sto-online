@@ -10,6 +10,7 @@
                         <th>UOM</th>
                         <th>QUANTITY</th>
                         <th>COST</th>
+                        <th>REMARKS</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -33,6 +34,9 @@
                             </td>
                             <td class="p-0">
                                 <input type="text" class="form-control border-0" wire:model="products.{{$key}}.cost">
+                            </td>
+                            <td class="p-0">
+                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.remarks">
                             </td>
                             <td class="p-0 text-center align-middle">
                                 <button class="btn btn-danger btn-xs" wire:click.prevent="removeLine({{$key}})">
