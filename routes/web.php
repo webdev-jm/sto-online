@@ -105,6 +105,7 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('rtv', [ReturnToVendorController::class, 'index'])->name('rtv.index');
         Route::get('rtv/create', [ReturnToVendorController::class, 'create'])->name('rtv.create')->middleware('permission:rtv create');
         Route::get('rtv/upload', [ReturnToVendorController::class, 'upload'])->name('rtv.upload')->middleware('permission:rtv upload');
+        Route::post('rtv', [ReturnToVendorController::class, 'store'])->name('rtv.store')->middleware('permission:rtv create');
     });
 
     // INVENTORIES
