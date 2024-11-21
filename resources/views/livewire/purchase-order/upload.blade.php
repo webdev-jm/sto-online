@@ -70,7 +70,6 @@
                         </thead>
                         <tbody>
                             <tr>
-                                
                                 <th class="border-0">ORDER DATE:</th>
                                 <td class="border-0">{{$data['headers']['order_date'] ?? ''}}</td>
                                 <th class="border-0">PO NO:</th>
