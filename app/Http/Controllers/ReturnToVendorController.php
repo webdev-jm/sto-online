@@ -99,7 +99,6 @@ class ReturnToVendorController extends Controller
                 'ship_date' => $request->ship_date,
                 'entry_date' => date('Y-m-d'),
                 'reason' => $request->reason,
-                'remarks' => NULL,
                 'ship_to_name' => $request->ship_to_name,
                 'ship_to_address' => $request->ship_to_address,
             ]);
