@@ -46,7 +46,6 @@ class Upload extends Component
                     'ship_date' => $header['ship_date'],
                     'entry_date' => $header['entry_date'],
                     'reason' => $header['reason'],
-                    'remarks' => '',
                     'ship_to_name' => $header['ship_to_name'],
                     'ship_to_address' => $header['ship_to_address'],
                 ]);

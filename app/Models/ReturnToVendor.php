@@ -19,7 +19,6 @@ class ReturnToVendor extends Model
         'ship_date',
         'entry_date',
         'reason',
-        'remarks',
         'ship_to_name',
         'ship_to_address',
     ];
