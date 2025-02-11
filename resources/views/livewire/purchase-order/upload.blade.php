@@ -120,21 +120,21 @@
                                     $product['quantity'] = empty($product['quantity']) ? 0 : $product['quantity'];
                                     $product['discount_amount'] = empty($product['discount_amount']) ? 0 : $product['discount_amount'];
 
-                                    $gross_amount += $product['gross_amount'];
-                                    $net_amount += $product['net_amount'];
+                                    $gross_amount += (float)$product['gross_amount'];
+                                    $net_amount += (float)$product['net_amount'];
                                     $quantity += $product['quantity'];
-                                    $discount_amount += $product['discount_amount'];
+                                    $discount_amount += (float)$product['discount_amount'];
                                 @endphp
                                 <tr>
                                     <td class="border-0 text-left">{{$product['sku_code']}}</td>
                                     <td class="border-0 text-left">{{$product['sku_code_other']}}</td>
                                     <td class="border-0 text-left">{{$product['product_name']}}</td>
                                     <td class="border-0 text-left">{{$product['unit_of_measure']}}</td>
-                                    <td class="text-right border-0">{{number_format($product['gross_amount'], 2)}}</td>
-                                    <td class="text-right border-0">{{number_format($product['discount'], 2)}}</td>
-                                    <td class="text-right border-0">{{number_format($product['net_amount'], 2)}}</td>
-                                    <td class="text-right border-0">{{number_format($product['quantity'])}}</td>
-                                    <td class="text-right border-0">{{number_format($product['net_amount_per_uom'], 2)}}</td>
+                                    <td class="text-right border-0">{{number_format((float)$product['gross_amount'], 2)}}</td>
+                                    <td class="text-right border-0">{{number_format((float)$product['discount'], 2)}}</td>
+                                    <td class="text-right border-0">{{number_format((float)$product['net_amount'], 2)}}</td>
+                                    <td class="text-right border-0">{{number_format((int)$product['quantity'])}}</td>
+                                    <td class="text-right border-0">{{number_format((float)$product['net_amount_per_uom'], 2)}}</td>
                                 </tr>
                             @endforeach
                         </tbody>
