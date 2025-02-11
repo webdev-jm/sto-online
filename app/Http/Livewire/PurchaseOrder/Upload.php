@@ -234,12 +234,12 @@ class Upload extends Component
                                         'field' => 'description',
                                     ],
                                     10 => [
-                                        'col_num' => 20,
-                                        'field' => 'buyUM',
-                                    ],
-                                    11 => [
                                         'col_num' => 21,
                                         'field' => '',
+                                    ],
+                                    11 => [
+                                        'col_num' => 20,
+                                        'field' => 'buyUM',
                                     ],
                                     12 => [
                                         'col_num' => 26,
@@ -370,7 +370,6 @@ class Upload extends Component
     private function convertStringValue($value) {
         $str_val = (string)$value;
         return (double) str_replace(',', '', $str_val);
-        
     }
 
     function processRow($row, &$po_data, $upload_template, $account_template_fields, $type, $custom = false) {
