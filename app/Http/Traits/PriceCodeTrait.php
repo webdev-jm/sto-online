@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Session;
 Trait PriceCodeTrait {
     
     // get product price base on account and Unit of Measurement(UOM)
-    public function getProductPrice($account_code, $vendor, $sku_code, $quantity, $uom = 'PCS') {
+    public function getProductPrice($account_code, $vendor, $sku_code, $quantity, $uom = 'PCS', $with_discount = true) {
         // company
         $company = SMSCompany::where('name', $vendor)->first();
         // account
         $account = SMSAccount::where('account_code', $account_code)->first();
         // discount
-        $discount = $account->discount ?? null;
+        $discount = NULL;
+        if($with_discount) {
+            $discount = $account->discount ?? NULL;
+        }
         // product
         $product = SMSProduct::where('stock_code', $sku_code)->first();
 
