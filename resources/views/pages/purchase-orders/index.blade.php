@@ -18,6 +18,12 @@
         <div class="card-header">
             <h3 class="card-title">PO LIST</h3>
             <div class="card-tools">
+                @can('purchase order create')
+                    <a href="{{route('purchase-order.create')}}" class="btn btn-success btn-xs">
+                        <i class="fa fa-plus"></i>
+                        CREATE
+                    </a>
+                @endcan
                 @can('purchase order upload')
                     <a href="{{route('purchase-order.upload')}}" class="btn btn-primary btn-xs">
                         <i class="fa fa-upload"></i>

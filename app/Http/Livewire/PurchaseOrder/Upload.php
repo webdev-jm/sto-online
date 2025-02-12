@@ -372,7 +372,7 @@ class Upload extends Component
         return (double) str_replace(',', '', $str_val);
     }
 
-    function processRow($row, &$po_data, $upload_template, $account_template_fields, $type, $custom = false) {
+    public function processRow($row, &$po_data, $upload_template, $account_template_fields, $type, $custom = false) {
         $po_number = ''; // Assign or extract $po_number as required
     
         foreach ($upload_template->fields as $field) {

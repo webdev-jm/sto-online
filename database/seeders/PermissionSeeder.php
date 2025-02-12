@@ -136,6 +136,7 @@ class PermissionSeeder extends Seeder
             'Purchase Order' => [
                 'purchase order access' => 'Allow user to access purchase orders',
                 'purchase order upload' => 'Allow user to upload purchase orders',
+                'purchase order create' => 'Allow user to create purchase orders',
             ],
             'Stock On Hand' => [
                 'stock on hand access' => 'Allow user to access stock on hand',
