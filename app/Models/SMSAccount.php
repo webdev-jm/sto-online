@@ -34,6 +34,10 @@ class SMSAccount extends Model
         return $this->belongsTo('App\Models\SMSCompany', 'company_id', 'id');
     }
 
+    public function discount() {
+        return $this->belongsTo('App\Models\SMSDiscount', 'discount_id', 'id');
+    }
+
     public function scopeAccountAjax($query, $search) {
         if($search == '') {
             $accounts = $query->select('id', 'account_code', 'short_name')->limit(5)->get();

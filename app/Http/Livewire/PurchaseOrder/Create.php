@@ -77,7 +77,8 @@ class Create extends Component
                         $uom = $data['uom'];
                     }
     
-                    $price = $this->getProductPrice($this->sms_account->account_code, $this->sms_account->company->name, $product->stock_code, $data['order'], $uom);
+                    // getProductPrice(account_code, company name, stock code, quantity, UOM, discount)
+                    $price = $this->getProductPrice($this->sms_account->account_code, $this->sms_account->company->name, $product->stock_code, $data['order'], $uom, false);
 
                     $total_quantity += $data['order'];
                     $total_price += $price;
