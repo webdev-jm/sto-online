@@ -26,6 +26,14 @@ class SMSAccount extends Model
         return $this->hasMany(\App\Models\AccountBranch::class, 'id', 'account_id');
     }
 
+    public function products() {
+        return $this->belongsToMany('App\Models\SMSProduct', 'sms_db.account_product', 'account_id', 'product_id');
+    }
+
+    public function company() {
+        return $this->belongsTo('App\Models\SMSCompany', 'company_id', 'id');
+    }
+
     public function scopeAccountAjax($query, $search) {
         if($search == '') {
             $accounts = $query->select('id', 'account_code', 'short_name')->limit(5)->get();

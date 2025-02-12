@@ -76,6 +76,19 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
+    public function create() {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        return view('pages.purchase-orders.create')->with([
+            'account_branch' => $account_branch,
+            'account' => $account
+        ]);
+    }
+
     public function show($id) {
         $account_branch = $this->checkBranch();
         if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {

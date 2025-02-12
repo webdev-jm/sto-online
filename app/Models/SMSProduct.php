@@ -15,4 +15,12 @@ class SMSProduct extends Model
     public function channel() {
         return $this->belongsTo('App\Models\SMSClassification');
     }
+
+    public function price_codes() {
+        return $this->hasMany('App\Models\SMSPriceCode', 'product_id', 'id');
+    }
+
+    public function references() {
+        return $this->hasMany('App\Models\SMSAccountProductReference', 'product_id', 'id');
+    }
 }
