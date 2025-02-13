@@ -15,6 +15,8 @@ use App\Models\SMSPriceCode;
 
 use App\Http\Traits\PriceCodeTrait;
 
+use Illuminate\Support\Facades\Session;
+
 class Create extends Component
 {
     use PriceCodeTrait;
@@ -148,6 +150,9 @@ class Create extends Component
         $this->account = $account;
         $this->sms_account = SMSAccount::find($account->sms_account_id);
         $this->account_branch = $account_branch;
+
+        // check if there is an existing data from session
+        $po_data = Session::get('po_data');
     }
 
     public function getOrders() {

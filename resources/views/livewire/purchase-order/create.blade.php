@@ -5,7 +5,7 @@
                 <div class="card-header">
                     <h3 class="card-title">CREATE PURCHASE ORDER</h3>
                     <div class="card-tools">
-                        <button class="btn btn-xs btn-info">
+                        <button class="btn btn-xs btn-info" id="btn-upload">
                             <i class="fa fa-upload"></i>
                             UPLOAD PURCHASE ORDER
                         </button>
