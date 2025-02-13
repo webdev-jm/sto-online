@@ -98,6 +98,9 @@ class SingleUpload extends Component
     public function uploadData() {
         if(!empty($this->po_data)) {
             Session::put('po_data', $this->po_data);
+
+            // reload page
+            return redirect(request()->header('Referer'));
         }
     }
     
