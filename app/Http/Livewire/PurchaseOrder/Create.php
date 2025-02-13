@@ -4,8 +4,11 @@ namespace App\Http\Livewire\PurchaseOrder;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderDetail;
+use App\Models\PurchaseOrderAttachment;
 use App\Models\SMSAccount;
 use App\Models\SMSProduct;
 use App\Models\SMSPriceCode;
@@ -15,16 +18,99 @@ use App\Http\Traits\PriceCodeTrait;
 class Create extends Component
 {
     use PriceCodeTrait;
+    use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
     public $account;
     public $sms_account;
+    public $account_branch;
     public $control_number;
     public $order_data;
     public $order_details;
+    public $attachment;
+    public $po_number, $ship_date;
+    public $ship_to_name, $ship_to_address, $shipping_instruction;
 
     public $brand_filter = 'ALL', $search;
+
+    public function savePO() {
+        $this->validate([
+            'po_number' => [
+                'required'
+            ],
+            'ship_date' => [
+                'required'
+            ],
+            'ship_to_name' => [
+                'required',
+                'max:255'
+            ],
+            'ship_to_address' => [
+                'required',
+                'max:255'
+            ],
+            'shipping_instruction' => [
+                'max:2000'
+            ],
+            'order_details' => [
+                'required'
+            ],
+            'attachment' => [
+                'mimes:jpeg,png,jpg,gif,pdf,xlsx,xls,doc,docx,xml'
+            ],
+        ]);
+
+        $this->generatePoNumber();
+        $purchase_order = new PurchaseOrder([
+            'sms_account_id' => $this->sms_account->id,
+            'account_branch_id' => $this->account_branch->id,
+            'control_number' => $this->control_number,
+            'po_number' => $this->po_number,
+            'order_date' => date('Y-m-d'),
+            'ship_date' => $this->ship_date,
+            'shipping_instruction' => $this->shipping_instruction,
+            'ship_to_name' => $this->ship_to_name,
+            'ship_to_address' => $this->ship_to_address,
+            'status' => NULL,
+            'total_quantity' => $this->order_details['total_quantity'],
+            'total_sales' => $this->order_details['total_price'],
+            'grand_total' => $this->order_details['total_price'],
+            'po_value' => $this->order_details['total_price'],
+        ]);
+        $purchase_order->save();
+
+        // save attachment
+        if($this->attachment) {
+            $path1 = $this->attachment->store('purchase-order-attachments');
+            $path = storage_path('app').'/'.$path1;
+
+            $po_attachment = new PurchaseOrderAttachment([
+                'purchase_order_id' => $purchase_order->id,
+                'path' => $path
+            ]);
+            $po_attachment->save();
+        }
+
+        foreach($this->order_details['details'] as $data) {
+            $po_detail = new PurchaseOrderDetail([
+                'purchase_order_id' => $purchase_order->id,
+                'product_id' => $data['product']['id'],
+                'sku_code' => $data['product']['stock_code'],
+                'sku_code_other' => $data['product']['stock_code'],
+                'product_name' => $data['product']['description'] .' '.$data['product']['size'],
+                'quantity' => $data['quantity'],
+                'unit_of_measure' => $data['uom'],
+                'discount_amount' => $data['price'],
+                'gross_amount' => $data['price'],
+                'net_amount' => $data['price'],
+                'net_amount_per_uom' => $data['price'],
+            ]);
+            $po_detail->save();
+        }
+
+        return redirect()->route('purchase-order.index');
+    }
 
     private function generatePoNumber() {
         $control_number = 'PO-20250111-0001';
@@ -58,9 +144,10 @@ class Create extends Component
         $this->control_number = $control_number;
     }
 
-    public function mount($account) {
+    public function mount($account, $account_branch) {
         $this->account = $account;
         $this->sms_account = SMSAccount::find($account->sms_account_id);
+        $this->account_branch = $account_branch;
     }
 
     public function getOrders() {
@@ -93,7 +180,13 @@ class Create extends Component
             }
         }
 
-        $this->order_details['details'] = $order_details;
+        // Remove items from order_details if they don't exist in order_data
+        $existing_product_ids = array_keys($order_details);
+        $this->order_details['details'] = array_filter($this->order_details['details'] ?? [], function ($order) use ($existing_product_ids) {
+            return in_array($order['product']['id'], $existing_product_ids);
+        });
+
+        $this->order_details['details'] = array_values($order_details);
         $this->order_details['total_quantity'] = $total_quantity;
         $this->order_details['total_price'] = $total_price;
     }

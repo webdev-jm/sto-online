@@ -14,6 +14,7 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'sms_account_id',
         'account_branch_id',
+        'control_number',
         'po_number',
         'order_date',
         'ship_date',
@@ -33,5 +34,9 @@ class PurchaseOrder extends Model
 
     public function details() {
         return $this->hasMany('App\Models\PurchaseOrderDetail');
+    }
+
+    public function attachments() {
+        return $this->hasMany('App\Models\PurchaseOrderAttachment');
     }
 }
