@@ -18,7 +18,13 @@
 @stop
 
 @section('content')
-    <livewire:purchase-order.create :account="$account"/>
+    <livewire:purchase-order.create :account="$account" :account_branch="$account_branch"/>
+
+    <div class="modal fade" id="modal-upload">
+        <div class="modal-dialog modal-xl">
+            <livewire:uploads.customer/>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -28,7 +34,10 @@
 @section('js')
 <script>
     $(function() {
-
+        $('#btn-upload').on('click', function(e) {
+            e.preventDefault();
+            $('#modal-upload').modal('show');
+        });
     });
 </script>
 @stop
