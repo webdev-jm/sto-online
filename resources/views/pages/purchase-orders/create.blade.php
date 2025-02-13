@@ -22,7 +22,7 @@
 
     <div class="modal fade" id="modal-upload">
         <div class="modal-dialog modal-xl">
-            <livewire:uploads.customer/>
+            <livewire:purchase-order.single-upload :account_branch="$account_branch"/>
         </div>
     </div>
 @stop
