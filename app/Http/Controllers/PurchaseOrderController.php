@@ -22,6 +22,7 @@ class PurchaseOrderController extends Controller
         $account = Session::get('account');
 
         Session::forget('po_upload_data');
+        Session::forget('po_data');
 
         $filters = Session::get('po_filters');
 

@@ -151,8 +151,54 @@ class Create extends Component
         $this->sms_account = SMSAccount::find($account->sms_account_id);
         $this->account_branch = $account_branch;
 
+        $this->checkData();
+    }
+
+    public function checkData() {
         // check if there is an existing data from session
         $po_data = Session::get('po_data');
+        if(!empty($po_data)) {
+            $header = $po_data['header'];
+            $details = $po_data['details'];
+
+            $this->po_number = $header['PO NUMBER'];
+            $this->ship_date = $header['SHIP DATE'];
+            $this->ship_to_name = $header['SHIP TO NAME'];
+            $this->ship_to_address = $header['SHIP TO ADDRESS'];
+            $this->shipping_instruction = $header['SHIPPING INSTRUCTION'];
+
+            foreach($details as $detail) {
+                // get product
+                $product = $this->getProduct($detail['BEVI SKU CODE'], $detail['OTHER SKU CODE']);
+
+                if(!empty($product)) {
+                    $this->order_data[$product->id] = [
+                        'order' => $detail['QUANTITY'],
+                        'uom' => $detail['UOM']
+                    ];
+                }
+            }
+
+            $this->getOrders();
+        }
+    }
+
+    private function getProduct($sku_code, $other_sku_code) {
+        $product = SMSProduct::whereHas('price_codes', function ($q) {
+                $q->where('company_id', $this->sms_account->company_id)
+                    ->where('code', $this->sms_account->price_code);
+            })
+            ->where(function($query) use($sku_code, $other_sku_code) {
+                $query->where('stock_code', $sku_code)
+                ->orWhereHas('references', function ($qry) use($other_sku_code) {
+                    $qry->where('account_reference', $other_sku_code)
+                        ->orWhere('description', $other_sku_code);
+                });
+            })
+            ->first();
+
+        return $product ?? NULL;
+            
     }
 
     public function getOrders() {
