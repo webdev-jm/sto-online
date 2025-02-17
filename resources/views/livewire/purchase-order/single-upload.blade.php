@@ -7,15 +7,19 @@
 
             <div class="row">
                 <div class="col-lg-6">
-                    <div class="form-group">
+                    <div class="form-group mb-0">
                         <label for="" class="mb-0">UPLOAD FILE</label>
                         <input type="file" class="form-control form-control-sm{{$errors->has('file') ? ' is-invalid' : ''}}" wire:model.live="file">
                         <small class="text-danger">{{$errors->first('file')}}</small>
                     </div>
                 </div>
+
+                <div class="col-12">
+                    <a href="{{asset('/templates/po-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading purchase order data.
+                </div>
                 
-                <div class="col-lg-12">
-                    <button class="btn btn-info btn-sm" wire:click.prevent="checkUploads">CHECK FILE</button>
+                <div class="col-lg-12 mt-2">
+                    <button class="btn btn-info btn-xs" wire:click.prevent="checkUploads" wire:loading.attr="disabled" wire:target="checkUploads">CHECK FILE</button>
                 </div>
             </div>
 
@@ -60,7 +64,9 @@
         </div>
         <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">Upload</button>
+            @if(!empty($po_data))
+                <button type="button" class="btn btn-primary" wire:loading.attr="disabled" wire:click.prevent="uploadData">Upload</button>
+            @endif
         </div>
     </div>
 </div>
