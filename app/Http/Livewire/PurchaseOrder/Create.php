@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\PurchaseOrder;
 
+use Illuminate\Validation\Rule;
+
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -39,7 +41,8 @@ class Create extends Component
     public function savePO() {
         $this->validate([
             'po_number' => [
-                'required'
+                'required',
+                Rule::unique((new PurchaseOrder)->getConnectionName().'.'.(new PurchaseOrder)->getTable())
             ],
             'ship_date' => [
                 'required'
