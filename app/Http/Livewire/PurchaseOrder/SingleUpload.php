@@ -29,6 +29,8 @@ class SingleUpload extends Component
             ]
         ]);
 
+        
+
         $path1 = $this->file->storeAs('purchase-order-upload/account_branch_'.$this->account_branch->id, $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
 

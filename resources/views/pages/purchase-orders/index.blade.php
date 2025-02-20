@@ -55,6 +55,7 @@
                             <th class="align-middle p-0">Total Quantity</th>
                             <th class="align-middle p-0">Total Gross Amount</th>
                             <th class="align-middle p-0">Total Net Amount</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,6 +105,13 @@
                                     <td class="p-0 px-1 align-middle text-right">
                                         {{number_format($purchase_order->grand_total, 2)}}
                                     </td>
+                                    <td class="p-0 py-1 text-center align-middle">
+                                        @can('purchase order edit')
+                                        <a href="{{route('purchase-order.edit', encrypt($purchase_order->id))}}" class="btn btn-xs btn-success">
+                                            <i class="fa fa-pen-alt"></i>
+                                        </a>
+                                        @endcan
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -114,6 +122,7 @@
                             <th class="text-right">{{number_format($total_data->quantity)}}</th>
                             <th class="text-right">{{number_format($total_data->sales, 2)}}</th>
                             <th class="text-right">{{number_format($total_data->total, 2)}}</th>
+                            <th></th>
                         </tr>
                     </tfoot>
                 </table>

@@ -106,4 +106,45 @@ class PurchaseOrderController extends Controller
             'purchase_order' => $purchase_order
         ]);
     }
+
+    public function edit($id) {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        $id = decrypt($id);
+        $purchase_order = PurchaseOrder::findOrFail($id);
+
+        $header = [
+            'PO NUMBER' => $purchase_order->po_number,
+            'SHIP DATE' => $purchase_order->ship_date,
+            'SHIPPING INSTRUCTION' => $purchase_order->shipping_instruction,
+            'SHIP TO NAME' => $purchase_order->ship_to_name,
+            'SHIP TO ADDRESS' => $purchase_order->ship_to_address,
+        ];
+
+        $details = [];
+        foreach($purchase_order->details as $key => $detail) {
+            $details[$key] = [
+                'BEVI SKU CODE' => $detail->sku_code,
+                'OTHER SKU CODE' => $detail->sku_code_other,
+                'UOM' => $detail->unit_of_measure,
+                'QUANTITY' => $detail->quantity,
+            ];
+        }
+
+        $po_data = [
+            'header' => $header,
+            'details' => $details
+        ];
+
+        Session::put('po_data', $po_data);
+
+        return view('pages.purchase-orders.edit')->with([
+            'account_branch' => $account_branch,
+            'account' => $account
+        ]);
+    }
 }
