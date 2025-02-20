@@ -87,6 +87,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('purchase-order/create', [PurchaseOrderController::class, 'create'])->name('purchase-order.create')->middleware('permission:purchase order create');
 
         Route::get('purchase-order/{id}', [PurchaseOrderController::class, 'show'])->name('purchase-order.show');
+
+        Route::get('purchase-order/{id}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase-order.edit')->middleware('permission:purchase order edit');
     });
 
     // STOCK ON HAND

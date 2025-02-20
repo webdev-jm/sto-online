@@ -35,6 +35,7 @@ class Create extends Component
     public $attachment;
     public $po_number, $ship_date;
     public $ship_to_name, $ship_to_address, $shipping_instruction;
+    public $type;
 
     public $brand_filter = 'ALL', $search;
 
@@ -149,10 +150,17 @@ class Create extends Component
         $this->control_number = $control_number;
     }
 
-    public function mount($account, $account_branch) {
+    public function mount($account, $account_branch, $type) {
         $this->account = $account;
         $this->sms_account = SMSAccount::find($account->sms_account_id);
         $this->account_branch = $account_branch;
+        $this->type = $type;
+
+        if($this->type == 'edit') {
+            $this->control_number = '';
+        } else {
+            $this->generatePoNumber();
+        }
 
         $this->checkData();
     }
@@ -255,7 +263,6 @@ class Create extends Component
 
     public function render()
     {
-        $this->generatePoNumber();
 
         $special_products = $this->sms_account->products;
 
