@@ -18,7 +18,7 @@
 @stop
 
 @section('content')
-    <livewire:purchase-order.create :account="$account" :account_branch="$account_branch" type="edit"/>
+    <livewire:purchase-order.create :account="$account" :account_branch="$account_branch" type="add"/>
 
     <div class="modal fade" id="modal-upload">
         <div class="modal-dialog modal-xl">

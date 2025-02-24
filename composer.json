@@ -20,8 +20,10 @@
         "phpoffice/phpspreadsheet": "^1.29",
         "rap2hpoutre/laravel-log-viewer": "^2.3",
         "silviolleite/laravelpwa": "^2.0",
+        "smalot/pdfparser": "*",
         "spatie/laravel-activitylog": "^3.17",
         "spatie/laravel-permission": "^5.10",
+        "spatie/pdf-to-text": "*",
         "spatie/simple-excel": "^3.2"
     },
     "require-dev": {
