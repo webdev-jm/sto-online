@@ -48,7 +48,7 @@
                         <li class="list-group-item p-1">
                             <b>Channel</b>
                             <span class="float-right">
-                                @if(!empty($$customer->channel))
+                                @if(!empty($customer->channel))
                                     [{{$customer->channel->code ?? '-'}}] {{$customer->channel->name ?? '-'}}
                                 @else
                                     -

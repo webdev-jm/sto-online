@@ -14,6 +14,13 @@ class PurchaseOrderController extends Controller
 {
     use AccountChecker;
 
+    public $status_arr = [
+        'draft' => 'secondary',
+        'submitted' => 'primary',
+        'rejected' => 'danger',
+        'approved' => 'success',
+    ];
+
     public function index(Request $request) {
         $account_branch = $this->checkBranch();
         if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
@@ -60,7 +67,8 @@ class PurchaseOrderController extends Controller
             'account' => $account,
             'account_branch' => $account_branch,
             'purchase_orders' => $purchase_orders,
-            'total_data' => $total_data[0]
+            'total_data' => $total_data[0],
+            'status_arr' => $this->status_arr
         ]);
     }
 

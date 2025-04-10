@@ -10,6 +10,7 @@ use Livewire\WithFileUploads;
 
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
+use App\Models\PurchaseOrderApproval;
 use App\Models\PurchaseOrderAttachment;
 use App\Models\SMSAccount;
 use App\Models\SMSProduct;
@@ -39,7 +40,7 @@ class Create extends Component
 
     public $brand_filter = 'ALL', $search;
 
-    public function savePO() {
+    public function savePO($status) {
         $this->validate([
             'po_number' => [
                 'required',
@@ -79,6 +80,7 @@ class Create extends Component
             'ship_to_name' => $this->ship_to_name,
             'ship_to_address' => $this->ship_to_address,
             'status' => NULL,
+            'approval_status' => $status,
             'total_quantity' => $this->order_details['total_quantity'],
             'total_sales' => $this->order_details['total_price'],
             'grand_total' => $this->order_details['total_price'],
@@ -113,6 +115,15 @@ class Create extends Component
                 'net_amount_per_uom' => $data['price'],
             ]);
             $po_detail->save();
+        }
+
+        if($status == 'submitted') {
+            $approval = new PurchaseOrderApproval([
+                'purchase_order_id' => $purchase_order->id,
+                'approval_status' => $status,
+                'remarks' => ''
+            ]);
+            $approval->save();
         }
 
         return redirect()->route('purchase-order.index');

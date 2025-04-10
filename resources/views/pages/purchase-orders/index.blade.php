@@ -76,7 +76,7 @@
                                         </a>
                                     </td>
                                     <td class="p-0 px-1 align-middle text-center">
-                                        {{$purchase_order->status}}
+                                        <span class="badge badge-{{$status_arr[$purchase_order->approval_status]}}">{{$purchase_order->approval_status}}</span>
                                     </td>
                                     <td class="p-0 px-1 align-middle text-center">
                                         {{date('Y-m-d', strtotime($purchase_order->created_at))}}
@@ -106,11 +106,13 @@
                                         {{number_format($purchase_order->grand_total, 2)}}
                                     </td>
                                     <td class="p-0 py-1 text-center align-middle">
-                                        @can('purchase order edit')
-                                        <a href="{{route('purchase-order.edit', encrypt($purchase_order->id))}}" class="btn btn-xs btn-success">
-                                            <i class="fa fa-pen-alt"></i>
-                                        </a>
-                                        @endcan
+                                        @if($purchase_order->approval_status == 'draft')
+                                            @can('purchase order edit')
+                                                <a href="{{route('purchase-order.edit', encrypt($purchase_order->id))}}" class="btn btn-xs btn-success">
+                                                    <i class="fa fa-pen-alt"></i>
+                                                </a>
+                                            @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

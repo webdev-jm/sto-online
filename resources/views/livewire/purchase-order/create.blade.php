@@ -9,9 +9,13 @@
                             <i class="fa fa-upload"></i>
                             UPLOAD PURCHASE ORDER
                         </button>
-                        <button class="btn btn-xs btn-success" wire:click.prevent="savePO">
+                        <button class="btn btn-xs btn-secondary" wire:click.prevent="savePO('draft')">
                             <i class="fa fa-save"></i>
-                            SAVE PURCHASE ORDER
+                            DRAFT
+                        </button>
+                        <button class="btn btn-xs btn-success" wire:click.prevent="savePO('submitted')">
+                            <i class="fa fa-save"></i>
+                            SUBMIT
                         </button>
                     </div>
                 </div>
