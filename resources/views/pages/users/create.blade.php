@@ -110,7 +110,7 @@
             <div class="row">
                 <div class="col-12">
                     @foreach($roles as $role)
-                    <button class="btn btn-default btn-role" data-id="{{$role->id}}">{{$role->name}}</button>
+                        <button class="btn btn-default btn-role" data-id="{{$role->id}}">{{$role->name}}</button>
                     @endforeach
                 </div>
             </div>

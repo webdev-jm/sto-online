@@ -22,6 +22,7 @@ class PurchaseOrder extends Model
         'ship_to_name',
         'ship_to_address',
         'status',
+        'approval_status',
         'total_quantity',
         'total_sales',
         'grand_total',
@@ -38,5 +39,9 @@ class PurchaseOrder extends Model
 
     public function attachments() {
         return $this->hasMany('App\Models\PurchaseOrderAttachment');
+    }
+
+    public function approvals() {
+        return $this->hasMany('App\Models\PurchaseOrderApproval');
     }
 }

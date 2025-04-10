@@ -25,6 +25,7 @@ class CreatePurchaseOrdersTable extends Migration
             $table->string('ship_to_name')->nullable();
             $table->string('ship_to_address')->nullable();
             $table->string('status')->nullable();
+            $table->string('approval_status')->nullable();
             $table->integer('total_quantity')->default(0);
             $table->decimal('total_sales', 15,2)->default(0.00);
             $table->decimal('grand_total', 15, 2)->default(0.00);

@@ -51,7 +51,7 @@ class UserController extends Controller
 
         // ROLES
         $roles = Role::orderBy('name', 'ASC')
-        ->get();
+            ->get();
 
         return view('pages.users.create')->with([
             'roles' => $roles,
