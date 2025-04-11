@@ -30,6 +30,7 @@ class InventoryUpload extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $inventory_data;
+    public $inventory_date;
     public $keys;
     public $file;
     public $data;
@@ -44,6 +45,13 @@ class InventoryUpload extends Component
 
     public function uploadData() {
         if(!empty($this->inventory_data)) {
+
+            $this->validate([
+                'inventory_date' => [
+                    'required'
+                ]
+            ]);
+
             // avoid duplicate uploads
             if ($this->upload_triggered) {
                 return;
@@ -53,7 +61,7 @@ class InventoryUpload extends Component
                 'account_id' => $this->account->id,
                 'account_branch_id' => $this->account_branch->id,
                 'user_id' => auth()->user()->id,
-                'date' => date('Y-m-d'),
+                'date' => $this->inventory_date,
                 'total_inventory' => 0
             ]);
             $inventory_upload->save();

@@ -45,6 +45,26 @@
 
         </div>
     </div>
+    
+    @if(!empty($inventory_data))
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    INVENTORY DATE
+                    @if($errors->has('inventory_date'))
+                        <span class="badge badge-danger">REQUIRED</span>
+                    @endif
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <input type="date" class="form-control{{$errors->has('inventory_date') ? ' is-invalid' : ''}}" wire:model="inventory_date">
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="card">
         <div class="card-header">
@@ -74,36 +94,38 @@
                     </thead>
                     <tbody>
                         @foreach($paginatedData as $inv_data)
-                        <tr>
-                            <td class="text-center p-0 align-middle">
-                                @switch($inv_data['check'])
-                                    @case(0)
-                                        <i class="fa fa-check-circle fa-sm text-success"></i>
-                                        @break
-                                    @case(1)
-                                        <i class="fa fa-times-circle fa-sm text-danger"></i>
-                                        <small class="text-danger">Product</small>
-                                        @break
-                                    @default
-                                @endswitch
-                            </td>
-                            <td class="align-middle">{{$inv_data['sku_code']}}</td>
-                            <td class="align-middle">{{$inv_data['description']}}</td>
-                            @php
-                                $total = 0;
-                            @endphp
-                            @if(!empty($keys))
-                                @foreach($keys as $key => $loc)
-                                    @php
-                                        $total += $inv_data[$loc['id']];
-                                    @endphp
-                                    <td class="text-right align-middle">{{number_format($inv_data[$loc['id']])}}</td>
-                                @endforeach
-                            @endif
-                            <td class="text-right">
-                                {{number_format($total)}}
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="text-center p-0 align-middle">
+                                    @switch($inv_data['check'])
+                                        @case(0)
+                                            <i class="fa fa-check-circle fa-sm text-success"></i>
+                                            @break
+                                        @case(1)
+                                            <i class="fa fa-times-circle fa-sm text-danger"></i>
+                                            <small class="text-danger">Product</small>
+                                            @break
+                                        @default
+                                    @endswitch
+                                </td>
+                                <td class="align-middle">{{$inv_data['sku_code']}}</td>
+                                <td class="align-middle">{{$inv_data['description']}}</td>
+                                @php
+                                    $total = 0;
+                                @endphp
+                                @if(!empty($keys))
+                                    @foreach($keys as $key => $loc)
+                                        @php
+                                            $total += $inv_data[$loc['id']];
+                                        @endphp
+                                        <td class="text-right align-middle">
+                                            {{number_format($inv_data[$loc['id']])}}
+                                        </td>
+                                    @endforeach
+                                @endif
+                                <td class="text-right">
+                                    {{number_format($total)}}
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>

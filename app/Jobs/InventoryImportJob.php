@@ -107,7 +107,7 @@ class InventoryImportJob implements ShouldQueue
             ]);
 
             // generate monthly inventory
-            $this->setMonthlyInventory($this->account_id, $this->account_branch_id, date('Y'), (int)date('m'));
+            $this->setMonthlyInventory($this->account_id, $this->account_branch_id, date('Y', strtotime($inventory_upload->date)), (int)date('m', strtotime($inventory_upload->date)));
 
             DB::setDefaultConnection('mysql');
 
