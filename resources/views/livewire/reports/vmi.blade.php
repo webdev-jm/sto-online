@@ -70,7 +70,7 @@
                                 <th rowspan="2" class="text-center align-middle p-0 px-1">INV TOTAL CS</th>
                                 <th colspan="4" class="text-center align-middle p-0 bg-info">1 MONTH</th>
                                 <th colspan="4" class="text-center align-middle p-0 bg-info">2 MONTHS</th>
-                                <th colspan="4" class="text-center align-middle p-0 bg-info">3 MOTNHS</th>
+                                <th colspan="4" class="text-center align-middle p-0 bg-info">3 MONTHS</th>
                             </tr>
                             <tr>
                                 <th class="text-center p-0">STO CS</th>

@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 
+use App\Models\Account as AccountModel; // Assuming this is your Account model
 use App\Models\Customer as Cust;
 use App\Models\Salesman;
 use App\Models\Channel;
@@ -25,6 +26,7 @@ use App\Models\Region;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Jobs\CustomerImportJob;
+use Illuminate\Support\Str;
 
 class Customer extends Component
 {
@@ -32,10 +34,10 @@ class Customer extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
-    public $customer_data;
+    public ?array $customer_data = [];
     public $file;
-    public $account;
-    public $account_branch;
+    public AccountModel $account;
+    public $account_branch; // Type hint if AccountBranch model exists, e.g., AccountBranch $account_branch
     public $err_msg;
 
     public $perPage = 10;
@@ -48,22 +50,22 @@ class Customer extends Component
             return;
         }
 
-        $total = 0;
-        foreach($this->customer_data as $data) {
-            if($data['check'] == 0) {
-                $total++;
-            }
-        }
+        $totalValidCustomers = collect($this->customer_data)->where('check', 0)->count();
+
+        // Determine tenant connection name
+        $tenantConnection = $this->account->db_data->connection_name ?? config('database.default');
 
         $upload_data = [
-            'total' => $total,
-            'start' => Cust::where('account_id', $this->account->id)->where('account_branch_id', $this->account_branch->id)->count(),
+            'total' => $totalValidCustomers,
+            'start' => Cust::on($tenantConnection)
+                            ->where('account_id', $this->account->id)
+                            ->where('account_branch_id', $this->account_branch->id) // Assuming account_branch is an object with id
+                            ->count(),
         ];
 
-        CustomerImportJob::dispatch($this->customer_data, $this->account->id, $this->account_branch->id);
+        CustomerImportJob::dispatch($this->customer_data, $this->account->id, $this->account_branch->id); // Ensure account_branch->id is correct
 
         $this->upload_triggered = true;
-
         // logs
         activity('upload')
         ->log(':causer.name has uploaded customer data on ['.$this->account->short_name.']');
@@ -74,138 +76,153 @@ class Customer extends Component
         ]);
     }
 
-    public function updatedFile() {
+    public function updatedFile(): void
+    {
         $this->validate([
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
 
-        $path1 = $this->file->storeAs('customer-uploads', $this->file->getClientOriginalName());
+        // Generate a unique filename
+        $originalName = $this->file->getClientOriginalName();
+        $filename = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $this->file->getClientOriginalExtension();
+        $path1 = $this->file->storeAs('customer-uploads', $filename);
         $path = storage_path('app').'/'.$path1;
 
-        $data = collect(Excel::toArray([], $path))->flatten(1)->skip(1);
-        $header = $data->first();
-        
         $this->reset([
             'customer_data',
             'err_msg'
         ]);
 
-        if($this->checkHeader($header) == 0) {
+        $excelSheets = Excel::toArray([], $path);
 
-            $current_customers = Cust::where('account_id', $this->account->id)
+        if (empty($excelSheets) || empty($excelSheets[0])) {
+            $this->err_msg = 'The Excel file is empty or the first sheet is missing.';
+            return;
+        }
+
+        $firstSheetData = $excelSheets[0];
+        if (count($firstSheetData) < 2) { // Needs at least a header and one data row
+            $this->err_msg = 'The Excel file does not contain enough data (requires a header and at least one data row).';
+            return;
+        }
+
+        $headerRow = $firstSheetData[1];
+        if ($this->checkHeader($headerRow) !== 0) {
+            $this->err_msg = 'Invalid Excel header format. Please ensure all required columns are present in the correct order: Code, Name, Address, Salesman Code, Channel Code, Channel Name, Province, City/Town, Barangay, Street, Postal Code.';
+            return;
+        }
+
+        $dataRows = array_slice($firstSheetData, 2);
+
+        if (empty($dataRows)) {
+            $this->err_msg = 'The Excel file contains a header but no data rows.';
+            return;
+        }
+
+        // Determine tenant connection name
+        $tenantConnection = $this->account->db_data->connection_name ?? config('database.default');
+
+            // Pre-fetch data for efficiency
+            $current_customers = Cust::on($tenantConnection)
+                ->where('account_id', $this->account->id)
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get()
                 ->keyBy('code');
 
-            $customer_ubos = CustomerUbo::where('account_id', $this->account->id)
+            $customer_ubos = CustomerUbo::on($tenantConnection)
+                ->where('account_id', $this->account->id)
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get();
-            
+
             $channels = Channel::get();
-            
-            $this->customer_data = $data->skip(1)->map(function ($row) use($current_customers, $customer_ubos, $channels) {
-                $code = trim($row[0]);
-                $name = trim($row[1]);
-                $address = trim($row[2]);
-                $salesman = trim($row[3]);
+
+            // Pre-fetch address entities
+            $provinceNames = collect($dataRows)->pluck(6)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+            $cityNames = collect($dataRows)->pluck(7)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+            $brgyNames = collect($dataRows)->pluck(8)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+
+            $dbProvinces = Province::whereIn('province_name', $provinceNames)->get()->keyBy('province_name');
+            $dbMunicipalities = Municipality::whereIn('municipality_name', $cityNames)->get()->keyBy('municipality_name');
+            $dbBarangays = Barangay::whereIn('barangay_name', $brgyNames)->get()->keyBy('barangay_name');
+
+        $this->customer_data = collect($dataRows)->map(function ($row) use (
+            $current_customers,
+            $customer_ubos,
+            $channels,
+            $dbProvinces,
+            $dbMunicipalities,
+            $dbBarangays
+        ) {
+                $code = trim($row[0] ?? '');
+                $name = trim($row[1] ?? '');
+                $address = trim($row[2] ?? '');
+                $salesmanCode = trim($row[3] ?? '');
                 $channel_code = trim($row[4] ?? '');
-                $channel_name = trim($row[5] ?? '');
-                $province = trim($row[6] ?? '');
-                $city = trim($row[7] ?? '');
-                $brgy = trim($row[8] ?? '');
+                // $channel_name = trim($row[5] ?? ''); // Not directly used if looking up by code
+                $provinceName = trim($row[6] ?? '');
+                $cityName = trim($row[7] ?? '');
+                $brgyName = trim($row[8] ?? '');
                 $street = trim($row[9] ?? '');
-                $postal_code = trim($row[10] ?? '');
+                $postalCode = trim($row[10] ?? '');
 
-                $customer = $current_customers->get($code);
-                $channel = $channels->where('code', $channel_code)
-                    ->first();
+                $customerData = [
+                    'code' => $code,
+                    'name' => $name,
+                    'address' => $address,
+                    'salesman' => $salesmanCode, // This is the salesman code
+                    'channel' => [],
+                    'street' => $street,
+                    'brgy' => $brgyName,
+                    'city' => $cityName,
+                    'province' => $provinceName,
+                    'country' => '', // Default or from config
+                    'postal_code' => $postalCode,
+                    'status' => 0, // Default: No UBO similarity / New UBO
+                    'similar' => [], // To store details of similar UBO for display
+                    'check' => 3, // Default: Error - Incomplete/Invalid
+                    'brgy_id' => null,
+                    'city_id' => null,
+                    'province_id' => null,
+                ];
 
-                $check = $customer_ubos->filter(function ($item) use ($name, $address) {
-                    return $this->checkSimilarity($item->name, $name) >= 90
-                        && $this->checkSimilarity($item->address, $address) >= 90;
-                })->first();
-
-                if(!empty($code) && !empty($name) && !empty($channel_code) && !empty($province) && !empty($city) && !empty($brgy)) {
-
-                    // validate address
-                    $barangay = Barangay::where('barangay_name', $brgy)
-                        ->first();
-                    $municipality = Municipality::where('municipality_name', $city)
-                        ->first();
-                    $prov = Province::where('province_name', $province)
-                        ->first();
-
-                    if(empty($channel)) {
-                        return [
-                            'similar' => !empty($check) ? $check->toArray() : [],
-                            'check' => 2,
-                            'code' => $code,
-                            'name' => $name,
-                            'address' => $address,
-                            'salesman' => $salesman,
-                            'channel' => $channel ?? [],
-                            'street' => $street,
-                            'brgy' => $brgy,
-                            'city' => $city,
-                            'province' => $province,
-                            'country' => '',
-                            'postal_code' => $postal_code,
-                            'status' => !empty($check) ? 1 : 0,
-                            'brgy_id' => $barangay->id ?? NULL,
-                            'city_id' => $municipality->id ?? NULL,
-                            'province_id' => $prov->id ?? NULL,
-                        ];
-                    } else {
-                        return [
-                            'similar' => !empty($check) ? $check->toArray() : [],
-                            'check' => empty($customer) ? 0 : 1,
-                            'code' => $code,
-                            'name' => $name,
-                            'address' => $address,
-                            'salesman' => $salesman,
-                            'channel' => $channel ?? [],
-                            'street' => $street,
-                            'brgy' => $brgy,
-                            'city' => $city,
-                            'province' => $province,
-                            'country' => '',
-                            'postal_code' => $postal_code,
-                            'status' => !empty($check) ? 1 : 0,
-                            'brgy_id' => $barangay->id ?? NULL,
-                            'city_id' => $municipality->id ?? NULL,
-                            'province_id' => $prov->id ?? NULL,
-                        ];
-                    }
-
-                } else {
-                    return [
-                        'similar' => [],
-                        'check' => 3,
-                        'code' => $code,
-                        'name' => $name,
-                        'address' => $address,
-                        'salesman' => $salesman,
-                        'channel' => $channel ?? [],
-                        'street' => $street,
-                        'brgy' => $brgy,
-                        'city' => $city,
-                        'province' => $province,
-                        'postal_code' => $postal_code,
-                        'country' => '',
-                        'status' => 1,
-                        'brgy_id' => NULL,
-                        'city_id' => NULL,
-                        'province_id' => NULL,
-                    ];
+                // Basic validation for required fields from Excel
+                if (empty($code) || empty($name) || empty($channel_code) || empty($provinceName) || empty($cityName) || empty($brgyName)) {
+                    return $customerData; // 'check' remains 3 (incomplete)
                 }
 
+                $channel = $channels->where('code', $channel_code)->first();
+                if (!$channel) {
+                    $customerData['check'] = 2; // Error: Invalid channel
+                    return $customerData;
+                }
+                $customerData['channel'] = $channel->toArray(); // Pass channel data to job
+
+                // Assign address IDs from pre-fetched data
+                $customerData['province_id'] = $dbProvinces->get($provinceName)->id ?? null;
+                $customerData['city_id'] = $dbMunicipalities->get($cityName)->id ?? null;
+                $customerData['brgy_id'] = $dbBarangays->get($brgyName)->id ?? null;
+
+                // Check if customer already exists by code
+                $existingCustomer = $current_customers->get($code);
+                $customerData['check'] = $existingCustomer ? 1 : 0; // 1 if exists, 0 if new and valid so far
+
+                // UBO similarity check (only if it's a new customer, check = 0)
+                if ($customerData['check'] === 0) {
+                    $similarUbo = $customer_ubos->first(function ($item) use ($name, $address) {
+                        return $this->checkSimilarity($item->name, $name) >= 90
+                            && $this->checkSimilarity($item->address, $address) >= 90;
+                    });
+
+                    if ($similarUbo) {
+                        $customerData['similar'] = $similarUbo->toArray();
+                        $customerData['status'] = 1; // Indicates UBO similarity found, will be linked by job
+                    }
+                }
+                return $customerData;
             })->toArray();
-        } else {
-            $this->err_msg = 'Invalid format. please provide an excel with the correct format.';
-        }
     }
 
-    private function paginateArray($data, $perPage)
+    private function paginateArray(array $data, int $perPage): LengthAwarePaginator
     {
         $currentPage = $this->page ?: 1;
         $items = collect($data);
@@ -248,28 +265,39 @@ class Customer extends Component
         return $err;
     }
 
-    public function differentCustomer($customer_key) {
+    public function differentCustomer(string $customer_key): void
+    {
         $customer_key = decrypt($customer_key);
-        $this->customer_data[$customer_key]['status'] = 'different';
-        $this->customer_data[$customer_key]['check'] = 0;
-    }
-
-    public function sameCustomer($customer_key) {
-        $customer_key = decrypt($customer_key);
-        $this->customer_data[$customer_key]['status'] = 'same';
-        $this->customer_data[$customer_key]['check'] = 0;
-    }
-
-    private function checkSimilarity($str1, $str2) {
-        $similarity = 0;
-        if(strlen($str1) > 0 && strlen($str2) > 0) {
-            $distance = levenshtein(strtoupper($str1), strtoupper($str2));
-            $max_length = max(strlen($str1), strlen($str2));
-            $similarity = 1 - ($distance / $max_length);
-            $similarity = $similarity * 100;
+        if (isset($this->customer_data[$customer_key])) {
+            $this->customer_data[$customer_key]['status'] = 0; // Mark as not similar to UBO / process as new UBO
+            $this->customer_data[$customer_key]['check'] = 0;  // Mark as valid for import
         }
+    }
 
-        return $similarity;
+    public function sameCustomer(string $customer_key): void
+    {
+        $customer_key = decrypt($customer_key);
+        if (isset($this->customer_data[$customer_key])) {
+            $this->customer_data[$customer_key]['status'] = 1; // Mark as similar to UBO, will be linked by job
+            $this->customer_data[$customer_key]['check'] = 0;  // Mark as valid for import
+        }
+    }
+
+    private function checkSimilarity(?string $str1, ?string $str2): float
+    {
+        $s1 = Str::upper(str_replace(' ', '', $str1 ?? ''));
+        $s2 = Str::upper(str_replace(' ', '', $str2 ?? ''));
+
+        $len1 = strlen($s1);
+        $len2 = strlen($s2);
+
+        if ($len1 === 0 && $len2 === 0) return 100.0; // Both empty, consider them same
+        if ($len1 === 0 || $len2 === 0) return 0.0;   // One is empty, not similar
+
+        $maxLength = max($len1, $len2);
+        $distance = levenshtein($s1, $s2);
+
+        return (1 - ($distance / $maxLength)) * 100.0;
     }
 
     public function mount() {

@@ -24,6 +24,11 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+ini_set('memory_limit', '-1');
+ini_set('max_execution_time', 0);
+ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
+ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
+
 class SalesUpload extends Component
 {
     use WithFileUploads;
@@ -147,147 +152,150 @@ class SalesUpload extends Component
             'sales_data',
             'err_msg'
         ]);
-        
-        $header = $data[1];
-    
-        if($this->checkHeader($header) == 0) {
 
-            // get customers
-            $customers = Customer::where('account_id', $this->account->id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->whereIn('code', array_unique(array_map('trim', Collection::make($data)->pluck(1)->slice(2)->toArray())))
-                ->get()
-                ->keyBy('code');
-            // get locations
-            $locations = Location::where('account_id', $this->account->id)
-                ->where('account_branch_id', $this->account_branch->id)
-                ->whereIn('code', array_unique(Collection::make($data)->pluck(4)->slice(2)->toArray()))
-                ->get()
-                ->keyBy('code');
-            // get products
-            $products = SMSProduct::whereIn('stock_code', array_unique(array_map('trim', Collection::make($data)->pluck(5)->slice(2)->toArray())))
-                ->get()
-                ->keyBy('stock_code');
-    
-            foreach(array_slice($data, 2) as $row) {
-                $invoice_date = $row[0];
-                $customer_code = trim($row[1]);
-                $salesman_code = trim($row[2]);
-                $invoice_number = trim($row[3]);
-                $warehouse_code = trim($row[4]);
-                $sku_code = trim($row[5]);
-                $quantity = trim($row[6]);
-                $uom = trim($row[7]);
-                $unit_price_inc_vat = trim($row[8]);
-                $amount = trim($row[9]);
-                $amount_inc_vat = trim($row[10]);
-                $line_discount = trim($row[11]);
-
-                $type = 1;
-                if(strpos(trim($sku_code ?? ''), '-')) {
-                    $sku_arr = explode('-', $sku_code);
-                    if($sku_arr[0] == 'FG') { // Free Goods
-                        $sku_code = end($sku_arr);
-                        // process when free goods
-                        $type = 2;
-                    }
-                    if($sku_arr[0] == 'PRM') { // Promo
-                        $sku_code = end($sku_arr);
-                        // process when promo
-                        $type = 3;
-                    }
-                }
-
-                $category = 0;
-                if(!empty($invoice_number) && strpos($invoice_number, '-')) {
-                    $invoice_number_str_arr = explode('-', $invoice_number);
-                    if($invoice_number_str_arr[0] == 'PSC') { // credit memo
-                        $category = 1;
-                    }
-                }
-
-                // remove comma and convert to float from values
-                $quantity = (float)trim(str_replace(',', '', $quantity));
-                $price_inc_vat = (float)trim(str_replace(',', '', $unit_price_inc_vat));
-                $amount = (float)trim(str_replace(',', '', $amount));
-                $amount_inc_vat = (float)trim(str_replace(',', '', $amount_inc_vat));
-                $line_discount = (float)trim(str_replace(',', '', $line_discount));
-
-                if (is_int($invoice_date)) {
-                    // Convert the value to a date instance if it looks like a date.
-                    $invoice_date = Date::excelToDateTimeObject($invoice_date)->format('Y-m-d');
-                }
-    
-                if($customers->has($customer_code) && $locations->has($warehouse_code) && $products->has($sku_code)) {
-                    $customer = $customers->get($customer_code);
-                    $location = $locations->get($warehouse_code);
-                    $product = $products->get($sku_code);
-
-                    // check if already exists
-                    $exist = Sale::where('account_id', $this->account->id)
-                        ->where('account_branch_id', $this->account_branch->id)
-                        ->where('document_number', $row[1])
-                        ->where('customer_id', $customer->id)
-                        ->where('product_id', $product->id)
-                        ->first();
-
-                    $this->sales_data[] = [
-                        'type' => $type,
-                        'check' => (!empty($exist)) ? 4 : 0,
-                        'date' => $invoice_date,
-                        'document' => $invoice_number,
-                        'category' => $category,
-                        'customer_code' => $customer_code,
-                        'location_code' => $warehouse_code,
-                        'sku_code' => $sku_code,
-                        'customer_id' => $customer->id,
-                        'channel_id' => $customer->channel_id,
-                        'location_id' => $location->id,
-                        'product_id' => $product->id,
-                        'salesman_id' => $customer->salesman_id,
-                        'description' => $product->description,
-                        'size' => $product->size,
-                        'quantity' => $quantity,
-                        'uom' => $uom,
-                        'price_inc_vat' => $price_inc_vat,
-                        'amount' => $amount,
-                        'amount_inc_vat' => $amount_inc_vat,
-                        'line_discount' => $line_discount,
-                        'status' => $customer->status,
-                    ];
-                    
-                } else {
-
-                    $this->sales_data[] = [
-                        'type' => $type,
-                        'check' => ($customers->has($customer_code)) ? ($locations->has($warehouse_code) ? 3 : 2) : 1,
-                        'date' => $invoice_date,
-                        'document' => $invoice_number,
-                        'category' => $category,
-                        'customer_code' => $customer_code,
-                        'location_code' => $warehouse_code,
-                        'sku_code' => $sku_code,
-                        'quantity' => $quantity,
-                        'uom' => $uom,
-                        'price_inc_vat' => $price_inc_vat,
-                        'amount' => $amount,
-                        'amount_inc_vat' => $amount_inc_vat,
-                        'line_discount' => $line_discount,
-                        'status' => 2
-                    ];
-                }
-            }
-
-            usort($this->sales_data, function($a, $b) {
-                return ($a['check'] === $b['check'])
-                    ? ($a['date'] <=> $b['date'])
-                    : ($b['check'] <=> $a['check']);
-            });
-
-        } else {
-            $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
+        if (empty($data) || count($data) < 3) {
+            $this->err_msg = 'The file is empty or has no data rows.';
+            return;
         }
 
+        $header = $data[1];
+    
+        if ($this->checkHeader($header) !== 0) {
+            $this->err_msg = 'Invalid header format. Please provide an excel file with the correct column structure.';
+            return;
+        }
+
+        $rows = array_slice($data, 2);
+
+        // 1. Collect all unique codes in a single pass
+        $customerCodes = [];
+        $locationCodes = [];
+        $skuCodes = [];
+
+        foreach ($rows as $row) {
+            if (count($row) < 6) continue;
+
+            if (!empty($row[1])) $customerCodes[trim($row[1])] = true;
+            if (!empty($row[4])) $locationCodes[trim($row[4])] = true;
+
+            $sku_code = trim($row[5] ?? '');
+            if (strpos($sku_code, '-') !== false) {
+                $sku_arr = explode('-', $sku_code);
+                if ($sku_arr[0] === 'FG' || $sku_arr[0] === 'PRM') {
+                    $sku_code = end($sku_arr);
+                }
+            }
+            if (!empty($sku_code)) $skuCodes[$sku_code] = true;
+        }
+
+        // 2. Pre-fetch all related models efficiently
+        $customers = Customer::where('account_id', $this->account->id)
+            ->where('account_branch_id', $this->account_branch->id)
+            ->whereIn('code', array_keys($customerCodes))
+            ->get()->keyBy('code');
+
+        $locations = Location::where('account_id', $this->account->id)
+            ->where('account_branch_id', $this->account_branch->id)
+            ->whereIn('code', array_keys($locationCodes))
+            ->get()->keyBy('code');
+
+        $products = SMSProduct::whereIn('stock_code', array_keys($skuCodes))
+            ->get()->keyBy('stock_code');
+
+        // 3. Process rows and prepare for bulk existence check
+        $processedData = [];
+        $existenceCheckPayload = [];
+
+        foreach ($rows as $index => $row) {
+            if (count($row) < 12) continue;
+
+            $invoice_date = $row[0];
+            $customer_code = trim($row[1]);
+            $invoice_number = trim($row[3]);
+            $warehouse_code = trim($row[4]);
+            $original_sku_code = trim($row[5]);
+
+            $sku_code = $original_sku_code;
+            $type = 1;
+            if (strpos($original_sku_code, '-') !== false) {
+                $sku_arr = explode('-', $original_sku_code);
+                if ($sku_arr[0] === 'FG') { $type = 2; $sku_code = end($sku_arr); }
+                if ($sku_arr[0] === 'PRM') { $type = 3; $sku_code = end($sku_arr); }
+            }
+
+            $category = 0;
+            if (!empty($invoice_number) && strpos($invoice_number, '-') !== false && explode('-', $invoice_number)[0] === 'PSC') {
+                $category = 1;
+            }
+
+            $quantity = (float)str_replace(',', '', trim($row[6]));
+            $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
+            $amount = (float)str_replace(',', '', trim($row[9]));
+            $amount_inc_vat = (float)str_replace(',', '', trim($row[10]));
+            $line_discount = (float)str_replace(',', '', trim($row[11]));
+
+            if (is_numeric($invoice_date)) {
+                $invoice_date = Date::excelToDateTimeObject($invoice_date)->format('Y-m-d');
+            }
+
+            $customer = $customers->get($customer_code);
+            $location = $locations->get($warehouse_code);
+            $product = $products->get($sku_code);
+
+            $rowData = [
+                'type' => $type, 'check' => 0, 'date' => $invoice_date, 'document' => $invoice_number,
+                'category' => $category, 'customer_code' => $customer_code, 'location_code' => $warehouse_code,
+                'sku_code' => $original_sku_code, 'quantity' => $quantity, 'uom' => trim($row[7]),
+                'price_inc_vat' => $price_inc_vat, 'amount' => $amount, 'amount_inc_vat' => $amount_inc_vat,
+                'line_discount' => $line_discount, 'status' => 2,
+            ];
+
+            if ($customer && $location && $product) {
+                $rowData = array_merge($rowData, [
+                    'customer_id' => $customer->id, 'channel_id' => $customer->channel_id,
+                    'location_id' => $location->id, 'product_id' => $product->id,
+                    'salesman_id' => $customer->salesman_id, 'description' => $product->description,
+                    'size' => $product->size, 'status' => $customer->status,
+                ]);
+                $existenceCheckPayload[] = ['doc' => $invoice_number, 'cust_id' => $customer->id, 'prod_id' => $product->id, 'index' => $index];
+            } else {
+                $rowData['check'] = !$customer ? 1 : (!$location ? 2 : 3);
+            }
+            $processedData[$index] = $rowData;
+        }
+
+        // 4. Bulk check for existing sales records
+        if (!empty($existenceCheckPayload)) {
+            $existingSales = Sale::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->where(function ($query) use ($existenceCheckPayload) {
+                    foreach ($existenceCheckPayload as $payload) {
+                        $query->orWhere(function ($q) use ($payload) {
+                            $q->where('document_number', $payload['doc'])
+                              ->where('customer_id', $payload['cust_id'])
+                              ->where('product_id', $payload['prod_id']);
+                        });
+                    }
+                })
+                ->select('document_number', 'customer_id', 'product_id')->get()
+                ->mapWithKeys(fn($sale) => [$sale->document_number . '|' . $sale->customer_id . '|' . $sale->product_id => true]);
+
+            foreach ($existenceCheckPayload as $payload) {
+                $key = $payload['doc'] . '|' . $payload['cust_id'] . '|' . $payload['prod_id'];
+                if (isset($existingSales[$key])) {
+                    $processedData[$payload['index']]['check'] = 4;
+                }
+            }
+        }
+
+        // 5. Final sort and assignment
+        $this->sales_data = array_values($processedData);
+        usort($this->sales_data, function($a, $b) {
+            if ($a['check'] !== $b['check']) {
+                return $b['check'] <=> $a['check'];
+            }
+            return $a['date'] <=> $b['date'];
+        });
     }
 
     private function isExcelDate(Cell $cell) {
