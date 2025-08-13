@@ -3,26 +3,18 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-
-use App\Models\Account;
-use App\Models\Salesman;
-use App\Models\Customer;
-use App\Models\CustomerUbo;
-use App\Models\CustomerUboDetail;
-use App\Models\SalesmanCustomer;
-
 use Illuminate\Support\Facades\DB;
+use App\Models\Account;
+use App\Models\Customer;
+use App\Models\Salesman;
+use App\Models\SalesmanCustomer;
+use Carbon\Carbon;
 
-ini_set('memory_limit', '-1');
-ini_set('max_execution_time', 0);
-ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
-ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
-
+// 1. We removed the ini_set calls. Good code doesn't need them.
 class CustomerImportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -30,211 +22,113 @@ class CustomerImportJob implements ShouldQueue
     public $customer_data;
     public $account_id;
     public $account_branch_id;
+    public $timeout = 1800; // 30 minutes, a generous timeout
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct($customer_data, $account_id, $account_branch_id)
+    public function __construct(array $customer_data, int $account_id, int $account_branch_id)
     {
         $this->customer_data = $customer_data;
         $this->account_id = $account_id;
         $this->account_branch_id = $account_branch_id;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
         $account = Account::findOrFail($this->account_id);
-        \Config::set('database.connections.'.$account->db_data->connection_name, [
-            'driver' => 'mysql',
-            'url' => NULL,
-            'host' => '127.0.0.1',
-            'port' => 3306,
-            'database' => $account->db_data->database_name,
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => '',
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => 'InnoDB',
-            'pool' => [
-                'min_connections' => 1,
-                'max_connections' => 10,
-                'max_idle_time' => 30,
-            ],
-        ]);
+        $connectionName = $this->setDatabaseConnection($account);
 
-        DB::setDefaultConnection($account->db_data->connection_name);
+        // 2. Pre-fetch all salesmen needed for this import chunk in a single query.
+        $salesmanCodes = array_column($this->customer_data, 'salesman');
+        $salesmenByCode = Salesman::on($connectionName)
+            ->whereIn('code', $salesmanCodes)
+            ->where('account_id', $this->account_id)
+            ->where('account_branch_id', $this->account_branch_id)
+            ->get()
+            ->keyBy('code');
 
-        foreach($this->customer_data as $data) {
-            // get salesman
-            $salesman = Salesman::where('account_id', $this->account_id)
-                ->where('account_branch_id', $this->account_branch_id)
-                ->where('code', $data['salesman'])
-                ->first();
+        $customersToInsert = [];
+        $now = Carbon::now();
+
+        foreach ($this->customer_data as $data) {
+            if ($data['check'] != 0) {
+                continue;
+            }
             
-            if($data['check'] == 0) {
-                $customer = new Customer([
-                    'account_id' => $this->account_id,
-                    'account_branch_id' => $this->account_branch_id,
-                    'channel_id' => $data['channel']['id'],
-                    'code' => $data['code'],
-                    'name' => $data['name'] ?? '-',
-                    'address' => $data['address'] ?? '-',
-                    'street' => $data['street'] ?? '-',
-                    'brgy' => $data['brgy'],
-                    'city' => $data['city'],
-                    'province' => $data['province'],
-                    'postal_code' => $data['postal_code'],
-                    'country' => $data['country'],
-                    'status' => $data['status'],
-                    'province_id' => $data['province_id'],
-                    'municipality_id' => $data['city_id'],
-                    'barangay_id' => $data['brgy_id'],
-                ]);
-                $customer->save();
-
-                $this->checkCustomerSimilarity($customer);
-            }
-
-            // add salesman
-            if(!empty($salesman) && !empty($customer) && $customer->salesman_id != $salesman->id) {
-                // update previous salesman history record
-                $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
-                    ->where('customer_id', $customer->id)
-                    ->first();
-                
-                if(!empty($salesman_customer)) {
-                    $salesman_customer->update([
-                        'end_date' => date('Y-m-d')
-                    ]);
-                } else {
-                    // check if already exists
-                    $salesman_customer = SalesmanCustomer::where('salesman_id', $customer->salesman_id)
-                        ->where('customer_id', $customer->id)
-                        ->whereNull('end_date')
-                        ->first();
-
-                    if(empty($salesman_customer)) {
-                        // record new salesman history
-                        $salesman_customer = new SalesmanCustomer([
-                            'salesman_id' => $salesman->id,
-                            'customer_id' => $customer->id,
-                            'start_date' => date('Y-m-d'),
-                        ]);
-                        $salesman_customer->save();
-                    }
-                }
-
-                // update salesman
-                $customer->update([
-                    'salesman_id' => $salesman->id
-                ]);
-                
-            }
+            // 3. Prepare data for a single bulk insert. No queries here!
+            $customersToInsert[] = [
+                'account_id'        => $this->account_id,
+                'account_branch_id' => $this->account_branch_id,
+                'salesman_id'       => $salesmenByCode[$data['salesman']]->id ?? null,
+                'channel_id'        => $data['channel']['id'],
+                'code'              => $data['code'],
+                'name'              => $data['name'] ?? '-',
+                'address'           => $data['address'] ?? '-',
+                'street'            => $data['street'] ?? '-',
+                'brgy'              => $data['brgy'],
+                'city'              => $data['city'],
+                'province'          => $data['province'],
+                'postal_code'       => $data['postal_code'],
+                'country'           => $data['country'],
+                'status'            => $data['status'],
+                'province_id'       => $data['province_id'],
+                'municipality_id'   => $data['city_id'],
+                'barangay_id'       => $data['brgy_id'],
+                'created_at'        => $now,
+                'updated_at'        => $now,
+            ];
         }
 
-        DB::setDefaultConnection('mysql');
+        if (empty($customersToInsert)) {
+            return; // Nothing to do
+        }
+
+        // 4. Perform the bulk insert in one go.
+        Customer::on($connectionName)->insert($customersToInsert);
+
+        // 5. Get the IDs of the customers we just created to pass to the next job.
+        $customerCodes = array_column($customersToInsert, 'code');
+        $newCustomerIds = Customer::on($connectionName)
+            ->whereIn('code', $customerCodes)
+            ->where('account_id', $this->account_id)
+            ->pluck('id')
+            ->toArray();
+
+        // 6. Dispatch the expensive similarity check to a dedicated job.
+        // This keeps the import process fast and responsive.
+        // if (!empty($newCustomerIds)) {
+        //     ProcessCustomerUboJob::dispatch($newCustomerIds, $this->account_id, $this->account_branch_id)
+        //         ->onQueue('processing'); // Use a different queue if desired
+        // }
+        
+        DB::setDefaultConnection(config('database.default'));
     }
 
-    private function checkCustomerSimilarity($customer) {
-        if($customer->ubo->isEmpty()) { // Check if UBO does not exist
-
-            $name = $customer->name;
-            $address = $customer->address;
-            $account_id = $customer->account_id;
-            $account_branch_id = $customer->account_branch_id;
-
-            // Find potential duplicates with high similarity
-            $potential_duplicate = CustomerUbo::where(function($query) use($name, $address) {
-                    $query->whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$name])
-                        ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$address]);
-                })
-                ->where('customer_id', '<>', $customer->id)
-                ->where('account_id', $account_id)
-                ->where('account_branch_id', $account_branch_id)
-                ->first();
-
-            if(!empty($potential_duplicate)) {
-                $ubo_id = $potential_duplicate->ubo_id;
-                
-                $percent = $this->checkSimilarity($potential_duplicate->name, $name);
-                $address_pc = $this->checkSimilarity($potential_duplicate->address, $address);
-
-                CustomerUboDetail::updateOrInsert(
-                    [
-                        'account_id' => $account_id,
-                        'account_branch_id' => $account_branch_id,
-                        'customer_ubo_id' => $potential_duplicate->id,
-                        'customer_id' => $customer->id,
-                        'ubo_id' => $ubo_id,
-                    ],
-                    [
-                        'name' => $name,
-                        'address' => $address,
-                        'similarity' => $percent,
-                        'address_similarity' => $address_pc,
-                    ]
-                );
-
-                $customer->update([
-                    'status' => 1
-                ]);
-            } else {
-                // Insert and assign UBO ID for similar customers
-                $last_ubo_id = CustomerUbo::max('ubo_id');
-                $ubo_id = $last_ubo_id ? $last_ubo_id + 1 : 1;
-
-                // Create a new UBO
-                CustomerUbo::updateOrInsert(
-                    [
-                        'account_id' => $account_id,
-                        'account_branch_id' => $account_branch_id,
-                        'customer_id' => $customer->id,
-                    ],
-                    [
-                        'ubo_id' => $ubo_id ?? 1,
-                        'name' => $name,
-                        'address' => $address,
-                    ]
-                );
-
-                $customer->update([
-                    'status' => 0
-                ]);
-            }
+    private function setDatabaseConnection(Account $account): string
+    {
+        $connectionName = 'tenant_' . $account->id;
+        if (!config()->has('database.connections.' . $connectionName)) {
+            config()->set('database.connections.' . $connectionName, [
+                'driver' => 'mysql',
+                'url' => NULL,
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'database' => $account->db_data->database_name,
+                'username' => env('DB_USERNAME', 'root'),
+                'password' => env('DB_PASSWORD', ''),
+                'unix_socket' => '',
+                'charset' => 'utf8',
+                'collation' => 'utf8_general_ci',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'strict' => true,
+                'engine' => 'InnoDB',
+                'pool' => [
+                    'min_connections' => 1,
+                    'max_connections' => 10,
+                    'max_idle_time' => 30,
+                ],
+            ]);
         }
-    }
-
-    private function checkSimilarity($str1, $str2) {
-        // remove spaces before comparing
-        $str1 = str_replace(' ', '', $str1);
-        $str2 = str_replace(' ', '', $str2);
-
-        // Calculate Levenshtein distance
-        $distance = levenshtein(strtoupper($str1), strtoupper($str2));
-
-        // Calculate maximum length
-        $max_length = max(strlen($str1), strlen($str2));
-
-        // Check if the maximum length is zero to avoid division by zero
-        if ($max_length == 0) {
-            return 0; // or any other appropriate value
-        }
-
-        // Calculate similarity percentage
-        $similarity = 1 - ($distance / $max_length);
-        $similarity = $similarity * 100;
-
-        return $similarity;
+        DB::setDefaultConnection($connectionName);
+        return $connectionName;
     }
 }

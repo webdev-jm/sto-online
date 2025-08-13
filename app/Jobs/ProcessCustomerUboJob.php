@@ -12,26 +12,25 @@ use App\Models\Account;
 use App\Models\Customer;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
+use Illuminate\Support\Str;
 
-// Removed ini_set calls. We will solve memory and timeout issues with better code.
-
-class CustomerUboJob implements ShouldQueue
+class ProcessCustomerUboJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $account_id;
-    public $account_branch_id;
-    // It's good practice to set a timeout for your job.
-    // The queue worker will try to kill it if it runs longer than this (in seconds).
-    public $timeout = 1200; // 20 minutes
+    public array $customerIds;
+    public int $account_id;
+    public int $account_branch_id;
+    public $timeout = 1800; // 30 minutes
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($account_id, $account_branch_id)
+    public function __construct(array $customerIds, int $account_id, int $account_branch_id)
     {
+        $this->customerIds = $customerIds;
         $this->account_id = $account_id;
         $this->account_branch_id = $account_branch_id;
     }
@@ -44,41 +43,48 @@ class CustomerUboJob implements ShouldQueue
     public function handle()
     {
         $account = Account::findOrFail($this->account_id);
-        $this->setDatabaseConnection($account);
+        $connectionName = $this->setDatabaseConnection($account);
 
-        // 1. Use chunkById to process records in batches, keeping memory low.
-        Customer::on($account->db_data->connection_name)
+        // Fetch only the customers relevant to this job
+        $customers = Customer::on($connectionName)
+            ->whereIn('id', $this->customerIds)
             ->where('account_id', $this->account_id)
             ->where('account_branch_id', $this->account_branch_id)
-            ->doesntHave('ubo') // This check is sufficient
-            ->chunkById(200, function ($customers) use ($account) {
-                foreach ($customers as $customer) {
-                    // 2. Optimized logic to find potential duplicates
-                    // This query is still heavy but now runs on smaller chunks.
-                    $potential_duplicate = CustomerUbo::on($account->db_data->connection_name)
-                        ->whereRaw('CalculateLevenshteinSimilarity(name, ?) >= 90', [$customer->name])
-                        ->whereRaw('CalculateLevenshteinSimilarity(address, ?) >= 90', [$customer->address])
-                        ->where('customer_id', '<>', $customer->id)
-                        ->first();
+            ->get();
 
-                    if ($potential_duplicate) {
-                        $this->handleDuplicateCustomer($customer, $potential_duplicate);
-                    } else {
-                        $this->createNewUboForCustomer($customer);
-                    }
-                }
+        // Pre-fetch existing UBOs for efficiency
+        $customerUbos = CustomerUbo::on($connectionName)
+            ->where('account_id', $this->account_id)
+            ->where('account_branch_id', $this->account_branch_id)
+            ->get();
+
+        foreach ($customers as $customer) {
+            // Skip if customer already has an UBO associated (e.g., from a previous run or manual assignment)
+            if ($customer->ubo()->exists()) {
+                continue;
+            }
+
+            $similarUbo = $customerUbos->first(function ($item) use ($customer) {
+                return $this->checkSimilarity($item->name, $customer->name) >= 90
+                    && $this->checkSimilarity($item->address, $customer->address) >= 90;
             });
 
-        // 3. Reset the connection if necessary for other jobs in the queue
+            if ($similarUbo) {
+                $this->handleDuplicateCustomer($customer, $similarUbo, $connectionName);
+            } else {
+                $this->createNewUboForCustomer($customer, $connectionName);
+            }
+        }
+
+        // Reset the connection if necessary for other jobs in the queue
         DB::setDefaultConnection(config('database.default'));
     }
 
     /**
      * Sets the database connection for the job.
      */
-    private function setDatabaseConnection(Account $account)
+    private function setDatabaseConnection(Account $account): string
     {
-        // Avoid overriding the config on every job run. Instead, use a dedicated connection name.
         $connectionName = 'tenant_' . $account->id;
 
         if (!config()->has('database.connections.' . $connectionName)) {
@@ -89,6 +95,7 @@ class CustomerUboJob implements ShouldQueue
                 'database'       => $account->db_data->database_name,
                 'username'       => $account->db_data->username ?? env('DB_USERNAME'),
                 'password'       => $account->db_data->password ?? env('DB_PASSWORD'),
+                'unix_socket'    => '',
                 'charset'        => 'utf8mb4',
                 'collation'      => 'utf8mb4_unicode_ci',
                 'prefix'         => '',
@@ -98,17 +105,18 @@ class CustomerUboJob implements ShouldQueue
         }
         
         DB::setDefaultConnection($connectionName);
+        return $connectionName;
     }
 
     /**
      * Handle a customer identified as a duplicate.
      */
-    private function handleDuplicateCustomer(Customer $customer, CustomerUbo $potential_duplicate)
+    private function handleDuplicateCustomer(Customer $customer, CustomerUbo $potential_duplicate, string $connectionName)
     {
         $percent = $this->checkSimilarity($potential_duplicate->name, $customer->name);
         $address_pc = $this->checkSimilarity($potential_duplicate->address, $customer->address);
 
-        CustomerUboDetail::updateOrInsert(
+        CustomerUboDetail::on($connectionName)->updateOrInsert(
             [
                 'customer_id'       => $customer->id,
                 'customer_ubo_id'   => $potential_duplicate->id,
@@ -132,12 +140,15 @@ class CustomerUboJob implements ShouldQueue
     /**
      * Create a new UBO record for a unique customer.
      */
-    private function createNewUboForCustomer(Customer $customer)
+    private function createNewUboForCustomer(Customer $customer, string $connectionName)
     {
-        // 4. Optimized UBO ID generation
-        $last_ubo_id = CustomerUbo::max('ubo_id') ?? 0;
+        // Optimized UBO ID generation
+        // This might be a bottleneck if many jobs run concurrently and rely on MAX(ubo_id)
+        // A better approach might be to use UUIDs or a dedicated sequence table.
+        // For now, keeping it simple as per original logic.
+        $last_ubo_id = CustomerUbo::on($connectionName)->max('ubo_id') ?? 0;
 
-        CustomerUbo::create([
+        CustomerUbo::on($connectionName)->create([
             'account_id'        => $customer->account_id,
             'account_branch_id' => $customer->account_branch_id,
             'customer_id'       => $customer->id,
@@ -158,23 +169,30 @@ class CustomerUboJob implements ShouldQueue
         $customer->save();
 
         // Assuming 'sales' is a relationship. Use the relationship to update.
-        $customer->sales()->update(['status' => $status]);
+        // This assumes the 'sales' relationship is defined on the Customer model.
+        // If not, this line might cause an error or do nothing.
+        if (method_exists($customer, 'sales')) {
+            $customer->sales()->update(['status' => $status]);
+        }
     }
 
     /**
-     * Calculates the similarity between two strings.
+     * Calculates the similarity between two strings using Levenshtein distance.
      */
-    private function checkSimilarity($str1, $str2)
+    private function checkSimilarity(?string $str1, ?string $str2): float
     {
-        $str1 = strtoupper(str_replace(' ', '', $str1));
-        $str2 = strtoupper(str_replace(' ', '', $str2));
-        $max_length = max(strlen($str1), strlen($str2));
+        $s1 = Str::upper(str_replace(' ', '', $str1 ?? ''));
+        $s2 = Str::upper(str_replace(' ', '', $str2 ?? ''));
 
-        if ($max_length == 0) {
-            return 100; // Two empty strings are 100% similar
-        }
+        $len1 = strlen($s1);
+        $len2 = strlen($s2);
 
-        $distance = levenshtein($str1, $str2);
-        return (1 - ($distance / $max_length)) * 100;
+        if ($len1 === 0 && $len2 === 0) return 100.0; // Both empty, consider them same
+        if ($len1 === 0 || $len2 === 0) return 0.0;   // One is empty, not similar
+
+        $maxLength = max($len1, $len2);
+        $distance = levenshtein($s1, $s2);
+
+        return (1 - ($distance / $maxLength)) * 100.0;
     }
 }

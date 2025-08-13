@@ -46,126 +46,132 @@ class SalesImportJob implements ShouldQueue
      */
     public function handle()
     {
+        // It's generally better to configure these in php.ini or through your queue worker's config.
+        // However, for large imports, setting them here is acceptable if not configured globally.
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+        ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
+        ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
+
         $account = Account::findOrFail($this->account_id);
-        \Config::set('database.connections.'.$account->db_data->connection_name, [
+        $connectionName = 'tenant_' . $account->id; // Use a unique connection name
+
+        // Dynamically set up the database connection for this job instance
+        config()->set('database.connections.' . $connectionName, [
             'driver' => 'mysql',
-            'url' => NULL,
-            'host' => '127.0.0.1',
-            'port' => 3306,
+            'host' => $account->db_data->host ?? '127.0.0.1', // Use account's DB host
+            'port' => $account->db_data->port ?? 3306,
             'database' => $account->db_data->database_name,
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => '',
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => 'InnoDB',
-            'pool' => [
-                'min_connections' => 1,
-                'max_connections' => 10,
-                'max_idle_time' => 30,
-            ],
+            'username' => $account->db_data->username ?? env('DB_USERNAME'), // Use account's DB username
+            'password' => $account->db_data->password ?? env('DB_PASSWORD'), // Use account's DB password
+            'charset' => 'utf8mb4', // Use utf8mb4 for broader character support
+            'collation' => 'utf8mb4_unicode_ci',
+            'strict' => true, // Keep strict mode
         ]);
 
-        DB::setDefaultConnection($account->db_data->connection_name);
+        // Use a transaction to ensure atomicity for the entire import process
+        DB::connection($connectionName)->transaction(function () use ($connectionName) {
 
-        if(!empty($this->sales_data)) {
+            if(!empty($this->sales_data)) {
 
-            $upload = SalesUpload::find($this->upload_id);
+                $upload = SalesUpload::find($this->upload_id);
 
-            $sku_count = 0;
+                $sku_count = 0;
 
-            $total_quantity = 0;
-            $total_price_vat = 0;
-            $total_amount = 0;
-            $total_amount_vat = 0;
+                $total_quantity = 0;
+                $total_price_vat = 0;
+                $total_amount = 0;
+                $total_amount_vat = 0;
 
-            $total_cm_quantity = 0;
-            $total_cm_price_vat = 0;
-            $total_cm_amount = 0;
-            $total_cm_amount_vat = 0;
+                $total_cm_quantity = 0;
+                $total_cm_price_vat = 0;
+                $total_cm_amount = 0;
+                $total_cm_amount_vat = 0;
 
-            $num = 0;
+                $num = 0;
 
-            $report_data = array();
+                $salesToInsert = []; // Array to collect sales data for bulk insert
 
-            foreach($this->sales_data as $data) {
-                // check data
-                if($data['check'] == 0) { // no error
-                    $sku_count++;
+                $report_data = array();
 
-                    // check if not FG or PROMO
-                    if($data['type'] == 1) {
-                        if($data['category'] == 1) { // Credit Memo
-                            $total_cm_quantity += $data['quantity'];
-                            $total_cm_price_vat += $data['price_inc_vat'];
-                            $total_cm_amount += $data['amount'];
-                            $total_cm_amount_vat += $data['amount_inc_vat'];
-                        } else { // Invoice
-                            $total_quantity += $data['quantity'];
-                            $total_price_vat += $data['price_inc_vat'];
-                            $total_amount += $data['amount'];
-                            $total_amount_vat += $data['amount_inc_vat'];
+                foreach($this->sales_data as $data) {
+                    // check data
+                    if($data['check'] == 0) { // no error
+                        $sku_count++;
+
+                        // check if not FG or PROMO
+                        if($data['type'] == 1) {
+                            if($data['category'] == 1) { // Credit Memo
+                                $total_cm_quantity += $data['quantity'];
+                                $total_cm_price_vat += $data['price_inc_vat'];
+                                $total_cm_amount += $data['amount'];
+                                $total_cm_amount_vat += $data['amount_inc_vat'];
+                            } else { // Invoice
+                                $total_quantity += $data['quantity'];
+                                $total_price_vat += $data['price_inc_vat'];
+                                $total_amount += $data['amount'];
+                                $total_amount_vat += $data['amount_inc_vat'];
+                            }
+                        }
+
+                        $salesToInsert[] = [
+                            'sales_upload_id' => $upload->id,
+                            'account_id' => $this->account_id,
+                            'account_branch_id' => $this->account_branch_id,
+                            'customer_id' => $data['customer_id'],
+                            'channel_id' => $data['channel_id'],
+                            'product_id' => $data['product_id'],
+                            'salesman_id' => $data['salesman_id'] ?? null, // Handle potential null salesman_id
+                            'location_id' => $data['location_id'],
+                            'user_id' => $this->user_id,
+                            'type' => $data['type'],
+                            'date' => \Carbon\Carbon::parse($data['date'])->format('Y-m-d'), // Use Carbon for robust date parsing
+                            'document_number' => $data['document'],
+                            'category' => $data['category'],
+                            'uom' => $data['uom'],
+                            'quantity' => $data['quantity'],
+                            'price_inc_vat' => $data['price_inc_vat'],
+                            'amount' => $data['amount'],
+                            'amount_inc_vat' => $data['amount_inc_vat'], // Ensure this is numeric
+                            'status' => $data['status'],
+                        ];
+
+                        $report_data[date('Y', strtotime($data['date']))][date('n', strtotime($data['date']))] = date('Y-m-d', strtotime($data['date']));
+                    }
+                }
+
+                $upload->update([
+                    'sku_count' => $sku_count,
+                    'total_quantity' => $total_quantity,
+                    'total_price_vat' => $total_price_vat,
+                    'total_amount' => $total_amount,
+                    'total_amount_vat' => $total_amount_vat,
+                    'total_cm_quantity' => $total_cm_quantity,
+                    'total_cm_price_vat' => $total_cm_price_vat,
+                    'total_cm_amount' => $total_cm_amount,
+                    'total_cm_amount_vat' => $total_cm_amount_vat,
+                ]);
+
+                // Perform bulk insert for all valid sales records
+                if (!empty($salesToInsert)) {
+                    Sale::on($connectionName)->insert($salesToInsert);
+                }
+
+                // UPDATE SALES REPORTS
+                if(!empty($report_data)) {
+                    foreach($report_data as $year => $months) {
+                        foreach($months as $month => $date) {
+                            DB::connection($connectionName)->statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
                         }
                     }
-
-                    $sale = new Sale([
-                        'sales_upload_id' => $upload->id,
-                        'account_id' => $this->account_id,
-                        'account_branch_id' => $this->account_branch_id,
-                        'customer_id' => $data['customer_id'],
-                        'channel_id' => $data['channel_id'],
-                        'product_id' => $data['product_id'],
-                        'salesman_id' => $data['salesman_id'],
-                        'location_id' => $data['location_id'],
-                        'user_id' => $this->user_id,
-                        'type' => $data['type'],
-                        'date' => date('Y-m-d', strtotime($data['date'])),
-                        'document_number' => $data['document'],
-                        'category' => $data['category'],
-                        'uom' => $data['uom'],
-                        'quantity' => $data['quantity'],
-                        'price_inc_vat' => $data['price_inc_vat'],
-                        'amount' => $data['amount'],
-                        'amount_inc_vat' => $data['amount_inc_vat'],
-                        'status' => $data['status'],
-                    ]);
-                    $sale->save();
-
-                    $report_data[date('Y', strtotime($data['date']))][date('n', strtotime($data['date']))] = date('Y-m-d', strtotime($data['date']));
                 }
+
+                // logs
+                activity('upload')
+                    ->performedOn($upload)
+                    ->log(':causer.name has uploaded sales data.');
             }
-
-            $upload->update([
-                'sku_count' => $sku_count,
-                'total_quantity' => $total_quantity,
-                'total_price_vat' => $total_price_vat,
-                'total_amount' => $total_amount,
-                'total_amount_vat' => $total_amount_vat,
-                'total_cm_quantity' => $total_cm_quantity,
-                'total_cm_price_vat' => $total_cm_price_vat,
-                'total_cm_amount' => $total_cm_amount,
-                'total_cm_amount_vat' => $total_cm_amount_vat,
-            ]);
-
-            // UPDATE SALES REPORTS
-            if(!empty($report_data)) {
-                foreach($report_data as $year => $months) {
-                    foreach($months as $month => $date) {
-                        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$this->account_id, $this->account_branch_id, $year, $month]);
-                    }
-                }
-            }
-
-            DB::setDefaultConnection('mysql');
-
-            // logs
-            activity('upload')
-                ->performedOn($upload)
-                ->log(':causer.name has uploaded sales data.');
-        }
         
+        }); // End of transaction
     }
 }
