@@ -15,6 +15,93 @@ class TemplateSeeder extends Seeder
      */
     public function run()
     {
+        $sales_upload_template = [
+            [
+                'column' => 'invoice_date',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'customer_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'salesman_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'invoice_number',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'warehouse_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'sku_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'quantity',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'uom',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'unit_price_inc_vat',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'amount',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'amount_inc_vat',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'line_discount',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'customer_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'customer_address',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'channel_code',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'channel_name',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'province',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'city',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'barangay',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'street',
+                'column_alt' => ''
+            ],
+            [
+                'column' => 'postal_code',
+                'column_alt' => ''
+            ],
+        ];
+
         $po_template_arr = [
             [
                 'column' => 'po_number',

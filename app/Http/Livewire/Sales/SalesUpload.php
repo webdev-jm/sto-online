@@ -18,11 +18,16 @@ use App\Models\Customer;
 use App\Models\SMSProduct;
 use App\Models\SalesUpload as Upload;
 
+use App\Models\UploadTemplate;
+use App\Models\AccountUploadTemplate;
+
 use App\Jobs\SalesImportJob;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+
+use Spatie\SimpleExcel\SimpleExcelReader;
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);
@@ -66,6 +71,41 @@ class SalesUpload extends Component
     public function maintainLocation($location_code) {
         $this->emit('maintainLocation', $location_code);
         $this->dispatchBrowserEvent('maintainLocation');
+    }
+
+    private function saveCustomer($rowData) {
+        $customer_code = $rowData['customer_code'];
+        $customer_name = $rowData['customer_name'] ?? '';
+        $customer_address = $rowData['customer_address'] ?? '';
+        $channel_code = $rowData['channel_code'] ?? '';
+        $channel_name = $rowData['channel_name'] ?? '';
+        $province = $rowData['province'] ?? '';
+        $city = $rowData['city'] ?? '';
+        $barangay = $rowData['barangay'] ?? '';
+        $street = $rowData['street'] ?? '';
+        $postal_code = $rowData['postal_code'] ?? '';
+
+
+
+        $customer = new Customer([
+            'account_id' => $this->account->id,
+            'account_branch_id' => $this->account_branch->id,
+            'salesman_id' => $this->salesman->id,
+            'channel_id',
+            'province_id',
+            'municipality_id',
+            'barangay_id',
+            'code',
+            'name',
+            'address',
+            'street',
+            'brgy',
+            'city',
+            'province',
+            'country',
+            'postal_code',
+            'status'
+        ]);
     }
 
     public function saveUpload() {
@@ -124,21 +164,51 @@ class SalesUpload extends Component
         $this->validate([
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);
+
+        $upload_template = UploadTemplate::where('title', 'SALES UPLOAD')->first();
+        $account_template = AccountUploadTemplate::where('upload_template_id', $upload_template->id)
+            ->where('account_id', $this->account_branch->account_id)
+            ->first();
+
+        $account_template_fields = $account_template->fields->mapWithKeys(function($field) {
+            return [
+                $field->upload_template_field_id => [
+                    'file_column_name' => $field->file_column_name,
+                    'file_column_number' => $field->file_column_number,
+                ],
+            ];
+        });
     
         $path1 = $this->file->storeAs('sales-uploads', $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
-        // $this->data = Excel::toArray([], $path)[0];
-        $spreadsheet = IOFactory::load($path);
-        $worksheet = $spreadsheet->getActiveSheet();
+        // Get the file extension
+        $extension = $this->file->getClientOriginalExtension();
 
-        $data = [];
-        foreach ($worksheet->getRowIterator() as $row) {
-            $rowResults = []; // Array to store results for this row
-            foreach ($row->getCellIterator() as $cell) {
-                $rowResults[] = $cell->getCalculatedValue(); // Store the result of the formula
+        $data = array();
+        if(in_array($extension, ['xlsx', 'csv', 'bin'])) {
+            if($account_template->type == 'name') {
+                $rows  = SimpleExcelReader::create($path)
+                    ->getRows();
+            } else if($account_template->type == 'number') {
+                $rows  = SimpleExcelReader::create($path)
+                    ->skip($account_template->start_row - 1)
+                    ->noHeaderRow()
+                    ->getRows();
             }
-            $data[] = $rowResults; // Store the results for this row in the main results array
+
+            $rows->each(function($row) use(&$data, $upload_template, $account_template_fields, $account_template) {
+                $this->processRow($row, $data, $upload_template, $account_template_fields, $account_template->type);
+            });
         }
+
+        // $data = [];
+        // foreach ($worksheet->getRowIterator() as $row) {
+        //     $rowResults = []; // Array to store results for this row
+        //     foreach ($row->getCellIterator() as $cell) {
+        //         $rowResults[] = $cell->getCalculatedValue(); // Store the result of the formula
+        //     }
+        //     $data[] = $rowResults; // Store the results for this row in the main results array
+        // }
 
         $this->data = $data;
 
@@ -152,20 +222,21 @@ class SalesUpload extends Component
             'sales_data',
             'err_msg'
         ]);
+        
 
         if (empty($data) || count($data) < 3) {
             $this->err_msg = 'The file is empty or has no data rows.';
             return;
         }
 
-        $header = $data[1];
+        $header = $data[0];
     
         if ($this->checkHeader($header) !== 0) {
             $this->err_msg = 'Invalid header format. Please provide an excel file with the correct column structure.';
             return;
         }
 
-        $rows = array_slice($data, 2);
+        $rows = array_slice($data, 1);
 
         // 1. Collect all unique codes in a single pass
         $customerCodes = [];
@@ -175,10 +246,10 @@ class SalesUpload extends Component
         foreach ($rows as $row) {
             if (count($row) < 6) continue;
 
-            if (!empty($row[1])) $customerCodes[trim($row[1])] = true;
-            if (!empty($row[4])) $locationCodes[trim($row[4])] = true;
+            if (!empty($row['customer_code'])) $customerCodes[trim($row['customer_code'])] = true;
+            if (!empty($row['warehouse_code'])) $locationCodes[trim($row['warehouse_code'])] = true;
 
-            $sku_code = trim($row[5] ?? '');
+            $sku_code = trim($row['sku_code'] ?? '');
             if (strpos($sku_code, '-') !== false) {
                 $sku_arr = explode('-', $sku_code);
                 if ($sku_arr[0] === 'FG' || $sku_arr[0] === 'PRM') {
@@ -209,12 +280,15 @@ class SalesUpload extends Component
         foreach ($rows as $index => $row) {
             if (count($row) < 12) continue;
 
-            $invoice_date = $row[0];
-            $customer_code = trim($row[1]);
-            $invoice_number = trim($row[3]);
-            $warehouse_code = trim($row[4]);
-            $original_sku_code = trim($row[5]);
-
+            $invoice_date = $row['invoice_date'];
+            $customer_code = trim($row['customer_code']);
+            $invoice_number = trim($row['invoice_number']);
+            $warehouse_code = trim($row['warehouse_code']);
+            $original_sku_code = trim($row['sku_code']);
+            // Convert DateTimeImmutable to string date 'YYYY-MM-DD' if needed
+            if ($invoice_date instanceof \DateTimeImmutable) {
+                $invoice_date = $invoice_date->format('Y-m-d');
+            }
             $sku_code = $original_sku_code;
             $type = 1;
             if (strpos($original_sku_code, '-') !== false) {
@@ -228,11 +302,11 @@ class SalesUpload extends Component
                 $category = 1;
             }
 
-            $quantity = (float)str_replace(',', '', trim($row[6]));
-            $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
-            $amount = (float)str_replace(',', '', trim($row[9]));
-            $amount_inc_vat = (float)str_replace(',', '', trim($row[10]));
-            $line_discount = (float)str_replace(',', '', trim($row[11]));
+            $quantity = (float)str_replace(',', '', trim($row['quantity']));
+            $price_inc_vat = (float)str_replace(',', '', trim($row['unit_price_inc_vat']));
+            $amount = (float)str_replace(',', '', trim($row['amount']));
+            $amount_inc_vat = (float)str_replace(',', '', trim($row['amount_inc_vat']));
+            $line_discount = (float)str_replace(',', '', trim($row['line_discount']));
 
             if (is_numeric($invoice_date)) {
                 $invoice_date = Date::excelToDateTimeObject($invoice_date)->format('Y-m-d');
@@ -245,7 +319,7 @@ class SalesUpload extends Component
             $rowData = [
                 'type' => $type, 'check' => 0, 'date' => $invoice_date, 'document' => $invoice_number,
                 'category' => $category, 'customer_code' => $customer_code, 'location_code' => $warehouse_code,
-                'sku_code' => $original_sku_code, 'quantity' => $quantity, 'uom' => trim($row[7]),
+                'sku_code' => $original_sku_code, 'quantity' => $quantity, 'uom' => trim($row['uom']),
                 'price_inc_vat' => $price_inc_vat, 'amount' => $amount, 'amount_inc_vat' => $amount_inc_vat,
                 'line_discount' => $line_discount, 'status' => 2,
             ];
@@ -298,6 +372,27 @@ class SalesUpload extends Component
         });
     }
 
+    private function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
+    
+        foreach ($upload_template->fields as $field) {
+            $column_name = $field->column_name;
+            if($type == 'name') {
+                $file_column_name = $account_template_fields[$field->id]['file_column_name'];
+            } else if($type == 'number') {
+                $file_column_name = $account_template_fields[$field->id]['file_column_number'] - 1;
+            }
+
+            ${$column_name} = $row[$file_column_name] ?? NULL;
+        }
+    
+        $rowData = [];
+        foreach($upload_template->fields as $field) {
+            $column_name = $field->column_name;
+            $rowData[$column_name] = ${$column_name};
+        }
+        $data[] = $rowData;
+    }
+
     private function isExcelDate(Cell $cell) {
         return Date::isDateTime($cell);
     }
@@ -321,6 +416,9 @@ class SalesUpload extends Component
     }
 
     private function checkHeader($header) {
+        // change key of header array to numeric starting at 0
+        $headerKeys = array_values($header);
+
         $requiredHeaders = [
             'Invoice Date',
             'Customer Code',
@@ -354,9 +452,9 @@ class SalesUpload extends Component
         $err = 0;
         $this->header_err = array();
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if(empty($header[$index]) || (trim(strtolower($header[$index])) !== strtolower($requiredHeader) && trim(strtolower($header[$index])) !== strtolower($requiredHeadersAlt[$index]))) {
+            if(empty($headerKeys[$index]) || (trim(strtolower($headerKeys[$index])) !== strtolower($requiredHeader) && trim(strtolower($headerKeys[$index])) !== strtolower($requiredHeadersAlt[$index]))) {
                 $err++;
-                $this->header_err[] = '<b>'.($header[$index] ?? '-').'</b> should be <b>'. $requiredHeader.'</b>';
+                $this->header_err[] = '<b>'.($headerKeys[$index] ?? '-').'</b> should be <b>'. $requiredHeader.'</b>';
             }
         }
     
