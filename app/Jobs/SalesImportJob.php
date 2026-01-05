@@ -74,7 +74,7 @@ class SalesImportJob implements ShouldQueue
 
             if(!empty($this->sales_data)) {
 
-                $upload = SalesUpload::find($this->upload_id);
+                $upload = SalesUpload::on($connectionName)->find($this->upload_id);
 
                 $sku_count = 0;
 
@@ -171,7 +171,7 @@ class SalesImportJob implements ShouldQueue
                     ->performedOn($upload)
                     ->log(':causer.name has uploaded sales data.');
             }
-        
+
         }); // End of transaction
     }
 }

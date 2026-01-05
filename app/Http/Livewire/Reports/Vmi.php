@@ -144,7 +144,7 @@ class Vmi extends Component
                 });
             })
             ->groupBy('product_id', 'uom')
-            ->paginate(10, ['*'], 'inventory-page');
+            ->paginate(20, ['*'], 'inventory-page');
 
         $product_ids = $inventories->pluck('product_id')->toArray();
         $products = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');
