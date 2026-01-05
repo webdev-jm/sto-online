@@ -84,28 +84,43 @@ class SalesUpload extends Component
         $barangay = $rowData['barangay'] ?? '';
         $street = $rowData['street'] ?? '';
         $postal_code = $rowData['postal_code'] ?? '';
+        $country = '';
 
+        if(!empty($customer_code) && !empty($customer_name) && !empty($customer_address)) {
 
+            $salesman = Salesman::where('code', $rowData['salesman_code'])
+                ->orWhere('name', $rowData['salesman_name'])
+                ->first();
+            $channel = Channel::where('code', $rowData['channel_code'])
+                ->orWhere('name', $rowData['channel_name'])
+                ->first();
 
-        $customer = new Customer([
-            'account_id' => $this->account->id,
-            'account_branch_id' => $this->account_branch->id,
-            'salesman_id' => $this->salesman->id,
-            'channel_id',
-            'province_id',
-            'municipality_id',
-            'barangay_id',
-            'code',
-            'name',
-            'address',
-            'street',
-            'brgy',
-            'city',
-            'province',
-            'country',
-            'postal_code',
-            'status'
-        ]);
+            $province = Province::where('province_name', $province)->first();
+            $municipality = Municipality::where('municipality_name', $city)->first();
+            $barangay = Barangay::where('barangay_name', $barangay)->first();
+
+            $customer = new Customer([
+                'account_id' => $this->account->id,
+                'account_branch_id' => $this->account_branch->id,
+                'salesman_id' => $salesman->id ?? NULL,
+                'channel_id' => $channel->id ?? NULL,
+                'province_id' => $province->id ?? NULL,
+                'municipality_id' => $municipality->id ?? NULL,
+                'barangay_id' => $barangay->id ?? NULL,
+                'code' => $customer_code,
+                'name' => $customer_name,
+                'address' => $customer_address,
+                'street' => $street,
+                'brgy' => $barangay,
+                'city' => $city,
+                'province' => $province,
+                'country' => $country,
+                'postal_code' => $postal_code,
+                'status' => NULL
+            ]);
+            $customer->save();
+        }
+
     }
 
     public function saveUpload() {
@@ -115,7 +130,7 @@ class SalesUpload extends Component
         }
 
         if(!empty($this->sales_data)) {
-        
+
             $upload = new Upload([
                 'account_id' => $this->account->id,
                 'account_branch_id' => $this->account_branch->id,
@@ -142,7 +157,7 @@ class SalesUpload extends Component
                 'start' => 0,
                 'upload_id' => $upload->id
             ];
-            
+
             // logs
             activity('upload')
             ->performedOn($upload)
@@ -154,7 +169,7 @@ class SalesUpload extends Component
                 'message_success' => 'Sales data has been added to queue for processing.',
                 'upload_data' => $upload_data
             ]);
-            
+
         } else {
             $this->err_msg = 'No data has been saved!';
         }
@@ -178,7 +193,7 @@ class SalesUpload extends Component
                 ],
             ];
         });
-    
+
         $path1 = $this->file->storeAs('sales-uploads', $this->file->getClientOriginalName());
         $path = storage_path('app').'/'.$path1;
         // Get the file extension
@@ -222,7 +237,7 @@ class SalesUpload extends Component
             'sales_data',
             'err_msg'
         ]);
-        
+
 
         if (empty($data) || count($data) < 3) {
             $this->err_msg = 'The file is empty or has no data rows.';
@@ -230,7 +245,7 @@ class SalesUpload extends Component
         }
 
         $header = $data[0];
-    
+
         if ($this->checkHeader($header) !== 0) {
             $this->err_msg = 'Invalid header format. Please provide an excel file with the correct column structure.';
             return;
@@ -373,7 +388,7 @@ class SalesUpload extends Component
     }
 
     private function processRow($row, &$data, $upload_template, $account_template_fields, $type) {
-    
+
         foreach ($upload_template->fields as $field) {
             $column_name = $field->column_name;
             if($type == 'name') {
@@ -384,7 +399,7 @@ class SalesUpload extends Component
 
             ${$column_name} = $row[$file_column_name] ?? NULL;
         }
-    
+
         $rowData = [];
         foreach($upload_template->fields as $field) {
             $column_name = $field->column_name;
@@ -403,7 +418,7 @@ class SalesUpload extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
@@ -448,7 +463,7 @@ class SalesUpload extends Component
             'Amount Including VAT',
             'Line Discount'
         ];
-    
+
         $err = 0;
         $this->header_err = array();
         foreach ($requiredHeaders as $index => $requiredHeader) {
@@ -457,7 +472,7 @@ class SalesUpload extends Component
                 $this->header_err[] = '<b>'.($headerKeys[$index] ?? '-').'</b> should be <b>'. $requiredHeader.'</b>';
             }
         }
-    
+
         return $err;
     }
 

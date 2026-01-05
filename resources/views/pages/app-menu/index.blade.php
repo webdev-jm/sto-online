@@ -60,33 +60,31 @@
         @endcan
 
         @can('stock on hand access')
-        {{-- 
             <div class="col-lg-3">
                 <a href="{{route('stock-on-hand.index')}}" class="btn btn-block btn-app bg-gradient-gray ml-0">
                     <i class="fa fa-cubes text-white"></i>
                     <span class="text-white">STOCK ON HAND</span>
                 </a>
             </div>
-        --}}
         @endcan
-        
-        {{-- 
+
+
         <div class="col-lg-3">
             <a href="{{route('stock-transfer.index')}}" class="btn btn-block btn-app bg-gradient-purple ml-0">
                 <i class="fa fa-exchange-alt text-white"></i>
                 <span class="text-white">STOCK TRANSFER</span>
             </a>
         </div>
-        --}}
 
-        {{--
+
+
         <div class="col-lg-3">
             <a href="{{route('rtv.index')}}" class="btn btn-block btn-app bg-gradient-red ml-0">
                 <i class="fa fa-undo text-white"></i>
                 <span class="text-white">RTV</span>
             </a>
         </div>
-        --}}
+
 
     </div>
 
@@ -105,62 +103,60 @@
         @endcan
 
         @can('area access')
-        <div class="col-lg-3">
-            <a href="{{route('area.index')}}" class="btn btn-block btn-app bg-gradient-success ml-0">
-                <i class="fa fa-map-marked-alt"></i>
-                AREAS
-            </a>
-        </div>
+            <div class="col-lg-3">
+                <a href="{{route('area.index')}}" class="btn btn-block btn-app bg-gradient-success ml-0">
+                    <i class="fa fa-map-marked-alt"></i>
+                    AREAS
+                </a>
+            </div>
         @endcan
 
         @can('district access')
-        <div class="col-lg-3">
-            <a href="{{route('district.index')}}" class="btn btn-block btn-app bg-gradient-warning ml-0">
-                <i class="fa fa-map"></i>
-                DISTRICT
-            </a>
-        </div>
+            <div class="col-lg-3">
+                <a href="{{route('district.index')}}" class="btn btn-block btn-app bg-gradient-warning ml-0">
+                    <i class="fa fa-map"></i>
+                    DISTRICT
+                </a>
+            </div>
         @endcan
 
         @can('salesman access')
-        <div class="col-lg-3">
-            <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-gradient-danger ml-0">
-                <i class="fa fa-user-tie"></i>
-                SALESMAN
-            </a>
-        </div>
+            <div class="col-lg-3">
+                <a href="{{route('salesman.index')}}" class="btn btn-block btn-app bg-gradient-danger ml-0">
+                    <i class="fa fa-user-tie"></i>
+                    SALESMAN
+                </a>
+            </div>
         @endcan
 
         @can('customer access')
-        <div class="col-lg-3">
-            <a href="{{route('customer.index')}}" class="btn btn-block btn-app bg-gradient-primary ml-0">
-                <i class="fa fa-people-carry"></i>
-                CUSTOMERS
-            </a>
-        </div>
+            <div class="col-lg-3">
+                <a href="{{route('customer.index')}}" class="btn btn-block btn-app bg-gradient-primary ml-0">
+                    <i class="fa fa-people-carry"></i>
+                    CUSTOMERS
+                </a>
+            </div>
         @endcan
-        
+
         @can('channel access')
-        <div class="col-lg-3">
-            <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
-                <i class="fa fa-route"></i>
-                CHANNELS
-            </a>
-        </div>
+            <div class="col-lg-3">
+                <a href="{{route('channel.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
+                    <i class="fa fa-route"></i>
+                    CHANNELS
+                </a>
+            </div>
         @endcan
 
         @can('template converter access')
-        {{--
-        <div class="col-lg-3">
-            <a href="{{route('template-converter.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
-                <i class="fa fa-route"></i>
-                TEMPLATE CONVERTER
-            </a>
-        </div>
-        --}}
+            <div class="col-lg-3">
+                <a href="{{route('template-converter.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
+                    <i class="fa fa-route"></i>
+                    TEMPLATE CONVERTER
+                </a>
+            </div>
         @endcan
-        
-        
+
+
     </div>
 
     <strong class="text-lg">DASHBOARD</strong>
