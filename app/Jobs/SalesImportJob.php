@@ -74,7 +74,11 @@ class SalesImportJob implements ShouldQueue
 
             if(!empty($this->sales_data)) {
 
-                $upload = SalesUpload::on($connectionName)->find($this->upload_id);
+                // $upload = SalesUpload::on($connectionName)->find($this->upload_id);
+                $upload = DB::connection($connectionName)
+                    ->table('sales_uploads')
+                    ->where('id', $this->upload_id)
+                    ->first();
 
                 $sku_count = 0;
 
@@ -113,7 +117,6 @@ class SalesImportJob implements ShouldQueue
                                 $total_amount_vat += $data['amount_inc_vat'];
                             }
                         }
-
                         $salesToInsert[] = [
                             'sales_upload_id' => $upload->id,
                             'account_id' => $this->account_id,
@@ -140,21 +143,39 @@ class SalesImportJob implements ShouldQueue
                     }
                 }
 
-                $upload->update([
-                    'sku_count' => $sku_count,
-                    'total_quantity' => $total_quantity,
-                    'total_price_vat' => $total_price_vat,
-                    'total_amount' => $total_amount,
-                    'total_amount_vat' => $total_amount_vat,
-                    'total_cm_quantity' => $total_cm_quantity,
-                    'total_cm_price_vat' => $total_cm_price_vat,
-                    'total_cm_amount' => $total_cm_amount,
-                    'total_cm_amount_vat' => $total_cm_amount_vat,
+                DB::connection($connectionName)->statement("
+                    UPDATE sales_uploads
+                    SET
+                        sku_count = ?,
+                        total_quantity = ?,
+                        total_price_vat = ?,
+                        total_amount = ?,
+                        total_amount_vat = ?,
+                        total_cm_quantity = ?,
+                        total_cm_price_vat = ?,
+                        total_cm_amount = ?,
+                        total_cm_amount_vat = ?,
+                        updated_at = NOW()
+                    WHERE id = ?
+                ", [
+                    $sku_count,
+                    $total_quantity,
+                    $total_price_vat,
+                    $total_amount,
+                    $total_amount_vat,
+                    $total_cm_quantity,
+                    $total_cm_price_vat,
+                    $total_cm_amount,
+                    $total_cm_amount_vat,
+                    $upload->id // The unique identifier from your original $upload object
                 ]);
 
                 // Perform bulk insert for all valid sales records
                 if (!empty($salesToInsert)) {
-                    Sale::on($connectionName)->insert($salesToInsert);
+                    // Sale::on($connectionName)->insert($salesToInsert);
+                    DB::connection($connectionName)
+                        ->table('sales')
+                        ->insert($salesToInsert);
                 }
 
                 // UPDATE SALES REPORTS
@@ -168,7 +189,6 @@ class SalesImportJob implements ShouldQueue
 
                 // logs
                 activity('upload')
-                    ->performedOn($upload)
                     ->log(':causer.name has uploaded sales data.');
             }
 
