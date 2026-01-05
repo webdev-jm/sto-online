@@ -60,30 +60,30 @@
         @endcan
 
         @can('stock on hand access')
-            <div class="col-lg-3">
+            {{-- <div class="col-lg-3">
                 <a href="{{route('stock-on-hand.index')}}" class="btn btn-block btn-app bg-gradient-gray ml-0">
                     <i class="fa fa-cubes text-white"></i>
                     <span class="text-white">STOCK ON HAND</span>
                 </a>
-            </div>
+            </div> --}}
         @endcan
 
 
-        <div class="col-lg-3">
+        {{-- <div class="col-lg-3">
             <a href="{{route('stock-transfer.index')}}" class="btn btn-block btn-app bg-gradient-purple ml-0">
                 <i class="fa fa-exchange-alt text-white"></i>
                 <span class="text-white">STOCK TRANSFER</span>
             </a>
-        </div>
+        </div> --}}
 
 
 
-        <div class="col-lg-3">
+        {{-- <div class="col-lg-3">
             <a href="{{route('rtv.index')}}" class="btn btn-block btn-app bg-gradient-red ml-0">
                 <i class="fa fa-undo text-white"></i>
                 <span class="text-white">RTV</span>
             </a>
-        </div>
+        </div> --}}
 
 
     </div>
@@ -148,12 +148,12 @@
         @endcan
 
         @can('template converter access')
-            <div class="col-lg-3">
+            {{-- <div class="col-lg-3">
                 <a href="{{route('template-converter.index')}}" class="btn btn-block btn-app bg-gradient-navy ml-0">
                     <i class="fa fa-route"></i>
                     TEMPLATE CONVERTER
                 </a>
-            </div>
+            </div> --}}
         @endcan
 
 
