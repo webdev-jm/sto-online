@@ -32,21 +32,19 @@ class InventoryImportJob implements ShouldQueue
     public $account_branch_id;
     public $user_id;
     public $upload_id;
-    public $keys;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($inventory_data, $account_id, $account_branch_id, $user_id, $upload_id, $keys)
+    public function __construct($inventory_data, $account_id, $account_branch_id, $user_id, $upload_id)
     {
         $this->inventory_data = $inventory_data;
         $this->account_id = $account_id;
         $this->account_branch_id = $account_branch_id;
         $this->user_id = $user_id;
         $this->upload_id = $upload_id;
-        $this->keys = $keys;
     }
 
     /**
@@ -86,24 +84,22 @@ class InventoryImportJob implements ShouldQueue
 
             $total_inventory = 0;
             foreach($this->inventory_data as $data) {
-
                 // check
                 if($data['check'] == 0) {
-                    foreach($this->keys as $key => $location) {
-                        $total_inventory += $data[$location['id']];
+                    $total_inventory += $data['quantity'];
 
-                        $inventory = new Inventory([
-                            'account_id' => $this->account_id,
-                            'account_branch_id' => $this->account_branch_id,
-                            'inventory_upload_id' => $inventory_upload->id,
-                            'location_id' => $location['id'],
-                            'product_id' => $data['product_id'],
-                            'type' => $data['type'],
-                            'uom' => $data['uom'],
-                            'inventory' => $data[$location['id']],
-                        ]);
-                        $inventory->save();
-                    }
+                    $inventory = new Inventory([
+                        'account_id' => $this->account_id,
+                        'account_branch_id' => $this->account_branch_id,
+                        'inventory_upload_id' => $inventory_upload->id,
+                        'location_id' => $data['location']['id'],
+                        'product_id' => $data['product_id'],
+                        'type' => $data['type'],
+                        'uom' => $data['uom'],
+                        'inventory' => $data['quantity'],
+                        'expiry_date' => $data['expiry_date'] ?? null,
+                    ]);
+                    $inventory->save();
                 }
             }
 
@@ -122,6 +118,6 @@ class InventoryImportJob implements ShouldQueue
                 ->log(':causer.name has uploaded inventory data.');
 
         }
-        
+
     }
 }

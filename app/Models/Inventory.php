@@ -10,7 +10,7 @@ class Inventory extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    
+
     protected $fillable = [
         'account_id',
         'account_branch_id',
@@ -19,7 +19,8 @@ class Inventory extends Model
         'product_id',
         'type',
         'uom',
-        'inventory'
+        'inventory',
+        'expiry_date'
     ];
 
     public function getConnectionName() {

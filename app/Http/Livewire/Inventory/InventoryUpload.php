@@ -21,6 +21,8 @@ use App\Http\Traits\GenerateMonthlyInventory;
 
 use App\Jobs\InventoryImportJob;
 
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 class InventoryUpload extends Component
 {
     use GenerateMonthlyInventory;
@@ -66,7 +68,7 @@ class InventoryUpload extends Component
             ]);
             $inventory_upload->save();
 
-            InventoryImportJob::dispatch($this->inventory_data, $this->account->id, $this->account_branch->id, auth()->user()->id, $inventory_upload->id, $this->keys);
+            InventoryImportJob::dispatch($this->inventory_data, $this->account->id, $this->account_branch->id, auth()->user()->id, $inventory_upload->id);
 
             $total = 0;
             foreach($this->inventory_data as $data) {
@@ -114,11 +116,13 @@ class InventoryUpload extends Component
             'inventory_data',
             'err_msg'
         ]);
-        
+
         $header = $data[0];
-    
+
         if($this->checkHeader($header) == 0) {
             $sku_codes = array_unique(array_map('trim', Collection::make($data)->pluck(0)->slice(1)->toArray()));
+            $location_codes = array_unique(array_map('trim', Collection::make($data)->pluck(2)->slice(1)->toArray()));
+
             foreach($sku_codes as $key => $code) {
                 if(strpos(trim($code ?? ''), '-')) {
                     $sku_arr = explode('-', $code);
@@ -131,24 +135,15 @@ class InventoryUpload extends Component
                 ->get()
                 ->keyBy('stock_code');
 
-            // check header
-            $this->keys = array();
-            foreach($header as $key => $val) {
-                $location = Location::where('account_id', $this->account->id)
-                    ->where('account_branch_id', $this->account_branch->id)
-                    ->where(function($query) use($val) {
-                        $query->where('code', $val)
-                            ->orWhere('name', $val);
-                    })
-                    ->first();
-
-                if(!empty($location)) {
-                    $this->keys[$key] = $location;
-                }
-            }
+            $locations = Location::where('account_id', $this->account->id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->whereIn('code', $location_codes)
+                ->get()
+                ->keyBy('code');
 
             foreach(array_slice($data, 1) as $data_key => $row) {
                 $sku_code = trim($row[0] ?? '');
+                $location_code = trim($row[2] ?? '');
 
                 $type = 1;
                 if(strpos(trim($sku_code ?? ''), '-')) {
@@ -164,35 +159,59 @@ class InventoryUpload extends Component
                         $type = 3;
                     }
                 }
-                
-                if($products->has($sku_code)) {
+
+                $expiry_date = $row[5];
+                if (is_numeric($expiry_date)) {
+                    $expiry_date = Date::excelToDateTimeObject($expiry_date)->format('Y-m-d');
+                }
+
+                if($products->has($sku_code) && $locations->has($location_code)) {
                     $product = $products->get($sku_code);
+                    $location = $locations->get($location_code);
 
                     $this->inventory_data[$data_key] = [
                         'type' => $type,
                         'check' => 0,
                         'sku_code' => $row[0],
                         'description' => $row[1],
+                        'location_code' => $location->code,
+                        'location_name' => $location->name,
+                        'location' => $location ?? NULL,
                         'product_id' => $product->id ?? NULL,
-                        'uom' => 'PCS'
+                        'uom' => $row[3],
+                        'quantity' => $row[4],
+                        'expiry_date' => $expiry_date
                     ];
                 } else {
-                    $this->inventory_data[$data_key] = [
-                        'type' => $type,
-                        'check' => 1,
-                        'sku_code' => $row[0],
-                        'description' => $row[1],
-                        'product_id' => $product->id ?? NULL,
-                        'uom' => 'PCS'
-                    ];
-                }
-
-                if(!empty($this->keys)) {
-                    foreach($this->keys as $key => $location) {
-                        $this->inventory_data[$data_key][$location->id] = $row[$key];
+                    if(!$products->has($sku_code)) {
+                        $this->inventory_data[$data_key] = [
+                            'type' => $type,
+                            'check' => 1,
+                            'sku_code' => $row[0],
+                            'description' => $row[1],
+                            'product_id' => $product->id ?? NULL,
+                            'location_code' => $location->code,
+                            'location_name' => $location->name,
+                            'location' => $location ?? NULL,
+                            'uom' => $row[3],
+                            'quantity' => $row[4],
+                            'expiry_date' => $expiry_date
+                        ];
+                    } else if(!$locations->has($location_code)) {
+                        $this->inventory_data[$data_key] = [
+                            'type' => $type,
+                            'check' => 2,
+                            'sku_code' => $row[0],
+                            'description' => $row[1],
+                            'product_id' => $product->id ?? NULL,
+                            'location_code' => $location->code,
+                            'location_name' => $location->name,
+                            'location' => $location ?? NULL,
+                            'uom' => $row[3],
+                            'quantity' => $row[4],
+                            'expiry_date' => $expiry_date
+                        ];
                     }
-                } else {
-                    unset($this->inventory_data[$data_key]);
                 }
             }
 
@@ -203,22 +222,25 @@ class InventoryUpload extends Component
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
-        
     }
 
     private function checkHeader($header) {
         $requiredHeaders = [
             'SKU CODE',
             'DESCRIPTION',
+            'LOCATION',
+            'UOM',
+            'QUANTITY',
+            'EXPIRY DATE',
         ];
-    
+
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
             if (trim(strtolower($header[$index]) ?? '') !== strtolower($requiredHeader)) {
                 $err++;
             }
         }
-    
+
         return $err;
     }
 
@@ -227,7 +249,7 @@ class InventoryUpload extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
