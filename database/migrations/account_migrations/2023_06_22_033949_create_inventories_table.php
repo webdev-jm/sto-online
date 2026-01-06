@@ -23,6 +23,7 @@ class CreateInventoriesTable extends Migration
             $table->integer('type')->default(1);
             $table->string('uom');
             $table->integer('inventory');
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
 
             $table->softDeletes();

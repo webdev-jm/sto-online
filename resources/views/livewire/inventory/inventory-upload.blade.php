@@ -33,7 +33,16 @@
                             <b>DESCRIPTION</b> - <span>Required</span>
                         </li>
                         <li>
-                            <b>[LOCATION CODE]</b> - <span>Required, If the location code is not maintained, it will not be included in the upload.</span>
+                            <b>LOCATION CODE</b> - <span>Required, If the location code is not maintained, it will not be included in the upload.</span>
+                        </li>
+                        <li>
+                            <b>UOM</b> - <span>Required, unit of measure</span>
+                        </li>
+                        <li>
+                            <b>QUANTITY</b> - <span>Required</span>
+                        </li>
+                        <li>
+                            <b>EXPIRY DATE</b> - <span>Optional</span>
                         </li>
                     </ul>
 
@@ -45,7 +54,7 @@
 
         </div>
     </div>
-    
+
     @if(!empty($inventory_data))
         <div class="card">
             <div class="card-header">
@@ -84,12 +93,10 @@
                             <th></th>
                             <th class="align-middle">SKU CODE</th>
                             <th class="align-middle">DESCRIPTION</th>
-                            @if(!empty($keys))
-                                @foreach($keys as $key => $loc)
-                                    <th class="align-middle">{{$loc['code']}}</th>
-                                @endforeach
-                            @endif
-                            <th class="p-0 align-middle">TOTAL</th>
+                            <th class="align-middle">LOCATION</th>
+                            <th class="align-middle">UOM</th>
+                            <th class="align-middle">QUANTITY</th>
+                            <th class="align-middle">EXPIRY DATE</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,27 +111,19 @@
                                             <i class="fa fa-times-circle fa-sm text-danger"></i>
                                             <small class="text-danger">Product</small>
                                             @break
+                                        @case(2)
+                                            <i class="fa fa-times-circle fa-sm text-danger"></i>
+                                            <small class="text-danger">Location</small>
+                                            @break
                                         @default
                                     @endswitch
                                 </td>
                                 <td class="align-middle">{{$inv_data['sku_code']}}</td>
                                 <td class="align-middle">{{$inv_data['description']}}</td>
-                                @php
-                                    $total = 0;
-                                @endphp
-                                @if(!empty($keys))
-                                    @foreach($keys as $key => $loc)
-                                        @php
-                                            $total += $inv_data[$loc['id']];
-                                        @endphp
-                                        <td class="text-right align-middle">
-                                            {{number_format($inv_data[$loc['id']])}}
-                                        </td>
-                                    @endforeach
-                                @endif
-                                <td class="text-right">
-                                    {{number_format($total)}}
-                                </td>
+                                <td class="text-center align-middle">{{$inv_data['location_code']}}</td>
+                                <td class="text-center align-middle">{{$inv_data['uom']}}</td>
+                                <td class="text-right align-middle">{{$inv_data['quantity']}}</td>
+                                <td class="text-center align-middle">{{$inv_data['expiry_date']}}</td>
                             </tr>
                         @endforeach
                     </tbody>
