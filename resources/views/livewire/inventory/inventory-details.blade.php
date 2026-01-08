@@ -5,16 +5,16 @@
             <h3 class="card-title">INVENTORIES</h3>
         </div>
         <div class="card-body p-0 table-responsive">
-            
+
             <table class="table table-stiped table-bordered table-sm">
                 <thead>
                     <tr class="text-center">
                         <th>SKU CODE</th>
                         <th>DESCRIPTION</th>
+                        <th>LOCATION</th>
                         <th>UOM</th>
-                        @foreach($location_ids as $location_id)
-                            <th>{{$location_id->location->code ?? '-'}}</th>
-                        @endforeach
+                        <th>QUANTITY</th>
+                        <th>EXPIRY DATE</th>
                         @if($type == 'edit')
                             <th class="p-0"></th>
                         @endif
@@ -25,10 +25,10 @@
                     <tr>
                         <td class="align-middle">{{$inventory->stock_code}}</td>
                         <td class="align-middle">{{$inventory->description}}</td>
+                        <td class="align-middle text-center">{{$inventory->location->code}}</td>
                         <td class="align-middle text-center">{{$inventory->uom}}</td>
-                        @foreach($location_ids as $location_id)
-                            <td class="align-middle text-right">{{ number_format($inventory->{'location_'.$location_id->location_id}) }}</td>
-                        @endforeach
+                        <td class="align-middle text-right">{{ number_format($inventory->inventory) }}</td>
+                        <td class="align-middle text-center">{{$inventory->expiry_date}}</td>
                         @if($type == 'edit' && (auth()->user()->can('inventory edit') || auth()->user()->can('inventory delete')))
                             <td class="text-center align-middle p-0">
                                 @can('inventory edit')
