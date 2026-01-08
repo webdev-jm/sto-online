@@ -223,16 +223,16 @@ class SalesUpload extends Component
                 if ($sku_arr[0] === 'PRM') { $type = 3; $sku_code = end($sku_arr); }
             }
 
-            $category = 0;
-            if (!empty($invoice_number) && strpos($invoice_number, '-') !== false && explode('-', $invoice_number)[0] === 'PSC') {
-                $category = 1;
-            }
-
             $quantity = (float)str_replace(',', '', trim($row[6]));
             $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
             $amount = (float)str_replace(',', '', trim($row[9]));
             $amount_inc_vat = (float)str_replace(',', '', trim($row[10]));
             $line_discount = (float)str_replace(',', '', trim($row[11]));
+
+            $category = 0;
+            if ((!empty($invoice_number) && strpos($invoice_number, '-') !== false && explode('-', $invoice_number)[0] === 'PSC') || ($amount < 0)) {
+                $category = 1;
+            }
 
             if (is_numeric($invoice_date)) {
                 $invoice_date = Date::excelToDateTimeObject($invoice_date)->format('Y-m-d');
