@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Location;
@@ -104,7 +105,10 @@ class InventoryUpload extends Component
 
         $path1 = $this->file->store('inventory-uploads');
         $path = storage_path('app').'/'.$path1;
-        $this->data = Excel::toArray([], $path)[0];
+
+        $import = new class implements WithCalculatedFormulas {};
+
+        $this->data = Excel::toArray($import, $path)[0];
 
         $this->resetPage('page');
 

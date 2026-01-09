@@ -86,7 +86,7 @@ class InventoryImportJob implements ShouldQueue
             foreach($this->inventory_data as $data) {
                 // check
                 if($data['check'] == 0) {
-                    $total_inventory += $data['quantity'];
+                    $total_inventory += (int)$data['quantity'];
 
                     $inventory = new Inventory([
                         'account_id' => $this->account_id,
