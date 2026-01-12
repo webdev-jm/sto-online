@@ -20,7 +20,7 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
 
                 -- INSERT NEW EXTACTED DATA
                 INSERT INTO sales_report
-                    SELECT 
+                    SELECT
                         s.account_id,
                         s.account_branch_id,
                         s.customer_id,
@@ -39,16 +39,16 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
                         SUM(IF(s.category = 0 AND s.type = 2, s.amount_inc_vat, NULL)) as fg_sales,
                         SUM(IF(s.category = 0 AND s.type = 3, s.quantity, NULL)) as promo_quantity,
                         SUM(IF(s.category = 0 AND s.type = 3, s.amount_inc_vat, NULL)) as promo_sales,
-                        SUM(IF(s.category = 1, s.amount_inc_vat, NULL)) as credit_memo,
+                        SUM(ABS(IF(s.category = 1, s.amount_inc_vat, 0))) as credit_memo,
                         0 as parked_quantity,
                         0 as parked_amount
-                    FROM 
+                    FROM
                         sales as s
                     LEFT JOIN
                         '.env('DB_DATABASE_2').'.products as p ON p.id = s.product_id
-                    LEFT JOIN 
+                    LEFT JOIN
                         customers c ON c.id = s.customer_id
-                    WHERE 
+                    WHERE
                             s.account_id = iAccount_id
                         AND
                             s.account_branch_id = iAccount_branch_id
