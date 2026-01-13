@@ -133,6 +133,9 @@ class InventoryUpload extends Component
 
                     $sku_codes[$key] = end($sku_arr);
                 }
+
+                // SKU MAPPING
+                $sku_codes[$key] = $this->productMapping($this->account->account_code, $code);
             }
 
             $products = SMSProduct::whereIn('stock_code', $sku_codes)
@@ -163,6 +166,9 @@ class InventoryUpload extends Component
                         $type = 3;
                     }
                 }
+
+                // SKU MAPPING
+                $sku_code = $this->productMapping($this->account->account_code, $sku_code);
 
                 $expiry_date = $row[5];
                 if (is_numeric($expiry_date)) {
@@ -226,6 +232,33 @@ class InventoryUpload extends Component
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
+    }
+
+    private function productMapping($account_code, $stock_code) {
+        $product_mappings = [
+            '3000058' => [
+                'BCP0001' => 'KS01027',
+                'BCP0002' => 'KS01030',
+                'BCP0003' => 'DW01008',
+                'BCP0004' => 'KS01032',
+                'BCP0005' => 'KS03002',
+            ],
+            '3000076' => [
+                'BCP0001' => 'KS01027',
+                'BCP0002' => 'KS01030',
+                'BCP0003' => 'DW01008',
+                'BCP0004' => 'KS01032',
+                'BCP0005' => 'KS03002',
+            ],
+        ];
+
+        if(!empty($product_mappings[$account_code])) {
+            if(array_key_exists($stock_code, $product_mappings[$account_code])) {
+                $stock_code = $product_mappings[$account_code][$stock_code];
+            }
+        }
+
+        return $stock_code;
     }
 
     private function checkHeader($header) {

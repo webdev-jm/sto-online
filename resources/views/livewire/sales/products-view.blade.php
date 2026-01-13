@@ -35,6 +35,7 @@
                         <th class="align-middle">QUANTITY</th>
                         <th class="align-middle">AMOUNT</th>
                         <th class="align-middle">AMOUNT INC VAT</th>
+                        <th class="align-middle">TYPE</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,6 +52,7 @@
                         <td class="align-middle text-right">{{number_format($sale->quantity)}}</td>
                         <td class="align-middle text-right">{{number_format($sale->amount, 2)}}</td>
                         <td class="align-middle text-right">{{number_format($sale->amount_inc_vat, 2)}}</td>
+                        <td class="align-middle text-center">{{ $sale->type == 2 ? 'FREE GOODS' : ($sale->type == 3 ? 'PROMO' : '') }}</td>
                     </tr>
                     @endforeach
                 </tbody>
