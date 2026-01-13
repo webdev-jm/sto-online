@@ -185,6 +185,10 @@ class SalesUpload extends Component
                     $sku_code = end($sku_arr);
                 }
             }
+
+            // OGCI SKU MAPPING
+            $sku_code = $this->productMapping($this->account->account_code, $sku_code);
+
             if (!empty($sku_code)) $skuCodes[$sku_code] = true;
         }
 
@@ -222,6 +226,9 @@ class SalesUpload extends Component
                 if ($sku_arr[0] === 'FG') { $type = 2; $sku_code = end($sku_arr); }
                 if ($sku_arr[0] === 'PRM') { $type = 3; $sku_code = end($sku_arr); }
             }
+
+            // SKU MAPPING
+            $sku_code = $this->productMapping($this->account->account_code, $sku_code);
 
             $quantity = (float)str_replace(',', '', trim($row[6]));
             $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
@@ -296,6 +303,33 @@ class SalesUpload extends Component
             }
             return $a['date'] <=> $b['date'];
         });
+    }
+
+    private function productMapping($account_code, $stock_code) {
+        $product_mappings = [
+            '3000058' => [
+                'BCP0001' => 'KS01027',
+                'BCP0002' => 'KS01030',
+                'BCP0003' => 'DW01008',
+                'BCP0004' => 'KS01032',
+                'BCP0005' => 'KS03002',
+            ],
+            '3000076' => [
+                'BCP0001' => 'KS01027',
+                'BCP0002' => 'KS01030',
+                'BCP0003' => 'DW01008',
+                'BCP0004' => 'KS01032',
+                'BCP0005' => 'KS03002',
+            ],
+        ];
+
+        if(!empty($product_mappings[$account_code])) {
+            if(array_key_exists($stock_code, $product_mappings[$account_code])) {
+                $stock_code = $product_mappings[$account_code][$stock_code];
+            }
+        }
+
+        return $stock_code;
     }
 
     private function isExcelDate(Cell $cell) {
