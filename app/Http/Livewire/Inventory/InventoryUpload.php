@@ -135,7 +135,8 @@ class InventoryUpload extends Component
                 }
 
                 // SKU MAPPING
-                $sku_codes[$key] = $this->productMapping($this->account->account_code, $code);
+                $mappingResult = $this->productMapping($this->account->account_code, $code);
+                $sku_codes[$key] = $mappingResult[0];
             }
 
             $products = SMSProduct::whereIn('stock_code', $sku_codes)
@@ -168,7 +169,10 @@ class InventoryUpload extends Component
                 }
 
                 // SKU MAPPING
-                $sku_code = $this->productMapping($this->account->account_code, $sku_code);
+                $mappingResult = $this->productMapping($this->account->account_code, $sku_code);
+                $sku_code = $mappingResult[0];
+                $type = $mappingResult[1] ?? $type;
+
 
                 $expiry_date = $row[5];
                 if (is_numeric($expiry_date)) {
@@ -237,28 +241,37 @@ class InventoryUpload extends Component
     private function productMapping($account_code, $stock_code) {
         $product_mappings = [
             '3000058' => [
-                'BCP0001' => 'KS01027',
-                'BCP0002' => 'KS01030',
-                'BCP0003' => 'DW01008',
-                'BCP0004' => 'KS01032',
-                'BCP0005' => 'KS03002',
+                'SKU' => [
+                    'BCP0001' => 'KS01027',
+                    'BCP0002' => 'KS01030',
+                    'BCP0003' => 'DW01008',
+                    'BCP0004' => 'KS01032',
+                    'BCP0005' => 'KS03002',
+                ],
+                'type' => 3
             ],
             '3000076' => [
-                'BCP0001' => 'KS01027',
-                'BCP0002' => 'KS01030',
-                'BCP0003' => 'DW01008',
-                'BCP0004' => 'KS01032',
-                'BCP0005' => 'KS03002',
+                'SKU' => [
+                    'BCP0001' => 'KS01027',
+                    'BCP0002' => 'KS01030',
+                    'BCP0003' => 'DW01008',
+                    'BCP0004' => 'KS01032',
+                    'BCP0005' => 'KS03002',
+                ],
+                'type' => 3
             ],
         ];
 
+        $type = NULL;
+
         if(!empty($product_mappings[$account_code])) {
-            if(array_key_exists($stock_code, $product_mappings[$account_code])) {
-                $stock_code = $product_mappings[$account_code][$stock_code];
+            if(array_key_exists($stock_code, $product_mappings[$account_code]['SKU'])) {
+                $stock_code = $product_mappings[$account_code]['SKU'][$stock_code];
+                $type = $product_mappings[$account_code]['type'] ?? NULL;
             }
         }
 
-        return $stock_code;
+        return [$stock_code, $type];
     }
 
     private function checkHeader($header) {
