@@ -48,7 +48,7 @@ Trait ProductMappingTrait {
                     'FGKS01034' => 'KS01034',
                     'FGKS04010' => 'KS04010',
                     'FGKS09006' => 'KS09006',
-                    'FG421766' => '421766',
+                    'FG421766' => 'KS01027',
                     'FGKM01005' => 'KM01005',
                 ],
                 'type' => 3
