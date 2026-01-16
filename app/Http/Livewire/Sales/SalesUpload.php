@@ -24,7 +24,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-use App\Http\Trait\ProductMappingTrait;
+use App\Http\Traits\ProductMappingTrait;
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);

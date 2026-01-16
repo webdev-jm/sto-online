@@ -24,7 +24,7 @@ use App\Jobs\InventoryImportJob;
 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-use App\Http\Trait\ProductMappingTrait;
+use App\Http\Traits\ProductMappingTrait;
 
 class InventoryUpload extends Component
 {
