@@ -24,8 +24,11 @@ use App\Jobs\InventoryImportJob;
 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
+use App\Http\Trait\ProductMappingTrait;
+
 class InventoryUpload extends Component
 {
+    use ProductMappingTrait;
     use GenerateMonthlyInventory;
 
     use WithFileUploads;
@@ -236,42 +239,6 @@ class InventoryUpload extends Component
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format.';
         }
-    }
-
-    private function productMapping($account_code, $stock_code) {
-        $product_mappings = [
-            '3000058' => [
-                'SKU' => [
-                    'BCP0001' => 'KS01027',
-                    'BCP0002' => 'KS01030',
-                    'BCP0003' => 'DW01008',
-                    'BCP0004' => 'KS01032',
-                    'BCP0005' => 'KS03002',
-                ],
-                'type' => 3
-            ],
-            '3000076' => [
-                'SKU' => [
-                    'BCP0001' => 'KS01027',
-                    'BCP0002' => 'KS01030',
-                    'BCP0003' => 'DW01008',
-                    'BCP0004' => 'KS01032',
-                    'BCP0005' => 'KS03002',
-                ],
-                'type' => 3
-            ],
-        ];
-
-        $type = NULL;
-
-        if(!empty($product_mappings[$account_code])) {
-            if(array_key_exists($stock_code, $product_mappings[$account_code]['SKU'])) {
-                $stock_code = $product_mappings[$account_code]['SKU'][$stock_code];
-                $type = $product_mappings[$account_code]['type'] ?? NULL;
-            }
-        }
-
-        return [$stock_code, $type];
     }
 
     private function checkHeader($header) {
