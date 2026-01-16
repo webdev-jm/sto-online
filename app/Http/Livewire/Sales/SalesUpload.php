@@ -24,6 +24,8 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+use App\Http\Trait\ProductMappingTrait;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);
 ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
@@ -31,6 +33,7 @@ ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
 
 class SalesUpload extends Component
 {
+    use ProductMappingTrait;
     use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
@@ -306,43 +309,6 @@ class SalesUpload extends Component
             }
             return $a['date'] <=> $b['date'];
         });
-    }
-
-    private function productMapping($account_code, $stock_code) {
-        $product_mappings = [
-            '3000058' => [
-                'SKU' => [
-                    'BCP0001' => 'KS01027',
-                    'BCP0002' => 'KS01030',
-                    'BCP0003' => 'DW01008',
-                    'BCP0004' => 'KS01032',
-                    'BCP0005' => 'KS03002',
-                ],
-                'type' => 3
-            ],
-            '3000076' => [
-                'SKU' => [
-                    'BCP0001' => 'KS01027',
-                    'BCP0002' => 'KS01030',
-                    'BCP0003' => 'DW01008',
-                    'BCP0004' => 'KS01032',
-                    'BCP0005' => 'KS03002',
-                ],
-                'type' => 3
-            ],
-        ];
-
-        $type = NULL;
-
-        if(!empty($product_mappings[$account_code])) {
-            if(array_key_exists($stock_code, $product_mappings[$account_code]['SKU'])) {
-                $stock_code = $product_mappings[$account_code]['SKU'][$stock_code];
-                $type = $product_mappings[$account_code]['type'] ?? NULL;
-            }
-        }
-
-
-        return [$stock_code, $type];
     }
 
     private function isExcelDate(Cell $cell) {
