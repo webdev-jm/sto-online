@@ -103,20 +103,19 @@ class SalesImportJob implements ShouldQueue
                     if($data['check'] == 0) { // no error
                         $sku_count++;
 
-                        // check if not FG or PROMO
-                        if($data['type'] == 1) {
-                            if($data['category'] == 1) { // Credit Memo
-                                $total_cm_quantity += $data['quantity'];
-                                $total_cm_price_vat += $data['price_inc_vat'];
-                                $total_cm_amount += $data['amount'];
-                                $total_cm_amount_vat += $data['amount_inc_vat'];
-                            } else { // Invoice
-                                $total_quantity += $data['quantity'];
-                                $total_price_vat += $data['price_inc_vat'];
-                                $total_amount += $data['amount'];
-                                $total_amount_vat += $data['amount_inc_vat'];
-                            }
+                        
+                        if($data['category'] == 1) { // Credit Memo
+                            $total_cm_quantity += $data['quantity'];
+                            $total_cm_price_vat += $data['price_inc_vat'];
+                            $total_cm_amount += $data['amount'];
+                            $total_cm_amount_vat += $data['amount_inc_vat'];
+                        } else { // Invoice
+                            $total_quantity += $data['quantity'];
+                            $total_price_vat += $data['price_inc_vat'];
+                            $total_amount += $data['amount'];
+                            $total_amount_vat += $data['amount_inc_vat'];
                         }
+                        
                         $salesToInsert[] = [
                             'sales_upload_id' => $upload->id,
                             'account_id' => $this->account_id,
