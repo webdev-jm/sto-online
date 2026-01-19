@@ -270,7 +270,7 @@ class SalesUpload extends Component
                     'salesman_id' => $customer->salesman_id, 'description' => $product->description,
                     'size' => $product->size, 'status' => $customer->status,
                 ]);
-                $existenceCheckPayload[] = ['doc' => $invoice_number, 'cust_id' => $customer->id, 'prod_id' => $product->id, 'index' => $index];
+                $existenceCheckPayload[] = ['doc' => $invoice_number, 'cust_id' => $customer->id, 'prod_id' => $product->id, 'uom' => $rowData['uom'], 'type' => $rowData['type'], 'index' => $index];
             } else {
                 $rowData['check'] = !$customer ? 1 : (!$location ? 2 : 3);
             }
@@ -286,15 +286,17 @@ class SalesUpload extends Component
                         $query->orWhere(function ($q) use ($payload) {
                             $q->where('document_number', $payload['doc'])
                               ->where('customer_id', $payload['cust_id'])
-                              ->where('product_id', $payload['prod_id']);
+                              ->where('product_id', $payload['prod_id'])
+                              ->where('uom', $payload['uom'])
+                              ->where('type', $payload['type']);
                         });
                     }
                 })
-                ->select('document_number', 'customer_id', 'product_id')->get()
-                ->mapWithKeys(fn($sale) => [$sale->document_number . '|' . $sale->customer_id . '|' . $sale->product_id => true]);
+                ->select('document_number', 'customer_id', 'product_id', 'uom', 'type')->get()
+                ->mapWithKeys(fn($sale) => [$sale->document_number . '|' . $sale->customer_id . '|' . $sale->product_id . '|' . $sale->uom . '|' . $sale->type => true]);
 
             foreach ($existenceCheckPayload as $payload) {
-                $key = $payload['doc'] . '|' . $payload['cust_id'] . '|' . $payload['prod_id'];
+                $key = $payload['doc'] . '|' . $payload['cust_id'] . '|' . $payload['prod_id'] . '|' . $payload['uom'] . '|' . $payload['type'];
                 if (isset($existingSales[$key])) {
                     $processedData[$payload['index']]['check'] = 4;
                 }

@@ -7,27 +7,39 @@ Trait ProductMappingTrait {
     public function productMapping($account_code, $stock_code) {
         $product_mappings = [
             '3000058' => [
-                'SKU' => [
+                3 => [
                     'BCP0001' => 'KS01027',
                     'BCP0002' => 'KS01030',
                     'BCP0003' => 'DW01008',
                     'BCP0004' => 'KS01032',
                     'BCP0005' => 'KS03002',
                 ],
-                'type' => 3
+                2 => [
+                    'KS03002FG' => 'KS03002',
+                    'KS01028FG' => 'KS01028',
+                    'KS01027FG' => 'KS01027',
+                    'KS01030FG' => 'KS01030',
+                    'DW01002FG' => 'DW01002',
+                ],
             ],
             '3000076' => [
-                'SKU' => [
+                3 => [
                     'BCP0001' => 'KS01027',
                     'BCP0002' => 'KS01030',
                     'BCP0003' => 'DW01008',
                     'BCP0004' => 'KS01032',
                     'BCP0005' => 'KS03002',
                 ],
-                'type' => 3
+                2 => [
+                    'KS03002FG' => 'KS03002',
+                    'KS01028FG' => 'KS01028',
+                    'KS01027FG' => 'KS01027',
+                    'KS01030FG' => 'KS01030',
+                    'DW01002FG' => 'DW01002',
+                ],
             ],
             '3000062' => [
-                'SKU' => [
+                3 => [
                     'FGKS01032' => 'KS01032',
                     'FGKS01027' => 'KS01027',
                     'FGKS01030' => 'KS01030',
@@ -50,20 +62,20 @@ Trait ProductMappingTrait {
                     'FGKS09006' => 'KS09006',
                     'FG421766' => 'KS01027',
                     'FGKM01005' => 'KM01005',
-                ],
-                'type' => 3
+                ]
             ]
         ];
 
         $type = NULL;
 
         if(!empty($product_mappings[$account_code])) {
-            if(array_key_exists($stock_code, $product_mappings[$account_code]['SKU'])) {
-                $stock_code = $product_mappings[$account_code]['SKU'][$stock_code];
-                $type = $product_mappings[$account_code]['type'] ?? NULL;
+            foreach($product_mappings[$account_code] as $key => $mapping) {
+                if(is_array($mapping) && array_key_exists($stock_code, $mapping)) {
+                    $stock_code = $mapping[$stock_code];
+                    $type = $key;
+                }
             }
         }
-
 
         return [$stock_code, $type];
     }
