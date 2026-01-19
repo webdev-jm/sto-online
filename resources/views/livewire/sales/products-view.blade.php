@@ -44,7 +44,13 @@
                         <td class="align-middle pl-1">{{$sale->date}}</td>
                         <td class="align-middle text-left">{{$sale->document_number}}</td>
                         <td class="align-middle text-left">[{{$sale->customer->code ?? '-'}}] {{$sale->customer->name ?? '-'}}</td>
-                        <td class="align-middle text-left">{{$sale->salesman->code ?? ''}} - {{$sale->salesman->name ?? ''}}</td>
+                        <td class="align-middle text-left">
+                            @if(!empty($sale->salesman))
+                                {{$sale->salesman->code ?? ''}} - {{$sale->salesman->name ?? ''}}
+                            @else
+                                {{$sale->customer->salesman->code ?? ''}} - {{$sale->customer->salesman->name ?? ''}}
+                            @endif
+                        </td>
                         <td class="align-middle">{{$sale->location->code ?? '-'}}</td>
                         <td class="align-middle">{{$sale->product->stock_code ?? '-'}}</td>
                         <td class="align-middle">{{$sale->product->description ?? '-'}} - {{$sale->product->size ?? '-'}}</td>
