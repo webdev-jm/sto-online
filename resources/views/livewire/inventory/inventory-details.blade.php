@@ -3,6 +3,14 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">INVENTORIES</h3>
+            @can('inventory export')
+                <div class="card-tools">
+                    <a href="{{ route('inventory.export', encrypt($inventory_upload->id)) }}" class="btn btn-success btn-xs">
+                        <i class="fa fa-file-excel"></i>
+                        EXPORT
+                    </a>
+                </div>
+            @endcan
         </div>
         <div class="card-body p-0 table-responsive">
 

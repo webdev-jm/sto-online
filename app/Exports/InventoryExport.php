@@ -2,9 +2,9 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
-
 use Maatwebsite\Excel\Concerns\FromCollection;
+
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithProperties;
@@ -13,12 +13,12 @@ use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class SalesLineExport implements FromCollection, ShouldAutoSize, WithStyles, WithProperties, WithBackgroundColor, WithCustomChunkSize
+class InventoryExport implements FromCollection, ShouldAutoSize, WithStyles, WithProperties, WithBackgroundColor, WithCustomChunkSize
 {
-    public $sales_upload;
+    public $inventory_upload;
 
-    public function __construct($sales_upload) {
-        $this->sales_upload = $sales_upload;
+    public function __construct($inventory_upload) {
+        $this->inventory_upload = $inventory_upload;
     }
 
     public function backgroundColor()
@@ -85,67 +85,37 @@ class SalesLineExport implements FromCollection, ShouldAutoSize, WithStyles, Wit
         // header
         $header = [
             'DATE',
-            'DOCUMENT NUMBER',
-            'CUSTOMER CODE',
-            'CUSTOMER NAME',
-            'ADDRESS',
-            'STREET',
-            'BRGY',
-            'CITY',
-            'PROVINCE',
-            'SALESMAN CODE',
-            'SALESMAN NAME',
-            'CHANNEL CODE',
-            'CHANNEL NAME',
             'LOCATION',
-            'SKU CODE',
+            'PRODUCT CODE',
             'DESCRIPTION',
             'UOM',
-            'QUANTITY',
-            'AMOUNT',
-            'AMOUNT INC. VAT',
+            'INVENTORY',
+            'EXPIRED DATE',
             'TYPE',
         ];
 
         $type_arr = [
-            1 => 'NORMAL',
+            1 => 'REGULAR',
             2 => 'FG',
             3 => 'PROMO'
         ];
 
-        $sales = $this->sales_upload->sales()
-            ->with(['salesman', 'location', 'product', 'customer'])
-            ->get();
-
-        $data = array();
-        foreach($sales as $sale) {
+        $data = [];
+        foreach($this->inventory_upload->inventories as $inventory) {
             $data[] = [
-                $sale->date ?? '',
-                $sale->document_number ?? '',
-                $sale->customer->code ?? '',
-                $sale->customer->name ?? '',
-                $sale->customer->address ?? '',
-                $sale->customer->street ?? '',
-                $sale->customer->brgy ?? '',
-                $sale->customer->city ?? '',
-                $sale->customer->province ?? '',
-                isset($sale->salesman->code) ? $sale->salesman->code : $sale->customer->salesman->code ?? '',
-                isset($sale->salesman->name) ? $sale->salesman->name : $sale->customer->salesman->name ?? '',
-                isset($sale->channel->code) ? $sale->channel->code : $sale->customer->channel->code ?? '',
-                isset($sale->channel->name) ? $sale->channel->name : $sale->customer->channel->name ?? '',
-                $sale->location->code ?? '',
-                $sale->product->stock_code ?? '',
-                $sale->product->description ?? '',
-                $sale->uom ?? '',
-                $sale->quantity ?? '',
-                $sale->amount ?? '',
-                $sale->amount_inc_vat ?? '',
-                $type_arr[$sale->type] ?? '-',
+                $this->inventory_upload->date,
+                $inventory->location ? $inventory->location->code : '',
+                $inventory->product ? $inventory->product->stock_code : '',
+                $inventory->product ? $inventory->product->description : '',
+                $inventory->uom,
+                $inventory->inventory,
+                $inventory->expiry_date ? $inventory->expiry_date : '',
+                $type_arr[$inventory->type] ?? '',
             ];
         }
 
         return new Collection([
-            ['STO ONLINE'],
+            ['STO ONLINE INVENTORY LIST'],
             $header,
             $data,
         ]);

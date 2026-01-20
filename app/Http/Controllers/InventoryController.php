@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Traits\AccountChecker;
 
+use App\Exports\InventoryExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class InventoryController extends Controller
 {
     use AccountChecker;
@@ -165,7 +168,7 @@ class InventoryController extends Controller
     {
         //
     }
-    
+
     public function restore($id) {
         $account_branch = $this->checkBranch();
         if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
@@ -187,5 +190,11 @@ class InventoryController extends Controller
         return back()->with([
             'message_success' => 'Inventory upload by '.$inventory_upload->user->name.' has been restored.'
         ]);
+    }
+
+    public function export($id) {
+        $inventory_upload = InventoryUpload::findOrFail(decrypt($id));
+
+        return Excel::download(new InventoryExport($inventory_upload), 'STO Inventory-'.time().'.xlsx');
     }
 }
