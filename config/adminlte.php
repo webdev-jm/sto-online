@@ -340,6 +340,13 @@ return [
                     'active'    => ['account-branch*']
                 ],
                 [
+                    'text'      => 'Product Mapping',
+                    'url'       => '/product-mapping',
+                    'icon'      => 'fa fa-fw fa-sitemap',
+                    'can'       => 'product mapping access',
+                    'active'    => ['product-mapping*']
+                ],
+                [
                     'text'      => 'Templates',
                     'url'       => '/template',
                     'icon'      => 'fa fa-fw fa-file-excel',
