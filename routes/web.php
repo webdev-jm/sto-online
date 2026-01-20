@@ -23,6 +23,8 @@ use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TemplateConverterControler;
 use App\Http\Controllers\ReturnToVendorController;
+use App\Http\Controllers\ProductMappingController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +80,12 @@ Route::group(['middleware' => 'auth'], function() {
     // TEMPLATE CONVERTER
     Route::group(['middleware' => 'permission:template converter access'], function() {
         Route::get('template-converter', [TemplateConverterControler::class, 'index'])->name('template-converter.index');
+    });
+
+    // PROEDUCT MAPPING
+    Route::group(['middleware' => 'permission:product mapping access'], function() {
+        Route::get('product-mapping', [ProductMappingController::class, 'index'])->name('product-mapping.index');
+        Route::get('product-mapping/{id}/entry', [ProductMappingController::class, 'entry'])->name('product-mapping.entry')->middleware('permission:product mapping entry');
     });
 
     // PURCHASE ORDER
