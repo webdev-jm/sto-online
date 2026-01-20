@@ -106,6 +106,13 @@ class SalesReportExport implements FromCollection, ShouldAutoSize, WithStyles, W
             'PRICE INC VAT',
             'AMOUNT',
             'AMOUNT INC. VAT',
+            'TYPE',
+        ];
+
+        $type_arr = [
+            1 => 'NORMAL',
+            2 => 'FG',
+            3 => 'PROMO'
         ];
 
         $data = array();
@@ -132,7 +139,8 @@ class SalesReportExport implements FromCollection, ShouldAutoSize, WithStyles, W
                 $sale->quantity,
                 $sale->price_inc_vat,
                 $sale->amount,
-                $sale->amount_inc_vat
+                $sale->amount_inc_vat,
+                $type_arr[$sale->type] ?? '-',
             ];
         }
 

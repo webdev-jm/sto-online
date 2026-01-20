@@ -67,6 +67,11 @@
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
+                                    @can('inventory export')
+                                        <a href="{{route('inventory.export', encrypt($inventory->id))}}" class="btn btn-primary btn-xs">
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    @endcan
                                     @can('inventory delete')
                                         <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($inventory->id)}}">
                                             <i class="fa fa-trash"></i>
@@ -84,7 +89,7 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
             {{$inventory_uploads->links()}}

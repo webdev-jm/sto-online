@@ -57,7 +57,9 @@ class Vmi extends Component
             'CAS' => 'CS',
             'CASE' => 'CS',
             'PC' => 'PCS',
-            'PIECES' => 'PCS'
+            'PIECES' => 'PCS',
+            'IB' => 'IN',
+            'PAC' => 'PCK'
         ];
         $uom = $uomMapping[$uom] ?? $uom;
 
@@ -171,7 +173,7 @@ class Vmi extends Component
         //         ->groupBy('product_id', 'uom')
         //         ->get()
         //         ->groupBy('product_id');
-            
+
         //     $data = array();
         //     foreach($inventories as $inventory) {
         //         if(!empty($inventory->total)) {
@@ -179,7 +181,7 @@ class Vmi extends Component
         //             $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
 
         //             $sales_data = $sales->get($inventory->product_id);
-                    
+
         //             $sales_cs_total = 0;
         //             if(!empty($sales_data)) {
         //                 foreach($sales_data as $val) {
@@ -257,7 +259,7 @@ class Vmi extends Component
                         ->groupBy('product_id');
 
                     $sales_data = $sales->get($inventory->product_id);
-                    
+
                     $sales_cs_total = 0;
                     if(!empty($sales_data)) {
                         foreach($sales_data as $val) {
@@ -292,7 +294,7 @@ class Vmi extends Component
             }
 
         }
-        
+
         return view('livewire.reports.vmi')->with([
             'data' => $data,
             'inventories' => $inventories

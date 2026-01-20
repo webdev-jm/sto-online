@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
                 'inventory delete'      => 'Allow user to delete inventory.',
                 'inventory upload'      => 'Allow user to upload inventory data.',
                 'inventory restore'     => 'Allow user to restore inventory.',
+                'inventory export'      => 'Allow user to export inventory data.',
             ],
             'Sales' => [
                 'sales access'      => 'Allow user to access sales list and details',
