@@ -11,7 +11,7 @@
             <h3 class="card-title">UPLOAD SALES DATA</h3>
         </div>
         <div class="card-body">
-            
+
             <div class="row">
                 <div class="col-lg-4">
                     <div class="form-group">
@@ -21,10 +21,10 @@
                         @if(!empty($err_msg))
                             <small class="text-danger">{{$err_msg}}</small>
                         @endif
-                        
+
                     </div>
                 </div>
-                
+
                 @if(!empty($header_err))
                     <div class="col-12 mb-2">
                         <div class="alert alert-danger alert-dismissible">
@@ -91,11 +91,11 @@
 
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">NOTE:</h3>
-            @if(!empty($sales_data))
+            @if(!empty($sales_data) && empty($err_msg))
                 <div class="card-tools" wire:loading.remove >
                     <button class="btn btn-primary btn-sm" wire:click.prevent="saveUpload"><i class="fa fa-save mr-1"></i>Save Data</button>
                 </div>
@@ -167,7 +167,7 @@
                                                 <small class="text-danger">Exists</small>
                                                 @break
                                             @default
-                                                
+
                                         @endswitch
                                     @endif
                                 </td>
@@ -239,7 +239,7 @@
             </div>
         @endif
     </div>
-    
+
     <div class="modal fade" id="customer-modal">
         <div class="modal-dialog modal-lg">
             <livewire:sales.customer-maintenance/>

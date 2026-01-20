@@ -273,6 +273,7 @@ class SalesUpload extends Component
                 $existenceCheckPayload[] = ['doc' => $invoice_number, 'cust_id' => $customer->id, 'prod_id' => $product->id, 'uom' => $rowData['uom'], 'type' => $rowData['type'], 'index' => $index];
             } else {
                 $rowData['check'] = !$customer ? 1 : (!$location ? 2 : 3);
+                $this->err_msg = 'Some data rows have missing references. Please review the data below, and maintain the missing references to proceed.';
             }
             $processedData[$index] = $rowData;
         }
