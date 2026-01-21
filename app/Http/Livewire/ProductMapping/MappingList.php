@@ -4,17 +4,23 @@ namespace App\Http\Livewire\ProductMapping;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 
 use App\Models\ProductMapping;
 use App\Models\SMSProduct;
 
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
+
 class MappingList extends Component
 {
+    use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
     public $account;
     public $mapping_arr;
+    public $upload_file;
 
     public function render()
     {
@@ -92,5 +98,57 @@ class MappingList extends Component
     {
         $key = explode('.', $key)[0];
         $this->saveMapping($key);
+    }
+
+    public function updatedUploadFile()
+    {
+       $this->validate([
+            'upload_file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
+        ]);
+
+        // Generate a unique filename
+        $originalName = $this->upload_file->getClientOriginalName();
+        $filename = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $this->upload_file->getClientOriginalExtension();
+        $path1 = $this->upload_file->storeAs('product-mapping-uploads', $filename);
+        $path = storage_path('app').'/'.$path1;
+
+        $excelSheets = Excel::toArray([], $path);
+
+        $dataRows = array_slice($excelSheets[0], 2);
+
+        foreach($dataRows as $row) {
+            if(!empty($row[0]) && !empty($row[1]) && !empty($row[2])) {
+                $external_stock_code = trim($row[0]);
+                $stock_code = trim($row[1]);
+                $type = trim($row[2]);
+
+                $product = SMSProduct::where('stock_code', $stock_code)->first();
+
+                if(!empty($product)) {
+
+                    $mapping = ProductMapping::where('account_id', $this->account->id)
+                        ->where('external_stock_code', $external_stock_code)
+                        ->first();
+
+                    if(!$mapping) {
+                        $mapping = new ProductMapping();
+                    }
+
+                    $mapping->account_id = $this->account->id;
+                    $mapping->external_stock_code = $external_stock_code;
+                    $mapping->product_id = $product->id;
+                    $mapping->type = $type;
+                    $mapping->save();
+
+                    $this->mapping_arr[] = [
+                        'id' => $mapping->id,
+                        'product_id' => $mapping->product_id,
+                        'external_stock_code' => $mapping->external_stock_code,
+                        'type' => $mapping->type,
+                    ];
+                }
+
+            }
+        }
     }
 }

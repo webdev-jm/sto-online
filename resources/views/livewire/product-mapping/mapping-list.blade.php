@@ -1,7 +1,21 @@
 <div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label for="upload_file">UPLOAD</label>
+                <input type="file" class="form-control" wire:model.live="upload_file">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <p>
+                <a href="{{asset('/templates/product-mapping-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading product mapping data.
+            </p>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title">Product Mapping</h5>
+            <h5 class="card-title">Product Mapping<i class="ml-2 fa fa-spinner fa-spin" wire:loading></i></h5>
             <div class="card-tools">
                 <button class="btn btn-info btn-xs" wire:click.prevent="addRow" wire:loading.attr="disabled">
                     <i class="fa fa-plus" wire:loading.remove></i>
