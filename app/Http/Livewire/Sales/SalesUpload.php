@@ -190,7 +190,7 @@ class SalesUpload extends Component
             }
 
             // SKU MAPPING
-            $mappingResult = $this->productMapping($this->account->account_code, $sku_code);
+            $mappingResult = $this->productMapping($this->account->id, $sku_code);
             $sku_code = $mappingResult[0];
 
             if (!empty($sku_code)) $skuCodes[$sku_code] = true;
@@ -232,7 +232,7 @@ class SalesUpload extends Component
             }
 
             // SKU MAPPING
-            $mappingResult = $this->productMapping($this->account->account_code, $sku_code);
+            $mappingResult = $this->productMapping($this->account->id, $sku_code);
             $sku_code = $mappingResult[0];
             $type = $mappingResult[1] ?? $type;
 
