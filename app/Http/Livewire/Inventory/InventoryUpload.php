@@ -138,7 +138,7 @@ class InventoryUpload extends Component
                 }
 
                 // SKU MAPPING
-                $mappingResult = $this->productMapping($this->account->account_code, $code);
+                $mappingResult = $this->productMapping($this->account->id, $code);
                 $sku_codes[$key] = $mappingResult[0];
             }
 
@@ -172,7 +172,7 @@ class InventoryUpload extends Component
                 }
 
                 // SKU MAPPING
-                $mappingResult = $this->productMapping($this->account->account_code, $sku_code);
+                $mappingResult = $this->productMapping($this->account->id, $sku_code);
                 $sku_code = $mappingResult[0];
                 $type = $mappingResult[1] ?? $type;
 

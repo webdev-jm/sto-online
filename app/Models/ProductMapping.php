@@ -25,6 +25,6 @@ class ProductMapping extends Model
 
     public function product()
     {
-        return $this->belongsTo('App\Models\SMSProduct');
+        return $this->belongsTo('App\Models\SMSProduct', 'product_id', 'id');
     }
 }
