@@ -34,6 +34,7 @@ class MappingList extends Component
 
     public function mount() {
         $mappings = ProductMapping::orderBy('id', 'asc')
+            ->where('account_id', $this->account->id)
             ->get();
 
         if(!empty($mappings->count())) {
