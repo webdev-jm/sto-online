@@ -28,6 +28,9 @@
                 @endforeach
             </div>
         </div>
+        <div class="card-foot">
+            {{ $accounts->links() }}
+        </div>
     </div>
 @stop
 

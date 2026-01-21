@@ -10,7 +10,7 @@ class ProductMappingController extends Controller
 {
     public function index(Request $request) {
         $accounts = Account::orderBy('account_code', 'asc')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('pages.product-mapping.index')->with([
             'accounts' => $accounts,
