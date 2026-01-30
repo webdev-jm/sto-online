@@ -22,6 +22,7 @@ class InventoryResource extends JsonResource
             'id' => $this->id,
             'uom' => $this->uom,
             'inventory' => $this->inventory,
+            'expiry_date' => $this->expiry_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'product' => new ProductResource($this->product),

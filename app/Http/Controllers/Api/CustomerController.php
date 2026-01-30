@@ -18,14 +18,16 @@ use App\Models\Municipality;
 use App\Models\Barangay;
 
 use App\Http\Traits\ApiBranchKeyChecker;
+use App\Http\Traits\ChannelMappingTrait;
 
 class CustomerController extends Controller
 {
     use ApiBranchKeyChecker;
+    use ChannelMappingTrait;
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -40,7 +42,7 @@ class CustomerController extends Controller
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -51,6 +53,9 @@ class CustomerController extends Controller
             'channel_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
+                    $mapping_result = $this->channelMapping($account_branch->account_id, $value);
+                    $value = $mapping_result[0];
+
                     // check if existed
                     $check = Channel::where('code', $value)
                         ->first();
@@ -102,6 +107,9 @@ class CustomerController extends Controller
             return $this->validationError($validator->errors());
         }
 
+        $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
+        $request->channel_code = $mapping_result[0];
+
         $channel = Channel::where('code', $request->channel_code)
             ->first();
         $salesman = Salesman::where('account_branch_id', $account_branch->id)
@@ -113,7 +121,7 @@ class CustomerController extends Controller
         if(!empty($province)) {
             $province_id = $province->id;
         }
-    
+
         $city = Municipality::where('municipality_name', $request->city)->first();
         $city_id = NULL;
         if(!empty($city)) {
@@ -149,7 +157,7 @@ class CustomerController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -163,7 +171,7 @@ class CustomerController extends Controller
         $customer = Customer::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
-        
+
         if(!empty($customer)) {
             return $this->successResponse(new CustomerResource($customer));
         } else {
@@ -173,7 +181,7 @@ class CustomerController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -188,6 +196,9 @@ class CustomerController extends Controller
             'channel_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
+                    $mapping_result = $this->channelMapping($account_branch->account_id, $value);
+                    $value = $mapping_result[0];
+
                     // check if existed
                     $check = Channel::where('code', $value)
                         ->first();
@@ -244,6 +255,10 @@ class CustomerController extends Controller
             ->first();
 
         if(!empty($customer)) {
+
+            $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
+            $request->channel_code = $mapping_result[0];
+
             $channel = Channel::where('code', $request->channel_code)
                 ->first();
             $salesman = Salesman::where('account_branch_id', $account_branch->id)
