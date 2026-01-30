@@ -15,13 +15,16 @@ use App\Models\SMSProduct;
 use App\Http\Resources\InventoryResource;
 use App\Http\Traits\ApiBranchKeyChecker;
 
+use App\Http\Traits\ProductMappingTrait;
+
 class InventoryController extends Controller
 {
     use ApiBranchKeyChecker;
+    use ProductMappingTrait;
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -36,7 +39,7 @@ class InventoryController extends Controller
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -57,8 +60,12 @@ class InventoryController extends Controller
             ],
             'sku_code' => [
                 'required',
-                function($attribute, $value, $fail) {
+                function($attribute, $value, $fail) use($account_branch) {
                     $sku_code = $value;
+
+                    $map_result = $this->mapProductCode($account_branch->account_id, $sku_code);
+                    $sku_code = $map_result[0];
+
                     if(strpos(trim($sku_code ?? ''), '-')) {
                         $sku_arr = explode('-', $sku_code);
                         if($sku_arr[0] == 'FG') { // Free Goods
@@ -109,6 +116,11 @@ class InventoryController extends Controller
         }
 
         $type = 1;
+
+        $map_result = $this->mapProductCode($account_branch->account_id, $request->sku_code);
+        $request->sku_code = $map_result[0];
+        $type = $map_result[1];
+
         if(strpos(trim($request->sku_code ?? ''), '-')) {
             $sku_arr = explode('-', $request->sku_code);
             if($sku_arr[0] == 'FG') { // Free Goods
@@ -161,7 +173,7 @@ class InventoryController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -184,7 +196,7 @@ class InventoryController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
