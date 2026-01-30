@@ -28,11 +28,15 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Jobs\CustomerImportJob;
 use Illuminate\Support\Str;
 
+use App\Http\Traits\ChannelMappingTrait;
+
 class Customer extends Component
 {
     use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
+
+    use ChannelMappingTrait;
 
     public ?array $customer_data = [];
     public $file;
@@ -69,7 +73,7 @@ class Customer extends Component
         // logs
         activity('upload')
         ->log(':causer.name has uploaded customer data on ['.$this->account->short_name.']');
-        
+
         return redirect()->route('customer.index')->with([
             'message_success' => 'Customer data has been added to queue to process.',
             'upload_data' => $upload_data
@@ -165,6 +169,9 @@ class Customer extends Component
                 $street = trim($row[9] ?? '');
                 $postalCode = trim($row[10] ?? '');
 
+                // Map channel code using ChannelMappingTrait
+                [$channel_code, $channel_name_mapped] = $this->channelMapping($this->account->id, $channel_code);
+
                 $customerData = [
                     'code' => $code,
                     'name' => $name,
@@ -228,7 +235,7 @@ class Customer extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
@@ -254,14 +261,14 @@ class Customer extends Component
             'street',
             'postal code',
         ];
-    
+
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
             if (empty($header[$index]) || trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
                 $err++;
             }
         }
-    
+
         return $err;
     }
 

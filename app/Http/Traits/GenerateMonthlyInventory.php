@@ -8,7 +8,7 @@ use App\Models\MonthlyInventory;
 use Illuminate\Support\Facades\DB;
 
 trait GenerateMonthlyInventory {
-    
+
     public function setMonthlyInventory($account_id, $account_branch_id, $year, $month) {
         $inventory_upload = InventoryUpload::with('inventories')
             ->where('account_id', $account_id)
@@ -36,7 +36,7 @@ trait GenerateMonthlyInventory {
                         'account_id' => $account_id,
                         'account_branch_id' => $account_branch_id,
                         'location_id' => $inventory->location_id,
-                        'product_id' => $inventory->product_id, 
+                        'product_id' => $inventory->product_id,
                         'inventory_id' => $inventory->id,
                         'year' => $year,
                         'month' => $month,
@@ -49,7 +49,7 @@ trait GenerateMonthlyInventory {
                         'account_id' => $account_id,
                         'account_branch_id' => $account_branch_id,
                         'location_id' => $inventory->location_id,
-                        'product_id' => $inventory->product_id, 
+                        'product_id' => $inventory->product_id,
                         'inventory_id' => $inventory->id,
                         'year' => $year,
                         'month' => $month,

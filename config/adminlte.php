@@ -347,6 +347,13 @@ return [
                     'active'    => ['product-mapping*']
                 ],
                 [
+                    'text'      => 'Channel Mapping',
+                    'url'       => '/channel-mapping',
+                    'icon'      => 'fa fa-fw fa-sitemap',
+                    'can'       => 'channel mapping access',
+                    'active'    => ['channel-mapping*']
+                ],
+                [
                     'text'      => 'Templates',
                     'url'       => '/template',
                     'icon'      => 'fa fa-fw fa-file-excel',
