@@ -103,7 +103,7 @@ class SalesImportJob implements ShouldQueue
                     if($data['check'] == 0) { // no error
                         $sku_count++;
 
-                        
+
                         if($data['category'] == 1) { // Credit Memo
                             $total_cm_quantity += $data['quantity'];
                             $total_cm_price_vat += $data['price_inc_vat'];
@@ -115,7 +115,7 @@ class SalesImportJob implements ShouldQueue
                             $total_amount += $data['amount'];
                             $total_amount_vat += $data['amount_inc_vat'];
                         }
-                        
+
                         $salesToInsert[] = [
                             'sales_upload_id' => $upload->id,
                             'account_id' => $this->account_id,
@@ -186,11 +186,13 @@ class SalesImportJob implements ShouldQueue
                     }
                 }
 
-                // logs
-                activity('upload')
-                    ->log(':causer.name has uploaded sales data.');
+
             }
 
         }); // End of transaction
+
+        // logs
+        activity('upload')
+            ->log(':causer.name has uploaded sales data.');
     }
 }

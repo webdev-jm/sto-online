@@ -118,6 +118,5 @@ class InventoryImportJob implements ShouldQueue
                 ->log(':causer.name has uploaded inventory data.');
 
         }
-
     }
 }

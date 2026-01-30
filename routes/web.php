@@ -24,7 +24,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TemplateConverterControler;
 use App\Http\Controllers\ReturnToVendorController;
 use App\Http\Controllers\ProductMappingController;
-
+use App\Http\Controllers\ChannelMappingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +85,13 @@ Route::group(['middleware' => 'auth'], function() {
     // PROEDUCT MAPPING
     Route::group(['middleware' => 'permission:product mapping access'], function() {
         Route::get('product-mapping', [ProductMappingController::class, 'index'])->name('product-mapping.index');
-        Route::get('product-mapping/{id}/entry', [ProductMappingController::class, 'entry'])->name('product-mapping.entry')->middleware('permission:product mapping entry');
+        Route::get('product-mapping/{id}/entry', [ProductMappingController::class, 'entry'])->name('product-mapping.entry')->middleware('permission:product mapping create');
+    });
+
+    // CHANNEL MAPPING
+    Route::group(['middleware' => 'permission:channel mapping access'], function() {
+        Route::get('channel-mapping', [ChannelMappingController::class, 'index'])->name('channel-mapping.index');
+        Route::get('channel-mapping/{id}/entry', [ChannelMappingController::class, 'entry'])->name('channel-mapping.entry')->middleware('permission:channel mapping create');
     });
 
     // PURCHASE ORDER

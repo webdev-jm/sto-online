@@ -18,6 +18,10 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions_arr = [
+            'Channel Mapping' => [
+                'channel mapping access' => 'Allow user to access channel mapping list and details.',
+                'channel mapping create' => 'Allow user to add channel mapping.',
+            ],
             'Product Mapping' => [
                 'product mapping access' => 'Allow user to access product mapping list and details.',
                 'product mapping create' => 'Allow user to add product mapping.',
