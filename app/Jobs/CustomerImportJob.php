@@ -52,7 +52,7 @@ class CustomerImportJob implements ShouldQueue
             if ($data['check'] != 0) {
                 continue;
             }
-            
+
             // 3. Prepare data for a single bulk insert. No queries here!
             $customersToInsert[] = [
                 'account_id'        => $this->account_id,
@@ -94,11 +94,10 @@ class CustomerImportJob implements ShouldQueue
 
         // 6. Dispatch the expensive similarity check to a dedicated job.
         // This keeps the import process fast and responsive.
-        // if (!empty($newCustomerIds)) {
-        //     ProcessCustomerUboJob::dispatch($newCustomerIds, $this->account_id, $this->account_branch_id)
-        //         ->onQueue('processing'); // Use a different queue if desired
-        // }
-        
+        if (!empty($newCustomerIds)) {
+            ProcessCustomerUboJob::dispatch($newCustomerIds, $this->account_id, $this->account_branch_id);
+        }
+
         DB::setDefaultConnection(config('database.default'));
     }
 

@@ -18,7 +18,7 @@
     <div class="col-lg-6">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">CUSTOMER DETAILS</h3>
+                <h3 class="card-title">NEW CUSTOMER DETAILS</h3>
                 @can('customer parked validation')
                     <div class="card-tools">
                         <a href="{{route('customer.same-customer', [encrypt($customer->id), $customer_ubo->ubo_id ?? 0])}}" class="btn btn-info btn-sm"><i class="fa fa-clone mr-1"></i>Same Customer</a>
@@ -48,7 +48,7 @@
     <div class="col-lg-6">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">MAIN CUSTOMER</h3>
+                <h3 class="card-title">EXISTING CUSTOMER</h3>
                 @if(!empty($customer_ubo->ubo_id))
                 <div class="card-tools">
                     <label>UBO ID: {{$customer_ubo->ubo_id}}</label>
@@ -75,7 +75,7 @@
             </div>
         </div>
     </div>
-     
+
     {{-- <div class="col-lg-12">
         <div class="card card-outline card-primary">
             <div class="card-header">
