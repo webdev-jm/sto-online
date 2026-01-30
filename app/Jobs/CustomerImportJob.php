@@ -85,18 +85,20 @@ class CustomerImportJob implements ShouldQueue
         Customer::on($connectionName)->insert($customersToInsert);
 
         // 5. Get the IDs of the customers we just created to pass to the next job.
-        $customerCodes = array_column($customersToInsert, 'code');
-        $newCustomerIds = Customer::on($connectionName)
-            ->whereIn('code', $customerCodes)
-            ->where('account_id', $this->account_id)
-            ->pluck('id')
-            ->toArray();
+        // $customerCodes = array_column($customersToInsert, 'code');
+        // $newCustomerIds = Customer::on($connectionName)
+        //     ->whereIn('code', $customerCodes)
+        //     ->where('account_id', $this->account_id)
+        //     ->pluck('id')
+        //     ->toArray();
 
-        // 6. Dispatch the expensive similarity check to a dedicated job.
-        // This keeps the import process fast and responsive.
-        if (!empty($newCustomerIds)) {
-            ProcessCustomerUboJob::dispatch($newCustomerIds, $this->account_id, $this->account_branch_id);
-        }
+        // // 6. Dispatch the expensive similarity check to a dedicated job.
+        // // This keeps the import process fast and responsive.
+        // if (!empty($newCustomerIds)) {
+        //     ProcessCustomerUboJob::dispatch($newCustomerIds, $this->account_id, $this->account_branch_id);
+        // }
+
+        CustomerUboJob::dispatch($this->account_id, $this->account_branch_id);
 
         DB::setDefaultConnection(config('database.default'));
     }
