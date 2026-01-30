@@ -13,9 +13,12 @@ use App\Models\Customer;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
 
+use App\Http\Traits\LevenshteinTrait;
+
 class CustomerUboJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use LevenshteinTrait;
 
     public $account_id;
     public $account_branch_id;
@@ -41,7 +44,9 @@ class CustomerUboJob implements ShouldQueue
         Customer::on($connection)
             ->where('account_id', $this->account_id)
             ->where('account_branch_id', $this->account_branch_id)
+            ->where('status', 0)
             ->doesntHave('ubo')
+            ->doesntHave('ubo_detail')
             ->with('sales') // Eager load sales to avoid N+1 in updateCustomerStatus
             ->chunkById(500, function ($customers) use ($connection, $existingUbos) {
 
@@ -149,15 +154,5 @@ class CustomerUboJob implements ShouldQueue
 
         DB::setDefaultConnection($connectionName);
         return $connectionName;
-    }
-
-    private function checkSimilarity($str1, $str2)
-    {
-        if ($str1 === $str2) return 100;
-        $str1 = strtoupper(str_replace(' ', '', $str1));
-        $str2 = strtoupper(str_replace(' ', '', $str2));
-        $max_length = max(strlen($str1), strlen($str2));
-        if ($max_length == 0) return 100;
-        return (1 - (levenshtein($str1, $str2) / $max_length)) * 100;
     }
 }

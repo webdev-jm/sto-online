@@ -119,7 +119,7 @@ class InventoryController extends Controller
 
         $map_result = $this->mapProductCode($account_branch->account_id, $request->sku_code);
         $request->sku_code = $map_result[0];
-        $type = $map_result[1];
+        $type = $map_result[1] ?? $type;
 
         if(strpos(trim($request->sku_code ?? ''), '-')) {
             $sku_arr = explode('-', $request->sku_code);
@@ -156,7 +156,8 @@ class InventoryController extends Controller
                 'product_id' => $product->id,
                 'type' => $type,
                 'uom' => $request->uom,
-                'inventory' => $request->inventory
+                'inventory' => $request->inventory,
+                'expiry_date' => $request->expiry_date ?? null,
             ]);
             $inventory->save();
 
@@ -221,8 +222,12 @@ class InventoryController extends Controller
             ],
             'sku_code' => [
                 'required',
-                function($attribute, $value, $fail) {
+                function($attribute, $value, $fail) use($account_branch) {
                     $sku_code = $value;
+
+                    $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
+                    $sku_code = $mapping_result[0];
+
                     if(strpos(trim($sku_code ?? ''), '-')) {
                         $sku_arr = explode('-', $sku_code);
                         if($sku_arr[0] == 'FG') { // Free Goods
@@ -262,6 +267,11 @@ class InventoryController extends Controller
         if(!empty($inventory)) {
 
             $type = 1;
+
+            $map_result = $this->mapProductCode($account_branch->account_id, $request->sku_code);
+            $request->sku_code = $map_result[0];
+            $type = $map_result[1] ?? $type;
+
             if(strpos(trim($request->sku_code ?? ''), '-')) {
                 $sku_arr = explode('-', $request->sku_code);
                 if($sku_arr[0] == 'FG') { // Free Goods

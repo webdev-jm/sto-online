@@ -19,13 +19,16 @@ use App\Models\Location;
 use App\Http\Resources\SalesResource;
 use App\Http\Traits\ApiBranchKeyChecker;
 
+use App\Http\Traits\ProductMappingTrait;
+
 class SalesController extends Controller
 {
     use ApiBranchKeyChecker;
-    
+    use ProductMappingTrait;
+
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -48,7 +51,7 @@ class SalesController extends Controller
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -70,8 +73,12 @@ class SalesController extends Controller
             ],
             'sku_code' => [
                 'required',
-                function($attribute, $value, $fail) {
+                function($attribute, $value, $fail) use($account_branch) {
                     $sku_code = $value;
+
+                    $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
+                    $sku_code = $mapping_result[0];
+
                     if(strpos(trim($sku_code ?? ''), '-')) {
                         $sku_arr = explode('-', $sku_code);
                         $sku_code = end($sku_arr);
@@ -148,6 +155,11 @@ class SalesController extends Controller
         }
 
         $type = 1;
+
+        $mapping_result = $this->productMapping($account_branch->account_id, $request->sku_code);
+        $request->sku_code = $mapping_result[0];
+        $type = $mapping_result[1] ?? $type;
+
         if(strpos(trim($request->sku_code ?? ''), '-')) {
             $sku_arr = explode('-', $request->sku_code);
             if($sku_arr[0] == 'FG') { // Free Goods
@@ -246,7 +258,7 @@ class SalesController extends Controller
             'category' => $category
         ]);
         $sale->save();
-        
+
         // check if not FG or PROMO
         if($type == 1) {
             if($category == 1) { // Credit Memo
@@ -285,7 +297,7 @@ class SalesController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -308,7 +320,7 @@ class SalesController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -334,8 +346,12 @@ class SalesController extends Controller
             ],
             'sku_code' => [
                 'required',
-                function($attribute, $value, $fail) {
+                function($attribute, $value, $fail) use($account_branch) {
                     $sku_code = $value;
+
+                    $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
+                    $sku_code = $mapping_result[0];
+
                     if(strpos(trim($sku_code ?? ''), '-')) {
                         $sku_arr = explode('-', $sku_code);
                         $sku_code = end($sku_arr);
@@ -412,6 +428,11 @@ class SalesController extends Controller
         }
 
         $type = 1;
+
+        $mapping_result = $this->productMapping($account_branch->account_id, $request->sku_code);
+        $request->sku_code = $mapping_result[0];
+        $type = $mapping_result[1] ?? $type;
+
         if(strpos(trim($request->sku_code ?? ''), '-')) {
             $sku_arr = explode('-', $request->sku_code);
             if($sku_arr[0] == 'FG') { // Free Goods
@@ -463,12 +484,12 @@ class SalesController extends Controller
 
         if($sale->date != $request->date) {
             DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
-                $account_branch->account_id, $account_branch->id, 
+                $account_branch->account_id, $account_branch->id,
                 date('Y', strtotime($sale->date)),
                 date('n', strtotime($sale->date))
             ]);
         }
-        
+
         if(!empty($sale)) {
             $sales_upload = $sale->sales_upload;
 
@@ -538,8 +559,8 @@ class SalesController extends Controller
             ]);
 
             DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
-                $account_branch->account_id, $account_branch->id, 
-                date('Y', strtotime($request->date)), 
+                $account_branch->account_id, $account_branch->id,
+                date('Y', strtotime($request->date)),
                 date('n', strtotime($request->date))
             ]);
 
