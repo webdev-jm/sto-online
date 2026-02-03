@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Session;
 
 use App\Http\Traits\AccountChecker;
 
+
 class HomeController extends Controller
 {
     use AccountChecker;
@@ -61,9 +62,11 @@ class HomeController extends Controller
 
         return view('home')->with([
             'accounts' => $accounts,
-            'search' => $search
+            'search' => $search,
         ]);
     }
+
+
 
     /**
      * Display the application menu.

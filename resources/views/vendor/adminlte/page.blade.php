@@ -39,7 +39,7 @@
             color: transparent;
         }
         .text-portal {
-            font-family: Helvetica, Arial, sans-serif; 
+            font-family: Helvetica, Arial, sans-serif;
             display: inline-block;
             font-weight: bold;
             background: radial-gradient(circle, rgb(199, 2, 2, 1) 0%, rgba(251, 255, 0, 1) 40%, rgba(55, 0, 255, 1) 70%);
@@ -69,7 +69,7 @@
     <div class="wrapper">
 
         {{-- Preloader Animation --}}
-        @if($layoutHelper->isPreloaderEnabled())
+        @if(config('adminlte.preloader.enabled'))
             @include('adminlte::partials.common.preloader')
         @endif
 
