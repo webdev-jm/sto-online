@@ -4,7 +4,7 @@
             <h3 class="card-title">Activities</h3>
             <div class="card-tools">
                 <div class="form-group-sm">
-                    <input type="text" class="form-control form-control-sm" placeholder="search" wire:model="search">
+                    <input type="text" class="form-control form-control-sm" placeholder="search" wire:model.live="search">
                 </div>
             </div>
         </div>

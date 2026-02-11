@@ -11,7 +11,7 @@
                 </a>
             @else
                 <div class="input-group">
-                    <input type="text" class="form-control form-control-sm" placeholder="Title" wire:model="title">
+                    <input type="text" class="form-control form-control-sm" placeholder="Title" wire:model.live="title">
                     <div class="input-group-append">
                         <button class="input-group-text btn btn-success" wire:click.prevent="saveTemplate">
                             <i class="fa fa-check"></i>

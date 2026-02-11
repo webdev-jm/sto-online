@@ -30,6 +30,7 @@ class Salesman extends Component
     public $perPage = 10;
 
     public $upload_triggered = false;
+    public $page;
 
     public function uploadData() {
         if($this->upload_triggered) {
@@ -80,7 +81,7 @@ class Salesman extends Component
         $path = storage_path('app').'/'.$path1;
         $data = Excel::toArray([], $path)[0];
         $header = $data[0];
-        
+
         $this->reset('salesman_data');
         if($this->checkHeader($header) == 0) {
             $current_salesmen = Sale::where('account_id', $this->account->id)
@@ -113,7 +114,7 @@ class Salesman extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
@@ -125,6 +126,18 @@ class Salesman extends Component
         return $paginator;
     }
 
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
+    }
+
     private function checkHeader($header) {
         $requiredHeaders = [
             'code',
@@ -132,14 +145,14 @@ class Salesman extends Component
             'type of salesman',
             'district code'
         ];
-    
+
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
             if (trim(strtolower($header[$index])) !== strtolower($requiredHeader)) {
                 $err++;
             }
         }
-    
+
         return $err;
     }
 

@@ -47,6 +47,7 @@ Route::middleware(['auth', 'admin'])->group(function() {
     Route::get('generate-ubo/{account_id}/{branch_id}', [CustomerController::class, 'generateUBO']);
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/branches/{id}', [HomeController::class, 'branches'])->name('branches');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 

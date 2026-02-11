@@ -29,7 +29,7 @@ class AssignedAccounts extends Component
 
         $this->form_message = 'Accounts has been assigned.';
 
-        $this->emit('updateBranches');
+        $this->dispatch('updateBranches');
     }
 
     public function selectAll() {

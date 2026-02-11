@@ -17,7 +17,7 @@ class TemplateList extends Component
 
     public function selectTemplate($id) {
         $this->selectedTemplate = UploadTemplate::find($id);
-        $this->emit('selectTemplate', $this->selectedTemplate->id);
+        $this->dispatch('selectTemplate', $this->selectedTemplate->id);
     }
 
     public function saveTemplate() {

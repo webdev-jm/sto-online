@@ -15,7 +15,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="">Upload File</label>
-                        <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model.lazy="file">
+                        <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model.blur="file">
                         <small class="text-danger">{{$errors->first('file')}}</small>
                         @if(!empty($err_msg))
                             <small class="text-danger">{{$err_msg}}</small>
@@ -68,7 +68,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-3">
-                        <input type="date" class="form-control{{$errors->has('inventory_date') ? ' is-invalid' : ''}}" wire:model="inventory_date">
+                        <input type="date" class="form-control{{$errors->has('inventory_date') ? ' is-invalid' : ''}}" wire:model.live="inventory_date">
                     </div>
                 </div>
             </div>

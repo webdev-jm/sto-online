@@ -3,7 +3,7 @@
         <div class="card-header">
             <h3 class="card-title">CUSTOMERS</h3>
             <div class="card-tools">
-                <input type="text" class="form-control form-control-sm" placeholder="Search" wire:model="search">
+                <input type="text" class="form-control form-control-sm" placeholder="Search" wire:model.live="search">
             </div>
         </div>
         <div class="card-body p-0 table-responsive">

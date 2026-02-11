@@ -33,7 +33,7 @@
                         <div class="col-lg-6">
                             <div class="form-group mb-0">
                                 <label for="" class="mb-0">ATTACHMENT</label>
-                                <input type="file" class="form-control form-control-sm{{$errors->has('attachment') ? ' is-invalid' : ''}}" wire:model="attachment">
+                                <input type="file" class="form-control form-control-sm{{$errors->has('attachment') ? ' is-invalid' : ''}}" wire:model.live="attachment">
                                 <small class="text-danger">{{$errors->first('attachment')}}</small>
                             </div>
                         </div>
@@ -56,14 +56,14 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="" class="mb-0">PO NUMBER</label>
-                                <input type="text" class="form-control form-control-sm{{$errors->has('po_number')  ? ' is-invalid' : ''}}" placeholder="PO Number..." wire:model="po_number">
+                                <input type="text" class="form-control form-control-sm{{$errors->has('po_number')  ? ' is-invalid' : ''}}" placeholder="PO Number..." wire:model.live="po_number">
                                 <small class="text-danger">{{$errors->first('po_number')}}</small>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="" class="mb-0">SHIP DATE</label>
-                                <input type="date" class="form-control form-control-sm{{$errors->has('ship_date') ? ' is-invalid' : ''}}" wire:model="ship_date">
+                                <input type="date" class="form-control form-control-sm{{$errors->has('ship_date') ? ' is-invalid' : ''}}" wire:model.live="ship_date">
                                 <small class="text-danger">{{$errors->first('ship_date')}}</small>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="ship_to_name" class="mb-0">SHIP TO NAME</label>
-                                <input type="text" class="form-control form-control-sm{{$errors->has('ship_to_name') ? ' is-invalid' : ''}}" placeholder="Ship to name..." wire:model="ship_to_name">
+                                <input type="text" class="form-control form-control-sm{{$errors->has('ship_to_name') ? ' is-invalid' : ''}}" placeholder="Ship to name..." wire:model.live="ship_to_name">
                                 <small class="text-danger">{{$errors->first('ship_to_name')}}</small>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="ship_to_address" class="mb-0">SHIP TO ADDRESS</label>
-                                <input type="text" class="form-control form-control-sm{{$errors->has('ship_to_address') ? ' is-invalid' : ''}}" placeholder="Ship to address..."wire:model="ship_to_address">
+                                <input type="text" class="form-control form-control-sm{{$errors->has('ship_to_address') ? ' is-invalid' : ''}}" placeholder="Ship to address..."wire:model.live="ship_to_address">
                                 <small class="text-danger">{{$errors->first('ship_to_address')}}</small>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="" class="mb-0">SHIPPING INSTRUCTION</label>
-                                <textarea class="form-control form-control-sm{{$errors->has('shipping_instruction') ? ' is-invalid' : ''}}" placeholder="Shipping instruction" wire:model="shipping_instruction"></textarea>
+                                <textarea class="form-control form-control-sm{{$errors->has('shipping_instruction') ? ' is-invalid' : ''}}" placeholder="Shipping instruction" wire:model.live="shipping_instruction"></textarea>
                                 <small class="text-danger">{{$errors->first('shipping_instruction')}}</small>
                             </div>
                         </div>
@@ -121,7 +121,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="" class="mb-0">BRANDS</label>
-                                <select class="form-control form-control-sm" wire:model="brand_filter">
+                                <select class="form-control form-control-sm" wire:model.live="brand_filter">
                                     <option value="ALL">ALL BRAND</option>
                                     @foreach($brands as $brand)
                                         <option value="{{$brand->brand}}">{{$brand->brand}}</option>
@@ -133,7 +133,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="" class="mb-0">SEARCH</label>
-                                <input type="text" class="form-control form-control-sm" placeholder="Search..." wire:model="search">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search..." wire:model.live="search">
                             </div>
                         </div>
 

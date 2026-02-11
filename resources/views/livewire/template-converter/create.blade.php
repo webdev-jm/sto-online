@@ -9,7 +9,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="">UPLOAD FILE</label>
-                        <input type="file" class="form-control{{$errors->has('file_upload') ? ' is-invalid' : ''}}" wire:model="file_upload">
+                        <input type="file" class="form-control{{$errors->has('file_upload') ? ' is-invalid' : ''}}" wire:model.live="file_upload">
                         <small class="text-danger">{{$errors->first('file_upload')}}</small>
                     </div>
                 </div>

@@ -31,6 +31,7 @@ class Upload extends Component
     public $data;
     public $perPage = 20;
     public $success_msg;
+    public $page;
 
     public function saveData() {
         $this->validate([
@@ -68,7 +69,7 @@ class Upload extends Component
                     ->first();
                 if(empty($product)) {
                     $account_reference = $account_product_references->filter(function($reference) use($val) {
-                            return $reference->account_reference == $val['sku_code'] 
+                            return $reference->account_reference == $val['sku_code']
                             || $reference->account_reference == $val['sku_code_other']
                             || $reference->account_reference == intval($val['sku_code'])
                             || $reference->account_reference == intval($val['sku_code_other']);
@@ -190,7 +191,7 @@ class Upload extends Component
 
     private function processRow($row, &$data, $upload_template, $account_template_fields, $type, $stock_transfers) {
         $customer_code = ''; // Assign or extract $customer_code as required
-    
+
         foreach ($upload_template->fields as $field) {
             $column_name = $field->column_name;
             if($type == 'name') {
@@ -201,7 +202,7 @@ class Upload extends Component
 
             ${$column_name} = $row[$file_column_name] ?? '';
         }
-    
+
         if(!empty($customer_code) && !empty($sku_code)) {
 
             // check for duplicate
@@ -232,7 +233,7 @@ class Upload extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
@@ -244,8 +245,20 @@ class Upload extends Component
         return $paginator;
     }
 
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
+    }
+
     public function mount($account_branch) {
-        $this->account_branch = $account_branch; 
+        $this->account_branch = $account_branch;
         $this->year = date('Y');
         $this->month = date('m');
     }

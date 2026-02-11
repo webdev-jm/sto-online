@@ -11,7 +11,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">YEAR</label>
-                        <input type="number" class="form-control{{$errors->has('year') ? ' is-invalid' : ''}}" wire:model="year">
+                        <input type="number" class="form-control{{$errors->has('year') ? ' is-invalid' : ''}}" wire:model.live="year">
                         <small class="text-danger">{{$errors->first('year')}}</small>
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">MONTH</label>
-                        <input type="number" class="form-control{{$errors->has('month') ? ' is-invalid' : ''}}" wire:model="month">
+                        <input type="number" class="form-control{{$errors->has('month') ? ' is-invalid' : ''}}" wire:model.live="month">
                         <small class="text-danger">{{$errors->first('month')}}</small>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">UPLOAD FILE</label>
-                        <input type="file" class="form-control{{$errors->has('upload_file') ? ' is-invalid' : ''}}" wire:model="upload_file">
+                        <input type="file" class="form-control{{$errors->has('upload_file') ? ' is-invalid' : ''}}" wire:model.live="upload_file">
                         <small class="text-danger">{{$errors->first('upload_file')}}</small>
                     </div>
                 </div>

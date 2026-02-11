@@ -9,7 +9,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="search">Search</label>
-                        <input type="text" class="form-control" placeholder="Search" wire:model="search">
+                        <input type="text" class="form-control" placeholder="Search" wire:model.live="search">
                     </div>
                 </div>
 

@@ -52,6 +52,7 @@ class SalesUpload extends Component
     public $upload_triggered = false;
 
     public $header_err;
+    public $page;
 
     protected $listeners = [
         'checkData' => 'updateData'
@@ -62,13 +63,13 @@ class SalesUpload extends Component
     }
 
     public function maintainCustomer($customer_code) {
-        $this->emit('maintainCustomer', $customer_code);
-        $this->dispatchBrowserEvent('maintainCustomer');
+        $this->dispatch('maintainCustomer', $customer_code);
+        $this->dispatch('maintainCustomer');
     }
 
     public function maintainLocation($location_code) {
-        $this->emit('maintainLocation', $location_code);
-        $this->dispatchBrowserEvent('maintainLocation');
+        $this->dispatch('maintainLocation', $location_code);
+        $this->dispatch('maintainLocation');
     }
 
     public function saveUpload() {
@@ -334,6 +335,18 @@ class SalesUpload extends Component
         );
 
         return $paginator;
+    }
+
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
     }
 
     private function checkHeader($header) {

@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit.prevent="saveCustomer">
+    <form wire:submit="saveCustomer">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Add Customer</h4>
@@ -12,7 +12,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="customer_code">Customer Code</label>
-                            <input type="text" class="form-control{{$errors->has('customer_code') ? ' is-invalid' : ''}}" wire:model="customer_code">
+                            <input type="text" class="form-control{{$errors->has('customer_code') ? ' is-invalid' : ''}}" wire:model.live="customer_code">
                             @error('customer_code')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
@@ -23,7 +23,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="customer_name">Customer Name</label>
-                            <input type="text" class="form-control{{$errors->has('customer_name') ? ' is-invalid' : ''}}" wire:model="customer_name">
+                            <input type="text" class="form-control{{$errors->has('customer_name') ? ' is-invalid' : ''}}" wire:model.live="customer_name">
                             @error('customer_name')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
@@ -34,7 +34,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="salesman">Salesman</label>
-                            <select id="salesman" class="form-control{{$errors->has('salesman_id') ? ' is-invalid' : ''}}" wire:model="salesman_id">
+                            <select id="salesman" class="form-control{{$errors->has('salesman_id') ? ' is-invalid' : ''}}" wire:model.live="salesman_id">
                                 <option value="">- select salesman -</option>
                                 @if(!empty($salesmen))
                                     @foreach($salesmen as $id => $salesman)
@@ -52,7 +52,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="channel_id">Salesman</label>
-                            <select id="channel_id" class="form-control{{$errors->has('channel_id') ? ' is-invalid' : ''}}" wire:model="channel_id">
+                            <select id="channel_id" class="form-control{{$errors->has('channel_id') ? ' is-invalid' : ''}}" wire:model.live="channel_id">
                                 <option value="">- select channels -</option>
                                 @if(!empty($channels))
                                     @foreach($channels as $id => $channel)
@@ -75,7 +75,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="province_id">Province</label>
-                            <select id="province_id" class="form-control{{$errors->has('province_id') ? ' is-invalid' : ''}}" wire:model="province_id">
+                            <select id="province_id" class="form-control{{$errors->has('province_id') ? ' is-invalid' : ''}}" wire:model.live="province_id">
                                 <option value="">- select province -</option>
                                 @if(!empty($provinces))
                                     @foreach($provinces as $id => $province_name)
@@ -95,7 +95,7 @@
                             @if(empty($province_id))
                                 <input type="text" class="form-control{{$errors->has('city_id') ? ' is-invalid' : ''}}" disabled>
                             @else
-                                <select id="city_id" class="form-control{{$errors->has('city_id') ? ' is-invalid' : ''}}" wire:model="city_id">
+                                <select id="city_id" class="form-control{{$errors->has('city_id') ? ' is-invalid' : ''}}" wire:model.live="city_id">
                                     <option value="">- select city -</option>
                                     @if(!empty($cities))
                                         @foreach($cities as $id => $city_name)
@@ -116,7 +116,7 @@
                             @if(empty($city_id))
                                 <input type="text" class="form-control{{$errors->has('barangay_id') ? ' is-invalid' : ''}}" disabled>
                             @else
-                                <select id="barangay_id" class="form-control{{$errors->has('barangay_id') ? ' is-invalid' : ''}}" wire:model="barangay_id">
+                                <select id="barangay_id" class="form-control{{$errors->has('barangay_id') ? ' is-invalid' : ''}}" wire:model.live="barangay_id">
                                     <option value="">- select barangay -</option>
                                     @if(!empty($barangays))
                                         @foreach($barangays as $id => $barangay_name)
@@ -134,7 +134,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="">Street</label>
-                            <input type="text" class="form-control{{$errors->has('street') ? ' is-invalid' : ''}}" wire:model="street">
+                            <input type="text" class="form-control{{$errors->has('street') ? ' is-invalid' : ''}}" wire:model.live="street">
                             @error('street')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
@@ -144,7 +144,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="customer_address">Address</label>
-                            <input type="text" class="form-control{{$errors->has('customer_address') ? ' is-invalid' : ''}}" wire:model="customer_address">
+                            <input type="text" class="form-control{{$errors->has('customer_address') ? ' is-invalid' : ''}}" wire:model.live="customer_address">
                             @error('customer_address')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
@@ -154,7 +154,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="postal_code">Postal Code</label>
-                            <input type="text" class="form-control{{$errors->has('postal_code') ? ' is-invalid' : ''}}" wire:model="postal_code">
+                            <input type="text" class="form-control{{$errors->has('postal_code') ? ' is-invalid' : ''}}" wire:model.live="postal_code">
                             @error('postal_code')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror

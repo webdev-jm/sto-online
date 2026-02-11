@@ -15,10 +15,19 @@ use Illuminate\Support\Facades\Session;
 
 use App\Http\Traits\AccountChecker;
 
+use Gemini\Laravel\Facades\Gemini;
+use Gemini\Data\Content;
+use Gemini\Enums\MimeType;
+use Gemini\Data\UploadedFile;
+use Gemini\Enums\Role;
+use Illuminate\Support\Facades\File;
+
+use App\Http\Traits\ConsolidateAccountData;
 
 class HomeController extends Controller
 {
     use AccountChecker;
+    use ConsolidateAccountData;
 
     /**
      * Create a new controller instance.
@@ -66,7 +75,65 @@ class HomeController extends Controller
         ]);
     }
 
+    public function dashboard() {
+        // $result = $this->startTenantConversation();
 
+        return view('dashboard');
+    }
+
+    private function waitForFile($geminiFile) {
+        $attempts = 0;
+        do {
+            sleep(3);
+            $geminiFile = Gemini::files()->metadataGet($geminiFile->uri);
+            $state = strtolower($geminiFile->state->name ?? (string)$geminiFile->state);
+            $attempts++;
+        } while ($state !== 'active' && $attempts < 15);
+    }
+
+    public function startTenantConversation() {
+        // $response = Gemini::models()->list();
+
+        // dd($response);
+
+        set_time_limit(600);
+        ini_set('memory_limit', '512M');
+
+        $accounts = Account::get();
+        $miniSummaries = [];
+        foreach($accounts as $account) {
+            $jsonPath = storage_path('app/reports/consolidated_account_data-'.$account->account_code.'.json');
+
+            if (!file_exists($jsonPath)) continue;
+
+            // upload
+            $file = Gemini::files()->upload(
+                filename: $jsonPath,
+                mimeType: MimeType::TEXT_PLAIN
+            );
+            $this->waitForFile($file);
+
+            $accountSummary = Gemini::generativeModel(model: 'gemini-2.5-flash')
+            ->generateContent([
+                "Analyze this specific account data and provide a concise 5-bullet summary of performance.",
+                new UploadedFile(fileUri: $file->uri, mimeType: MimeType::TEXT_PLAIN)
+            ]);
+
+            $miniSummaries[] = "Account: {$account->account_code}\n" . $accountSummary->text();
+
+            // Optional: Clean up file to save storage space
+            Gemini::files()->delete($file->uri);
+        }
+
+        $finalPrompt = "You are a BI Analyst. Below are summaries for several accounts.
+                    Combine them into a single Consolidated Performance Summary and Global Overview: \n\n"
+                    . implode("\n---\n", $miniSummaries);
+
+        $response = Gemini::generativeModel(model: 'gemini-2.5-flash')
+            ->generateContent($finalPrompt);
+
+        return $response->text();
+    }
 
     /**
      * Display the application menu.

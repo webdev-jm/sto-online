@@ -10,21 +10,21 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">YEAR</label>
-                        <input type="number" class="form-control" placeholder="Year" wire:model="year">
+                        <input type="number" class="form-control" placeholder="Year" wire:model.live="year">
                     </div>
                 </div>
 
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">MONTH</label>
-                        <input type="number" class="form-control" placeholder="Month" wire:model="month">
+                        <input type="number" class="form-control" placeholder="Month" wire:model.live="month">
                     </div>
                 </div>
 
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label for="">UPLOAD FILE</label>
-                        <input type="file" class="form-control" wire:model="upload_file">
+                        <input type="file" class="form-control" wire:model.live="upload_file">
                     </div>
                 </div>
 

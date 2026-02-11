@@ -14,12 +14,6 @@
 
 @section('content')
     <livewire:reports.sto/>
-
-    <div class="card">
-        <div class="card-body">
-            <pre>{{ $response ?? '' }}</pre>
-        </div>
-    </div>
 @stop
 
 @section('css')

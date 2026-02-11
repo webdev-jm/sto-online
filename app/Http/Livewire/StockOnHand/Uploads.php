@@ -31,6 +31,7 @@ class Uploads extends Component
     public $perPage = 20;
     public $year, $month;
     public $success_msg;
+    public $page;
 
     public function save() {
         $this->validate([
@@ -192,7 +193,7 @@ class Uploads extends Component
 
     private function processRow($row, &$data, $upload_template, $account_template_fields, $type, $existing_data) {
         $customer_code = ''; // Assign or extract $customer_code as required
-    
+
         foreach ($upload_template->fields as $field) {
             $column_name = $field->column_name;
             if($type == 'name') {
@@ -203,7 +204,7 @@ class Uploads extends Component
 
             ${$column_name} = $row[$file_column_name] ?? NULL;
         }
-    
+
         if(!empty($customer_code) && $inventory > 0) {
 
             // check for duplicates
@@ -224,7 +225,7 @@ class Uploads extends Component
                     'inventory' => $inventory,
                 ];
             }
-            
+
         }
     }
 
@@ -234,7 +235,7 @@ class Uploads extends Component
         $items = collect($data);
         $offset = ($currentPage - 1) * $perPage;
         $itemsForCurrentPage = $items->slice($offset, $perPage);
-        
+
         $paginator = new LengthAwarePaginator(
             $itemsForCurrentPage,
             $items->count(),
@@ -244,6 +245,18 @@ class Uploads extends Component
         );
 
         return $paginator;
+    }
+
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
     }
 
     public function mount($account_branch) {

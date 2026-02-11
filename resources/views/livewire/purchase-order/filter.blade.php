@@ -17,7 +17,7 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="date-type">DATE TYPE</label>
-                            <select id="date-type" class="form-control form-control-sm" wire:model="filters.date_type">
+                            <select id="date-type" class="form-control form-control-sm" wire:model.live="filters.date_type">
                                 <option value="">-SELECT TYPE-</option>
                                 <option value="order_date">ORDER DATE</option>
                                 <option value="ship_date">SHIP DATE</option>
@@ -29,14 +29,14 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="from">FROM</label>
-                            <input type="date" id="from" class="form-control form-control-sm" wire:model="filters.from">
+                            <input type="date" id="from" class="form-control form-control-sm" wire:model.live="filters.from">
                         </div>
                     </div>
 
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="to">TO</label>
-                            <input type="date" id="to" class="form-control form-control-sm" wire:model="filters.to">
+                            <input type="date" id="to" class="form-control form-control-sm" wire:model.live="filters.to">
                         </div>
                     </div>
 
