@@ -87,9 +87,9 @@ class CustomerMaintenance extends Component
         ]);
         $customer->save();
 
-        $this->emit('checkData');
+        $this->dispatch('checkData');
 
-        $this->dispatchBrowserEvent('closeCustomerModal');
+        $this->dispatch('closeCustomerModal');
 
         $this->reset([
             'customer_code',

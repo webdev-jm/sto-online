@@ -11,7 +11,7 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label for="" class="mb-0">UPLOAD FILE/S</label>
-                        <input type="file" class="form-control{{$errors->has('upload_files') ? ' is-invalid' : ''}}" wire:model="upload_files" multiple>
+                        <input type="file" class="form-control{{$errors->has('upload_files') ? ' is-invalid' : ''}}" wire:model.live="upload_files" multiple>
                         <small class="text-danger">{{$errors->first('upload_files')}}</small>
                     </div>
                 </div>

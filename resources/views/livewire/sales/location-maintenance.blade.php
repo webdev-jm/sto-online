@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit.prevent="saveLocation">
+    <form wire:submit="saveLocation">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Add Location</h4>
@@ -12,7 +12,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="location_code">Location Code</label>
-                            <input type="text" class="form-control{{$errors->has('location_code') ? ' is-invalid' : ''}}" wire:model="location_code">
+                            <input type="text" class="form-control{{$errors->has('location_code') ? ' is-invalid' : ''}}" wire:model.live="location_code">
                             @error('location_code')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
@@ -23,7 +23,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label for="location_name">Location Name</label>
-                            <input type="text" class="form-control{{$errors->has('location_name') ? ' is-invalid' : ''}}" wire:model="location_name">
+                            <input type="text" class="form-control{{$errors->has('location_name') ? ' is-invalid' : ''}}" wire:model.live="location_name">
                             @error('location_name')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror

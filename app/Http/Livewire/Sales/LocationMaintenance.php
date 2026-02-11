@@ -37,9 +37,9 @@ class LocationMaintenance extends Component
         ]);
         $location->save();
 
-        $this->emit('checkData');
+        $this->dispatch('checkData');
 
-        $this->dispatchBrowserEvent('closeLocationModal');
+        $this->dispatch('closeLocationModal');
 
         $this->reset([
             'location_code',

@@ -18,25 +18,25 @@
                     @foreach($products as $key => $product)
                         <tr>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.sku_code">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.sku_code">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.other_sku_code">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.other_sku_code">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.description">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.description">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.uom">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.uom">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.quantity">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.quantity">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.cost">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.cost">
                             </td>
                             <td class="p-0">
-                                <input type="text" class="form-control border-0" wire:model="products.{{$key}}.remarks">
+                                <input type="text" class="form-control border-0" wire:model.live="products.{{$key}}.remarks">
                             </td>
                             <td class="p-0 text-center align-middle">
                                 <button class="btn btn-danger btn-xs" wire:click.prevent="removeLine({{$key}})">

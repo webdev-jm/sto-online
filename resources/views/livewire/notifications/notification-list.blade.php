@@ -27,7 +27,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">SUBJECT</label>
-                                    <input type="text" class="form-control form-control-sm{{$errors->has('subject') ? ' is-invalid' : ''}}" wire:model="subject">
+                                    <input type="text" class="form-control form-control-sm{{$errors->has('subject') ? ' is-invalid' : ''}}" wire:model.live="subject">
                                     <small class="text-danger">{{$errors->first('subject')}}</small>
                                 </div>
                             </div>
@@ -35,7 +35,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">FROM EMAIL</label>
-                                    <input type="text" class="form-control form-control-sm{{$errors->has('from_email') ? ' is-invalid' : ''}}" wire:model="from_email">
+                                    <input type="text" class="form-control form-control-sm{{$errors->has('from_email') ? ' is-invalid' : ''}}" wire:model.live="from_email">
                                     <small class="text-danger">{{$errors->first('from_email')}}</small>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">FROM NAME</label>
-                                    <input type="text" class="form-control form-control-sm{{$errors->has('from_name') ? ' is-invalid' : ''}}" wire:model="from_name">
+                                    <input type="text" class="form-control form-control-sm{{$errors->has('from_name') ? ' is-invalid' : ''}}" wire:model.live="from_name">
                                     <small class="text-danger">{{$errors->first('from_name')}}</small>
                                 </div>
                             </div>
@@ -51,7 +51,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="mb-0">MESSAGE</label>
-                                    <textarea class="form-control form-control-sm{{$errors->has('message') ? ' is-invalid' : ''}}" wire:model="message"></textarea>
+                                    <textarea class="form-control form-control-sm{{$errors->has('message') ? ' is-invalid' : ''}}" wire:model.live="message"></textarea>
                                     <small class="text-danger">{{$errors->first('message')}}</small>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">LINK NAME</label>
-                                    <input type="text" class="form-control form-control-sm{{$errors->has('link_name') ? ' is-invalid' : ''}}" wire:model="link_name">
+                                    <input type="text" class="form-control form-control-sm{{$errors->has('link_name') ? ' is-invalid' : ''}}" wire:model.live="link_name">
                                     <small class="text-danger">{{$errors->first('link_name')}}</small>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">LINK URL</label>
-                                    <input type="text" class="form-control form-control-sm{{$errors->has('link_url') ? ' is-invalid' : ''}}" wire:model="link_url">
+                                    <input type="text" class="form-control form-control-sm{{$errors->has('link_url') ? ' is-invalid' : ''}}" wire:model.live="link_url">
                                     <small class="text-danger">{{$errors->first('link_url')}}</small>
                                 </div>
                             </div>

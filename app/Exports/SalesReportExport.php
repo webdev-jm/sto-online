@@ -10,10 +10,12 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithBackgroundColor;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class SalesReportExport implements FromCollection, ShouldAutoSize, WithStyles, WithProperties, WithBackgroundColor, WithCustomChunkSize
+class SalesReportExport implements FromCollection, ShouldAutoSize, WithStyles, WithProperties, WithBackgroundColor, WithCustomChunkSize, WithEvents
 {
     public $sales;
 
@@ -75,6 +77,16 @@ class SalesReportExport implements FromCollection, ShouldAutoSize, WithStyles, W
     public function chunkSize(): int
     {
         return 500;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                // This disables the calculation engine for the entire sheet
+                $event->sheet->getDelegate()->getParent()->getCalculationEngine()->setCalculationCacheEnabled(false);
+            },
+        ];
     }
 
     /**

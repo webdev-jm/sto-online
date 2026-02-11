@@ -33,6 +33,7 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
                         p.core_group as brand_classification,
                         p.brand,
                         p.category,
+                        s.uom,
                         SUM(IF(s.category = 0 AND s.type = 1, s.quantity, NULL)) as quantity,
                         SUM(IF(s.category = 0 AND s.type = 1, s.amount_inc_vat, NULL)) as sales,
                         SUM(IF(s.category = 0 AND s.type = 2, s.quantity, NULL)) as fg_quantity,
@@ -59,7 +60,7 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
                         AND
                             s.deleted_at IS NULL
                     GROUP BY
-                        account_id, account_branch_id, customer_id, year, month, p.id, p.stock_code, p.description, p.size, brand_classification, brand, category;
+                        account_id, account_branch_id, customer_id, year, month, p.id, p.stock_code, p.description, p.size, brand_classification, brand, category, uom;
             END
         ');
     }

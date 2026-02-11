@@ -5,11 +5,11 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="submitForm" autocomplete="off">
+    <form wire:submit="submitForm" autocomplete="off">
         <div class="form-group row">
             <label for="current" class="col-sm-3 col-form-label">Current Password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control @error('current_password') is-invalid @enderror" placeholder="Current Password" wire:model.lazy="current_password">
+                <input type="password" class="form-control @error('current_password') is-invalid @enderror" placeholder="Current Password" wire:model.blur="current_password">
                 @error('current_password')
                     <p class="text-danger">{{$message}}</p>
                 @enderror
@@ -21,7 +21,7 @@
         <div class="form-group row">
             <label for="new" class="col-sm-3 col-form-label">New Password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control @error('password') is-invalid @enderror" placeholder="New Password" wire:model.lazy="password">
+                <input type="password" class="form-control @error('password') is-invalid @enderror" placeholder="New Password" wire:model.blur="password">
                 @error('password')
                     <p class="text-danger">{{$message}}</p>
                 @enderror
@@ -30,7 +30,7 @@
         <div class="form-group row">
             <label for="confirm" class="col-sm-3 col-form-label">Confirm Password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control @error('password') is-invalid @enderror" placeholder="Confirm Password" wire:model.lazy="password_confirmation">
+                <input type="password" class="form-control @error('password') is-invalid @enderror" placeholder="Confirm Password" wire:model.blur="password_confirmation">
                 @error('password')
                     <p class="text-danger">{{$message}}</p>
                 @enderror

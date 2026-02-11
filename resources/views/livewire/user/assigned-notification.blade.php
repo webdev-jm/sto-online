@@ -31,7 +31,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>NOTIFICATION</label>
-                                    <select class="form-control form-control-sm{{$errors->has('notification_id') ? ' is-invalid' : ''}}" wire:model="notification_id">
+                                    <select class="form-control form-control-sm{{$errors->has('notification_id') ? ' is-invalid' : ''}}" wire:model.live="notification_id">
                                         <option value="">SELECT NOTIFICATION</option>
                                         @foreach($notifications as $notification)
                                             <option value="{{$notification->id}}">{{$notification->subject}}</option>
@@ -44,7 +44,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>FREQUENCY</label>
-                                    <select class="form-control form-control-sm{{$errors->has('frequency_id') ? ' is-invalid' : ''}}" wire:model="frequency_id">
+                                    <select class="form-control form-control-sm{{$errors->has('frequency_id') ? ' is-invalid' : ''}}" wire:model.live="frequency_id">
                                         <option value="">SELECT FREQUENCY</option>
                                         @foreach($frequencies as $frequency)
                                             <option value="{{$frequency->id}}">{{$frequency->type}} - {{$frequency->time}} - {{$frequency->day}}</option>

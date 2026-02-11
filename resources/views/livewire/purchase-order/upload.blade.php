@@ -6,13 +6,13 @@
             </div>
         </div>
         <div class="card-body">
-            <form wire:submit.prevent="checkUploads">
+            <form wire:submit="checkUploads">
                 @csrf
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
                             <strong>MAX 100 FILES</strong>
-                            <input type="file" class="form-control" id="file-upload-form" wire:model="files" multiple>
+                            <input type="file" class="form-control" id="file-upload-form" wire:model.live="files" multiple>
                             <p class="text-danger">{{$errors->first('files')}}</p>
                             <span wire:loading wire:target="files">Uploading...</span>
                         </div>

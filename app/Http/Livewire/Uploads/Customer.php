@@ -24,6 +24,8 @@ use App\Models\Province;
 use App\Models\Region;
 
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
 use App\Jobs\CustomerImportJob;
 use Illuminate\Support\Str;
@@ -47,6 +49,7 @@ class Customer extends Component
     public $perPage = 10;
 
     public $upload_triggered = false;
+    public $page;
 
     public function uploadData() {
         // avoid duplicate uploads
@@ -80,7 +83,7 @@ class Customer extends Component
         ]);
     }
 
-    public function updatedFile(): void
+    public function updatedFile()
     {
         $this->validate([
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
@@ -97,7 +100,7 @@ class Customer extends Component
             'err_msg'
         ]);
 
-        $excelSheets = Excel::toArray([], $path);
+        $excelSheets = Excel::toArray(new class implements WithCalculatedFormulas, SkipsEmptyRows {}, $path);
 
         if (empty($excelSheets) || empty($excelSheets[0])) {
             $this->err_msg = 'The Excel file is empty or the first sheet is missing.';
@@ -245,6 +248,18 @@ class Customer extends Component
         );
 
         return $paginator;
+    }
+
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
     }
 
     private function checkHeader($header) {

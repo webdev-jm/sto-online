@@ -9,14 +9,14 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="date_from">DATE FROM</label>
-                        <input type="date" class="form-control" wire:model="date_from">
+                        <input type="date" class="form-control" wire:model.live="date_from">
                     </div>
                 </div>
 
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="date_to">DATE TO</label>
-                        <input type="date" class="form-control" wire:model="date_to">
+                        <input type="date" class="form-control" wire:model.live="date_to">
                     </div>
                 </div>
             </div>

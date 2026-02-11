@@ -16,7 +16,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">TEMPLATE</label>
-                        <select class="form-control{{$errors->has('template_id') ? ' is-invalid' : ''}}" wire:model="template_id">
+                        <select class="form-control{{$errors->has('template_id') ? ' is-invalid' : ''}}" wire:model.live="template_id">
                             <option value="" selected>- SELECT -</option>
                             @foreach($templates as $template)
                                 <option value="{{$template->id}}">{{$template->title}}</option>
@@ -29,7 +29,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">START ROW</label>
-                        <input type="number" class="form-control{{$errors->has('start_row') ? ' is-invalid' : ''}}" wire:model="start_row">
+                        <input type="number" class="form-control{{$errors->has('start_row') ? ' is-invalid' : ''}}" wire:model.live="start_row">
                         <small class="text-danger">{{$errors->first('start_row')}}</small>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="">COLUMN TYPE</label>
-                        <select class="form-control{{$errors->has('column_type') ? ' is-invalid' : ''}}" wire:model="column_type">
+                        <select class="form-control{{$errors->has('column_type') ? ' is-invalid' : ''}}" wire:model.live="column_type">
                             <option value="" selected>- SELECT -</option>
                             <option value="name">COLUMN NAME</option>
                             <option value="number">COLUMN NUMBER</option>

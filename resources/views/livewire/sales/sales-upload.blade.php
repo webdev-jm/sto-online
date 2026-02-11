@@ -16,7 +16,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="">Upload File</label>
-                        <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model.lazy="file">
+                        <input type="file" class="form-control{{!empty($err_msg) ? ' is-invalid' : ''}}" wire:model.blur="file">
                         <small class="text-danger">{{$errors->first('file')}}</small>
                         @if(!empty($err_msg))
                             <small class="text-danger">{{$err_msg}}</small>

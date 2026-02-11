@@ -5,10 +5,10 @@
             <div class="card-tools">
                 <div class="row">
                     <div class="col">
-                        <input type="number" class="form-control form-control-sm" wire:model="year" placeholder="Year">
+                        <input type="number" class="form-control form-control-sm" wire:model.live="year" placeholder="Year">
                     </div>
                     <div class="col">
-                        <input type="number" class="form-control form-control-sm" wire:model="month" placeholder="Month">
+                        <input type="number" class="form-control form-control-sm" wire:model.live="month" placeholder="Month">
                     </div>
                 </div>
             </div>
@@ -19,7 +19,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Search</label>
-                        <input type="text" class="form-control" placeholder="Search" wire:model="search">
+                        <input type="text" class="form-control" placeholder="Search" wire:model.live="search">
                     </div>
                 </div>
 

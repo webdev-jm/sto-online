@@ -24,7 +24,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">TYPE</label>
-                                    <select class="form-control form-control-sm{{$errors->has('type') ? ' is-invalid' : ''}}" wire:model="type">
+                                    <select class="form-control form-control-sm{{$errors->has('type') ? ' is-invalid' : ''}}" wire:model.live="type">
                                         <option value="daily">DAILY</option>
                                         <option value="weekly">WEEKLY</option>
                                         <option value="monthly">MONTHLY</option>
@@ -36,7 +36,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">TIME</label>
-                                    <input type="time" class="form-control form-control-sm{{$errors->has('time') ? ' is-invalid' : ''}}" wire:model="time">
+                                    <input type="time" class="form-control form-control-sm{{$errors->has('time') ? ' is-invalid' : ''}}" wire:model.live="time">
                                     <small class="text-danger">{{$errors->first('time')}}</small>
                                 </div>
                             </div>
@@ -44,7 +44,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="mb-0">DAY</label>
-                                    <input type="number" class="form-control form-control-sm{{$errors->has('day') ? ' is-invalid' : ''}}" wire:model="day">
+                                    <input type="number" class="form-control form-control-sm{{$errors->has('day') ? ' is-invalid' : ''}}" wire:model.live="day">
                                 </div>
                                 <small class="text-danger">{{$errors->first('day')}}</small>
                             </div>

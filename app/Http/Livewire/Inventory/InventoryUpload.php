@@ -48,6 +48,7 @@ class InventoryUpload extends Component
     public $perPage = 20;
 
     public $upload_triggered = false;
+    public $page;
 
     public function uploadData() {
         if(!empty($this->inventory_data)) {
@@ -261,6 +262,7 @@ class InventoryUpload extends Component
         return $err;
     }
 
+
     private function paginateArray($data, $perPage) {
         $currentPage = $this->page ?: 1;
         $items = collect($data);
@@ -276,6 +278,18 @@ class InventoryUpload extends Component
         );
 
         return $paginator;
+    }
+
+    public function gotoPage($page, $el) {
+        $this->page = $page;
+    }
+
+    public function previousPage($el) {
+        $this->page--;
+    }
+
+    public function nextPage($el) {
+        $this->page++;
     }
 
     public function mount() {

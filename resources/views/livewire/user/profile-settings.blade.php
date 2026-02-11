@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit.prevent="saveSettings">
+    <form wire:submit="saveSettings">
         <div class="row">
             
             <div class="col-lg-6">
@@ -14,7 +14,7 @@
                     <label>Profile Picture</label>
                     <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" wire:model="profile_picture">
+                            <input type="file" class="custom-file-input" wire:model.live="profile_picture">
                             <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                     <label>Signature</label>
                     <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" wire:model="user_signature">
+                            <input type="file" class="custom-file-input" wire:model.live="user_signature">
                             <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                         </div>
                     </div>

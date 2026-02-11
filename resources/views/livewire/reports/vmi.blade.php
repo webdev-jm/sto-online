@@ -12,28 +12,28 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="year">YEAR</label>
-                        <input type="number" class="form-control" wire:model="year">
+                        <input type="number" class="form-control" wire:model.live="year">
                     </div>
                 </div>
 
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="month">MONTH</label>
-                        <input type="number" class="form-control" wire:model="month">
+                        <input type="number" class="form-control" wire:model.live="month">
                     </div>
                 </div>
 
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="parameter">PARAMETER</label>
-                        <input type="number" class="form-control" wire:model="parameter" max="12" min="1">
+                        <input type="number" class="form-control" wire:model.live="parameter" max="12" min="1">
                     </div>
                 </div>
 
                 {{-- <div class="col-lg-3">
                     <div class="form-group">
                         <label for="months">MONTHS (AVG.)</label>
-                        <select id="months" class="form-control" wire:model="month_param">
+                        <select id="months" class="form-control" wire:model.live="month_param">
                             @foreach($months_arr as $key => $val)
                                 <option value="{{$key}}">{{$val}}</option>
                             @endforeach
@@ -49,7 +49,7 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="search">SEARCH</label>
-                        <input type="text" class="form-control" wire:model="search" placeholder="Search">
+                        <input type="text" class="form-control" wire:model.live="search" placeholder="Search">
                     </div>
                 </div>
             </div>
