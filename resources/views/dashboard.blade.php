@@ -10,23 +10,41 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">REPORTS</h3>
+            <div class="card-tools">
+                <button class="btn btn-xs btn-success">
+                    EXCEL
+                </button>
+                <button class="btn btn-xs btn-warning">
+                    JSON
+                </button>
+                <button class="btn btn-xs btn-danger">
+                    XML
+                </button>
+            </div>
         </div>
         <div class="card-body">
-
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="year">YEAR</label>
+                        <input type="number" id="year" class="form-control form-control-sm" value="{{ date('Y') }}" class="form-contol form-control-sm">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-6">
-            <livewire:dashboard.reports.sales-performance />
+            {{-- <livewire:dashboard.reports.sales-performance /> --}}
         </div>
 
         <div class="col-lg-6">
-            <livewire:dashboard.reports.sales-volume />
+            {{-- <livewire:dashboard.reports.sales-volume /> --}}
         </div>
 
         <div class="col-lg-6">
-            <livewire:dashboard.reports.sales-sku />
+            {{-- <livewire:dashboard.reports.sales-sku /> --}}
         </div>
 
         <div class="col-lg-6">
@@ -35,7 +53,7 @@
                     <h3 class="card-title">TOP SKU BASED ON SALES</h3>
                 </div>
                 <div class="card-body">
-
+                    <livewire:dashboard.reports.sales-sku-total />
                 </div>
             </div>
         </div>

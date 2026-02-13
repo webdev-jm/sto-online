@@ -26,6 +26,7 @@ class CreateSalesReport extends Migration
             $table->string('brand_classification')->nullable();
             $table->string('brand')->nullable();
             $table->string('category')->nullable();
+            $table->string('uom')->nullable();
             $table->integer('quantity')->nullable();
             $table->decimal('sales', 10, 2)->nullable();
             $table->integer('fg_quantity')->nullable();

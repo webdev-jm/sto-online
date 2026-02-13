@@ -11,7 +11,7 @@ trait ConsolidateAccountData
 
     public function setConsolidatedAccountData()
     {
-        $accounts = Account::all();
+        $accounts = Account::where('id', '>=', '10')->get();
         foreach($accounts as $account) {
             $allConsolidatedData = $this->consolidateAccountData($account);
 
@@ -47,6 +47,7 @@ trait ConsolidateAccountData
                 'brand_classification',
                 'brand',
                 'category',
+                'uom',
                 'quantity',
                 'sales',
                 'fg_quantity',

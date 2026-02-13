@@ -12,8 +12,11 @@ use App\Models\Sale;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+use App\Http\Traits\UomConversionTrait;
+
 class Vmi extends Component
 {
+    use UomConversionTrait;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
@@ -48,69 +51,6 @@ class Vmi extends Component
 
         $this->parameter = 4;
         $this->month_param = 1;
-    }
-
-    private function csConversion($product, $uom, $quantity) {
-        // Normalize UOM to standard codes
-        $uom = trim(strtoupper($uom));
-        $uomMapping = [
-            'CAS' => 'CS',
-            'CASE' => 'CS',
-            'PC' => 'PCS',
-            'PIECES' => 'PCS',
-            'IB' => 'IN',
-            'PAC' => 'PCK'
-        ];
-        $uom = $uomMapping[$uom] ?? $uom;
-
-        // Return null if the product is empty
-        if (empty($product)) {
-            return NULL;
-        }
-
-        // Define the UOMs
-        $stock_uom = $product->stock_uom;
-        $order_uom = $product->order_uom;
-        $other_uom = $product->other_uom;
-
-        // Direct return if already in 'CS'
-        if ($uom == 'CS') {
-            return $quantity;
-        }
-
-        // Conversion logic based on UOM
-        if ($stock_uom == 'CS') {
-            if ($uom == $order_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
-            } elseif ($uom == $other_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
-            }
-        } elseif ($order_uom == 'CS') {
-            if ($uom == $stock_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
-            } elseif ($uom == $other_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
-                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, false);
-            }
-        } elseif ($other_uom == 'CS') {
-            if ($uom == $stock_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, true);
-            } elseif ($uom == $order_uom) {
-                $quantity = $this->quantityConversion($quantity, $product->order_uom_conversion, $product->order_uom_operator, true);
-                $quantity = $this->quantityConversion($quantity, $product->other_uom_conversion, $product->other_uom_operator, false);
-            }
-        }
-
-        return $quantity;
-    }
-
-    private function quantityConversion($quantity, $conversion, $operator, $reverse = false) {
-        if ($operator == 'M') { // multiply
-            return $reverse ? $quantity / $conversion : $quantity * $conversion;
-        } elseif ($operator == 'D') { // divide
-            return $reverse ? $quantity * $conversion : $quantity / $conversion;
-        }
-        return $quantity;
     }
 
     public function render()
@@ -225,7 +165,7 @@ class Vmi extends Component
         foreach($inventories as $inventory) {
             if(!empty($inventory->total)) {
                 $product = $products->get($inventory->product_id);
-                $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
+                $cs_total = $this->convertUom($product, $inventory->uom, $inventory->total, $targetUom = 'CS');
 
                 $data[$inventory->product_id] = [
                     'stock_code' => $product->stock_code,
@@ -263,7 +203,7 @@ class Vmi extends Component
                     $sales_cs_total = 0;
                     if(!empty($sales_data)) {
                         foreach($sales_data as $val) {
-                            $sales_cs_total += $this->csConversion($product, $val->uom, $val->total);
+                            $sales_cs_total += $this->convertUom($product, $val->uom, $val->total, 'CS');
                         }
                     }
 
