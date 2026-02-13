@@ -6,122 +6,132 @@ use App\Models\SMSAccount;
 use App\Models\SMSCompany;
 use App\Models\SMSProduct;
 use App\Models\SMSPriceCode;
+use App\Http\Traits\UomConversionTrait;
 
 use Illuminate\Support\Facades\Session;
 
 Trait PriceCodeTrait {
+
+    use UomConversionTrait;
     
     // get product price base on account and Unit of Measurement(UOM)
-    public function getProductPrice($account_code, $vendor, $sku_code, $quantity, $uom = 'PCS', $with_discount = true) {
-        // company
-        $company = SMSCompany::where('name', $vendor)->first();
-        // account
-        $account = SMSAccount::where('account_code', $account_code)->first();
-        // discount
-        $discount = NULL;
-        if($with_discount) {
-            $discount = $account->discount ?? NULL;
-        }
-        // product
-        $product = SMSProduct::where('stock_code', $sku_code)->first();
+    public function getProductPrice($accountInput, $vendorInput, $skuInput, $quantity, $uom = 'PCS', $withDiscount = true)
+    {
+        // 1. Resolve Models
+        $account = $this->resolveModel(SMSAccount::class, 'account_code', $accountInput);
+        $company = $this->resolveModel(SMSCompany::class, 'name', $vendorInput);
+        $product = $this->resolveModel(SMSProduct::class, 'stock_code', $skuInput);
 
-        $err_msg = Session::get('price_code_err');
-        if(empty($err_msg)) {
-            $err_msg = [];
+        if (!$account || !$company || !$product) {
+            $this->logError('missing_data', [
+                'account' => $account ? null : $accountInput,
+                'company' => $company ? null : $vendorInput,
+                'product' => $product ? null : $skuInput,
+            ]);
+            return null;
         }
 
-        if(!empty($company) && !empty($account) && !empty($product)) {
-
-            // get price code account and product
-            $price_code = SMSPriceCode::where('company_id', $company->id)
+        // 2. Fetch Price Code
+        $priceCode = SMSPriceCode::where('company_id', $company->id)
             ->where('product_id', $product->id)
             ->where('code', $account->price_code)
             ->first();
 
-            $selling_price = 0;
-            if(!empty($price_code)) {
-                // COMPUTE VALUE BASE ON UOM
-                $selling_price = $price_code->selling_price;
-                $price_basis = $price_code->price_basis;
-        
-                // convert selling price to stock uom price
-                if($price_basis == 'A') { // ORDER UOM
-                    if($product->order_uom_operator == 'M') { // MULTIPLY
-                        $selling_price = $selling_price / $product->order_uom_conversion;
-                    }
-                    if($product->order_uom_operator == 'D') { // DIVIDE
-                        $selling_price = $selling_price * $product->order_uom_conversion;
-                    }
-                } else if($price_basis == 'O') { // OTHER UOM
-                    if($product->other_uom_operator == 'M') { // MULTIPLY
-                        $selling_price = $selling_price / $product->other_uom_conversion;
-                    }
-                    if($product->other_uom_operator == 'D') { // DIVIDE
-                        $selling_price = $selling_price * $product->other_uom_conversion;
-                    }
-                }
-            } else {
-                $err_msg[] = [
-                    'price_code' => ''
-                ];
-
-                Session::put('price_code_err', $err_msg);
-            }
-
-            $total = 0;
-            // CONVERT BASE ON UOM
-            if($uom == $product->stock_uom) {
-                $total += $quantity * $selling_price;
-            } else if($uom == $product->order_uom) {
-                // check operation
-                if($product->order_uom_operator == 'M') { // MULTIPLY
-                    $total += ($quantity * $product->order_uom_conversion) * $selling_price;
-                }
-                if($product->order_uom_operator == 'D') { // DIVIDE
-                    $total += ($quantity / $product->order_uom_conversion) * $selling_price;
-                }
-            } else if($uom == $product->other_uom) {
-                if($product->other_uom_operator == 'M') { // MULTIPLY
-                    $total += ($quantity * $product->other_uom_conversion) * $selling_price;
-                }
-                if($product->other_uom_operator == 'D') { // DIVIDE
-                    $total += ($quantity / $product->other_uom_conversion) * $selling_price;
-                }
-            } else { // if UOM is not found use default price code UOM
-                $total += $quantity * $selling_price;
-            }
-
-            // apply discount
-            $discounted = $total;
-            if(!empty($discount)) {
-                if($discount->discount_1 > 0) {
-                    $discounted = $discounted * ((100 - $discount->discount_1) / 100);
-                }
-                if($discount->discount_2 > 0) {
-                    $discounted = $discounted * ((100 - $discount->discount_2) / 100);
-                }
-                if($discount->discount_3 > 0) {
-                    $discounted = $discounted * ((100 - $discount->discount_3) / 100);
-                }
-            }
-
-            return $discounted;
-
-        } else {
-            if(empty($company)) {
-                $err_msg[]['company'] = $vendor;
-            }
-            if(empty($account)) {
-                $err_msg[]['account'] = $account_code;
-            }
-            if(empty($product)) {
-                $err_msg[]['product'] = $sku_code;
-            }
-
-            Session::put('price_code_err', $err_msg);
-
+        if (!$priceCode) {
+            $this->logError('price_code_missing', ['sku' => $skuInput]);
             return null;
         }
 
+        // 3. GET BASE UNIT PRICE (Price per 1 Stock Unit)
+        // We use the helper below which leverages your UomConversion logic
+        $baseUnitPrice = $this->calculateBaseUnitPrice($product, $priceCode);
+
+        // 4. CONVERT QUANTITY TO BASE UNITS
+        // Instead of calculating "Price per Target UOM", we calculate "Total Base Units Needed"
+        // Example: User wants 2 CS. 1 CS = 12 PCS.
+        // convertUom(product, 'CS', 2, 'PCS') returns 24.
+        // Total Price = 24 PCS * PricePerPCS.
+        $totalBaseUnits = $this->convertUom($product, $uom, $quantity, $product->stock_uom);
+        
+        $totalPrice = $totalBaseUnits * $baseUnitPrice;
+
+        // 5. Apply Discounts
+        if ($withDiscount && $account->discount) {
+            $totalPrice = $this->applyDiscounts($totalPrice, $account->discount);
+        }
+
+        return $totalPrice;
+    }
+
+    /**
+     * Calculate the price of ONE Single Stock Unit (e.g., 1 PCS).
+     * This uses the logic from your UomConversionTrait implicitly by checking operators.
+     */
+    public function calculateBaseUnitPrice($product, $priceCode)
+    {
+        $price = (float) $priceCode->selling_price;
+        $basis = $priceCode->price_basis; // 'A' (Order), 'O' (Other), 'S' (Stock)
+
+        // If price is already in Stock UOM, return as is.
+        if ($basis !== 'A' && $basis !== 'O') {
+            return $price;
+        }
+
+        // We need to know: "How many Stock Units are in this Price Basis?"
+        // We can reuse getConversionFactor() from your UomConversionTrait!
+        
+        $basisUom = ($basis === 'A') ? $product->order_uom : $product->other_uom;
+        
+        // This function comes from UomConversionTrait
+        $factor = $this->getConversionFactor($product, $basisUom); 
+
+        // If the price is $120 for a Case (Factor 12), the unit price is $120 / 12.
+        return ($factor != 0) ? ($price / $factor) : $price;
+    }
+
+    /**
+     * Apply chain discounts (e.g., 10% + 5% + 2%).
+     */
+    private function applyDiscounts($amount, $discountModel)
+    {
+        $discounts = [
+            $discountModel->discount_1,
+            $discountModel->discount_2,
+            $discountModel->discount_3
+        ];
+
+        foreach ($discounts as $disc) {
+            if ($disc > 0) {
+                $amount *= (1 - ($disc / 100));
+            }
+        }
+
+        return $amount;
+    }
+
+    /**
+     * Helper to resolve a Model from ID/Code or return the Model itself.
+     */
+    private function resolveModel($class, $field, $input)
+    {
+        if ($input instanceof $class) {
+            return $input;
+        }
+        return $class::where($field, $input)->first();
+    }
+
+    private function logError($type, $data)
+    {
+        $errors = Session::get('price_code_err', []);
+        
+        if ($type === 'missing_data') {
+            foreach ($data as $key => $value) {
+                if ($value) $errors[] = [$key => $value];
+            }
+        } elseif ($type === 'price_code_missing') {
+            $errors[] = ['price_code' => $data['sku'] ?? 'unknown'];
+        }
+
+        Session::put('price_code_err', $errors);
     }
 }
