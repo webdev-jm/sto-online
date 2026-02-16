@@ -23,6 +23,7 @@
         "openai-php/laravel": "^0.11.0",
         "phpoffice/phpspreadsheet": "^1.29",
         "rap2hpoutre/laravel-log-viewer": "^2.3",
+        "rappasoft/laravel-livewire-tables": "dev-develop",
         "silviolleite/laravelpwa": "^2.0",
         "smalot/pdfparser": "*",
         "spatie/laravel-activitylog": "^4.0",

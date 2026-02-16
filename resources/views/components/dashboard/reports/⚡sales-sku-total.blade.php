@@ -1,13 +1,60 @@
 <?php
 
 use Livewire\Component;
+use App\Http\Traits\SalesDataAggregator;
 
 new class extends Component
 {
+    use SalesDataAggregator;
+
     public $year;
+    public $chart_data = []; // Stores the formatted data for the grid
 
     public function mount() {
         $this->year = date('Y');
+        $this->loadChartData();
+    }
+
+    public function updatedYear() {
+        $this->loadChartData();
+        $this->dispatch('refresh-grid', data: $this->chart_data);
+    }
+
+    public function loadChartData() {
+        $raw = $this->getYearlySalesData($this->year);
+
+        // Group, Sum, Sort
+        $ranked = collect($raw)
+            ->groupBy('sku')
+            ->map(function($items) {
+                return [
+                    'stock_code' => $items->first()['sku'],
+                    'name' => $items->first()['name'],
+                    'y' => $items->sum('sales')
+                ];
+            })
+            ->sortByDesc('y')
+            ->values(); // Reset keys for ranking
+
+        // Prepare Grid Columns
+        $ranks = [];
+        $skus = [];
+        $descriptions = [];
+        $sales = [];
+
+        foreach ($ranked as $index => $item) {
+            $ranks[] = $index + 1;
+            $skus[] = $item['stock_code'];
+            $descriptions[] = $item['name'];
+            $sales[] = number_format($item['y'], 2, '.', ',');
+        }
+
+        $this->chart_data = [
+            'Rank' => $ranks,
+            'Stock Code' => $skus,
+            'Description' => $descriptions,
+            'Total Sales' => $sales
+        ];
     }
 };
 ?>
@@ -15,9 +62,9 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">SALES BY SKU ({{ $year }})</h3>
+            <h3 class="card-title">TOP 10 SKU SALES ({{ $year }})</h3>
             <div class="card-tools">
-                <input type="number" class="form-control form-control-sm" wire:model.live="year">
+                <input type="number" class="form-control form-control-sm" wire:model.live.debounce.500ms="year">
             </div>
         </div>
         <div class="card-body" wire:ignore>
@@ -33,61 +80,48 @@ new class extends Component
 
 @script
     <script>
-        function generateRandomData(rows) {
-            const names = ['John', 'Jane', 'Alex', 'Chris', 'Katie', 'Michael'];
-            const departments = ['HR', 'Engineering', 'Sales', 'Marketing', 'Finance'];
-            const positions = [
-                'Manager',
-                'Software Developer',
-                'Sales Executive',
-                'Marketing Specialist',
-                'Financial Analyst'
-            ];
-            const columns = {
-                ID: [],
-                Name: [],
-                Department: [],
-                Position: [],
-                Email: [],
-                Phone: []
-            };
-
-            for (let i = 0; i < rows; i++) {
-                const nameIndex = Math.floor(Math.random() * names.length);
-                const departmentIndex = Math.floor(Math.random() * departments.length);
-                const positionIndex = Math.floor(Math.random() * positions.length);
-                const id = i + 1;
-                const email = `${names[nameIndex].toLowerCase()}${id}@example.com`;
-                const phone = `123-456-7${Math.floor(Math.random() * 1000)
-                    .toString()
-                    .padStart(3, '0')}`;
-
-                columns.ID.push(id);
-                columns.Name.push(names[nameIndex]);
-                columns.Department.push(departments[departmentIndex]);
-                columns.Position.push(positions[positionIndex]);
-                columns.Email.push(email);
-                columns.Phone.push(phone);
+        // Function to render the Grid
+        function renderGrid(dataColumns) {
+            // Check if we have data, otherwise handle empty state
+            if (!dataColumns || Object.keys(dataColumns).length === 0) {
+                document.getElementById('container4').innerHTML = '<p class="text-center p-3">No data available for this year.</p>';
+                return;
             }
 
-            return columns;
+            // Clear previous grid to avoid duplication
+            document.getElementById('container4').innerHTML = '';
+
+            Grid.grid('container4', {
+                dataTable: {
+                    columns: dataColumns
+                },
+                rendering: {
+                    rows: {
+                        minVisibleRows: 10 // Show all top 10
+                    }
+                },
+                columns: [
+                    { id: 'Rank', width: 50 },
+                    { id: 'Stock Code', width: 150 },
+                    { id: 'Description' }, // Auto width
+                    {
+                        id: 'Total Sales',
+                        width: 150,
+                        // Simple formatter for currency
+                        format: (value) => value ? '$' + Number(value).toLocaleString() : ''
+                    }
+                ]
+            });
         }
 
-        console.log(generateRandomData(100));
+        // 1. Initial Render
+        renderGrid($wire.chart_data);
 
-        Grid.grid('container4', {
-            dataTable: {
-                columns: generateRandomData(100)
-            },
-            rendering: {
-                rows: {
-                    minVisibleRows: 5
-                }
-            },
-            columns: [{
-                id: 'ID',
-                width: 60
-            }]
+        // 2. Listen for 'refresh-grid' event from PHP
+        $wire.on('refresh-grid', (event) => {
+            // Livewire 3 events pass data in event.data or the first argument object
+            const data = event.data || event[0]?.data;
+            renderGrid(data);
         });
     </script>
 @endscript
