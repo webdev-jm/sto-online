@@ -5,6 +5,7 @@ namespace App\Http\Traits;
 use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ConsolidatedSalesReport;
 
 trait ConsolidateAccountData
 {
@@ -23,7 +24,7 @@ trait ConsolidateAccountData
         }
     }
 
-    private function consolidateAccountData($account)
+    public function consolidateAccountData($account)
     {
         $account_db = $account->db_data;
         $sales_data = [];
@@ -33,7 +34,9 @@ trait ConsolidateAccountData
 
         $sales_data = DB::table('sales_report as sr')
             ->select(
-                DB::raw('"'.$account->account_code.' '.$account->account_name.'" as account'),
+                DB::raw('"'.$account->account_code.'" as account_code'),
+                DB::raw('"'.$account->account_name.'" as account_name'),
+                DB::raw('"'.$account->account_code.' '.$account->account_name.'" as account_description'),
                 'c.code as customer_code',
                 'c.name as customer_name',
                 'c.province',
@@ -51,6 +54,7 @@ trait ConsolidateAccountData
                 'quantity',
                 'sales',
                 'fg_quantity',
+                'fg_sales',
                 'promo_quantity',
                 'promo_sales',
                 'credit_memo',
@@ -87,5 +91,9 @@ trait ConsolidateAccountData
             'sales_data' => $sales_data,
             'inventory_data' => $inventory_data,
         ];
+    }
+
+    public function updateAccountData($account, $year, $month) {
+
     }
 }
