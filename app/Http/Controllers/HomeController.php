@@ -99,7 +99,7 @@ class HomeController extends Controller
         set_time_limit(600);
         ini_set('memory_limit', '512M');
 
-        $accounts = Account::get();
+        $accounts = Account::where('id', '>=', 10)->get();
         $miniSummaries = [];
         foreach($accounts as $account) {
             $jsonPath = storage_path('app/reports/consolidated_account_data-'.$account->account_code.'.json');
@@ -113,7 +113,7 @@ class HomeController extends Controller
             );
             $this->waitForFile($file);
 
-            $accountSummary = Gemini::generativeModel(model: 'gemini-2.5-flash')
+            $accountSummary = Gemini::generativeModel(model: 'gemini-2.5-flash-lite')
             ->generateContent([
                 "Analyze this specific account data and provide a concise 5-bullet summary of performance.",
                 new UploadedFile(fileUri: $file->uri, mimeType: MimeType::TEXT_PLAIN)
@@ -125,6 +125,8 @@ class HomeController extends Controller
             Gemini::files()->delete($file->uri);
         }
 
+        dd($miniSummaries);
+
         $finalPrompt = "You are a BI Analyst. Below are summaries for several accounts.
                     Combine them into a single Consolidated Performance Summary and Global Overview: \n\n"
                     . implode("\n---\n", $miniSummaries);
@@ -132,6 +134,7 @@ class HomeController extends Controller
         $response = Gemini::generativeModel(model: 'gemini-2.5-flash')
             ->generateContent($finalPrompt);
 
+        dd($response->text());
         return $response->text();
     }
 

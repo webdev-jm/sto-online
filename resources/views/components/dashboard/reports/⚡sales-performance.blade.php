@@ -3,9 +3,13 @@
 use Livewire\Component;
 use App\Http\Traits\SalesDataAggregator;
 
+use App\Http\Traits\GenerateMonthlyInventory;
+
 new class extends Component
 {
     use SalesDataAggregator;
+    use GenerateMonthlyInventory;
+
 
     public $year;
     public $chart_data = [];
@@ -13,6 +17,8 @@ new class extends Component
     public function mount() {
         $this->year = date('Y');
         $this->chartUpdated();
+
+        $this->setMonthlyInventory(1, 1, 2026, 1);
     }
 
     public function updatedYear() {

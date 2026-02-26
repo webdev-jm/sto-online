@@ -7,7 +7,10 @@ use App\Models\MonthlyInventory;
 
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Traits\GenerateInventoryExpiry;
+
 trait GenerateMonthlyInventory {
+    use GenerateInventoryExpiry;
 
     public function setMonthlyInventory($account_id, $account_branch_id, $year, $month) {
         $inventory_upload = InventoryUpload::with('inventories')
@@ -62,6 +65,8 @@ trait GenerateMonthlyInventory {
             }
 
         }
+
+        $this->generateInventoryExpiry($account_id, $account_branch_id, $year, $month);
     }
 
 }

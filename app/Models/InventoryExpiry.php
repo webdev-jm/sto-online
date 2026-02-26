@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MonthlyInventory extends Model
+class InventoryExpiry extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -17,29 +17,24 @@ class MonthlyInventory extends Model
         'location_id',
         'product_id',
         'inventory_id',
-        'year',
-        'month',
-        'type',
-        'uom',
-        'total',
+        'quantity',
         'expiry_date',
     ];
 
     public function getConnectionName() {
         return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
-        // return 'sto_online_db';
     }
 
     public function account() {
-        return $this->belongsTo('App\Models\SMSAccount', 'account_id', 'id');
+        return $this->belongsTo('App\Models\Account', 'account_id', 'id');
     }
 
     public function account_branch() {
-        return $this->belongsTo('App\Models\AccountBranch');
+        return $this->belongsTo('App\Models\AccountBranch', 'account_branch_id', 'id');
     }
 
     public function location() {
-        return $this->belongsTo('App\Models\Location');
+        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
     }
 
     public function product() {
@@ -47,6 +42,6 @@ class MonthlyInventory extends Model
     }
 
     public function inventory() {
-        return $this->belongsTo('App\Models\Inventory');
+        return $this->belongsTo('App\Models\Inventory', 'inventory_id', 'id');
     }
 }

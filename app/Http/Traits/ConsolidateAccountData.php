@@ -14,18 +14,22 @@ trait ConsolidateAccountData
     {
         $accounts = Account::where('id', '>=', '10')->get();
         foreach($accounts as $account) {
-            $allConsolidatedData = $this->consolidateAccountData($account);
+            $years = [2025, 2026];
+            foreach($years as $y) {
+                foreach(range(1, 12) as $m) {
+                    $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
 
-            Storage::disk('local')
-                ->put(
-                    'reports/consolidated_account_data-'.$account->account_code.'.json',
-                    json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
-                );
+                    Storage::disk('local')
+                        ->put(
+                            'reports/consolidated_account_data-'.$account->account_code.'-'.$y.'-'.$m.'.json',
+                            json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
+                        );
+                }
+            }
         }
     }
 
-    public function consolidateAccountData($account)
-    {
+    public function consolidateAccountData($account, $year = null, $month = null) {
         $account_db = $account->db_data;
         $sales_data = [];
         $inventory_data = [];
@@ -64,6 +68,12 @@ trait ConsolidateAccountData
             ->leftJoin('customers as c', 'c.id', '=', 'sr.customer_id')
             ->leftJoin(DB::connection('mysql')->getDatabaseName().'.channels as ch', 'ch.id', '=', 'c.channel_id')
             ->leftJoin('salesmen as s', 's.id', '=', 'c.salesman_id')
+            ->when(!empty($year), function($query) use($year) {
+                $query->where('year', $year);
+            })
+            ->when(!empty($month), function($query) use($month) {
+                $query->where('month', $month);
+            })
             ->get();
 
         $inventory_data = DB::table('monthly_inventories as mi')
@@ -82,6 +92,12 @@ trait ConsolidateAccountData
             )
             ->leftJoin(DB::connection('sms_db')->getDatabaseName().'.products as p', 'p.id', '=', 'mi.product_id')
             ->leftJoin('locations as l', 'l.id', '=', 'mi.location_id')
+            ->when(!empty($year), function($query) use($year) {
+                $query->where('year', $year);
+            })
+            ->when(!empty($month), function($query) use($month) {
+                $query->where('month', $month);
+            })
             ->get();
 
 
@@ -91,9 +107,5 @@ trait ConsolidateAccountData
             'sales_data' => $sales_data,
             'inventory_data' => $inventory_data,
         ];
-    }
-
-    public function updateAccountData($account, $year, $month) {
-
     }
 }
