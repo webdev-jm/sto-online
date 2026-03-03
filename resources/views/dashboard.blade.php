@@ -7,72 +7,7 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">REPORTS</h3>
-            <div class="card-tools">
-                <button class="btn btn-sm btn-success">REFRESH DATA</button>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="year">YEAR</label>
-                        <input type="number" id="year" class="form-control form-control-sm" value="{{ date('Y') }}" class="form-contol form-control-sm">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer text-right">
-            <button class="btn btn-xs btn-success">
-                EXCEL
-            </button>
-            <button class="btn btn-xs btn-warning">
-                JSON
-            </button>
-            <button class="btn btn-xs btn-danger">
-                XML
-            </button>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-6">
-            <livewire:dashboard.reports.sales-performance />
-
-            <livewire:dashboard.reports.sales-sku />
-
-            <livewire:dashboard.reports.sales-brands />
-        </div>
-        <div class="col-lg-6">
-            <livewire:dashboard.reports.sales-volume />
-
-            <livewire:dashboard.reports.sales-sku-total />
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">ENDING INVENTORY</h3>
-                </div>
-                <div class="card-body">
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">INVENTORY AGING</h3>
-                </div>
-                <div class="card-body">
-
-                </div>
-            </div>
-        </div>
-    </div>
+    <livewire:dashboard.header />
 @stop
 
 @section('css')

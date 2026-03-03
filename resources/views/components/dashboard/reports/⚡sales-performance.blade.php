@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use Livewire\Attributes\Reactive;
 use App\Http\Traits\SalesDataAggregator;
 
 use App\Http\Traits\GenerateMonthlyInventory;
@@ -10,15 +11,15 @@ new class extends Component
     use SalesDataAggregator;
     use GenerateMonthlyInventory;
 
-
+    #[Reactive]
     public $year;
     public $chart_data = [];
 
-    public function mount() {
-        $this->year = date('Y');
+    public function mount($year) {
+        $this->year = $year;
         $this->chartUpdated();
 
-        $this->setMonthlyInventory(1, 1, 2026, 1);
+        // $this->setMonthlyInventory(1, 1, 2026, 1);
     }
 
     public function updatedYear() {
