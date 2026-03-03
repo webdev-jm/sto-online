@@ -1,17 +1,19 @@
 <?php
 
 use Livewire\Component;
+use Livewire\Attributes\Reactive;
 use App\Http\Traits\SalesDataAggregator;
 
 new class extends Component
 {
     use SalesDataAggregator;
 
+    #[Reactive]
     public $year;
     public $chart_data = [];
 
-    public function mount() {
-        $this->year = date('Y');
+    public function mount($year) {
+        $this->year = $year;
         $this->chartUpdated();
     }
 
@@ -48,7 +50,7 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">TOP SKU BASED ON SALES ({{ $year }})</h3>
+            <h3 class="card-title">TOP 10 SKU SALES ({{ $year }})</h3>
             <div class="card-tools">
                 <input type="number" class="form-control form-control-sm" wire:model.live="year">
             </div>

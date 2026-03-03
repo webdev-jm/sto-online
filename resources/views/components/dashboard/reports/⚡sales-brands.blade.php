@@ -1,16 +1,19 @@
 <?php
 
 use Livewire\Component;
+use Livewire\Attributes\Reactive;
 use App\Http\Traits\SalesDataAggregator;
 
 new class extends Component
 {
     use SalesDataAggregator;
+
+    #[Reactive]
     public $year;
     public $chart_data = [];
 
-    public function mount() {
-        $this->year = date('Y');
+    public function mount($year) {
+        $this->year = $year;
         $this->chartUpdated();
     }
 
