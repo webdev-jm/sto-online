@@ -84,7 +84,7 @@ trait SalesDataAggregator
                             'month'     => (int) $row['month'],
                             'sales'     => (float) ($qtyPcs * $netPrice),
                             'qty_pcs'   => (float) $qtyPcs,
-                            'account_id'=> $account->id // Useful for filtering later
+                            'account_id'=> $account->id
                         ];
                     }
                 } // End Month Loop
@@ -93,4 +93,126 @@ trait SalesDataAggregator
             return $masterData;
         });
     }
+
+    public function getYearlyInventoryData(int $year)
+    {
+        return Cache::remember("inventory_data_consolidated_{$year}", 60 * 60, function () use ($year) {
+            set_time_limit(120);
+            ini_set('memory_limit', '512M');
+
+            $accounts = Account::where('id', '>=', 10)->get();
+            $masterData = [];
+
+            foreach ($accounts as $account) {
+                $smsAccount = $account->sms_account;
+                $smsCompany = $smsAccount ? $smsAccount->company : null;
+
+                if (!$smsAccount || !$smsCompany) continue;
+
+                foreach (range(1, 12) as $m) {
+                    $jsonPath = storage_path("app/reports/consolidated_account_data-{$account->account_code}-{$year}-{$m}.json");
+
+                    if (!file_exists($jsonPath)) continue;
+
+                    $raw = json_decode(file_get_contents($jsonPath), true);
+                    $yearRows = collect($raw['inventory_data'] ?? [])->where('year', $year);
+
+                    if ($yearRows->isEmpty()) continue;
+
+                    foreach($yearRows as $row) {
+                        $masterData[] = [
+                            'sku'       => $row['stock_code'],
+                            'name'      => $row['description'],
+                            'full_name' => "{$row['stock_code']} {$row['description']} {$row['size']}",
+                            'year'     => $row['year'],
+                            'month'     => (int) $row['month'],
+                            'total'     => (float) $row['total'],
+                            'uom'       => $row['uom'],
+                            'account_id'=> $account->id
+                        ];
+                    }
+                }
+            }
+
+            return $masterData;
+
+        });
+    }
+
+    public function getYearlyInventoryAgingData(int $year)
+    {
+        return Cache::remember("inventory_aging_data_consolidated_{$year}", 60 * 60, function () use ($year) {
+            set_time_limit(120);
+            ini_set('memory_limit', '512M');
+
+            $accounts = Account::where('id', '>=', 10)->get();
+            $masterData = [];
+
+            foreach ($accounts as $account) {
+                $smsAccount = $account->sms_account;
+                $smsCompany = $smsAccount ? $smsAccount->company : null;
+
+                if (!$smsAccount || !$smsCompany) continue;
+
+                foreach (range(1, 12) as $m) {
+                    $jsonPath = storage_path("app/reports/consolidated_account_data-{$account->account_code}-{$year}-{$m}.json");
+
+                    $raw = json_decode(file_get_contents($jsonPath), true);
+                    $yearRows = collect($raw['inventory_aging'] ?? []);
+
+                    if ($yearRows->isEmpty()) continue;
+
+                    foreach($yearRows as $row) {
+
+                        $remainingDays = $this->computeRemainingDays($row['expiry_date']);
+
+                        $masterData[] = [
+                            'location_code' => $row['location_code'],
+                            'location_name' => $row['location_name'],
+                            'stock_code' => $row['stock_code'],
+                            'name' => $row['description'],
+                            'size' => $row['size'],
+                            'uom' => $row['uom'],
+                            'expiry_date' => $row['expiry_date'],
+                            'total_inventory' => $row['inventory'],
+                            'remaining_days' => $remainingDays,
+                            'account_id'=> $account->id
+                        ];
+
+                    }
+                }
+            }
+
+            return collect($masterData)
+                ->groupBy(function ($item) {
+                    return $item['stock_code'] . '|' . $item['expiry_date'] . '|' . $item['uom'];
+                })
+                ->map(function ($group) {
+                    $first = $group->first();
+
+                    $first['total_inventory'] = $group->sum('total_inventory');
+
+                    return $first;
+                })
+                ->values()
+                ->all();
+
+        });
+    }
+
+    private function computeRemainingDays($expiryDate) {
+        if (empty($expiryDate)) {
+            return 0;
+        }
+
+        $today = new \DateTime();
+        $expiry = new \DateTime($expiryDate);
+
+        // This returns the difference. We use format('%r%a') to get
+        // a signed integer (e.g., -5 for expired, 10 for future).
+        $interval = $today->diff($expiry);
+
+        return (int)$interval->format('%r%a');
+    }
+
 }

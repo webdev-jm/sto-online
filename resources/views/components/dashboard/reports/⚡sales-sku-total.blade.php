@@ -48,7 +48,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">TOP SKU BASED ON SALES ({{ $year }})</h3>
             <div class="card-tools">
-                <input type="number" class="form-control form-control-sm" wire:model.live.debounce.500ms="year">
+                {{-- <input type="number" class="form-control form-control-sm" wire:model.live.debounce.500ms="year"> --}}
             </div>
         </div>
         <div class="card-body table-responsive p-0" style="max-height: 416px; overflow-y: auto;">

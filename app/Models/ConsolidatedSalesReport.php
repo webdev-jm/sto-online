@@ -11,7 +11,7 @@ class ConsolidatedSalesReport extends Model
 
     protected $fillable = [
         'account_code',
-        'account_name',,
+        'account_name',
         'account_description',
         'customer_code',
         'customer_name',

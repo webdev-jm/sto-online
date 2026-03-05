@@ -5,7 +5,6 @@ namespace App\Http\Traits;
 use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Models\ConsolidatedSalesReport;
 
 trait ConsolidateAccountData
 {
@@ -100,12 +99,46 @@ trait ConsolidateAccountData
             })
             ->get();
 
+        $inventory_uploads = DB::table('inventory_uploads as iu')
+            ->when(!empty($year), function($query) use($year) {
+                $query->where(DB::raw('YEAR(date)'), $year);
+            })
+            ->when(!empty($month), function($query) use($month) {
+                $query->where(DB::raw('MONTH(date)'), $month);
+            })
+            ->orderBy('date', 'ASC')
+            ->get();
+
+        $inventory_aging = [];
+        foreach($inventory_uploads as $upload) {
+            $inventories = DB::table('inventories as i')
+                ->select(
+                    'l.code as location_code',
+                    'l.name as location_name',
+                    'p.stock_code',
+                    'p.description',
+                    'p.size',
+                    'i.uom',
+                    'i.inventory',
+                    'i.expiry_date',
+                )
+                ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
+                ->leftJoin(DB::connection('sms_db')->getDatabaseName().'.products as p', 'p.id', '=', 'i.product_id')
+                ->whereNotNull('expiry_date')
+                ->where('i.inventory_upload_id', '=', $upload->id)
+                ->get();
+
+            foreach($inventories as $inventory) {
+                $inventory_aging[$inventory->stock_code] = $inventory;   
+            }
+        }
 
         DB::setDefaultConnection('mysql');
 
         return [
             'sales_data' => $sales_data,
             'inventory_data' => $inventory_data,
+            'inventory_aging' => $inventory_aging
         ];
     }
 }
