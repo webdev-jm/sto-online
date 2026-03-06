@@ -60,7 +60,7 @@ new class extends Component
             </div>
         </div>
         <div class="card-body" wire:ignore>
-            <div id="container6"></div>
+            <div id="container-aging"></div>
         </div>
     </div>
 </div>
@@ -80,7 +80,7 @@ new class extends Component
         let chart
 
         const initChart = () => {
-            chart = Highcharts.chart('container6', {
+            chart = Highcharts.chart('container-aging', {
                 chart: { type: 'bubble', plotBorderWidth: 1, zooming: { type: 'xy' } },
                 title: { text: 'Inventory Aging Risk Analysis' },
                 xAxis: {

@@ -69,7 +69,7 @@ new class extends Component
             <h3 class="card-title">ENDING INVENTORY {{ $year }}</h3>
         </div>
         <div class="card-body" wire:ignore>
-            <div id="container7"></div>
+            <div id="container-ending"></div>
             <div class="mb-2">
                 <button onclick="toggleAll(true)" class="btn btn-sm btn-outline-primary">Show All</button>
                 <button onclick="toggleAll(false)" class="btn btn-sm btn-outline-secondary">Hide All</button>
@@ -106,7 +106,7 @@ new class extends Component
         let chart;
 
         const initChart = () => {
-            chart = Highcharts.chart('container7', {
+            chart = Highcharts.chart('container-ending', {
                 chart: {
                     type: 'line',
                     height: 700,

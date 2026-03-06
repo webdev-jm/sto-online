@@ -58,7 +58,7 @@ new class extends Component
         </div>
 
         <div class="row">
-            <div class="col-lg-6">
+            {{-- <div class="col-lg-6">
                 <livewire:dashboard.reports.sales-performance :year="$globalYear" />
             </div>
             <div class="col-lg-6">
@@ -80,17 +80,10 @@ new class extends Component
 
             <div class="col-lg-12">
                 <livewire:dashboard.reports.inventory-ending :year="$globalYear"/>
-            </div>
+            </div> --}}
 
             <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">SALES BY CHANNEL {{ $globalYear }}</h3>
-                    </div>
-                    <div class="card-body">
-
-                    </div>
-                </div>
+                <livewire:dashboard.reports.sales-by-channel :year="$globalYear"/>
             </div>
 
             <div class="col-lg-6">
