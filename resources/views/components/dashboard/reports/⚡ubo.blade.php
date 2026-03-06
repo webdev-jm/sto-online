@@ -14,6 +14,7 @@ new class extends Component
 
     public function mount($year) {
         $this->year = $year;
+
         $this->chartUpdated();
     }
 
@@ -22,26 +23,27 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        // 1. Get Cached, Unified Data
         $raw = $this->getYearlySalesData($this->year);
 
-        // 2. Group by Month and Sum Sales
-        // Creates array [1 => 1200, 2 => 1500...]
-        $monthlySums = collect($raw)->groupBy('month')->map(function($items) {
-             return $items->sum('sales');
-        });
+        $this->chart_data = collect($raw)
+            ->groupBy('month')
+            ->filter(function($items) {
+                return $items->get('customer_status') == 0;
+            })
+            ->map(function($items) {
+                $first = $items->first();
 
-        // 3. Format for Highcharts (Ensure all 12 months exist)
-        $formattedData = [];
-        for ($m = 1; $m <= 12; $m++) {
-            $formattedData[] = [
-                'name' => \DateTime::createFromFormat('!m', $m)->format('M'),
-                'y' => round($monthlySums[$m] ?? 0, 2),
-                'color' => '#7cb5ec' // Optional: default Highcharts color
-            ];
-        }
+                $month = \DateTime::createFromFormat('!m', $first['month'])->format('M');
+                $count = collect($items)->groupBy('customer_code')->count();
 
-        $this->chart_data = $formattedData;
+                return [
+                    'name' => $month,
+                    'y' => (int) $count,
+                ];
+            })
+            ->values()
+            ->toArray();
+
         $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
@@ -50,23 +52,21 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">MONTHLY SALES PERPORMANCE</h3>
-            <div class="card-tools">
-                {{-- <input type="number" class="form-control form-control-sm" wire:model.live="year"> --}}
-            </div>
+            <h3 class="card-title">UNIQUE BUYING OUTLET (UBO) {{ $year }}</h3>
         </div>
         <div class="card-body" wire:ignore>
-            <div id="container-performance"></div>
+            <div id="container-ubo"></div>
         </div>
     </div>
 </div>
+
 @assets
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/data.js"></script>
-    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/drilldown.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 @endassets
 
 @script
@@ -74,15 +74,12 @@ new class extends Component
     let chart;
 
     const initChart = () => {
-        chart = Highcharts.chart('container-performance', {
+        chart = Highcharts.chart('container-ubo', {
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'MONTHLY SALES PERPORMANCE ' + $wire.year
-            },
-            subtitle: {
-                text: 'Monthly Sales Performance Report'
+                text: '>UNIQUE BUYING OUTLET (UBO) ' + $wire.year
             },
             accessibility: {
                 announceNewData: {
@@ -94,7 +91,7 @@ new class extends Component
             },
             yAxis: {
                 title: {
-                    text: 'Total percent market share'
+                    text: 'Total UBO'
                 }
 
             },
@@ -106,7 +103,7 @@ new class extends Component
                     borderWidth: 0,
                     dataLabels: {
                         enabled: true,
-                        format: '₱ {point.y:,.2f}'
+                        format: '{point.y}'
                     }
                 }
             },
@@ -114,24 +111,27 @@ new class extends Component
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
                 pointFormat: '<span style="color:{point.color}">{point.name}</span>: ' +
-                    '<b>{point.y:,.2f}</b> total<br/>'
+                    '<b>{point.y}</b><br/>'
             },
 
             series: [
                 {
-                    name: 'MONTH SALES',
+                    name: 'Browsers',
                     colorByPoint: true,
                     data: $wire.chart_data
                 }
-            ]
+            ],
         });
-    }
+    };
+
 
     initChart();
+    console.log(chart);
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData($wire.chart_data);
-        chart.setTitle({text: 'MONTHLY SALES PERPORMANCE ' + $wire.year});
+        chart.setTitle({text: 'UNIQUE BUYING OUTLET (UBO) ' + $wire.year});
     });
+
 </script>
 @endscript
