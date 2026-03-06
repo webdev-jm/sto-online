@@ -51,7 +51,7 @@ new class extends Component
             </div>
         </div>
         <div class="card-body" wire:ignore>
-            <div id="container2"></div>
+            <div id="container-volume"></div>
         </div>
     </div>
 </div>
@@ -70,7 +70,7 @@ new class extends Component
     let chart;
 
     const initChart = () => {
-        chart = Highcharts.chart('container2', {
+        chart = Highcharts.chart('container-volume', {
             chart: {
                 type: 'column'
             },
