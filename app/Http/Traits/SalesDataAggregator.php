@@ -77,6 +77,11 @@ trait SalesDataAggregator
                         $qtyPcs = $row['quantity'] * $uomFactor;
 
                         $masterData[] = [
+                            'customer_code' => $row['customer_code'],
+                            'customer_name' => $row['customer_name'],
+                            'channel_code' => $row['channel_code'],
+                            'channel_name' => $row['channel_name'],
+                            'customer_status' => $row['customer_status'],
                             'sku'       => $code,
                             'name'      => $product->description,
                             'full_name' => "{$product->stock_code} {$product->description} {$product->size}",
