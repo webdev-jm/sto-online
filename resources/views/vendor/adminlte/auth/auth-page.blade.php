@@ -13,45 +13,8 @@
     @yield('css')
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .image-container-gif {
-            position: relative;
-            width: max-content; /* Adjust as necessary */
-            height: max-content; /* Adjust as necessary */
-            z-index: -1;
-        }
-        .overlapping-image {
-            position: absolute;
-            top: -90px;
-            left: -30px;
-        }
-
-        .overlapping-image:nth-child(2) {
-            top: -85px;
-            left: -40px;
-        }
-        .text-bev {
-            font-weight: bold;
-            background: linear-gradient(to right, rgb(255, 76, 76), rgb(156, 1, 1), rgb(255, 76, 76));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
         .text-portal {
-            font-family: Helvetica, Arial, sans-serif; 
-            display: inline-block;
-            font-size: 50px;
-            font-weight: bold;
-            background: radial-gradient(circle, rgb(199, 2, 2, 1) 0%, rgba(251, 255, 0, 1) 40%, rgba(55, 0, 255, 1) 70%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            animation: spin 5s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            height: 50px;
         }
     </style>
 @stop
@@ -60,11 +23,6 @@
 
 @section('body')
     <div class="{{ $auth_type ?? 'login' }}-box">
-
-        <div class="image-container-gif">
-            <img src="{{asset('/images/X5NX.gif')}}" alt="" class="overlapping-image">
-            <img src="{{asset('/images/XDZT.gif')}}" alt="" class="overlapping-image">
-        </div>
 
         {{-- Logo --}}
         <div class="{{ $auth_type ?? 'login' }}-logo">
