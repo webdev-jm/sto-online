@@ -1,19 +1,42 @@
 <?php
 
 use Livewire\Component;
+use App\Http\Traits\ConsolidateAccountData;
+use App\Http\Traits\SalesDataAggregator;
+use Illuminate\Support\Facades\Cache;
 
 new class extends Component
 {
+    use ConsolidateAccountData;
+    use SalesDataAggregator;
+
     public $type = 'sales';
     public $globalYear;
 
     public function mount() {
-            $this->globalYear = 2026;
+        $this->globalYear = 2026;
     }
 
     public function selectType($type)
     {
         $this->type = $type;
+    }
+
+    public function refreshData() {
+        // $this->setConsolidatedAccountData($this->globalYear);
+
+        // clear cache
+        Cache::forget('sales_data_consolidated_'.$this->globalYear);
+        Cache::forget('inventory_data_consolidated_'.$this->globalYear);
+        Cache::forget('inventory_aging_data_consolidated_'.$this->globalYear);
+
+        $this->selectType($this->type);
+    }
+
+    public function export($export_type) {
+        if($export_type == 'excel') {
+
+        }
     }
 };
 ?>
@@ -31,7 +54,7 @@ new class extends Component
             <div class="card-header">
                 <h3 class="card-title">REPORTS</h3>
                 <div class="card-tools">
-                    <button class="btn btn-sm btn-success">REFRESH DATA</button>
+                    <button class="btn btn-sm btn-success" wire:click.prevent="refreshData" wire:loading.attr="disabled"><i class="fa fa-spinner fa-spin mr-1" wire:loading></i>REFRESH DATA</button>
                 </div>
             </div>
             <div class="card-body">
@@ -45,14 +68,11 @@ new class extends Component
                 </div>
             </div>
             <div class="card-footer text-right">
-                <button class="btn btn-xs btn-success">
+                <button class="btn btn-xs btn-success" wire:click.prevent="export('excel')">
                     EXCEL
                 </button>
-                <button class="btn btn-xs btn-warning">
+                <button class="btn btn-xs btn-warning" wire:click.prevent="export('json')">
                     JSON
-                </button>
-                <button class="btn btn-xs btn-danger">
-                    XML
                 </button>
             </div>
         </div>
