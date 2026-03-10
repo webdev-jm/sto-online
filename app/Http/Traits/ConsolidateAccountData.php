@@ -9,10 +9,15 @@ use Illuminate\Support\Facades\Storage;
 trait ConsolidateAccountData
 {
 
-    public function setConsolidatedAccountData()
+    public function setConsolidatedAccountData($year = NULL)
     {
 
-        $years = [2025, 2026];
+        if(empty($year)) {
+            $years = [2025, 2026];
+        } else {
+            $years = [$year];
+        }
+
         $months = range(1, 12);
 
         Account::where('id', '>=', '10')->chunk(100, function($accounts) use($years, $months) {
