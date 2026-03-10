@@ -3,7 +3,7 @@
 @section('adminlte_css_pre')
     <style>
         .login-page {
-            background: #ffffff8e url('/images/pexels-apasaric-2603464.jpg') no-repeat center center;
+            background: #ffffff8e url('/images/BEVI-ARANGA-SKETCH.png') no-repeat center center;
 	        background-size: cover;
         }
     </style>

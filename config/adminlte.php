@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b><span class="text-bev">BEV</span> P<span class="text-portal"><i class="fa fa-circle"></i></span>RTAL</b>',
-    'logo_img' => '/images/XDZT.gif',
+    'logo' => '<b><span class="text-bev">BEV</span> P<img src="/images/BEV-LOGO.png" class="text-portal">RTAL</b>',
+    'logo_img' => '/images/BEV-LOGO.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => '/images/XDZT.gif',
+            'path' => '/images/BEV-LOGO.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -109,7 +109,7 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => '/images/XDZT.gif',
+            'path' => '/images/BEV-LOGO.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -387,13 +387,6 @@ return [
             'text'      => 'Reports',
             'url'       => 'report/sto',
             'icon'      => 'fa fa-fw fa-chart-pie',
-            'can'       => 'reports sto',
-            'active'    => ['report-sto*']
-        ],
-        [
-            'text'      => 'STO',
-            'url'       => 'https://sto.bevi.ph/',
-            'icon'      => 'fa fa-fw fa-chart-bar',
             'can'       => 'reports sto',
             'active'    => ['report-sto*']
         ],
