@@ -3,7 +3,18 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <div class="row">
+        <div class="col-lg-6">
+            <h1>HOME</h1>
+        </div>
+        <div class="col-lg-6 text-right">
+            @if(auth()->user()->type == 1)
+                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-secondary">
+                    DASHBOARD
+                </a>
+            @endif
+        </div>
+    </div>
 @stop
 
 @section('content')

@@ -77,8 +77,12 @@ class HomeController extends Controller
 
     public function dashboard() {
         // $result = $this->startTenantConversation();
+        if(auth()->user()->type == 0) {
+            return view('home');
+        } else {
+            return view('dashboard');
+        }
 
-        return view('dashboard');
     }
 
     private function waitForFile($geminiFile) {
