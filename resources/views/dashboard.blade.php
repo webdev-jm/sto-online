@@ -3,7 +3,16 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <div class="row">
+        <div class="col-lg-6">
+            <h1>Dashboard</h1>
+        </div>
+        <div class="col-lg-6 text-right">
+            <a href="{{ route('home') }}" class="btn btn-sm btn-secondary">
+                VIEW ACCOUNTS
+            </a>
+        </div>
+    </div>
 @stop
 
 @section('content')

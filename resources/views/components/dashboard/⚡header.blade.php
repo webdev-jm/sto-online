@@ -11,6 +11,7 @@ new class extends Component
     use SalesDataAggregator;
 
     public $type = 'sales';
+    public $group = 'sales';
     public $globalYear;
 
     public function mount() {
@@ -73,6 +74,18 @@ new class extends Component
                 </button>
                 <button class="btn btn-xs btn-warning" wire:click.prevent="export('json')">
                     JSON
+                </button>
+            </div>
+        </div>
+
+        {{-- TABS --}}
+        <div class="row mb-2">
+            <div class="col-lg-12">
+                <button class="btn btn-default">
+                    SALES
+                </button>
+                <button class="btn btn-default">
+                    INVENTORIES
                 </button>
             </div>
         </div>

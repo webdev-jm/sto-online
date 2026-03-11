@@ -21,14 +21,46 @@
             font-weight: 750;
         }
 
-        .bg-dark {
+        /* .bg-dark {
             background: #ffffff8e url('/images/pexels-hngstrm-inverted.jpg') no-repeat center center;
             background-size: cover;
+            backdrop-filter: blur(5px);
         }
+
         .bg-light {
             background: #ffffff8e url('/images/pexels-hngstrm-2341290.jpg') no-repeat center center;
             background-size: cover;
+            backdrop-filter: blur(5px);
+        } */
+
+        .bg-dark, .bg-light {
+            position: relative;
+            overflow: hidden; /* Keeps the blur from bleeding outside the edges */
+            z-index: 1;
         }
+
+        .bg-dark::before, .bg-light::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: blur(3px); /* This is the actual blur */
+            transform: scale(1.1); /* Prevents white edges caused by the blur */
+            z-index: -1;
+        }
+
+        .bg-dark::before {
+            background-image: url('/images/pexels-hngstrm-inverted.jpg');
+            background-color: #ffffff8e;
+        }
+
+        .bg-light::before {
+            background-image: url('/images/pexels-hngstrm-2341290.jpg');
+            background-color: #ffffff8e;
+        }
+
         .text-portal {
             height: 20px;
         }

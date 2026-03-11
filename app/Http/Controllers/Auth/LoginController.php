@@ -47,4 +47,16 @@ class LoginController extends Controller
     public function username() {
         return 'username';
     }
+
+    protected function authenticated(Request $request, $user) {
+        if($user->type == 0) {
+            if(!empty($user->account_id)) {
+                return redirect()->route('branches', encrypt($user->account_id));
+            }
+        } else {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->intended($this->redirectPath());
+    }
 }

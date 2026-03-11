@@ -15,6 +15,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class DashboardReportExport implements FromCollection, ShouldAutoSize, WithStyles, WithProperties, WithBackgroundColor, WithCustomChunkSize
 {
+    public $year;
+
+    public function _construct($year) {
+        $this->year = $year;
+    }
 
     public function backgroundColor()
     {
