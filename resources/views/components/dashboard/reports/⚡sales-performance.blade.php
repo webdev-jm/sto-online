@@ -24,24 +24,43 @@ new class extends Component
     public function chartUpdated() {
         // 1. Get Cached, Unified Data
         $raw = $this->getYearlySalesData($this->year);
+        $prev_raw = $this->getYearlySalesData($this->year - 1);
 
         // 2. Group by Month and Sum Sales
         // Creates array [1 => 1200, 2 => 1500...]
         $monthlySums = collect($raw)->groupBy('month')->map(function($items) {
-             return $items->sum('sales');
+            return $items->sum('sales');
+        });
+        $prevMonthlySums = collect($prev_raw)->groupBy('month')->map(function($items) {
+            return $items->sum('sales');
         });
 
         // 3. Format for Highcharts (Ensure all 12 months exist)
-        $formattedData = [];
+        $currData = [];
+        $prevData = [];
+        $categories = [];
         for ($m = 1; $m <= 12; $m++) {
-            $formattedData[] = [
-                'name' => \DateTime::createFromFormat('!m', $m)->format('M'),
-                'y' => round($monthlySums[$m] ?? 0, 2),
-                'color' => '#7cb5ec' // Optional: default Highcharts color
-            ];
+            if(!empty($monthlySums[$m])) {
+                $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
+                $currData[] = round($monthlySums[$m] ?? 0, 2);
+                $prevData[] = round($prevMonthlySums[$m] ?? 0, 2);
+            }
         }
 
-        $this->chart_data = $formattedData;
+        $this->chart_data = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => $this->year - 1,
+                    'data' => $prevData
+                ],
+                [
+                    'name' => $this->year,
+                    'data' => $currData
+                ]
+            ]
+        ];
+
         $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
@@ -60,14 +79,6 @@ new class extends Component
         </div>
     </div>
 </div>
-@assets
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/data.js"></script>
-    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-@endassets
 
 @script
 <script>
@@ -90,7 +101,11 @@ new class extends Component
                 }
             },
             xAxis: {
-                type: 'category'
+                categories: $wire.chart_data.categories,
+                crosshair: true,
+                accessibility: {
+                    description: 'YEAR'
+                }
             },
             yAxis: {
                 title: {
@@ -113,24 +128,18 @@ new class extends Component
 
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: ' +
-                    '<b>{point.y:,.2f}</b> total<br/>'
+                pointFormat: '<b>{point.y:,.2f}</b> total<br/>'
             },
 
-            series: [
-                {
-                    name: 'MONTH SALES',
-                    colorByPoint: true,
-                    data: $wire.chart_data
-                }
-            ]
+            series: $wire.chart_data.data
         });
     }
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData($wire.chart_data);
+        chart.setSeries($wire.chart_data.data);
+        chart.xAxis.setCategories($wire.chart_data.categories);
         chart.setTitle({text: 'MONTHLY SALES PERPORMANCE ' + $wire.year});
     });
 </script>

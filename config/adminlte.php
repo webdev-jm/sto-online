@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b><span class="text-bev">BEV</span> P<img src="/images/BEV-LOGO.png" class="text-portal">RTAL</b>',
+    'logo' => '<b><span class="text-bev">BEV</span> PORTAL</b>',
     'logo_img' => '/images/BEV-LOGO.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
