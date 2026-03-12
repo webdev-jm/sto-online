@@ -21,6 +21,9 @@
         "sass-loader": "^11.0.1"
     },
     "dependencies": {
+        "apexcharts": "^5.10.3",
+        "echarts": "^6.0.0",
+        "highcharts": "^12.5.0",
         "sweetalert2": "^11.7.3"
     }
 }

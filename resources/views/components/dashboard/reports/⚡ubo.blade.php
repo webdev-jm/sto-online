@@ -60,14 +60,6 @@ new class extends Component
     </div>
 </div>
 
-@assets
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/data.js"></script>
-<script src="https://code.highcharts.com/modules/drilldown.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/modules/accessibility.js"></script>
-@endassets
 
 @script
 <script>
@@ -116,7 +108,7 @@ new class extends Component
 
             series: [
                 {
-                    name: 'Browsers',
+                    name: 'UBO',
                     colorByPoint: true,
                     data: $wire.chart_data
                 }
@@ -126,7 +118,6 @@ new class extends Component
 
 
     initChart();
-    console.log(chart);
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData($wire.chart_data);
