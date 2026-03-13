@@ -24,19 +24,38 @@ new class extends Component
 
     public function chartUpdated() {
         $raw = $this->getYearlySalesData($this->year);
+        $prev_raw = $this->getYearlySalesData($this->year - 1);
 
-        // Sum Quantity (PCS) per month
-        $monthlyQty = collect($raw)->groupBy('month')->map(function($items) {
-            return $items->sum('qty_pcs');
-        });
+        $monthlyQty = collect($raw)
+            ->groupBy('month')->map(function($items) {
+                return $items->sum('qty_pcs');
+            });
 
-        // Fill 0s for missing months
+        $prevMonthlyQty = collect($prev_raw)
+            ->groupBy('month')
+            ->map(function($items) {
+                return $items->sum('qty_pcs');
+            });
+
         $dataSeries = [];
+        $prevDataSeries = [];
         for ($m = 1; $m <= 12; $m++) {
-            $dataSeries[] = round($monthlyQty[$m] ?? 0, 2);
+            if(!empty($monthlyQty[$m])) {
+                $dataSeries[] = round($monthlyQty[$m] ?? 0, 2);
+                $prevDataSeries[] = round($prevMonthlyQty[$m] ?? 0, 2);
+            }
         }
 
-        $this->chart_data['data'] = $dataSeries;
+        $this->chart_data['data'] = [
+            [
+                'name' => $this->year - 1,
+                'data' => $prevDataSeries
+            ],
+            [
+                'name' => $this->year,
+                'data' => $dataSeries
+            ]
+        ];
         $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
@@ -46,9 +65,6 @@ new class extends Component
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">MONTHLY SALES VOLUME</h3>
-            <div class="card-tools">
-                {{-- <input type="number" class="form-control form-control-sm" wire:model.live="year"> --}}
-            </div>
         </div>
         <div class="card-body" wire:ignore>
             <div id="container-volume"></div>
@@ -64,7 +80,7 @@ new class extends Component
     const initChart = () => {
         chart = Highcharts.chart('container-volume', {
             chart: {
-                type: 'column'
+                type: 'line'
             },
             title: {
                 text: 'MONTHLY SALES VOLUME ' + $wire.year
@@ -81,10 +97,15 @@ new class extends Component
                     text: 'Total Quantity Sold (PCS)'
                 }
             },
-            series: [{
-                name: 'Sales Volume',
-                data: $wire.chart_data['data'] // Sample data
-            }]
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                    enableMouseTracking: false
+                }
+            },
+            series: $wire.chart_data['data']
         });
     };
 

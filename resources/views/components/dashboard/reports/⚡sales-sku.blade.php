@@ -29,7 +29,8 @@ new class extends Component
             ->groupBy('sku')
             ->map(function($items) {
                 return [
-                    'name' => $items->first()['full_name'], // Grab name from first item
+                    'name' => $items->first()['full_name'],
+                    'sku' => $items->first()['sku'],
                     'y' => $items->sum('sales')
                 ];
             })
@@ -38,7 +39,7 @@ new class extends Component
             ->values(); // Reset keys
 
         $this->chart_data = [
-            'categories' => $top10->pluck('name')->toArray(),
+            'categories' => $top10->pluck('sku')->toArray(),
             'data'       => $top10->pluck('y')->map(fn($val) => round($val, 2))->toArray()
         ];
 
@@ -51,9 +52,6 @@ new class extends Component
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">TOP 10 SKU SALES ({{ $year }})</h3>
-            <div class="card-tools">
-                {{-- <input type="number" class="form-control form-control-sm" wire:model.live="year"> --}}
-            </div>
         </div>
         <div class="card-body" wire:ignore>
             <div id="container-sku"></div>
@@ -75,7 +73,6 @@ new class extends Component
                 text: 'TOP SKU BASED ON SALES ' + $wire.year
             },
             xAxis: {
-                // Bind Categories dynamically
                 categories: $wire.chart_data['categories'],
                 title: {
                     text: 'Product SKU'
@@ -93,7 +90,6 @@ new class extends Component
             },
             series: [{
                 name: 'Sales Amount',
-                // Bind Data dynamically
                 data: $wire.chart_data['data']
             }]
         });

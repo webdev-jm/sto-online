@@ -47,15 +47,12 @@ new class extends Component
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">TOP SKU BASED ON SALES ({{ $year }})</h3>
-            <div class="card-tools">
-                {{-- <input type="number" class="form-control form-control-sm" wire:model.live.debounce.500ms="year"> --}}
-            </div>
         </div>
-        <div class="card-body table-responsive p-0" style="max-height: 416px; overflow-y: auto;">
+        <div class="card-body table-responsive p-0" style="max-height: 700px; overflow-y: auto;">
             <table class="table table-bordered table-sm table-hover m-0 text-xs">
                 <thead class="bg-secondary" style="position: sticky; top: 0; z-index: 10;">
                     <tr>
-                        <th class="text-center" style="width: 50px;">Rank</th>
+                        <th class="text-center p-0 align-middle" style="width: 50px;">Rank</th>
                         <th>StockCode</th>
                         <th>Description</th>
                         <th class="text-right">Total Sales

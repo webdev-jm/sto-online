@@ -69,6 +69,7 @@ trait ConsolidateAccountData
                 DB::raw("'" . $account->account_code . "' as account_code"),
                 DB::raw("'" . $account->account_name . "' as account_name"),
                 DB::raw("'" . $account->account_code . " " . $account->account_name . "' as account_description"),
+                DB::raw("'".$account->area."' as area"),
                 'c.code as customer_code',
                 'c.name as customer_name',
                 'ch.code as channel_code',
