@@ -45,11 +45,8 @@ new class extends Component
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">SALES BY BRAND</h3>
-            <div class="card-tools">
-                {{-- <input type="number" class="form-control form-control-sm" wire:model.live="year"> --}}
-            </div>
         </div>
-        <div class="card-body" wire:ignore>
+        <div class="card-body p-0" wire:ignore>
             <div id="container-brands"></div>
         </div>
     </div>
@@ -78,7 +75,7 @@ new class extends Component
         initChart();
 
         $wire.on('update-chart', (event) => {
-            chart.series[0].setData($wire.chart_data);
+            chart.series[0].setData(event.data);
             chart.setTitle({text: 'SALES BY BRAND ' + $wire.year});
         });
     </script>

@@ -89,11 +89,13 @@ trait SalesDataAggregator
                             'month'     => (int) $row['month'],
                             'sales'     => (float) ($qtyPcs * $netPrice),
                             'qty_pcs'   => (float) $qtyPcs,
-                            'account_id'=> $account->id
+                            'account_id'=> $account->id,
+                            'account_name' => $account->account_name,
+                            'area'      => $account->area
                         ];
                     }
-                } // End Month Loop
-            } // End Account Loop
+                } // Month Loop
+            } // Account Loop
 
             return $masterData;
         });

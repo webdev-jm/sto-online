@@ -60,7 +60,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">SALES BY CHANNEL {{ $year }}</h3>
         </div>
-        <div class="card-body" wire:ignore>
+        <div class="card-body p-0" wire:ignore>
             <div id="container-channel"></div>
         </div>
     </div>
@@ -73,7 +73,7 @@ new class extends Component
     const initChart = () => {
         chart = Highcharts.chart('container-channel', {
             chart: {
-                type: 'pie'
+                type: 'column'
             },
             title: {
                 text: 'SALES BY CHANNEL'
@@ -100,6 +100,15 @@ new class extends Component
                         distance: 20
                     }
                 }
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Total percent market share'
+                }
+
             },
             series: [{
                 enableMouseTracking: true,
