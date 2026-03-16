@@ -124,7 +124,6 @@ trait ConsolidateAccountData
             ->when(!empty($month), fn($query) => $query->where('mi.month', $month))
             ->get();
 
-        // OPTIMIZATION: Eliminated N+1 Query. Fetches all required inventory aging data in ONE query instead of looping
         $inventories = DB::table('inventories as i')
             ->select([
                 'l.code as location_code',
@@ -140,14 +139,12 @@ trait ConsolidateAccountData
             ->leftJoin('locations as l', 'l.id', '=', 'i.location_id')
             ->leftJoin($smsDb . '.products as p', 'p.id', '=', 'i.product_id')
             ->whereNotNull('i.expiry_date')
-            // OPTIMIZATION: Used Laravel's native whereYear/whereMonth instead of DB::raw('YEAR()')
             ->when(!empty($year), fn($query) => $query->whereYear('iu.date', $year))
             ->when(!empty($month), fn($query) => $query->whereMonth('iu.date', $month))
             ->orderBy('iu.date', 'ASC')
             ->get();
 
         $inventory_aging = [];
-        // The last upload processed overwrites the previous ones for the same stock_code, maintaining original logic
         foreach($inventories as $inventory) {
             $inventory_aging[$inventory->stock_code] = $inventory;
         }

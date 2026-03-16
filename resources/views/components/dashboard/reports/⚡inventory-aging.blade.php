@@ -14,9 +14,9 @@ new class extends Component
 
     const EXPIRY_BUCKETS = [
         '1–3 Months'  => [1,  3],
-        '3–6 Months'  => [3,  6],
-        '6–12 Months' => [6,  12],
-        '18+ Months'  => [18, null],
+        '4–6 Months'  => [4,  6],
+        '7–12 Months' => [7,  12],
+        '18+ Months'  => [13, null],
     ];
 
     public function mount($year) {
@@ -54,7 +54,7 @@ new class extends Component
     private function resolveBucket(float $months): ?string
     {
         foreach (self::EXPIRY_BUCKETS as $label => [$min, $max]) {
-            if ($months >= $min && ($max === null || $months < $max)) {
+            if ($months >= $min && ($max === null || $months <= $max)) {
                 return $label;
             }
         }

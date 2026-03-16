@@ -135,7 +135,9 @@ trait SalesDataAggregator
                             'month'     => (int) $row['month'],
                             'total'     => (float) $row['total'],
                             'uom'       => $row['uom'],
-                            'account_id'=> $account->id
+                            'account_id'=> $account->id,
+                            'account_code' => $account->account_code,
+                            'short_name' => $account->short_name
                         ];
                     }
                 }
