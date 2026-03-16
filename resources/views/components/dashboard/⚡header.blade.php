@@ -168,7 +168,7 @@ new class extends Component
                                     <livewire:dashboard.reports.inventory-ending :year="$globalYear"/>
                                 </div>
                                 <div class="col-lg-4">
-                                    <livewire:dashboard.reports.sales-sku-total :year="$globalYear"/>
+                                    <livewire:dashboard.reports.oos :year="$globalYear"/>
                                 </div>
                             </div>
                         </div>
