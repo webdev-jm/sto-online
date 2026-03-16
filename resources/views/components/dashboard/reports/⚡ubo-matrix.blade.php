@@ -57,6 +57,9 @@ new class extends Component
     </div>
 </div>
 
+
+
+
 @script
 <script>
     let chart;

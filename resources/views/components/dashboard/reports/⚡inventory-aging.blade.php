@@ -126,7 +126,6 @@ new class extends Component
     $wire.on('update-chart', (event) => {
         chart.series[0].setData(event.data, false);
         chart.setTitle({ text: 'INVENTORY AGING ' + event.year });
-        chart.redraw();
     });
 </script>
 @endscript

@@ -73,6 +73,7 @@ new class extends Component
 </div>
 
 
+
 @script
 <script>
     let chart;
