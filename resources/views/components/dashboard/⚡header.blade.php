@@ -11,7 +11,6 @@ new class extends Component
     use SalesDataAggregator;
 
     public $type = 'sales';
-    public $group = 'sales';
     public $globalYear;
 
     public function mount() {
@@ -79,8 +78,9 @@ new class extends Component
                 <div class="tab-content" id="custom-tabs-five-tabContent">
                     <div class="tab-pane fade show active" id="sales" role="tabpanel" aria-labelledby="sales-tab">
                         <div class="overlay-wrapper">
-                            <div class="overlay" wire:loading><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div>
-                        </div>
+                            <div class="overlay" wire:loading><i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                                <div class="text-bold pt-2">Loading...</div>
+                            </div>
 
                             <div class="row">
                                 <div class="col-lg-3">
@@ -171,6 +171,7 @@ new class extends Component
                                     <livewire:dashboard.reports.oos :year="$globalYear"/>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -183,18 +184,11 @@ new class extends Component
     @endif
 </div>
 
-
-<style>
-</style>
-
 @assets
-{{-- <script src="{{ asset('vendor/apexcharts/dist/apexcharts.min.js') }}"></script> --}}
 <script src="{{ asset('vendor/highcharts/highcharts.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/data.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/drilldown.js') }}"></script>
-{{-- <script src="{{ asset('vendor/highcharts/modules/exporting.js') }}"></script>
-<script src="{{ asset('vendor/highcharts/modules/export-data.js') }}"></script>
-<script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script> --}}
+<script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/map.js') }}"></script>
 @endassets
 
