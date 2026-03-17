@@ -22,10 +22,8 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        $raw = $this->getYearlyInventoryData($this->year);
-        $inventory_data = collect($raw);
 
-        $this->table_data = $inventory_data->groupBy(fn($item) => $item['sku'] . '_' . $item['account_id'])
+        $this->table_data = collect($this->getYearlyInventoryData($this->year))->groupBy(fn($item) => $item['sku'] . '_' . $item['account_id'])
             ->map(function($items) {
                 return $items->sortByDesc('month')->first();
             })
@@ -42,7 +40,9 @@ new class extends Component
                     'total'      => $latest['total'],
                     'month'      => $latest['month'],
                 ];
-            });
+            })
+            ->values()
+            ->toArray();
     }
 };
 ?>

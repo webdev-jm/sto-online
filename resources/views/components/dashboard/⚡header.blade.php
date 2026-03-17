@@ -12,9 +12,11 @@ new class extends Component
 
     public $type = 'sales';
     public $globalYear;
+    public $header_data = [];
 
     public function mount() {
-        $this->globalYear = 2026;
+        $this->globalYear = date('Y');
+        $this->getData();
     }
 
     public function selectType($type)
@@ -22,21 +24,37 @@ new class extends Component
         $this->type = $type;
     }
 
+    public function updatedGlobalYear() {
+        $this->getData();
+    }
+
     public function refreshData() {
         // $this->setConsolidatedAccountData($this->globalYear);
-
-        // clear cache
-        Cache::forget('sales_data_consolidated_'.$this->globalYear);
-        Cache::forget('inventory_data_consolidated_'.$this->globalYear);
-        Cache::forget('inventory_aging_data_consolidated_'.$this->globalYear);
 
         $this->selectType($this->type);
     }
 
-    public function export($export_type) {
-        if($export_type == 'excel') {
+    public function getData() {
+        $group_data = collect($this->getYearlySalesData($this->globalYear))
+            ->groupBy('account_name')
+            ->map(function ($items) {
+                $ubo = $items
+                    ->groupBy('customer_code')
+                    ->filter(fn($ubo_items) => $ubo_items->first()['customer_status'] == 0)
+                    ->count();
 
-        }
+                return [
+                    'account' => $items->first()['account_name'],
+                    'total'   => $items->sum('sales'),
+                    'ubo'     => $ubo,
+                ];
+            });
+
+        $this->header_data = [
+            'distributors' => $group_data->count(),
+            'sales'        => $group_data->sum('total'),
+            'ubo'          => $group_data->sum('ubo'),
+        ];
     }
 };
 ?>
@@ -89,7 +107,7 @@ new class extends Component
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">GROSS SALES</span>
-                                            <span class="info-box-number">1,410</span>
+                                            <span class="info-box-number">{{ number_format($header_data['sales'] ?? 0, 2) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -100,7 +118,7 @@ new class extends Component
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">TOTAL DISTRIBUTORS</span>
-                                            <span class="info-box-number">1,410</span>
+                                            <span class="info-box-number">{{ number_format($header_data['distributors'] ?? 0) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -111,7 +129,7 @@ new class extends Component
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">NUMBER OF OUTLETS</span>
-                                            <span class="info-box-number">1,410</span>
+                                            <span class="info-box-number">{{ number_format($header_data['ubo'] ?? 0) }}</span>
                                         </div>
                                     </div>
                                 </div>

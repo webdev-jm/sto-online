@@ -32,9 +32,9 @@ new class extends Component
                     'y'    => round($items->sum('sales'), 2)
                 ];
             })
-            ->sortByDesc('y') // Sort highest sales first
-            ->values()        // Reset array keys (0, 1, 2...)
-            ->toArray();      // Convert to pure Array for JS
+            ->sortByDesc('y')
+            ->values()
+            ->toArray();
 
         $this->dispatch('update-chart', data: $this->chart_data);
     }

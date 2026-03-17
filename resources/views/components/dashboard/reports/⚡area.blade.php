@@ -37,7 +37,9 @@ new class extends Component
             ->groupBy('area')
             ->map(function($items) {
                 return $items->sum('sales');
-            });
+            })
+            ->values()
+            ->toArray();
     }
 };
 ?>
