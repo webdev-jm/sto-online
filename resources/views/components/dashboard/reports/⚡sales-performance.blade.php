@@ -22,42 +22,28 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        // 1. Get Cached, Unified Data
-        $raw = $this->getYearlySalesData($this->year);
+        $raw      = $this->getYearlySalesData($this->year);
         $prev_raw = $this->getYearlySalesData($this->year - 1);
 
-        // 2. Group by Month and Sum Sales
-        // Creates array [1 => 1200, 2 => 1500...]
-        $monthlySums = collect($raw)->groupBy('month')->map(function($items) {
-            return $items->sum('sales');
-        });
-        $prevMonthlySums = collect($prev_raw)->groupBy('month')->map(function($items) {
-            return $items->sum('sales');
-        });
+        $monthlySums     = collect($raw)->groupBy('month')->map(fn($i) => $i->sum('sales'));
+        $prevMonthlySums = collect($prev_raw)->groupBy('month')->map(fn($i) => $i->sum('sales'));
 
-        // 3. Format for Highcharts (Ensure all 12 months exist)
-        $currData = [];
-        $prevData = [];
+        $currData   = [];
+        $prevData   = [];
         $categories = [];
+
         for ($m = 1; $m <= 12; $m++) {
-            if(!empty($monthlySums[$m])) {
-                $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
-                $currData[] = round($monthlySums[$m] ?? 0, 2);
-                $prevData[] = round($prevMonthlySums[$m] ?? 0, 2);
-            }
+            // ✅ Always push all 12 months — keeps both arrays aligned
+            $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
+            $currData[]   = round($monthlySums[$m] ?? 0, 2);
+            $prevData[]   = round($prevMonthlySums[$m] ?? 0, 2);
         }
 
         $this->chart_data = [
             'categories' => $categories,
             'data' => [
-                [
-                    'name' => $this->year - 1,
-                    'data' => $prevData
-                ],
-                [
-                    'name' => $this->year,
-                    'data' => $currData
-                ]
+                ['name' => $this->year - 1, 'data' => $prevData],
+                ['name' => $this->year,     'data' => $currData],
             ]
         ];
 
@@ -135,11 +121,16 @@ new class extends Component
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData(event.data.data, true);
+        event.data.data.forEach((series, index) => {
+            if (chart.series[index]) {
+                chart.series[index].setData(series.data, false);
+                chart.series[index].update({ name: series.name }, false);
+            }
+        });
 
-        chart.xAxis[0].setCategories(event.data.categories);
-
-        chart.setTitle({text: 'MONTHLY SALES PERPORMANCE ' + $wire.year});
+        chart.xAxis[0].setCategories(event.data.categories, false);
+        chart.setTitle({ text: 'MONTHLY SALES PERPORMANCE ' + $wire.year }, false);
+        chart.redraw();
     });
 </script>
 @endscript

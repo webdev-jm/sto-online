@@ -43,6 +43,13 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        'sqlite_reports' => [
+            'driver'   => 'sqlite',
+            'database' => storage_path('app/reports/sales.sqlite'),
+            'prefix'   => '',
+            'foreign_key_constraints' => false,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -68,7 +75,7 @@ return [
                 'max_idle_time' => 30,
             ],
         ],
-        
+
         'sms_db' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL_2'),

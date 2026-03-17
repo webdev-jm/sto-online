@@ -48,9 +48,7 @@ new class extends Component
             ->values()
             ->toArray();
 
-            // dd($this->chart_data);
-
-        $this->dispatch('update-chart');
+        $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
 ?>
@@ -121,8 +119,9 @@ new class extends Component
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData($wire.chart_data);
+        chart.series[0].setData(event.data);
         chart.setTitle({text: 'SALES BY CHANNEL ' + $wire.year});
+        chart.redraw();
     });
 
 </script>

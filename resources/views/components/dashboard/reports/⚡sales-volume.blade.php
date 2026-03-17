@@ -23,39 +23,27 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        $raw = $this->getYearlySalesData($this->year);
+        $raw      = $this->getYearlySalesData($this->year);
         $prev_raw = $this->getYearlySalesData($this->year - 1);
 
-        $monthlyQty = collect($raw)
-            ->groupBy('month')->map(function($items) {
-                return $items->sum('qty_pcs');
-            });
+        $monthlyQty     = collect($raw)->groupBy('month')->map(fn($i) => $i->sum('qty_pcs'));
+        $prevMonthlyQty = collect($prev_raw)->groupBy('month')->map(fn($i) => $i->sum('qty_pcs'));
 
-        $prevMonthlyQty = collect($prev_raw)
-            ->groupBy('month')
-            ->map(function($items) {
-                return $items->sum('qty_pcs');
-            });
-
-        $dataSeries = [];
+        $dataSeries     = [];
         $prevDataSeries = [];
+
         for ($m = 1; $m <= 12; $m++) {
             if(!empty($monthlyQty[$m])) {
-                $dataSeries[] = round($monthlyQty[$m] ?? 0, 2);
+                $dataSeries[]     = round($monthlyQty[$m] ?? 0, 2);
                 $prevDataSeries[] = round($prevMonthlyQty[$m] ?? 0, 2);
             }
         }
 
         $this->chart_data['data'] = [
-            [
-                'name' => $this->year - 1,
-                'data' => $prevDataSeries
-            ],
-            [
-                'name' => $this->year,
-                'data' => $dataSeries
-            ]
+            ['name' => $this->year - 1, 'data' => $prevDataSeries],
+            ['name' => $this->year,     'data' => $dataSeries],
         ];
+
         $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
@@ -113,9 +101,16 @@ new class extends Component
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData($wire.chart_data['data']);
-        chart.xAxis[0].setCategories($wire.chart_data['categories']);
-        chart.setTitle({text: 'MONTHLY SALES VOLUME ' + $wire.year});
+        event.data.data.forEach((series, index) => {
+            if (chart.series[index]) {
+                chart.series[index].setData(series.data, false);
+                chart.series[index].update({ name: series.name }, false);
+            }
+        });
+
+        chart.xAxis[0].setCategories(event.data.categories, false);
+        chart.setTitle({ text: 'MONTHLY SALES VOLUME ' + $wire.year }, false);
+        chart.redraw();
     });
 
 </script>
