@@ -96,14 +96,15 @@ new class extends Component
                 <div class="tab-content" id="custom-tabs-five-tabContent">
                     <div class="tab-pane fade show active" id="sales" role="tabpanel" aria-labelledby="sales-tab">
                         <div class="overlay-wrapper">
-                            <div class="overlay" wire:loading><i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                            <div class="overlay text-center align-middle" wire:loading>
+                                <i class="fas fa-3x fa-sync-alt fa-spin"></i>
                                 <div class="text-bold pt-2">Loading...</div>
                             </div>
 
                             <div class="row">
                                 <div class="col-lg-3">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-info"><i class="far fa-envelope"></i></span>
+                                        <span class="info-box-icon bg-info"><i class="fa fa-dollar-sign"></i></span>
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">GROSS SALES</span>
@@ -114,7 +115,7 @@ new class extends Component
 
                                 <div class="col-lg-3">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-info"><i class="far fa-envelope"></i></span>
+                                        <span class="info-box-icon bg-info"><i class="fa fa-building"></i></span>
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">TOTAL DISTRIBUTORS</span>
@@ -125,7 +126,7 @@ new class extends Component
 
                                 <div class="col-lg-3">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-info"><i class="far fa-envelope"></i></span>
+                                        <span class="info-box-icon bg-info"><i class="fa fa-store"></i></span>
 
                                         <div class="info-box-content">
                                             <span class="info-box-text">NUMBER OF OUTLETS</span>
@@ -176,7 +177,8 @@ new class extends Component
                     </div>
                     <div class="tab-pane fade" id="inventories" role="tabpanel" aria-labelledby="inventories-tab">
                         <div class="overlay-wrapper">
-                            <div class="overlay" wire:loading><i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                            <div class="overlay text-center align-middle" wire:loading>
+                                <i class="fas fa-3x fa-sync-alt fa-spin"></i>
                                 <div class="text-bold pt-2">Loading...</div>
                             </div>
 

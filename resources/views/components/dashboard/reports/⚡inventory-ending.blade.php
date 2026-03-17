@@ -22,7 +22,7 @@ new class extends Component
         $this->year = $year;
 
         $this->products = Cache::remember('products_cache', 60 * 60, function () {
-            return SMSProduct::get();
+            return SMSProduct::get()->keyBy('stock_code');
         });
 
         $this->chartUpdated();
@@ -33,54 +33,62 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        $raw         = $this->getYearlyInventoryData($this->year);
-        $inventories = collect($raw);
-        $latest_month = $inventories->max('month');
+        $cache_key = "yearly_inventory_{$this->year}";
+        $raw       = Cache::remember($cache_key, 60 * 15, fn() => $this->getYearlyInventoryData($this->year));
 
+        $inventories  = collect($raw);
+        // $latest_month = $inventories->max('month');
+        $latest_month = 1;
 
-        $api_url   = env('API_URL_SYSPRODATA');
-        $api_token = env('API_TOKEN_SYSPRODATA');
+        $api_url   = config('services.sysprodata.url');
+        $api_token = config('services.sysprodata.token');
 
         $grouped = $inventories
+            ->where('month', $latest_month)
             ->groupBy(fn($item) => $item['sku'] . '_' . $item['short_name'])
-            ->filter(fn($items) => $items->where('month', $latest_month)->isNotEmpty())
             ->map(fn($items) => [
-                'first'   => $items->sortByDesc('month')->first(),
-                'total'   => $items->where('month', $latest_month)->sum('total'),
+                'first' => $items->sortByDesc('month')->first(),
+                'total' => $items->sum('total'),
             ]);
 
-        // Build all HTTP requests concurrently via pool
-        $keys = $grouped->keys()->values();
-        $responses = Http::pool(function ($pool) use ($grouped, $keys, $api_url, $api_token, $latest_month) {
-            return $keys->map(function ($key) use ($pool, $grouped, $api_url, $api_token, $latest_month) {
-                $first = $grouped[$key]['first'];
-                return $pool->as($key)
+        // Deduplicate by account_code — one request per account, not per SKU
+        $unique_accounts = $grouped
+            ->mapWithKeys(fn($row) => [$row['first']['account_code'] => $row['first']])
+            ->filter(fn($first) => !empty($first['account_code']));
+
+        $account_keys = $unique_accounts->keys()->values();
+
+        $responses = Http::pool(function ($pool) use ($unique_accounts, $account_keys, $api_url, $api_token, $latest_month) {
+            return $account_keys->map(function ($account_code) use ($pool, $unique_accounts, $api_url, $api_token, $latest_month) {
+                $first = $unique_accounts[$account_code];
+                return $pool->as($account_code)
                     ->withHeaders([
-                        'Accept'         => 'application/json',
-                        'Authorization'  => 'Bearer ' . $api_token,
-                        'year'           => $this->year,
-                        'month'          => $latest_month,
-                        'company'        => 'BEVA',
-                        'account_code'   => $first['account_code'] ?? null,
-                        'stock_code'     => $first['sku'],
+                        'Accept'        => 'application/json',
+                        'Authorization' => 'Bearer ' . $api_token,
+                        'year'          => $this->year,
+                        'month'         => $latest_month,
+                        'company'       => 'BEVA',
+                        'account_code'  => $account_code,
                     ])
                     ->timeout(30)
                     ->get($api_url . 'getOrders');
             })->all();
         });
 
-        // Map final table_data using pooled responses
-        $this->table_data = $grouped->map(function ($row, $key) use ($responses) {
-            $first   = $row['first'];
-            $product = $this->products->firstWhere('stock_code', $first['sku']);
-            $sell_in = 0;
 
-            $response = $responses[$key] ?? null;
+        $this->table_data = $grouped->map(function ($row) use ($responses) {
+            $first        = $row['first'];
+            $product      = $this->products->get($first['sku']);
+            $sell_in      = 0;
+            $account_code = $first['account_code'] ?? null;
+            $response     = $responses[$account_code] ?? null;
 
-            if ($response && $response->successful()) {
-                foreach ($response->json() as $val) {
-                    $sell_in += $this->convertUom($product, $val['uom'], $val['total'], 'PCS');
-                }
+            if ($response instanceof \Throwable) {
+                \Log::warning("Pool request failed for account [{$account_code}]: " . $response->getMessage());
+            } elseif ($response && $response->successful()) {
+                $sell_in = collect($response->json())
+                    ->where('StockCode', $first['sku'])
+                    ->sum(fn($item) => $this->convertUom($product, $item['uom'], $item['total'], 'PCS'));
             }
 
             return [
