@@ -11,6 +11,7 @@ new class extends Component
     use SalesDataAggregator;
 
     public $type = 'sales';
+    public $selected_tab = 'sales';
     public $globalYear;
     public $header_data = [];
 
@@ -26,12 +27,6 @@ new class extends Component
 
     public function updatedGlobalYear() {
         $this->getData();
-    }
-
-    public function refreshData() {
-        // $this->setConsolidatedAccountData($this->globalYear);
-
-        $this->selectType($this->type);
     }
 
     public function getData() {
@@ -56,6 +51,10 @@ new class extends Component
             'ubo'          => $group_data->sum('ubo'),
         ];
     }
+
+    public function selectTab($tab) {
+        $this->selected_tab = $tab;
+    }
 };
 ?>
 
@@ -68,25 +67,17 @@ new class extends Component
     </div>
 
     @if($type === 'sales')
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">REPORTS</h3>
-                <div class="card-tools">
-                    <button class="btn btn-sm btn-success" wire:click.prevent="refreshData" wire:loading.attr="disabled"><i class="fa fa-spinner fa-spin mr-1" wire:loading></i>REFRESH DATA</button>
-                </div>
-            </div>
-        </div>
 
         <div class="card card-secondary card-tabs">
             <div class="card-header p-0 pt-1">
                 <ul class="nav nav-tabs" id="custom-tabs-five-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="sales-tab" data-toggle="pill" href="#sales" role="tab" aria-controls="sales" aria-selected="true">
+                        <a class="nav-link {{ $selected_tab == 'sales' ? 'active' : '' }}" id="sales-tab" data-toggle="pill" href="#sales" role="tab" aria-controls="sales" aria-selected="{{ $selected_tab == 'sales' ? 'true' : 'false' }}" wire:click="selectTab('sales')">
                             SALES PERFORMANCE
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="inventories-tab" data-toggle="pill" href="#inventories" role="tab" aria-controls="inventories" aria-selected="false">
+                        <a class="nav-link {{ $selected_tab == 'inventories' ? 'active' : '' }}" id="inventories-tab" data-toggle="pill" href="#inventories" role="tab" aria-controls="inventories" aria-selected="{{ $selected_tab == 'inventories' ? 'true' : 'false' }}" wire:click="selectTab('inventories')">
                             INVENTORY AND SUPPLY CHAIN OVERVIEW
                         </a>
                     </li>
@@ -94,7 +85,7 @@ new class extends Component
             </div>
             <div class="card-body" style="background-color: rgba(136, 136, 136, 0.6)">
                 <div class="tab-content" id="custom-tabs-five-tabContent">
-                    <div class="tab-pane fade show active" id="sales" role="tabpanel" aria-labelledby="sales-tab">
+                    <div class="tab-pane fade {{ $selected_tab == 'sales' ? 'show active' : '' }}" id="sales" role="tabpanel" aria-labelledby="sales-tab">
                         <div class="overlay-wrapper">
                             <div class="overlay text-center align-middle" wire:loading>
                                 <i class="fas fa-3x fa-sync-alt fa-spin"></i>
@@ -175,11 +166,53 @@ new class extends Component
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="inventories" role="tabpanel" aria-labelledby="inventories-tab">
+                    <div class="tab-pane fade {{ $selected_tab == 'inventories' ? 'show active' : '' }}" id="inventories" role="tabpanel" aria-labelledby="inventories-tab">
                         <div class="overlay-wrapper">
                             <div class="overlay text-center align-middle" wire:loading>
                                 <i class="fas fa-3x fa-sync-alt fa-spin"></i>
                                 <div class="text-bold pt-2">Loading...</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-info"><i class="fa fa-dollar-sign"></i></span>
+
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">GROSS SALES</span>
+                                            <span class="info-box-number">{{ number_format($header_data['sales'] ?? 0, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-info"><i class="fa fa-building"></i></span>
+
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">TOTAL DISTRIBUTORS</span>
+                                            <span class="info-box-number">{{ number_format($header_data['distributors'] ?? 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-info"><i class="fa fa-store"></i></span>
+
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">NUMBER OF OUTLETS</span>
+                                            <span class="info-box-number">{{ number_format($header_data['ubo'] ?? 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="year">YEAR</label>
+                                        <input type="number" id="year" class="form-control form-control-sm" wire:model.live="globalYear">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">
