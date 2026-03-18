@@ -31,14 +31,11 @@ new class extends Component
     }
 
     public function chartUpdated() {
-        $raw = $this->getYearlySalesData($this->year);
-
-        $this->chart_data = collect($raw)
+        $this->chart_data = collect($this->getYearlySalesData($this->year))
             ->groupBy('area')
             ->map(function($items) {
                 return $items->sum('sales');
             })
-            ->values()
             ->toArray();
     }
 };
@@ -54,7 +51,7 @@ new class extends Component
                 @foreach($areas as $area)
                     <div class="col-lg-4">
                         <label>{{ $area }}</label>
-                        <input type="text" class="form-control border-bottom border-top-0 border-left-0 border-right-0" value="{{ number_format($chart_data[$area] ?? 0, 2) }}">
+                        <input type="text" class="form-control border-bottom border-top-0 border-left-0 border-right-0 bg-light" value="{{ number_format($chart_data[$area] ?? 0, 2) }}" readonly>
                     </div>
                 @endforeach
             </div>

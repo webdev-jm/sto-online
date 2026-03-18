@@ -17,6 +17,7 @@ var filesToCache = [
     "/images/avatar.png",
     "/images/BEV-LOGO.png",
     "/images/pexels-apasaric-2603464.jpg",
+    "/images/pexels-hngstrm-2341290.jpg",
     "/images/pexels-hngstrm-inverted.jpg",
     "/images/BEVI-ARANGA-SKETCH.png",
     "/vendor/adminlte/dist/css/adminlte.min.css",

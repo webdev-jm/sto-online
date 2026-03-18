@@ -3,11 +3,15 @@
 namespace App\Http\Traits;
 
 use App\Models\Account;
+use App\Models\AccountBranch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Traits\GenerateMonthlyInventory;
 
 trait ConsolidateAccountData
 {
+    use GenerateMonthlyInventory;
+
     public function setConsolidatedAccountData($year = NULL)
     {
         if (empty($year)) {
@@ -22,6 +26,10 @@ trait ConsolidateAccountData
             foreach ($accounts as $account) {
                 foreach ($years as $y) {
                     foreach (range(1, 12) as $m) {
+                        foreach(AccountBranch::where('account_id', $account->id)->get() as $branch) {
+                            $this->setMonthlyInventory($account->id, $branch->id, $y, $m);
+                        }
+
                         $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
 
                         // ✅ Write JSON

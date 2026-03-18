@@ -3,7 +3,7 @@
 use Livewire\Component;
 use App\Http\Traits\ConsolidateAccountData;
 use App\Http\Traits\SalesDataAggregator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan;
 
 new class extends Component
 {
@@ -55,18 +55,31 @@ new class extends Component
     public function selectTab($tab) {
         $this->selected_tab = $tab;
     }
+
+    public function refreshData() {
+        Artisan::call('cache:clear');
+        $this->setConsolidatedAccountData();
+    }
 };
 ?>
 
 <div>
     <div class="card">
         <div class="card-body">
-            <button class="btn btn-{{ $this->type == 'sales' ? 'primary' : 'default'}} btn-sm" wire:click.prevent="selectType('sales')">REPORTS</button>
-            <button class="btn btn-{{ $this->type == 'account-monitoring' ? 'primary' : 'default'}} btn-sm" wire:click.prevent="selectType('account-monitoring')">ACCOUNT MONITORING</button>
+            <button class="btn btn-{{ $this->type == 'sales' ? 'primary' : 'default'}} btn-sm" wire:click.prevent="selectType('sales')" wire:loading.attr="disabled">
+                REPORTS
+            </button>
+            <button class="btn btn-{{ $this->type == 'account-monitoring' ? 'primary' : 'default'}} btn-sm" wire:click.prevent="selectType('account-monitoring')" wire:loading.attr="disabled">
+                ACCOUNT MONITORING
+            </button>
         </div>
     </div>
 
     @if($type === 'sales')
+
+        <button class="btn btn-success btn-xs mb-2" wire:click.prevent="refreshData" wire:loading.attr="disabled">
+            REFRESH DATA
+        </button>
 
         <div class="card card-secondary card-tabs">
             <div class="card-header p-0 pt-1">
