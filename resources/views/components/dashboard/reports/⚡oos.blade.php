@@ -23,7 +23,8 @@ new class extends Component
 
     public function chartUpdated() {
 
-        $this->table_data = collect($this->getYearlyInventoryData($this->year))->groupBy(fn($item) => $item['sku'] . '_' . $item['account_id'])
+        $this->table_data = collect($this->getYearlyInventoryData($this->year))
+            ->groupBy(fn($item) => $item['sku'] . '_' . $item['account_id'])
             ->map(function($items) {
                 return $items->sortByDesc('month')->first();
             })

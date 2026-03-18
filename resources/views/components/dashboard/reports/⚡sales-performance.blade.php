@@ -33,10 +33,11 @@ new class extends Component
         $categories = [];
 
         for ($m = 1; $m <= 12; $m++) {
-            // ✅ Always push all 12 months — keeps both arrays aligned
-            $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
-            $currData[]   = round($monthlySums[$m] ?? 0, 2);
-            $prevData[]   = round($prevMonthlySums[$m] ?? 0, 2);
+            if(!empty($monthlySums[$m])) {
+                $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
+                $currData[]   = round($monthlySums[$m] ?? 0, 2);
+                $prevData[]   = round($prevMonthlySums[$m] ?? 0, 2);
+            }
         }
 
         $this->chart_data = [

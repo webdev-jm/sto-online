@@ -2,48 +2,55 @@
 
 namespace App\Http\Traits;
 
-use App\Models\Inventory;
-use App\Models\InventoryExpiry;
-
+use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 
 trait GenerateInventoryExpiry {
 
     public function generateInventoryExpiry($account_id, $account_branch_id, $year, $month) {
-        $inventories = Inventory::where('account_id', $account_id)
-            ->where('account_branch_id', $account_branch_id)
-            ->whereHas('inventory_upload', function($query) use ($year, $month) {
-                $query->where(DB::raw('YEAR(date)'), $year)
-                    ->where(DB::raw('MONTH(date)'), $month);
-            })
-            ->where('expiry_date', '!=', null)
+        $account = Account::find($account_id);
+        $connection = $account->db_data->connection_name;
+
+        $db = DB::connection($connection);
+
+        $inventories = $db->table('inventories')
+            ->join('inventory_uploads', 'inventories.inventory_upload_id', '=', 'inventory_uploads.id')
+            ->where('inventories.account_id', $account_id)
+            ->where('inventories.account_branch_id', $account_branch_id)
+            ->whereYear('inventory_uploads.date', $year)
+            ->whereMonth('inventory_uploads.date', $month)
+            ->whereNotNull('inventories.expiry_date')
+            ->select('inventories.*')
             ->get();
 
-        foreach($inventories as $inventory) {
-            // check in expiry table
-            $inventory_expiry = InventoryExpiry::where('account_id', $account_id)
+        foreach ($inventories as $inventory) {
+
+            $inventory_expiry = $db->table('inventory_expiries')
+                ->where('account_id', $account_id)
                 ->where('account_branch_id', $account_branch_id)
                 ->where('inventory_id', $inventory->id)
                 ->where('product_id', $inventory->product_id)
                 ->where('location_id', $inventory->location_id)
                 ->where('expiry_date', $inventory->expiry_date)
                 ->first();
+
             if (!$inventory_expiry) {
-                // Create new expiry record if not exists
-                InventoryExpiry::create([
-                    'account_id' => $account_id,
-                    'account_branch_id' => $account_branch_id,
-                    'inventory_id' => $inventory->id,
-                    'product_id' => $inventory->product_id,
-                    'location_id' => $inventory->location_id,
-                    'quantity' => $inventory->inventory,
-                    'expiry_date' => $inventory->expiry_date
-                ]);
+                $db->table('inventory_expiries')
+                    ->insert([
+                        'account_id'        => $account_id,
+                        'account_branch_id' => $account_branch_id,
+                        'inventory_id'      => $inventory->id,
+                        'product_id'        => $inventory->product_id,
+                        'location_id'       => $inventory->location_id,
+                        'quantity'          => $inventory->inventory,
+                        'expiry_date'       => $inventory->expiry_date,
+                    ]);
             } else {
-                // Update existing expiry record if exists
-                $inventory_expiry->update([
-                    'quantity' => $inventory->inventory,
-                ]);
+                $db->table('inventory_expiries')
+                    ->where('id', $inventory_expiry->id)
+                    ->update([
+                        'quantity' => $inventory->inventory,
+                    ]);
             }
         }
     }
