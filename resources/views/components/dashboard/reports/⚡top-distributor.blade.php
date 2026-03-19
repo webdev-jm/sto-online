@@ -30,7 +30,7 @@ new class extends Component
                 return $items->sum('sales');
             })
             ->sortByDesc(fn ($sum) => $sum)
-            ->take(3);
+            ->take(5);
     }
 
 };
@@ -39,16 +39,16 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-header">TOP 3 DISTRIBUTOR</h3>
+            <h3 class="card-title">TOP 5 DISTRIBUTOR</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-1">
             <ul class="list-group">
                 @php
                     $num = 1;
                 @endphp
                 @foreach($chart_data as $account => $data)
-                    <li class="list-group-item py-1">
-                        <strong>{{ $num++ }}.</strong> {{ $account }} - <b>{{ number_format($data, 2) }}</b>
+                    <li class="list-group-item py-1 px-1">
+                        <strong>{{ $num++ }}.</strong> {{ $account }}<b class="float-right">{{ number_format($data, 2) }}</b>
                     </li>
                 @endforeach
             </ul>

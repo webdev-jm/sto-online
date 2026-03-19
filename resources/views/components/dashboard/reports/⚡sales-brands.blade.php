@@ -46,7 +46,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">SALES BY BRAND</h3>
         </div>
-        <div class="card-body p-0" wire:ignore>
+        <div class="card-body" wire:ignore>
             <div id="container-brands"></div>
         </div>
     </div>
@@ -58,11 +58,15 @@ new class extends Component
 
         const initChart = () => {
             chart = Highcharts.chart('container-brands', {
+                credits: {
+                    enabled: false
+                },
                 chart: {
                     type: 'pie'
                 },
                 title: {
-                    text: 'Sales by Brands'
+                    text: null,
+                    enabled: false
                 },
                 series: [{
                     name: 'Sales',
@@ -76,7 +80,6 @@ new class extends Component
 
         $wire.on('update-chart', (event) => {
             chart.series[0].setData(event.data);
-            chart.setTitle({text: 'SALES BY BRAND ' + $wire.year});
         });
     </script>
 @endscript

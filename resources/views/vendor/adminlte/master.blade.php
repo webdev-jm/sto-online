@@ -108,6 +108,87 @@
     @yield('adminlte_js')
 
     <script>
+        /**
+        * modal-fix.js
+        * ------------
+        * Fixes the Bootstrap / AdminLTE issue where `.modal-backdrop` is appended
+        * to <body> AFTER `.modal`, causing it to paint on top of the modal dialog
+        * despite a lower z-index — because both are `position:fixed` children of
+        * the same stacking context (<body>), and DOM order is used as the tiebreaker.
+        *
+        * Strategy: use a MutationObserver to watch <body> for new children.
+        * Whenever a `.modal-backdrop` appears, immediately move it to just BEFORE
+        * its corresponding `.modal` in the DOM so z-index works as expected.
+        *
+        * Drop this script at the bottom of <body>, after Bootstrap JS.
+        * No jQuery required, no framework dependency.
+        */
+
+        (function () {
+            "use strict";
+
+            /**
+            * Move every existing/new .modal-backdrop to sit just before
+            * the first .modal it belongs to.
+            */
+            function reorderBackdrops() {
+                const backdrops = document.querySelectorAll(".modal-backdrop");
+
+                backdrops.forEach(function (backdrop) {
+                    // Find the modal that is currently shown (or any modal on the page)
+                    const modal =
+                        document.querySelector(".modal.show") ||
+                        document.querySelector(".modal");
+
+                    if (!modal) return;
+
+                    // Only move if the backdrop currently comes AFTER the modal in the DOM.
+                    // Node.compareDocumentPosition returns a bitmask:
+                    //   DOCUMENT_POSITION_FOLLOWING (4) means `modal` comes after `backdrop`
+                    //   DOCUMENT_POSITION_PRECEDING (2) means `modal` comes before `backdrop`
+                    const position = backdrop.compareDocumentPosition(modal);
+                    const modalIsAfterBackdrop = position & Node.DOCUMENT_POSITION_FOLLOWING;
+
+                    if (modalIsAfterBackdrop) {
+                        // Already correct — backdrop is before modal, nothing to do.
+                        return;
+                    }
+
+                    // Backdrop is after modal — move backdrop to just before the modal.
+                    modal.parentNode.insertBefore(backdrop, modal);
+                });
+            }
+
+            // Run once on load to catch any pre-existing bad ordering.
+            document.addEventListener("DOMContentLoaded", reorderBackdrops);
+
+            // Watch for Bootstrap dynamically appending the backdrop to <body>.
+            const observer = new MutationObserver(function (mutations) {
+                let needsReorder = false;
+
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (
+                        node.nodeType === 1 && // Element node
+                        (node.classList.contains("modal-backdrop") ||
+                            node.classList.contains("modal"))
+                        ) {
+                            needsReorder = true;
+                        }
+                    });
+                });
+
+                if (needsReorder) {
+                    // Use requestAnimationFrame so Bootstrap finishes its own DOM work first.
+                    requestAnimationFrame(reorderBackdrops);
+                }
+            });
+
+            observer.observe(document.body, { childList: true });
+        })();
+    </script>
+
+    <script>
         $(function() {
             // Dark mode toggle
             $('#darkModeToggle').on('click', function(e) {
@@ -117,6 +198,12 @@
                 $('body').find('.content-wrapper').toggleClass('bg-light').toggleClass('bg-dark', !$('body').find('.content-wrapper').hasClass('bg-light'));
                 $('body').find('.main-header').toggleClass('navbar-white navbar-light').toggleClass('navbar-secondary navbar-dark', !$('body').find('.main-header').hasClass('navbar-secondary navbar-dark'));
             });
+
+            // close modal
+            $('body').on('click', '[data-dismiss="modal"]', function () {
+                $(this).closest('.modal').modal('hide');
+            });
+
         });
     </script>
 

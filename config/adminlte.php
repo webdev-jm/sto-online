@@ -383,13 +383,13 @@ return [
                 ]
             ],
         ],
-        [
-            'text'      => 'Reports',
-            'url'       => 'report/sto',
-            'icon'      => 'fa fa-fw fa-chart-pie',
-            'can'       => 'reports sto',
-            'active'    => ['report-sto*']
-        ],
+        // [
+        //     'text'      => 'Reports',
+        //     'url'       => 'report/sto',
+        //     'icon'      => 'fa fa-fw fa-chart-pie',
+        //     'can'       => 'reports sto',
+        //     'active'    => ['report-sto*']
+        // ],
     ],
 
     /*

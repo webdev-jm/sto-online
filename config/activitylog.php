@@ -49,4 +49,7 @@ return [
      * Laravel database.default will be used instead.
      */
     'database_connection' => env('ACTIVITY_LOGGER_DB_CONNECTION'),
+
+    'use_log_name' => 'default',
+    'batch_uuid' => false,
 ];

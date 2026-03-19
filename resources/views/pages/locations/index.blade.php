@@ -81,7 +81,7 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
             {{$locations->links()}}

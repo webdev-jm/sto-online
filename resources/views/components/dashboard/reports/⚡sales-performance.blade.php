@@ -58,7 +58,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">MONTHLY SALES PERPORMANCE</h3>
         </div>
-        <div class="card-body p-0" wire:ignore>
+        <div class="card-body" wire:ignore>
             <div id="container-performance"></div>
         </div>
     </div>
@@ -70,14 +70,15 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-performance', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'MONTHLY SALES PERPORMANCE ' + $wire.year
-            },
-            subtitle: {
-                text: 'Monthly Sales Performance Report'
+                text: null,
+                enabled: false
             },
             accessibility: {
                 announceNewData: {
@@ -130,7 +131,6 @@ new class extends Component
         });
 
         chart.xAxis[0].setCategories(event.data.categories, false);
-        chart.setTitle({ text: 'MONTHLY SALES PERPORMANCE ' + $wire.year }, false);
         chart.redraw();
     });
 </script>

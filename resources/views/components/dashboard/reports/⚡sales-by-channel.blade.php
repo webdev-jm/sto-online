@@ -58,7 +58,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">SALES BY CHANNEL {{ $year }}</h3>
         </div>
-        <div class="card-body p-0" wire:ignore>
+        <div class="card-body" wire:ignore>
             <div id="container-channel"></div>
         </div>
     </div>
@@ -70,11 +70,18 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-channel', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'column'
             },
+            legend: {
+                enabled: false
+            },
             title: {
-                text: 'SALES BY CHANNEL'
+                text: null,
+                enabled: false
             },
             tooltip: {
                 headerFormat: '',
@@ -120,7 +127,6 @@ new class extends Component
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData(event.data);
-        chart.setTitle({text: 'SALES BY CHANNEL ' + $wire.year});
         chart.redraw();
     });
 

@@ -68,11 +68,15 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-volume', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'line'
             },
             title: {
-                text: 'MONTHLY SALES VOLUME ' + $wire.year
+                text: null,
+                enabled: false
             },
             xAxis: {
                 categories: $wire.chart_data['categories'],
@@ -109,7 +113,6 @@ new class extends Component
         });
 
         chart.xAxis[0].setCategories(event.data.categories, false);
-        chart.setTitle({ text: 'MONTHLY SALES VOLUME ' + $wire.year }, false);
         chart.redraw();
     });
 

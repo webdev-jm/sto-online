@@ -67,11 +67,15 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-ubo', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'column'
             },
             title: {
-                text: '>UNIQUE BUYING OUTLET (UBO) ' + $wire.year
+                text: null,
+                enabled: false
             },
             accessibility: {
                 announceNewData: {
@@ -121,7 +125,6 @@ new class extends Component
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData($wire.chart_data);
-        chart.setTitle({text: 'UNIQUE BUYING OUTLET (UBO) ' + $wire.year});
     });
 
 </script>
