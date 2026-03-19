@@ -53,7 +53,7 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">OUT OF STOCK (OOS) {{ $year }}</h3>
         </div>
-        <div class="card-body table-responsive p-0" style="max-height: 700px; overflow-y: auto;">
+        <div class="card-body table-responsive" style="max-height: 700px; overflow-y: auto;">
             <table class="table table-bordered table-sm table-hover m-0 text-xs">
                 <thead class="bg-secondary" style="position: sticky; top: 0; z-index: 10;">
                     <tr>

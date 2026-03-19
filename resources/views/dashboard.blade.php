@@ -8,7 +8,7 @@
             <h1>Dashboard</h1>
         </div>
         <div class="col-lg-6 text-right">
-            <a href="{{ route('home') }}" class="btn btn-sm btn-secondary">
+            <a href="{{ route('home') }}" class="btn-change-branch">
                 VIEW ACCOUNTS
             </a>
         </div>

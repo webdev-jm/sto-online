@@ -28,7 +28,7 @@
                     @can('customer parked')
                     <a href="{{route('customer.parked')}}" class="btn btn-warning btn-sm"><i class="fa fa-handshake-slash mr-1"></i>Parked Customers</a>
                     @endcan
-                    <button class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</button>
+                    <a href="#" class="btn btn-info btn-sm" type="button" id="btn-upload"><i class="fa fa-upload mr-1"></i>Upload</a>
                 </div>
             @endcan
         </div>
@@ -110,7 +110,7 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
             {{$customers->links()}}
@@ -128,7 +128,7 @@
 
     @can('customer delete')
     <div class="modal fade" id="modal-delete">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <livewire:confirm-delete/>
         </div>
     </div>

@@ -142,9 +142,15 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-ubo-matrix', {
+            credits: {
+                enabled: false
+            },
             chart: { type: 'scatter', zooming: { type: 'xy' } },
+            title: {
+                text: null,
+                enabled: false
+            },
             legend: { enabled: false },
-            title: { text: 'UBO MATRIX ' + $wire.year },
             xAxis: {
                 gridLineWidth: 1,
                 title: { text: 'Sales' },
@@ -178,7 +184,6 @@ new class extends Component
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData(event.data);
-        chart.setTitle({ text: 'UBO MATRIX ' + event.year });
         chart.redraw();
     });
 </script>

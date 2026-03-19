@@ -66,11 +66,18 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-sku', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'bar'
             },
+            legend: {
+                enabled: false
+            },
             title: {
-                text: 'TOP SKU BASED ON SALES ' + $wire.year
+                text: null,
+                enabled: false
             },
             xAxis: {
                 categories: $wire.chart_data['categories'],
@@ -99,8 +106,6 @@ new class extends Component
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData($wire.chart_data['data']);
-        chart.xAxis[0].setCategories($wire.chart_data['categories']);
-        chart.setTitle({text: 'TOP SKU BASED ON SALES ' + $wire.year});
     });
 
 </script>

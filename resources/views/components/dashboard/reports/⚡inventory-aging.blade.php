@@ -82,11 +82,15 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-aging', {
+            credits: {
+                enabled: false
+            },
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'INVENTORY AGING ' + $wire.year
+                text: null,
+                enabled: false
             },
             xAxis: {
                 categories: BUCKET_LABELS,
@@ -125,7 +129,6 @@ new class extends Component
 
     $wire.on('update-chart', (event) => {
         chart.series[0].setData(event.data, false);
-        chart.setTitle({ text: 'INVENTORY AGING ' + event.year });
         chart.redraw();
     });
 </script>
