@@ -167,7 +167,7 @@ new class extends Component
                                 <livewire:dashboard.reports.sales-performance :year="$globalYear" />
                             </div>
                             <div class="col-lg-6">
-                                {{-- <livewire:dashboard.reports.sales-brands :year="$globalYear"/> --}}
+                                <livewire:dashboard.reports.sales-brands :year="$globalYear"/>
                             </div>
                             <div class="col-lg-6">
                                 {{-- <livewire:dashboard.reports.sales-by-channel :year="$globalYear"/> --}}
