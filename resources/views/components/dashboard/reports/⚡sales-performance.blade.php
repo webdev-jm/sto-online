@@ -55,7 +55,7 @@ new class extends Component
                 $drilldown[] = [
                     'id'   => $currDrillId,
                     'name' => "{$monthLabel} {$this->year}",
-                    'type' => 'column',
+                    'type' => 'pie',          // ← change from 'column'
                     'data' => collect($raw)
                                 ->where('month', $m)
                                 ->groupBy('account_name')
@@ -70,7 +70,7 @@ new class extends Component
                 $drilldown[] = [
                     'id'   => $prevDrillId,
                     'name' => "{$monthLabel} " . ($this->year - 1),
-                    'type' => 'column',
+                    'type' => 'pie',          // ← change from 'column'
                     'data' => collect($prev_raw)
                                 ->where('month', $m)
                                 ->groupBy('account_name')
@@ -116,11 +116,20 @@ new class extends Component
     const initChart = () => {
         chart = Highcharts.chart('container-performance', {
             credits: { enabled: false },
-            chart: { type: 'column' },
+            chart: {
+                type: 'column',
+                events: {
+                    drillup: function () {
+                        const categories = this.userOptions.xAxis.categories;
+                        this.xAxis[0].setCategories(categories, false);
+                        this.redraw();
+                    }
+                }
+            },
             title: { text: null },
             accessibility: { announceNewData: { enabled: true } },
             xAxis: {
-                type: 'category',
+                categories: $wire.chart_data.categories,
                 crosshair: true,
             },
             yAxis: {
@@ -132,13 +141,47 @@ new class extends Component
                     borderWidth: 0,
                     dataLabels: {
                         enabled: true,
-                        format: '₱ {point.y:,.2f}'
+                        formatter: function () {
+                            const val = this.y;
+                            if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            return '₱ ' + Highcharts.numberFormat(val, 2);
+                        }
                     }
+                },
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            const val = this.y;
+                            let abbreviated;
+                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            else                       abbreviated = Highcharts.numberFormat(val, 2);
+                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                        }
+                    },
+                    showInLegend: true
                 }
             },
             tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<b>₱ {point.y:,.2f}</b> total<br/>'
+                formatter: function () {
+                    if (this.series.type === 'pie') {
+                        // Drilldown tooltip
+                        return `<span style="font-size:11px">${this.series.name}</span><br>
+                                <b>${this.point.name}</b><br>
+                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
+                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                    }
+                    // Top level column tooltip
+                    return `<span style="font-size:11px">${this.series.name}</span><br>
+                            <b>${this.point.name}</b><br>
+                            ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
+                }
             },
             series: $wire.chart_data.data,
             drilldown: {
@@ -157,11 +200,20 @@ new class extends Component
         chart.destroy();
         chart = Highcharts.chart('container-performance', {
             credits: { enabled: false },
-            chart: { type: 'column' },
+            chart: {
+                type: 'column',
+                events: {
+                    drillup: function () {
+                        const categories = event.data.categories;
+                        this.xAxis[0].setCategories(categories, false);
+                        this.redraw();
+                    }
+                }
+            },
             title: { text: null },
             accessibility: { announceNewData: { enabled: true } },
             xAxis: {
-                type: 'category',
+                categories: event.data.categories,
                 crosshair: true,
             },
             yAxis: {
@@ -173,13 +225,47 @@ new class extends Component
                     borderWidth: 0,
                     dataLabels: {
                         enabled: true,
-                        format: '₱ {point.y:,.2f}'
+                        formatter: function () {
+                            const val = this.y;
+                            if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            return '₱ ' + Highcharts.numberFormat(val, 2);
+                        }
                     }
+                },
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            const val = this.y;
+                            let abbreviated;
+                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            else                       abbreviated = Highcharts.numberFormat(val, 2);
+                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                        }
+                    },
+                    showInLegend: true
                 }
             },
             tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<b>₱ {point.y:,.2f}</b> total<br/>'
+                formatter: function () {
+                    if (this.series.type === 'pie') {
+                        // Drilldown tooltip
+                        return `<span style="font-size:11px">${this.series.name}</span><br>
+                                <b>${this.point.name}</b><br>
+                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
+                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                    }
+                    // Top level column tooltip
+                    return `<span style="font-size:11px">${this.series.name}</span><br>
+                            <b>${this.point.name}</b><br>
+                            ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
+                }
             },
             series: event.data.data,
             drilldown: {
