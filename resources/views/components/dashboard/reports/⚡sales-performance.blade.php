@@ -31,21 +31,66 @@ new class extends Component
         $currData   = [];
         $prevData   = [];
         $categories = [];
+        $drilldown  = [];
 
         for ($m = 1; $m <= 12; $m++) {
-            if(!empty($monthlySums[$m])) {
-                $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
-                $currData[]   = round($monthlySums[$m] ?? 0, 2);
-                $prevData[]   = round($prevMonthlySums[$m] ?? 0, 2);
+            if (!empty($monthlySums[$m])) {
+                $monthLabel = \DateTime::createFromFormat('!m', $m)->format('M');
+                $categories[] = $monthLabel;
+
+                $currDrillId = "curr_{$m}";
+                $prevDrillId = "prev_{$m}";
+
+                $currData[] = [
+                    'name'      => $monthLabel,
+                    'y'         => round($monthlySums[$m] ?? 0, 2),
+                    'drilldown' => $currDrillId,
+                ];
+                $prevData[] = [
+                    'name'      => $monthLabel,
+                    'y'         => round($prevMonthlySums[$m] ?? 0, 2),
+                    'drilldown' => $prevDrillId,
+                ];
+
+                $drilldown[] = [
+                    'id'   => $currDrillId,
+                    'name' => "{$monthLabel} {$this->year}",
+                    'type' => 'column',
+                    'data' => collect($raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $k) => [
+                                    'name' => $k,
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->values()
+                                ->toArray(),
+                ];
+
+                $drilldown[] = [
+                    'id'   => $prevDrillId,
+                    'name' => "{$monthLabel} " . ($this->year - 1),
+                    'type' => 'column',
+                    'data' => collect($prev_raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $k) => [
+                                    'name' => $k,
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->values()
+                                ->toArray(),
+                ];
             }
         }
 
         $this->chart_data = [
             'categories' => $categories,
-            'data' => [
+            'data'       => [
                 ['name' => $this->year - 1, 'data' => $prevData],
                 ['name' => $this->year,     'data' => $currData],
-            ]
+            ],
+            'drilldown'  => $drilldown,
         ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
@@ -70,37 +115,18 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-performance', {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            accessibility: {
-                announceNewData: {
-                    enabled: true
-                }
-            },
+            credits: { enabled: false },
+            chart: { type: 'column' },
+            title: { text: null },
+            accessibility: { announceNewData: { enabled: true } },
             xAxis: {
-                categories: $wire.chart_data.categories,
+                type: 'category',
                 crosshair: true,
-                accessibility: {
-                    description: 'YEAR'
-                }
             },
             yAxis: {
-                title: {
-                    text: 'Total percent market share'
-                }
-
+                title: { text: 'Total percent market share' }
             },
-            legend: {
-                enabled: false
-            },
+            legend: { enabled: false },
             plotOptions: {
                 series: {
                     borderWidth: 0,
@@ -110,28 +136,60 @@ new class extends Component
                     }
                 }
             },
-
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<b>{point.y:,.2f}</b> total<br/>'
+                pointFormat: '<b>₱ {point.y:,.2f}</b> total<br/>'
             },
-
-            series: $wire.chart_data.data
+            series: $wire.chart_data.data,
+            drilldown: {
+                series: $wire.chart_data.drilldown,
+                activeDataLabelStyle: {
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }
+            }
         });
     }
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        event.data.data.forEach((series, index) => {
-            if (chart.series[index]) {
-                chart.series[index].setData(series.data, false);
-                chart.series[index].update({ name: series.name }, false);
+        chart.destroy();
+        chart = Highcharts.chart('container-performance', {
+            credits: { enabled: false },
+            chart: { type: 'column' },
+            title: { text: null },
+            accessibility: { announceNewData: { enabled: true } },
+            xAxis: {
+                type: 'category',
+                crosshair: true,
+            },
+            yAxis: {
+                title: { text: 'Total percent market share' }
+            },
+            legend: { enabled: false },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '₱ {point.y:,.2f}'
+                    }
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<b>₱ {point.y:,.2f}</b> total<br/>'
+            },
+            series: event.data.data,
+            drilldown: {
+                series: event.data.drilldown,
+                activeDataLabelStyle: {
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }
             }
         });
-
-        chart.xAxis[0].setCategories(event.data.categories, false);
-        chart.redraw();
     });
 </script>
 @endscript
