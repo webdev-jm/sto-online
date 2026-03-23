@@ -24,25 +24,45 @@ new class extends Component
 
     public function chartUpdated() {
         $raw = $this->getYearlySalesData($this->year);
+        $collection = collect($raw)->where('customer_status', 0);
 
-        $this->chart_data = collect($raw)
+        $drilldown = [];
+
+        $chart_data = $collection
             ->groupBy('month')
-            ->filter(function($items) {
-                return $items->get('customer_status') == 0;
-            })
-            ->map(function($items) {
-                $first = $items->first();
+            ->map(function ($items, $month) use (&$drilldown) {
+                $monthLabel = \DateTime::createFromFormat('!m', $month)->format('M');
+                $drillId    = "month_{$month}";
 
-                $month = \DateTime::createFromFormat('!m', $first['month'])->format('M');
-                $count = collect($items)->groupBy('customer_code')->count();
+                // Per-account UBO count for this month
+                $drilldown[] = [
+                    'id'   => $drillId,
+                    'name' => $monthLabel,
+                    'type' => 'column',
+                    'data' => collect($items)
+                                ->groupBy('account_name')
+                                ->map(fn($accountItems, $accountName) => [
+                                    'name' => $accountName ?: 'Unknown',
+                                    'y'    => collect($accountItems)->groupBy('customer_code')->count(),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
 
                 return [
-                    'name' => $month,
-                    'y' => (int) $count,
+                    'name'      => $monthLabel,
+                    'y'         => collect($items)->groupBy('customer_code')->count(),
+                    'drilldown' => $drillId,
                 ];
             })
             ->values()
             ->toArray();
+
+        $this->chart_data = [
+            'data'      => $chart_data,
+            'drilldown' => $drilldown,
+        ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
     }
@@ -65,66 +85,69 @@ new class extends Component
 <script>
     let chart;
 
+    const buildConfig = (data) => ({
+        credits: { enabled: false },
+        chart: {
+            type: 'column',
+            events: {
+                drillup: function () {
+                    this.setTitle({ text: null });
+                    this.yAxis[0].setTitle({ text: 'Total UBO' }, false);
+                    this.redraw();
+                },
+                drilldown: function (e) {
+                    this.setTitle({ text: `${e.point.name} — UBO per Account` });
+                    this.yAxis[0].setTitle({ text: 'UBO Count' }, false);
+                    this.redraw();
+                }
+            }
+        },
+        title: { text: null },
+        accessibility: { announceNewData: { enabled: true } },
+        xAxis: { type: 'category' },
+        yAxis: {
+            title: { text: 'Total UBO' }
+        },
+        legend: { enabled: false },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.y}'
+                }
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} UBO</b><br/>'
+        },
+        series: [{
+            name: 'UBO',
+            colorByPoint: true,
+            data: data.data
+        }],
+        drilldown: {
+            breadcrumbs: {
+                position: { align: 'right' }
+            },
+            activeDataLabelStyle: {
+                textDecoration: 'none',
+                color: 'inherit'
+            },
+            series: data.drilldown
+        }
+    });
+
     const initChart = () => {
-        chart = Highcharts.chart('container-ubo', {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            accessibility: {
-                announceNewData: {
-                    enabled: true
-                }
-            },
-            xAxis: {
-                type: 'category'
-            },
-            yAxis: {
-                title: {
-                    text: 'Total UBO'
-                }
-
-            },
-            legend: {
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.y}'
-                    }
-                }
-            },
-
-            tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: ' +
-                    '<b>{point.y}</b><br/>'
-            },
-
-            series: [
-                {
-                    name: 'UBO',
-                    colorByPoint: true,
-                    data: $wire.chart_data
-                }
-            ],
-        });
+        chart = Highcharts.chart('container-ubo', buildConfig($wire.chart_data));
     };
-
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData($wire.chart_data);
+        chart.destroy();
+        chart = Highcharts.chart('container-ubo', buildConfig(event.data));
     });
 
 </script>
