@@ -71,7 +71,7 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">SALES BY BRAND</h3>
+            <h3 class="card-title">SALES BY BRAND {{ $this->year }}</h3>
         </div>
         <div class="card-body" wire:ignore>
             <div id="container-brands"></div>

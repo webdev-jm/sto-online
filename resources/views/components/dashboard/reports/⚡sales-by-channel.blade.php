@@ -33,20 +33,41 @@ new class extends Component
             return;
         }
 
-        $this->chart_data = $collection->groupBy('channel_code')
-            ->map(function ($items) use($total_sales) {
-                $first = $items->first();
-                $sales = $items->sum('sales');
+        $drilldown = [];
 
-                $percent = round(($sales / $total_sales) * 100, 2);
+        $chart_data = $collection->groupBy('channel_code')
+            ->map(function ($items) use (&$drilldown) {
+                $first   = $items->first();
+                $drillId = 'channel_' . md5($first['channel_code']);
+
+                // Build per-account drilldown for this channel
+                $drilldown[] = [
+                    'id'   => $drillId,
+                    'name' => '[' . $first['channel_code'] . '] ' . $first['channel_name'],
+                    'type' => 'column',
+                    'data' => $items->groupBy('account_name')
+                                ->map(fn($i, $account) => [
+                                    'name' => $account ?: 'Unknown',
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
 
                 return [
-                    'name' => '['.$first['channel_code'].'] '.$first['channel_name'],
-                    'y' => (float) $sales
+                    'name'      => '[' . $first['channel_code'] . '] ' . $first['channel_name'],
+                    'y'         => (float) $items->sum('sales'),
+                    'drilldown' => $drillId,
                 ];
             })
             ->values()
             ->toArray();
+
+        $this->chart_data = [
+            'data'      => $chart_data,
+            'drilldown' => $drilldown,
+        ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
     }
@@ -68,66 +89,75 @@ new class extends Component
 <script>
     let chart;
 
-    const initChart = () => {
-        chart = Highcharts.chart('container-channel', {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                type: 'column'
-            },
-            legend: {
-                enabled: false
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            tooltip: {
-                headerFormat: '',
-                pointFormat:
-                    '<span style="color:{point.color}">\u25cf</span> ' +
-                    '{point.name}: <b>{point.y:,.2f}</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
+    const buildConfig = (data) => ({
+        credits: { enabled: false },
+        chart: {
+            type: 'column',
+            events: {
+                drillup: function () {
+                    this.setTitle({ text: null });
+                },
+                drilldown: function (e) {
+                    this.setTitle({ text: `${e.point.name} — by Account` });
                 }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    borderWidth: 2,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b><br>{point.percentage:.1f}%',
-                        distance: 20
+            }
+        },
+        legend: { enabled: false },
+        title: { text: null },
+        accessibility: { announceNewData: { enabled: true } },
+        xAxis: { type: 'category', crosshair: true },
+        yAxis: {
+            title: { text: 'Sales Amount' }
+        },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        const val = this.y;
+                        if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                        if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                        if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                        return '₱ ' + Highcharts.numberFormat(val, 2);
                     }
                 }
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                const val = this.y;
+                return `<span style="color:${this.point.color}">\u25cf</span>
+                        <b>${this.point.name}</b><br>
+                        ₱ <b>${Highcharts.numberFormat(val, 2)}</b>`;
+            }
+        },
+        series: [{
+            name: 'Sales by Channel',
+            colorByPoint: true,
+            data: data.data
+        }],
+        drilldown: {
+            breadcrumbs: {
+                position: { align: 'right' }
             },
-            xAxis: {
-                type: 'category'
+            activeDataLabelStyle: {
+                textDecoration: 'none',
+                color: 'inherit'
             },
-            yAxis: {
-                title: {
-                    text: 'Total percent market share'
-                }
+            series: data.drilldown
+        }
+    });
 
-            },
-            series: [{
-                enableMouseTracking: true,
-                colorByPoint: true,
-                data: $wire.chart_data
-            }]
-        });
-    }
+    const initChart = () => {
+        chart = Highcharts.chart('container-channel', buildConfig($wire.chart_data));
+    };
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData(event.data);
-        chart.redraw();
+        chart.destroy();
+        chart = Highcharts.chart('container-channel', buildConfig(event.data));
     });
 
 </script>

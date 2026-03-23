@@ -101,7 +101,7 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">MONTHLY SALES PERPORMANCE</h3>
+            <h3 class="card-title">MONTHLY SALES PERPORMANCE {{ $this->year }}</h3>
         </div>
         <div class="card-body" wire:ignore>
             <div id="container-performance"></div>
