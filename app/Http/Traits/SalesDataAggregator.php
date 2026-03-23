@@ -172,6 +172,8 @@ trait SalesDataAggregator
                     'expiry_date'     => $row->expiry_date,
                     'total_inventory' => (float) $row->total_inventory,
                     'remaining_days'  => $this->computeRemainingDays($row->expiry_date),
+                    'account_code'    => $account->account_code,
+                    'short_name'      => $account->short_name,
                     'account_id'      => $account?->id,
                 ];
             })->toArray();
