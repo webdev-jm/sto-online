@@ -1,4 +1,4 @@
-const version = "v1.0.22" + new Date().getTime();
+const version = "v1.0.28" + new Date().getTime();
 var staticCacheName = "pwa-v-sto-online" + version;
 var filesToCache = [
     "/offline",
@@ -41,6 +41,12 @@ var filesToCache = [
     "vendor/highcharts/modules/export-data.js",
     "vendor/highcharts/modules/accessibility.js",
     "vendor/highcharts/modules/map.js",
+    "vendor/sweetalert2/sweetalert2.all.min.js",
+    "vendor/sweetalert2/sweetalert2.min.css",
+    "rappasoft/laravel-livewire-tables/thirdparty.css",
+    "rappasoft/laravel-livewire-tables/thirdparty.min.js",
+    "rappasoft/laravel-livewire-tables/core.min.js",
+    "rappasoft/laravel-livewire-tables/core.min.css",
 ];
 
 // Cache on install
