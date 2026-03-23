@@ -1510,8 +1510,12 @@ select.form-control {
    PAGINATION
 ============================================================================= */
 .pagination {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     font-family: "Figtree", sans-serif !important;
     gap: 4px !important;
+    margin-bottom: 0 !important;
 }
 .page-item .page-link {
     border-radius: 8px !important;
@@ -1680,31 +1684,6 @@ select.form-control {
     font-family: "Syne", sans-serif !important;
     font-weight: 700 !important;
     color: var(--col-dark) !important;
-}
-
-.modal-body ul {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 14px 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-}
-.modal-body ul li {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
-    background: rgba(255, 255, 255, 0.55) !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-left: 3px solid var(--col-accent) !important;
-    border-radius: 10px !important;
-    padding: 10px 14px !important;
-    font-size: 0.85rem !important;
-    color: var(--col-muted) !important;
-}
-.modal-body ul li::before {
-    content: "" !important;
-    display: none !important;
 }
 
 .modal-body input[type="file"]:not(.custom-file-input) {
