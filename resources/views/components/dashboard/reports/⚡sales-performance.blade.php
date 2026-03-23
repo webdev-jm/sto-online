@@ -31,21 +31,66 @@ new class extends Component
         $currData   = [];
         $prevData   = [];
         $categories = [];
+        $drilldown  = [];
 
         for ($m = 1; $m <= 12; $m++) {
-            if(!empty($monthlySums[$m])) {
-                $categories[] = \DateTime::createFromFormat('!m', $m)->format('M');
-                $currData[]   = round($monthlySums[$m] ?? 0, 2);
-                $prevData[]   = round($prevMonthlySums[$m] ?? 0, 2);
+            if (!empty($monthlySums[$m])) {
+                $monthLabel = \DateTime::createFromFormat('!m', $m)->format('M');
+                $categories[] = $monthLabel;
+
+                $currDrillId = "curr_{$m}";
+                $prevDrillId = "prev_{$m}";
+
+                $currData[] = [
+                    'name'      => $monthLabel,
+                    'y'         => round($monthlySums[$m] ?? 0, 2),
+                    'drilldown' => $currDrillId,
+                ];
+                $prevData[] = [
+                    'name'      => $monthLabel,
+                    'y'         => round($prevMonthlySums[$m] ?? 0, 2),
+                    'drilldown' => $prevDrillId,
+                ];
+
+                $drilldown[] = [
+                    'id'   => $currDrillId,
+                    'name' => "{$monthLabel} {$this->year}",
+                    'type' => 'pie',          // ← change from 'column'
+                    'data' => collect($raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $k) => [
+                                    'name' => $k,
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->values()
+                                ->toArray(),
+                ];
+
+                $drilldown[] = [
+                    'id'   => $prevDrillId,
+                    'name' => "{$monthLabel} " . ($this->year - 1),
+                    'type' => 'pie',          // ← change from 'column'
+                    'data' => collect($prev_raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $k) => [
+                                    'name' => $k,
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->values()
+                                ->toArray(),
+                ];
             }
         }
 
         $this->chart_data = [
             'categories' => $categories,
-            'data' => [
+            'data'       => [
                 ['name' => $this->year - 1, 'data' => $prevData],
                 ['name' => $this->year,     'data' => $currData],
-            ]
+            ],
+            'drilldown'  => $drilldown,
         ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
@@ -70,68 +115,167 @@ new class extends Component
 
     const initChart = () => {
         chart = Highcharts.chart('container-performance', {
-            credits: {
-                enabled: false
-            },
+            credits: { enabled: false },
             chart: {
-                type: 'column'
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            accessibility: {
-                announceNewData: {
-                    enabled: true
+                type: 'column',
+                events: {
+                    drillup: function () {
+                        const categories = this.userOptions.xAxis.categories;
+                        this.xAxis[0].setCategories(categories, false);
+                        this.redraw();
+                    }
                 }
             },
+            title: { text: null },
+            accessibility: { announceNewData: { enabled: true } },
             xAxis: {
                 categories: $wire.chart_data.categories,
                 crosshair: true,
-                accessibility: {
-                    description: 'YEAR'
-                }
             },
             yAxis: {
-                title: {
-                    text: 'Total percent market share'
-                }
-
+                title: { text: 'Total percent market share' }
             },
-            legend: {
-                enabled: false
-            },
+            legend: { enabled: false },
             plotOptions: {
                 series: {
                     borderWidth: 0,
                     dataLabels: {
                         enabled: true,
-                        format: '₱ {point.y:,.2f}'
+                        formatter: function () {
+                            const val = this.y;
+                            if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            return '₱ ' + Highcharts.numberFormat(val, 2);
+                        }
                     }
+                },
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            const val = this.y;
+                            let abbreviated;
+                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            else                       abbreviated = Highcharts.numberFormat(val, 2);
+                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                        }
+                    },
+                    showInLegend: true
                 }
             },
-
             tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<b>{point.y:,.2f}</b> total<br/>'
+                formatter: function () {
+                    if (this.series.type === 'pie') {
+                        // Drilldown tooltip
+                        return `<span style="font-size:11px">${this.series.name}</span><br>
+                                <b>${this.point.name}</b><br>
+                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
+                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                    }
+                    // Top level column tooltip
+                    return `<span style="font-size:11px">${this.series.name}</span><br>
+                            <b>${this.point.name}</b><br>
+                            ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
+                }
             },
-
-            series: $wire.chart_data.data
+            series: $wire.chart_data.data,
+            drilldown: {
+                series: $wire.chart_data.drilldown,
+                activeDataLabelStyle: {
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }
+            }
         });
     }
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        event.data.data.forEach((series, index) => {
-            if (chart.series[index]) {
-                chart.series[index].setData(series.data, false);
-                chart.series[index].update({ name: series.name }, false);
+        chart.destroy();
+        chart = Highcharts.chart('container-performance', {
+            credits: { enabled: false },
+            chart: {
+                type: 'column',
+                events: {
+                    drillup: function () {
+                        const categories = event.data.categories;
+                        this.xAxis[0].setCategories(categories, false);
+                        this.redraw();
+                    }
+                }
+            },
+            title: { text: null },
+            accessibility: { announceNewData: { enabled: true } },
+            xAxis: {
+                categories: event.data.categories,
+                crosshair: true,
+            },
+            yAxis: {
+                title: { text: 'Total percent market share' }
+            },
+            legend: { enabled: false },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            const val = this.y;
+                            if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            return '₱ ' + Highcharts.numberFormat(val, 2);
+                        }
+                    }
+                },
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            const val = this.y;
+                            let abbreviated;
+                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                            else                       abbreviated = Highcharts.numberFormat(val, 2);
+                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                        }
+                    },
+                    showInLegend: true
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    if (this.series.type === 'pie') {
+                        // Drilldown tooltip
+                        return `<span style="font-size:11px">${this.series.name}</span><br>
+                                <b>${this.point.name}</b><br>
+                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
+                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                    }
+                    // Top level column tooltip
+                    return `<span style="font-size:11px">${this.series.name}</span><br>
+                            <b>${this.point.name}</b><br>
+                            ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
+                }
+            },
+            series: event.data.data,
+            drilldown: {
+                series: event.data.drilldown,
+                activeDataLabelStyle: {
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }
             }
         });
-
-        chart.xAxis[0].setCategories(event.data.categories, false);
-        chart.redraw();
     });
 </script>
 @endscript
