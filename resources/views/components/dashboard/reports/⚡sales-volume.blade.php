@@ -31,11 +31,55 @@ new class extends Component
 
         $dataSeries     = [];
         $prevDataSeries = [];
+        $drilldown      = [];
 
         for ($m = 1; $m <= 12; $m++) {
-            if(!empty($monthlyQty[$m])) {
-                $dataSeries[]     = round($monthlyQty[$m] ?? 0, 2);
-                $prevDataSeries[] = round($prevMonthlyQty[$m] ?? 0, 2);
+            $monthLabel   = \DateTime::createFromFormat('!m', $m)->format('M');
+            $currDrillId  = "curr_{$m}";
+            $prevDrillId  = "prev_{$m}";
+
+            if (!empty($monthlyQty[$m])) {
+                $dataSeries[] = [
+                    'y'        => round($monthlyQty[$m] ?? 0, 2),
+                    'drilldown' => $currDrillId,
+                ];
+
+                $prevDataSeries[] = [
+                    'y'        => round($prevMonthlyQty[$m] ?? 0, 2),
+                    'drilldown' => $prevDrillId,
+                ];
+
+                $drilldown[] = [
+                    'id'   => $currDrillId,
+                    'name' => "{$monthLabel} {$this->year}",
+                    'type' => 'column',
+                    'data' => collect($raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $account) => [
+                                    'name' => $account ?: 'Unknown',
+                                    'y'    => round($i->sum('qty_pcs'), 2),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
+
+                $drilldown[] = [
+                    'id'   => $prevDrillId,
+                    'name' => "{$monthLabel} " . ($this->year - 1),
+                    'type' => 'column',
+                    'data' => collect($prev_raw)
+                                ->where('month', $m)
+                                ->groupBy('account_name')
+                                ->map(fn($i, $account) => [
+                                    'name' => $account ?: 'Unknown',
+                                    'y'    => round($i->sum('qty_pcs'), 2),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
             }
         }
 
@@ -43,6 +87,7 @@ new class extends Component
             ['name' => $this->year - 1, 'data' => $prevDataSeries],
             ['name' => $this->year,     'data' => $dataSeries],
         ];
+        $this->chart_data['drilldown'] = $drilldown;
 
         $this->dispatch('update-chart', data: $this->chart_data);
     }
@@ -52,7 +97,7 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">MONTHLY SALES VOLUME</h3>
+            <h3 class="card-title">MONTHLY SALES VOLUME {{ $this->year }}</h3>
         </div>
         <div class="card-body" wire:ignore>
             <div id="container-volume"></div>
@@ -66,54 +111,85 @@ new class extends Component
 <script>
     let chart;
 
+    const buildConfig = (data) => ({
+        credits: { enabled: false },
+        chart: {
+            type: 'line',
+            events: {
+                drillup: function () {
+                    this.setTitle({ text: null });
+                },
+                drilldown: function (e) {
+                    this.setTitle({ text: `${e.point.series.name} — ${e.point.category} by Account` });
+                }
+            }
+        },
+        title: { text: null },
+        xAxis: {
+            categories: data.categories,
+            crosshair: true,
+            title: { text: 'Months' }
+        },
+        yAxis: {
+            min: 0,
+            title: { text: 'Total Quantity Sold (PCS)' }
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        const val = this.y;
+                        if (val >= 1_000_000) return Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                        if (val >= 1_000)     return Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                        return Highcharts.numberFormat(val, 0);
+                    }
+                },
+                marker: { enabled: true }
+            },
+            column: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        const val = this.y;
+                        if (val >= 1_000_000) return Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                        if (val >= 1_000)     return Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                        return Highcharts.numberFormat(val, 0);
+                    }
+                }
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                const val = this.y;
+                return `<span style="font-size:11px">${this.series.name}</span><br>
+                        <b>${this.point.name ?? this.point.category}</b><br>
+                        <b>${Highcharts.numberFormat(val, 0)} pcs</b>`;
+            }
+        },
+        series: data.data,
+        drilldown: {
+            breadcrumbs: {
+                position: { align: 'right' }
+            },
+            activeDataLabelStyle: {
+                textDecoration: 'none',
+                color: 'inherit'
+            },
+            series: data.drilldown
+        }
+    });
+
     const initChart = () => {
-        chart = Highcharts.chart('container-volume', {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                type: 'line'
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            xAxis: {
-                categories: $wire.chart_data['categories'],
-                title: {
-                    text: 'Months'
-                }
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Total Quantity Sold (PCS)'
-                }
-            },
-            plotOptions: {
-                line: {
-                    dataLabels: {
-                        enabled: true
-                    },
-                    enableMouseTracking: false
-                }
-            },
-            series: $wire.chart_data['data']
-        });
+        chart = Highcharts.chart('container-volume', buildConfig($wire.chart_data));
     };
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        event.data.data.forEach((series, index) => {
-            if (chart.series[index]) {
-                chart.series[index].setData(series.data, false);
-                chart.series[index].update({ name: series.name }, false);
-            }
-        });
-
-        chart.xAxis[0].setCategories(event.data.categories, false);
-        chart.redraw();
+        chart.destroy();
+        chart = Highcharts.chart('container-volume', buildConfig(event.data));
     });
 
 </script>

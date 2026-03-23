@@ -182,11 +182,11 @@ new class extends Component
                         <div class="row">
                             <div class="col-lg-5">
                                 <livewire:dashboard.reports.sales-volume :year="$globalYear"/>
-                                {{-- <livewire:dashboard.reports.sales-sku :year="$globalYear"/> --}}
+                                <livewire:dashboard.reports.sales-sku :year="$globalYear"/>
                             </div>
                             <div class="col-lg-7">
-                                {{-- <livewire:dashboard.reports.ubo-matrix :year="$globalYear"/> --}}
-                                {{-- <livewire:dashboard.reports.ubo :year="$globalYear"/> --}}
+                                <livewire:dashboard.reports.ubo-matrix :year="$globalYear"/>
+                                <livewire:dashboard.reports.ubo :year="$globalYear"/>
                             </div>
                         </div>
                     </div>
@@ -241,11 +241,11 @@ new class extends Component
                         {{-- Inventory charts --}}
                         <div class="row">
                             <div class="col-lg-8">
-                                {{-- <livewire:dashboard.reports.inventory-aging :year="$globalYear"/> --}}
-                                {{-- <livewire:dashboard.reports.inventory-ending :year="$globalYear"/> --}}
+                                <livewire:dashboard.reports.inventory-aging :year="$globalYear"/>
+                                <livewire:dashboard.reports.inventory-ending :year="$globalYear"/>
                             </div>
                             <div class="col-lg-4">
-                                {{-- <livewire:dashboard.reports.oos :year="$globalYear"/> --}}
+                                <livewire:dashboard.reports.oos :year="$globalYear"/>
                             </div>
                         </div>
                     </div>

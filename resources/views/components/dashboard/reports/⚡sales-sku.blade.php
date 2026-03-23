@@ -23,24 +23,45 @@ new class extends Component
 
     public function chartUpdated() {
         $raw = $this->getYearlySalesData($this->year);
+        $collection = collect($raw);
 
-        // Group by SKU -> Sum Sales -> Sort -> Top 10
-        $top10 = collect($raw)
+        $drilldown = [];
+
+        $top10 = $collection
             ->groupBy('sku')
-            ->map(function($items) {
+            ->map(function ($items) use (&$drilldown) {
+                $sku       = $items->first()['sku'];
+                $fullName  = $items->first()['full_name'];
+                $drillId   = 'sku_' . md5($sku);
+
+                $drilldown[] = [
+                    'id'   => $drillId,
+                    'name' => $fullName ?: $sku,
+                    'type' => 'bar',
+                    'data' => $items->groupBy('short_name')
+                                ->map(fn($i, $account) => [
+                                    'name' => $account ?: 'Unknown',
+                                    'y'    => round($i->sum('sales'), 2),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
+
                 return [
-                    'name' => $items->first()['full_name'],
-                    'sku' => $items->first()['sku'],
-                    'y' => $items->sum('sales')
+                    'name'      => $sku,
+                    'full_name' => $fullName,
+                    'y'         => round($items->sum('sales'), 2),
+                    'drilldown' => $drillId,
                 ];
             })
             ->sortByDesc('y')
             ->take(10)
-            ->values(); // Reset keys
+            ->values();
 
         $this->chart_data = [
-            'categories' => $top10->pluck('sku')->toArray(),
-            'data'       => $top10->pluck('y')->map(fn($val) => round($val, 2))->toArray()
+            'data'      => $top10->toArray(),
+            'drilldown' => $drilldown,
         ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
@@ -64,48 +85,83 @@ new class extends Component
 <script>
     let chart;
 
+    const buildConfig = (data) => ({
+        credits: { enabled: false },
+        chart: {
+            type: 'bar',
+            events: {
+                drillup: function () {
+                    this.setTitle({ text: null });
+                    this.xAxis[0].update({ title: { text: 'Product SKU' } }, false);
+                    this.yAxis[0].update({ title: { text: 'Total Sales' } }, false);
+                    this.redraw();
+                },
+                drilldown: function (e) {
+                    this.setTitle({ text: `${e.point.full_name || e.point.name} — by Account` });
+                    this.xAxis[0].update({ title: { text: 'Account' } }, false);
+                    this.yAxis[0].update({ title: { text: 'Sales Amount' } }, false);
+                    this.redraw();
+                }
+            }
+        },
+        legend: { enabled: false },
+        title: { text: null },
+        xAxis: {
+            type: 'category',           // ← key fix: reads point.name at every level
+            title: { text: 'Product SKU' }
+        },
+        yAxis: {
+            min: 0,
+            title: { text: 'Total Sales', align: 'high' }
+        },
+        plotOptions: {
+            bar: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        const val = this.y;
+                        if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
+                        if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
+                        if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
+                        return '₱ ' + Highcharts.numberFormat(val, 2);
+                    }
+                }
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                const val = this.y;
+                const label = this.point.full_name || this.point.name;
+                return `<b>${label}</b><br>₱ <b>${Highcharts.numberFormat(val, 2)}</b>`;
+            }
+        },
+        series: [{
+            name: 'Sales Amount',
+            colorByPoint: true,
+            data: data.data       // no categories needed — names come from point.name
+        }],
+        drilldown: {
+            breadcrumbs: {
+                position: { align: 'right' }
+            },
+            activeDataLabelStyle: {
+                textDecoration: 'none',
+                color: 'inherit'
+            },
+            series: data.drilldown
+        }
+    });
+
     const initChart = () => {
-        chart = Highcharts.chart('container-sku', {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                type: 'bar'
-            },
-            legend: {
-                enabled: false
-            },
-            title: {
-                text: null,
-                enabled: false
-            },
-            xAxis: {
-                categories: $wire.chart_data['categories'],
-                title: {
-                    text: 'Product SKU'
-                }
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Total Sales ({{ $year }})',
-                    align: 'high'
-                }
-            },
-            tooltip: {
-                valuePrefix: '₱ '
-            },
-            series: [{
-                name: 'Sales Amount',
-                data: $wire.chart_data['data']
-            }]
-        });
+        chart = Highcharts.chart('container-sku', buildConfig($wire.chart_data));
     };
 
     initChart();
 
     $wire.on('update-chart', (event) => {
-        chart.series[0].setData($wire.chart_data['data']);
+        chart.destroy();
+        chart = Highcharts.chart('container-sku', buildConfig(event.data));
     });
 
 </script>
