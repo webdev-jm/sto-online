@@ -2107,30 +2107,114 @@ select.form-control {
     color: rgba(255, 255, 255, 0.692) !important;
 }
 
-/* Highcharts */
+/* =============================================================================
+   DARK MODE — HIGHCHARTS
+============================================================================= */
+
+/* Chart background */
 .dark-mode .highcharts-background {
-    fill: rgba(28, 28, 34, 0);
+    fill: transparent !important;
 }
+
+/* Title & subtitle */
 .dark-mode .highcharts-title,
 .dark-mode .highcharts-subtitle {
     fill: rgba(255, 255, 255, 0.85) !important;
 }
+
+/* Axis titles & labels */
 .dark-mode .highcharts-axis-title,
 .dark-mode .highcharts-axis-labels > text,
-.dark-mode .highcharts-legend-item > text {
+.dark-mode .highcharts-xaxis-labels > text,
+.dark-mode .highcharts-yaxis-labels > text {
     fill: rgba(142, 142, 147, 0.85) !important;
 }
-.dark-mode .highcharts-grid-line {
-    stroke: rgba(255, 255, 255, 0.06);
+
+/* Axis lines & tick marks */
+.dark-mode .highcharts-axis-line,
+.dark-mode .highcharts-tick {
+    stroke: rgba(255, 255, 255, 0.12) !important;
 }
-.dark-mode .highcharts-graph {
-    stroke: var(--col-accent);
+
+/* Grid lines */
+.dark-mode .highcharts-grid-line,
+.dark-mode .highcharts-xaxis-grid .highcharts-grid-line,
+.dark-mode .highcharts-yaxis-grid .highcharts-grid-line {
+    stroke: rgba(255, 255, 255, 0.06) !important;
 }
+
+/* Legend */
+.dark-mode .highcharts-legend-box {
+    fill: rgba(28, 28, 34, 0.72) !important;
+    stroke: rgba(255, 255, 255, 0.08) !important;
+}
+.dark-mode .highcharts-legend-item > text,
+.dark-mode .highcharts-legend-item-hidden > text {
+    fill: rgba(142, 142, 147, 0.85) !important;
+}
+.dark-mode .highcharts-legend-item-hidden > text {
+    fill: rgba(142, 142, 147, 0.35) !important;
+}
+
+/* Tooltip */
+.dark-mode .highcharts-tooltip-box {
+    fill: rgba(20, 20, 26, 0.95) !important;
+    stroke: rgba(255, 255, 255, 0.1) !important;
+}
+.dark-mode .highcharts-tooltip text,
+.dark-mode .highcharts-tooltip > text {
+    fill: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Column / bar series */
 .dark-mode .highcharts-series-0 .highcharts-point {
     fill: var(--col-accent) !important;
 }
 .dark-mode .highcharts-series-1 .highcharts-point {
     fill: #5e5ce6 !important;
+}
+.dark-mode .highcharts-series-2 .highcharts-point {
+    fill: #34c759 !important;
+}
+.dark-mode .highcharts-series-3 .highcharts-point {
+    fill: #ff9f0a !important;
+}
+.dark-mode .highcharts-series-4 .highcharts-point {
+    fill: #ff3b30 !important;
+}
+.dark-mode .highcharts-series-5 .highcharts-point {
+    fill: #32ade6 !important;
+}
+
+/* Line series */
+.dark-mode .highcharts-graph {
+    stroke: var(--col-accent) !important;
+}
+
+/* Data labels */
+.dark-mode .highcharts-data-label text,
+.dark-mode .highcharts-data-label > text {
+    fill: rgb(0 0 0) !important;
+}
+
+/* Drilldown breadcrumbs */
+.dark-mode .highcharts-breadcrumbs-button text {
+    fill: rgba(142, 142, 147, 0.85) !important;
+}
+.dark-mode .highcharts-breadcrumbs-separator text {
+    fill: rgba(142, 142, 147, 0.45) !important;
+}
+
+/* No data label */
+.dark-mode .highcharts-no-data text {
+    fill: rgba(142, 142, 147, 0.65) !important;
+}
+
+/* Plot border */
+.dark-mode .highcharts-plot-border,
+.dark-mode .highcharts-plot-background {
+    fill: transparent !important;
+    stroke: rgba(255, 255, 255, 0.06) !important;
 }
 
 /* Dark tile variants */
