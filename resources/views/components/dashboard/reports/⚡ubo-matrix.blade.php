@@ -145,7 +145,29 @@ new class extends Component
             credits: {
                 enabled: false
             },
-            chart: { type: 'scatter', zooming: { type: 'xy' } },
+            chart: {
+                type: 'scatter',
+                panning: {
+                    enabled: true,
+                    type: 'xy'
+                },
+                panKey: 'ctrl',
+                zooming: {
+                    type: 'xy',
+                    mouseWheel: {
+                        enabled: true,
+                        type: 'xy'
+                    },
+                    resetButton: {
+                        position: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 10
+                        }
+                    }
+                }
+            },
             title: {
                 text: null,
                 enabled: false

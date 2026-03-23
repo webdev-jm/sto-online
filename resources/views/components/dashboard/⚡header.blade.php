@@ -266,6 +266,7 @@ new class extends Component
 <script src="{{ asset('vendor/highcharts/modules/drilldown.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/map.js') }}"></script>
+<script src="{{ asset('vendor/highcharts/modules/mouse-wheel-zoom.js') }}"></script>
 @endassets
 
 @script
