@@ -11,7 +11,7 @@
     <div class="row">
 
         <div class="col-lg-4">
-            
+
             <!-- User Details -->
             <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
@@ -73,6 +73,80 @@
 
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
+    <style>
+        /* Profile Box - Frosted Glass Effect */
+        .box-profile {
+            background: var(--glass-light) !important; /* Translucent white */
+            border-radius: var(--radius-sm) !important; /* Match Apple-style corners */
+            padding: 20px !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--shadow-btn) !important; /* Subtle inner shadow */
+        }
+
+        /* Ensure the parent card is also glass or transparent to see the effect */
+        .card.card-primary.card-outline {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ─── NAVIGATION PILLS (Tabs) ──────────────────────────────── */
+        .nav-pills .nav-link {
+            font-family: "Syne", sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            border-radius: var(--radius-xs) !important;
+            color: rgba(255, 255, 255, 0.87) !important;
+            transition: all 0.2s ease;
+            margin-right: 5px;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--col-accent-g) !important; /* Blue-Purple Gradient */
+            color: #fff !important;
+            box-shadow: var(--shadow-btn) !important;
+        }
+
+        .nav-pills .nav-link:not(.active):hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: var(--col-dark) !important;
+        }
+
+        .dark-mode .nav-pills .nav-link:not(.active) {
+            color: #a1a1a6 !important;
+        }
+
+        /* Dark Mode support for the box-profile */
+        .dark-mode .box-profile {
+            background: rgba(28, 28, 30, 0.6) !important; /* Apple Dark Material style */
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #f5f5f7 !important;
+        }
+
+        /* Typography consistency with your design system */
+        .profile-username {
+            font-family: "Syne", sans-serif !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-user-img {
+            border: 3px solid var(--glass-border) !important;
+            box-shadow: var(--shadow-btn) !important;
+        }
+
+        /* Make list items inside the glass box transparent */
+        .box-profile .list-group-item {
+            background: transparent !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .dark-mode .box-profile .list-group-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
 @stop
 
 @section('js')

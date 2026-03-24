@@ -164,29 +164,29 @@ new class extends Component
                         {{-- Charts row 1 --}}
                         <div class="row">
                             <div class="col-lg-6">
-                                <livewire:dashboard.reports.sales-performance :year="$globalYear" />
+                                <livewire:dashboard.reports.sales-performance :year="$globalYear"/>
                             </div>
                             <div class="col-lg-6">
-                                <livewire:dashboard.reports.sales-brands :year="$globalYear"/>
+                                <livewire:dashboard.reports.sales-brands :year="$globalYear" />
                             </div>
                             <div class="col-lg-6">
-                                <livewire:dashboard.reports.sales-by-channel :year="$globalYear"/>
+                                <livewire:dashboard.reports.sales-by-channel :year="$globalYear" />
                             </div>
                             <div class="col-lg-6">
                                 <livewire:dashboard.reports.area :year="$globalYear"/>
-                                <livewire:dashboard.reports.top-distributor :year="$globalYear"/>
+                                <livewire:dashboard.reports.top-distributor :year="$globalYear" />
                             </div>
                         </div>
 
                         {{-- Charts row 2 --}}
                         <div class="row">
                             <div class="col-lg-5">
-                                <livewire:dashboard.reports.sales-volume :year="$globalYear"/>
-                                <livewire:dashboard.reports.sales-sku :year="$globalYear"/>
+                                <livewire:dashboard.reports.sales-volume :year="$globalYear" />
+                                <livewire:dashboard.reports.sales-sku :year="$globalYear" />
                             </div>
                             <div class="col-lg-7">
-                                <livewire:dashboard.reports.ubo-matrix :year="$globalYear"/>
-                                <livewire:dashboard.reports.ubo :year="$globalYear"/>
+                                <livewire:dashboard.reports.ubo-matrix :year="$globalYear" />
+                                <livewire:dashboard.reports.ubo :year="$globalYear" />
                             </div>
                         </div>
                     </div>

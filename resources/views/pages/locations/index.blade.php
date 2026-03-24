@@ -84,7 +84,7 @@
 
         </div>
         <div class="card-footer">
-            {{$locations->links()}}
+            {{$locations->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

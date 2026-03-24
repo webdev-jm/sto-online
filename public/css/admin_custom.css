@@ -1734,19 +1734,19 @@ select.form-control {
 ---------------------------------------------------------------------------- */
 .modal-dialog {
     max-width: 500px !important;
-    margin: 4rem auto !important;
+    margin: 4.2rem auto !important;
 }
 .modal-dialog.modal-sm {
     max-width: 300px !important;
-    margin: 4rem auto !important;
+    margin: 4.2rem auto !important;
 }
 .modal-dialog.modal-lg {
     max-width: 800px !important;
-    margin: 4rem auto !important;
+    margin: 4.2rem auto !important;
 }
 .modal-dialog.modal-xl {
     max-width: 1140px !important;
-    margin: 4rem auto !important;
+    margin: 4.2rem auto !important;
 }
 
 /* Vertically centered */
@@ -2303,4 +2303,151 @@ select.form-control {
     .branch-search {
         width: 130px;
     }
+}
+
+/* =============================================================================
+   USER MENU — RESKIN ONLY (structure unchanged)
+============================================================================= */
+
+/* Trigger */
+.navbar-nav .user-menu > .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 5px 10px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.12) !important;
+    transition: background 0.2s !important;
+}
+
+.navbar-nav .user-menu > .nav-link:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+}
+
+.navbar-nav .user-menu > .nav-link .user-image {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-right: 0 !important;
+    object-fit: cover !important;
+}
+
+/* Dropdown panel */
+.navbar-nav .user-menu.dropdown .dropdown-menu {
+    min-width: 240px !important;
+    padding: 8px !important;
+    background: rgba(22, 22, 28, 0.97) !important;
+    backdrop-filter: blur(32px) saturate(1.8) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(1.8) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45) !important;
+    right: 0 !important;
+    left: auto !important;
+    top: calc(100% + 6px) !important;
+}
+
+/* User header */
+.navbar-nav .user-menu .user-header {
+    background: transparent !important;
+    padding: 10px 12px 12px !important;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.07) !important;
+    margin-bottom: 4px !important;
+    min-height: unset !important;
+}
+
+.navbar-nav .user-menu .user-header img {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    border: 2px solid rgba(10, 132, 255, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15) !important;
+}
+
+.navbar-nav .user-menu .user-header p {
+    font-family: "Figtree", sans-serif !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-top: 8px !important;
+}
+
+.navbar-nav .user-menu .user-header p small {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-size: 0.75rem !important;
+}
+
+/* User body */
+.navbar-nav .user-menu .user-body {
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.07) !important;
+    padding: 4px 0 !important;
+}
+
+.navbar-nav .user-menu .user-body a {
+    font-family: "Figtree", sans-serif !important;
+    font-size: 0.84rem !important;
+    font-weight: 500 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    border-right: none !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    transition:
+        background 0.15s,
+        color 0.15s !important;
+}
+
+.navbar-nav .user-menu .user-body a:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* User footer */
+.navbar-nav .user-menu .user-footer {
+    background: transparent !important;
+    padding: 6px 0 0 !important;
+    display: flex !important;
+    gap: 6px !important;
+}
+
+.navbar-nav .user-menu .user-footer .btn {
+    flex: 1 !important;
+    border-radius: 9px !important;
+    font-family: "Figtree", sans-serif !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    padding: 7px 12px !important;
+    border: none !important;
+    transition:
+        opacity 0.2s,
+        transform 0.15s !important;
+}
+
+.navbar-nav .user-menu .user-footer .btn:hover {
+    opacity: 0.88 !important;
+    transform: translateY(-1px) !important;
+}
+
+.navbar-nav .user-menu .user-footer .btn-default {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.navbar-nav .user-menu .user-footer .btn-default:hover {
+    background: rgba(255, 255, 255, 0.13) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.navbar-nav .user-menu .user-footer .btn-danger {
+    background: rgba(255, 59, 48, 0.85) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 10px rgba(255, 59, 48, 0.3) !important;
+}
+
+/* Dark mode */
+.dark-mode .navbar-nav .user-menu.dropdown .dropdown-menu {
+    background: rgba(14, 14, 18, 0.98) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
 }

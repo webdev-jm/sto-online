@@ -4,7 +4,7 @@
             <h3 class="card-title">STOCK ON HAND UPLOAD</h3>
         </div>
         <div class="card-body">
-            
+
             <div class="row">
 
                 <div class="col-lg-3">
@@ -35,7 +35,7 @@
                         CHECK
                     </button>
                 </div>
-                
+
             </div>
 
         </div>
@@ -59,7 +59,7 @@
             </div>
         </div>
         <div class="card-body p-0">
-            
+
             <div class="table-responsive">
                 <table class="table table-sm table-bordered">
                     <thead>
@@ -89,7 +89,7 @@
 
         </div>
         <div class="card-footer">
-            {{$paginatedData->links()}}
+            {{$paginatedData->links(data: ['scrollTo' => false])}}
         </div>
     </div>
     @endif

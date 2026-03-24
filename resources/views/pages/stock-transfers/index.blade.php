@@ -32,7 +32,7 @@
                 <div class="col-12">
                 </div>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-bordered table-sm table-hover">
                     <thead>
@@ -116,7 +116,7 @@
 
         </div>
         <div class="card-footer">
-            {{$stock_transfers->links()}}
+            {{$stock_transfers->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 @stop

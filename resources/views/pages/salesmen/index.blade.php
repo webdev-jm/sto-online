@@ -85,10 +85,10 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
-            {{$salesmen->links()}}
+            {{$salesmen->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

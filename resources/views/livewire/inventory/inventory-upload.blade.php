@@ -1,4 +1,10 @@
 <div>
+    <style>
+        .card-body {
+            border-radius: 0 !important;
+        }
+    </style>
+
     @if(!empty($err_msg))
     <div class="alert alert-danger">
         {{$err_msg}}
@@ -53,6 +59,7 @@
             </div>
 
         </div>
+        <div class="card-footer"></div>
     </div>
 
     @if(!empty($inventory_data))
@@ -72,6 +79,7 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer"></div>
         </div>
     @endif
 
@@ -131,10 +139,10 @@
             @endif
 
         </div>
-        @if(!empty($inventory_data))
         <div class="card-footer">
-            {{$paginatedData->links()}}
+            @if(!empty($inventory_data))
+                {{$paginatedData->links(data: ['scrollTo' => false])}}
+            @endif
         </div>
-        @endif
     </div>
 </div>

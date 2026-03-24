@@ -27,7 +27,7 @@
             </table>
         </div>
         <div class="card-footer">
-            {{$customers->links()}}
+            {{$customers->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 </div>

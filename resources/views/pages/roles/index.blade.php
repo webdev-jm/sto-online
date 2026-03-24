@@ -72,7 +72,7 @@
 
         </div>
         <div class="card-footer">
-            {{$roles->links()}}
+            {{$roles->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

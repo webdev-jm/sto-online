@@ -40,14 +40,14 @@
                                 </ul>
                                 @endif
                             </td>
-                            
+
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
         <div class="card-footer">
-            {{$activities->links()}}
+            {{$activities->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 </div>

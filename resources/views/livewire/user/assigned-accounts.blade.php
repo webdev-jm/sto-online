@@ -36,7 +36,7 @@
 
             <div class="row mt-1">
                 <div class="col-12">
-                    {{$accounts->links()}}
+                    {{$accounts->links(data: ['scrollTo' => false])}}
                 </div>
             </div>
         </div>

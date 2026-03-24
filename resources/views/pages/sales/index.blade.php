@@ -101,10 +101,10 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
-            {{$sales_uploads->links()}}
+            {{$sales_uploads->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

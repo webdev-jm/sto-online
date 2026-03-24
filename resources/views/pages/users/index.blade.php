@@ -99,7 +99,7 @@
             </ul>
         </div>
         <div class="card-footer">
-            {{$users->links()}}
+            {{$users->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 
