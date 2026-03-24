@@ -65,7 +65,6 @@ new class extends Component
         $api_url   = config('services.sysprodata.url');
         $api_token = config('services.sysprodata.token');
 
-        // Get latest month per account_code
         $latest_month_per_account = $inventories
             ->groupBy(fn($item) => $item['account_code'])
             ->map(fn($items) => $items->max('month'));
@@ -107,7 +106,6 @@ new class extends Component
             })->all();
         });
 
-        // Get all unique account+month combos for sell_out query
         $account_month_pairs = $unique_accounts->map(fn($row) => [
             'account_code' => $row['first']['account_code'],
             'month'        => $row['latest_month'],
@@ -161,7 +159,7 @@ new class extends Component
                 'total'         => $row['total'],
                 'sell_in'       => $sell_in,
                 'sell_out'      => $sell_out,
-                'latest_month'  => $latest_month, // optional: useful for debugging
+                'latest_month'  => $latest_month,
             ];
         })->values()->toArray();
 
@@ -193,6 +191,7 @@ new class extends Component
                         <th>SELL IN</th>
                         <th>SELL OUT</th>
                         <th>SHOULD BE</th>
+                        <th>AS OF</th>
                     </tr>
                 </thead>
 
@@ -205,6 +204,7 @@ new class extends Component
                             <td>{{ number_format($data['sell_in'] ?? 0) }}</td>
                             <td>{{ number_format($data['sell_out'] ?? 0) }}</td>
                             <td>{{ number_format(($data['total'] + $data['sell_in']) - $data['sell_out']) }}</td>
+                            <td>{{ \DateTime::createFromFormat('!m', $data['latest_month'])->format('M') }}</td>
                         </tr>
                     @endforeach
                 </tbody>

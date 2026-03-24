@@ -262,11 +262,11 @@ new class extends Component
 
 @assets
 <script src="{{ asset('vendor/highcharts/highcharts.js') }}"></script>
-<script src="{{ asset('vendor/highcharts/modules/data.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/drilldown.js') }}"></script>
-<script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script>
+<script src="{{ asset('vendor/highcharts/modules/data.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/map.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/mouse-wheel-zoom.js') }}"></script>
+<script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script>
 @endassets
 
 @script
