@@ -75,10 +75,10 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
-            {{$channels->links()}}
+            {{$channels->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

@@ -24,7 +24,7 @@
                         <!-- CONTROL NUMBER -->
                         <div class="col-lg-6">
                             <h4 class="mb-0">
-                                CONTROL NUMBER: 
+                                CONTROL NUMBER:
                                 <span class="bg-info px-1 rounded font-weight">{{$control_number}}</span>
                             </h4>
                         </div>
@@ -181,10 +181,10 @@
                             </table>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="card-footer">
-                    {{$products->links()}}
+                    {{$products->links(data: ['scrollTo' => false])}}
                 </div>
             </div>
         </div>
@@ -251,10 +251,10 @@
                     </table>
                 </div>
             </div>
-            
+
          </div>
     </div>
 
 
-    
+
 </div>

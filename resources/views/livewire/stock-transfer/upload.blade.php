@@ -94,7 +94,7 @@
                 </table>
             </div>
             <div class="card-footer">
-                {{ $paginatedData->links() }}
+                {{ $paginatedData->links(data: ['scrollTo' => false]) }}
             </div>
         </div>
     @endif

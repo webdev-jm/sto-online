@@ -39,7 +39,7 @@
                     <livewire:purchase-order.filter :account_branch="$account_branch"/>
                 </div>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
                     <thead>
@@ -132,7 +132,7 @@
 
         </div>
         <div class="card-footer">
-            {{$purchase_orders->links()}}
+            {{$purchase_orders->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 @stop

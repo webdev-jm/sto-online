@@ -1,5 +1,11 @@
 <div>
 
+    <style>
+        .card-body {
+            border-radius: 0 !important;
+        }
+    </style>
+
     @if(!empty($err_msg))
     <div class="alert alert-danger">
         {{$err_msg}}
@@ -90,6 +96,7 @@
             </div>
 
         </div>
+        <div class="card-footer"></div>
     </div>
 
     <div class="card">
@@ -109,6 +116,7 @@
                 All lines marked with <i class="fa fa-times-circle fa-sm text-danger"></i> will not be uploaded and only lines marked with <i class="fa fa-check-circle fa-sm text-success"></i> will be uploaded.
             </p>
         </div>
+        <div class="card-footer"></div>
     </div>
 
     <div class="card">
@@ -120,7 +128,7 @@
                 </div>
             @endif
         </div>
-        <div class="card-body table-responsive py-0 px-1">
+        <div class="card-body table-responsive p-0">
             @if(!empty($sales_data))
                 <table class="table table-striped table-bordered table-sm">
                     <thead>
@@ -233,11 +241,11 @@
                 </table>
             @endif
         </div>
-        @if(!empty($sales_data))
-            <div class="card-footer">
-                {{$paginatedData->links()}}
-            </div>
-        @endif
+        <div class="card-footer">
+            @if(!empty($sales_data))
+            {{$paginatedData->links(data: ['scrollTo' => false])}}
+            @endif
+        </div>
     </div>
 
     <div class="modal fade" id="customer-modal">

@@ -75,7 +75,7 @@
             </ul>
         </div>
         <div class="card-footer">
-            {{$account_branches->links()}}
+            {{$account_branches->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

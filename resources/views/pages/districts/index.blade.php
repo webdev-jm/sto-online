@@ -25,7 +25,7 @@
             <h3 class="card-title">DISTRICT LIST</h3>
         </div>
         <div class="card-body">
-            
+
             <div class="row mb-1">
                 <div class="col-lg-4">
                     <div class="form-group">
@@ -72,10 +72,10 @@
                 </li>
                 @endforeach
             </ul>
-            
+
         </div>
         <div class="card-footer">
-            {{$districts->links()}}
+            {{$districts->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

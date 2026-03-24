@@ -19,7 +19,7 @@
                 @endforeach
 
                 <div class="col-12 mt-2">
-                    {{$branches->links()}}
+                    {{$branches->links(data: ['scrollTo' => false])}}
                 </div>
             </div>
 

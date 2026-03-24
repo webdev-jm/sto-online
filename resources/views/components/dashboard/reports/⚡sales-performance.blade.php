@@ -277,8 +277,5 @@ new class extends Component
             }
         });
     });
-
-    console.log(typeof Highcharts.Chart.prototype.addSeriesAsDrilldown);
-    console.log(Highcharts.version);
 </script>
 @endscript

@@ -32,7 +32,7 @@
                 <div class="col-12">
                 </div>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
                     <thead>
@@ -68,7 +68,7 @@
 
         </div>
         <div class="card-footer">
-            {{$stock_on_hands->links()}}
+            {{$stock_on_hands->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 @stop

@@ -92,7 +92,7 @@
 
         </div>
         <div class="card-footer">
-            {{$inventory_uploads->links()}}
+            {{$inventory_uploads->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

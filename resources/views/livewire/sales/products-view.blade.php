@@ -65,7 +65,7 @@
             </table>
         </div>
         <div class="card-footer">
-            {{$sales->links()}}
+            {{$sales->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 </div>
