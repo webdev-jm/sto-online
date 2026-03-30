@@ -125,6 +125,7 @@ new class extends Component
 
 @script
 <script>
+
     const BUCKET_LABELS = ['1–3 Months', '3–6 Months', '6–12 Months', '18+ Months'];
 
     let chart;

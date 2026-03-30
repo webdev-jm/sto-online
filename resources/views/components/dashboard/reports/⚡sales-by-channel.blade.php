@@ -43,9 +43,9 @@ new class extends Component
                 // Build per-account drilldown for this channel
                 $drilldown[] = [
                     'id'   => $drillId,
-                    'name' => '[' . $first['channel_code'] . '] ' . $first['channel_name'],
+                    'name' => $first['channel_code'],
                     'type' => 'column',
-                    'data' => $items->groupBy('account_name')
+                    'data' => $items->groupBy('short_name')
                                 ->map(fn($i, $account) => [
                                     'name' => $account ?: 'Unknown',
                                     'y'    => round($i->sum('sales'), 2),
@@ -56,7 +56,7 @@ new class extends Component
                 ];
 
                 return [
-                    'name'      => '[' . $first['channel_code'] . '] ' . $first['channel_name'],
+                    'name'      => $first['channel_code'],
                     'y'         => (float) $items->sum('sales'),
                     'drilldown' => $drillId,
                 ];

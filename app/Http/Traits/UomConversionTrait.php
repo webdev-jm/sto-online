@@ -8,8 +8,6 @@ trait UomConversionTrait {
         'CAS'    => 'CS',
         'CASE'   => 'CS',
         'CASES'  => 'CS',
-        'BX'     => 'CS', // Often handled as a case
-        'BOX'    => 'CS',
         'CTN'    => 'CS',
         'CARTON' => 'CS',
 
@@ -35,6 +33,8 @@ trait UomConversionTrait {
         'INNER' => 'IN',
         'IN-BOX' => 'IN',
         'INNER-BOX' => 'IN',
+        'BX'     => 'IN',
+        'BOX'    => 'IN',
     ];
 
     public function convertUom($product, $uom, $quantity, $targetUom = 'CS')

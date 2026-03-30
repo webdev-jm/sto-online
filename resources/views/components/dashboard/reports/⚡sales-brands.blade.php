@@ -23,35 +23,81 @@ new class extends Component
 
     public function chartUpdated() {
         $raw = $this->getYearlySalesData($this->year);
+        $collection = collect($raw);
 
-        $drilldown = [];
+        $drilldown  = [];
 
-        $chart_data = collect($raw)
-            ->groupBy('brand')
-            ->map(function ($items, $brandName) use (&$drilldown) {
-                $drillId = 'brand_' . md5($brandName);
+        $chart_data = $collection
+            ->groupBy('brand_tag')
+            ->map(function ($tagItems, $brandTag) use (&$drilldown) {
+                $tagDrillId = 'tag_' . md5($brandTag);
 
-                // Build SKU drilldown for this brand
+                // Level 1: brand_tag → brands
+                $brandData = $tagItems->groupBy('brand')
+                    ->map(function ($brandItems, $brand) use ($brandTag, &$drilldown) {
+                        $brandDrillId = 'brand_' . md5($brandTag . $brand);
+
+                        // Level 2: brand → category
+                        $categoryData = $brandItems->groupBy('category')
+                            ->map(function ($catItems, $category) use ($brandTag, $brand, &$drilldown) {
+                                $catDrillId = 'cat_' . md5($brandTag . $brand . $category);
+
+                                // Level 3: category → SKU
+                                $drilldown[] = [
+                                    'id'   => $catDrillId,
+                                    'name' => $category ?: 'Uncategorized',
+                                    'type' => 'pie',
+                                    'data' => $catItems->groupBy('sku')
+                                                ->map(fn($skuItems, $sku) => [
+                                                    'name'      => $sku ?: 'Unknown SKU',
+                                                    'full_name' => $skuItems->first()['full_name'] ?? '',
+                                                    'y'         => round($skuItems->sum('sales'), 2),
+                                                ])
+                                                ->sortByDesc('y')
+                                                ->values()
+                                                ->toArray(),
+                                ];
+
+                                return [
+                                    'name'      => $category ?: 'Uncategorized',
+                                    'y'         => round($catItems->sum('sales'), 2),
+                                    'drilldown' => $catDrillId,
+                                ];
+                            })
+                            ->sortByDesc('y')
+                            ->values()
+                            ->toArray();
+
+                        // Level 2 drilldown: brand → categories
+                        $drilldown[] = [
+                            'id'   => $brandDrillId,
+                            'name' => $brand ?: 'Other',
+                            'type' => 'pie',
+                            'data' => $categoryData,
+                        ];
+
+                        return [
+                            'name'      => $brand ?: 'Other',
+                            'y'         => round($brandItems->sum('sales'), 2),
+                            'drilldown' => $brandDrillId,
+                        ];
+                    })
+                    ->sortByDesc('y')
+                    ->values()
+                    ->toArray();
+
+                // Level 1 drilldown: brand_tag → brands
                 $drilldown[] = [
-                    'id'   => $drillId,
-                    'name' => $brandName ?: 'Other',
+                    'id'   => $tagDrillId,
+                    'name' => $brandTag ?: 'Untagged',
                     'type' => 'pie',
-                    'data' => $items->groupBy('sku')
-                                ->map(fn($i, $sku) => [
-                                    'full_name' => $i->first()['full_name'] ?? '',
-                                    'name' => $sku ?: 'Unknown SKU',
-                                    'y'    => round($i->sum('sales'), 2),
-                                ])
-                                ->sortByDesc('y')
-                                ->values()
-                                ->toArray(),
+                    'data' => $brandData,
                 ];
 
                 return [
-                    'name'      => $brandName ?: 'Other',
-                    'full_name' => '',
-                    'y'         => round($items->sum('sales'), 2),
-                    'drilldown' => $drillId,
+                    'name'      => $brandTag ?: 'Untagged',
+                    'y'         => round($tagItems->sum('sales'), 2),
+                    'drilldown' => $tagDrillId,
                 ];
             })
             ->sortByDesc('y')
@@ -83,18 +129,17 @@ new class extends Component
     <script>
         let chart;
 
+        const DRILL_TITLES = [
+            null,
+            '— by Brand',
+            '— by Category',
+            '— by SKU',
+        ];
+
         const buildConfig = (data) => ({
             credits: { enabled: false },
             chart: {
                 type: 'pie',
-                events: {
-                    drillup: function () {
-                        this.setTitle({ text: null });
-                    },
-                    drilldown: function (e) {
-                        this.setTitle({ text: `${e.point.name} — by SKU` });
-                    }
-                }
             },
             title: { text: null },
             legend: { enabled: false },
@@ -106,13 +151,7 @@ new class extends Component
                     dataLabels: {
                         enabled: true,
                         formatter: function () {
-                            const val = this.y;
-                            let abbreviated;
-                            if (val >= 1_000_000_000)      abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
-                            else if (val >= 1_000_000)     abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
-                            else if (val >= 1_000)         abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
-                            else                           abbreviated = Highcharts.numberFormat(val, 2);
-                            return `<b>${this.point.name}</b><br>₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
+                            return `<b>${this.point.name}</b><br>${Highcharts.numberFormat(this.percentage, 1)}%`;
                         }
                     },
                     showInLegend: true
@@ -120,7 +159,7 @@ new class extends Component
             },
             tooltip: {
                 formatter: function () {
-                    const val = this.y;
+                    const val  = this.y;
                     const full = Highcharts.numberFormat(val, 2);
                     const label = this.point.full_name || this.point.name;
                     return `<span style="font-size:11px">${this.series.name}</span><br>
@@ -129,7 +168,7 @@ new class extends Component
                 }
             },
             series: [{
-                name: 'Sales by Brand',
+                name: 'Sales by Brand Tag',
                 colorByPoint: true,
                 data: data.data
             }],
