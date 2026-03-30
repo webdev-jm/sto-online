@@ -271,10 +271,21 @@ new class extends Component
 
 @script
 <script>
+
+    const isDark = document.body.classList.contains('dark-mode');
+
     Highcharts.setOptions({
-        colors: [
-            'rgba(5,141,199,0.5)', 'rgba(80,180,50,0.5)', 'rgba(237,86,27,0.5)'
-        ]
+        colors: isDark
+            ? [
+                'rgba(5,141,199,0.85)',
+                'rgba(80,180,50,0.85)',
+                'rgba(237,86,27,0.85)'
+            ]
+            : [
+                'rgba(5,141,199,0.5)',
+                'rgba(80,180,50,0.5)',
+                'rgba(237,86,27,0.5)'
+            ]
     });
 </script>
 @endscript

@@ -87,6 +87,8 @@ trait SalesDataAggregator
                     'name'            => $product->description,
                     'full_name'       => "{$product->stock_code} {$product->description} {$product->size}",
                     'brand'           => $product->brand,
+                    'brand_tag'       => $product->brand_tag,
+                    'category'        => $product->category,
                     'month'           => (int) $row->month,
                     'sales'           => (float) ($qtyPcs * $netPrice),
                     'qty_pcs'         => (float) $qtyPcs,

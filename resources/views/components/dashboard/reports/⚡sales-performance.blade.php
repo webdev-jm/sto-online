@@ -111,6 +111,7 @@ new class extends Component
 
 @script
 <script>
+
     let chart;
 
     const initChart = () => {
@@ -133,7 +134,7 @@ new class extends Component
                 crosshair: true,
             },
             yAxis: {
-                title: { text: 'Total percent market share' }
+                title: { text: 'Sales' }
             },
             legend: { enabled: false },
             plotOptions: {
@@ -206,6 +207,8 @@ new class extends Component
                     drillup: function () {
                         const categories = event.data.categories;
                         this.xAxis[0].setCategories(categories, false);
+
+                        this.yAxis[0].setTitle({ text: 'Sales' }, false);
                         this.redraw();
                     }
                 }
@@ -217,7 +220,7 @@ new class extends Component
                 crosshair: true,
             },
             yAxis: {
-                title: { text: 'Total percent market share' }
+                title: { text: 'Sales' }
             },
             legend: { enabled: false },
             plotOptions: {

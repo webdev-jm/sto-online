@@ -51,7 +51,7 @@ new class extends Component
                 @foreach($areas as $area)
                     <div class="col-lg-4">
                         <label>{{ $area }}</label>
-                        <input type="text" class="form-control border-bottom border-top-0 border-left-0 border-right-0 bg-light" value="{{ number_format($chart_data[$area] ?? 0, 2) }}" readonly>
+                        <input type="text" class="form-control border-bottom border-top-0 border-left-0 border-right-0 bg-light text-right" value="{{ number_format($chart_data[$area] ?? 0, 2) }}" readonly>
                     </div>
                 @endforeach
             </div>

@@ -1,7 +1,7 @@
 /* =============================================================================
    APP GLASS — Apple visionOS / macOS Liquid Glass Design System
    Font imports — add this to your layout's <head>:
-   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@600;700;800&family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
 ============================================================================= */
 
 /* ── TOKENS ──────────────────────────────────────────────────────────────── */
@@ -48,7 +48,7 @@
 body,
 .content-wrapper {
     font-family:
-        "Figtree",
+        "Roboto",
         -apple-system,
         BlinkMacSystemFont,
         sans-serif !important;
@@ -112,7 +112,7 @@ body::before {
     -webkit-backdrop-filter: var(--glass-blur-sm);
     border: 1px solid var(--glass-border);
     color: var(--col-accent);
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-weight: 800;
     font-size: 1rem;
     letter-spacing: 0.09em;
@@ -123,7 +123,7 @@ body::before {
 }
 
 .page-header-title {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--col-dark);
@@ -149,7 +149,7 @@ body::before {
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     padding: 8px 18px;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
@@ -186,7 +186,7 @@ body::before {
 }
 
 .section-label-text {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -246,7 +246,7 @@ body::before {
 }
 
 .dashboard-card-title {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.92rem;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.92);
@@ -294,7 +294,7 @@ body::before {
     border: none;
     outline: none;
     background: transparent;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.9);
     padding: 8px 0;
@@ -311,7 +311,7 @@ body::before {
     border: none;
     border-radius: 8px;
     padding: 5px 14px;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
@@ -345,7 +345,7 @@ body::before {
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.9);
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.85rem;
     outline: none;
     backdrop-filter: blur(8px);
@@ -370,7 +370,7 @@ body::before {
     border: none;
     border-radius: 10px;
     padding: 7px 18px;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
@@ -488,7 +488,7 @@ body::before {
 
 .tile-title {
     display: block;
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.03em;
@@ -634,7 +634,7 @@ body::before {
     padding: 8px 18px;
     border: none;
     border-radius: 10px;
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -667,7 +667,7 @@ body::before {
     border: none;
     border-radius: 10px;
     padding: 7px 16px;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -723,7 +723,7 @@ body::before {
 .dash-tab-nav .nav-link {
     display: block;
     padding: 14px 18px;
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -847,7 +847,7 @@ body::before {
 }
 
 .stat-card-label {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -858,7 +858,7 @@ body::before {
 }
 
 .stat-card-value {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 1.35rem;
     font-weight: 800;
     color: var(--col-dark);
@@ -878,7 +878,7 @@ body::before {
 }
 
 .stat-year-label {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -895,7 +895,7 @@ body::before {
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.7);
     color: var(--col-dark);
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     outline: none;
@@ -922,7 +922,7 @@ body::before {
     z-index: 10;
     border-radius: var(--radius);
     gap: 8px;
-    font-family: "Figtree", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--col-dark);
@@ -934,7 +934,7 @@ body::before {
 
 /* ── Content header ── */
 .content-header h1 {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 1.2rem !important;
     font-weight: 700 !important;
     color: var(--col-dark) !important;
@@ -943,7 +943,7 @@ body::before {
 
 .content-header .breadcrumb {
     background: transparent !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.8rem !important;
 }
 .content-header .breadcrumb-item a {
@@ -973,7 +973,7 @@ body::before {
 }
 
 .card-header .card-title {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.68rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.14em !important;
@@ -1022,7 +1022,7 @@ body::before {
 
 /* ── Form labels & inputs ── */
 .card-body .form-group label {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.65rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.11em !important;
@@ -1033,7 +1033,7 @@ body::before {
 .card-body .form-control {
     border: 1px solid rgba(0, 0, 0, 0.09) !important;
     border-radius: 10px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     color: var(--col-dark) !important;
     background: rgba(255, 255, 255, 0.7) !important;
 }
@@ -1044,7 +1044,7 @@ body::before {
 }
 
 .card-body > b {
-    font-family: "Syne", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1065,7 +1065,7 @@ body::before {
     background: rgba(255, 255, 255, 0.6) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
 }
 .list-group-item:last-child {
     border-bottom: none !important;
@@ -1076,7 +1076,7 @@ body::before {
 
 .list-group-item small.font-weight-bold.text-muted,
 .list-group-item b {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.6rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.11em !important;
@@ -1085,7 +1085,7 @@ body::before {
 }
 
 .list-group-item p.font-weight-bold {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.9rem !important;
     font-weight: 600 !important;
     color: var(--col-subtle) !important;
@@ -1145,7 +1145,7 @@ body::before {
 .main-header .navbar-brand,
 .main-header .brand-link {
     color: var(--col-white) !important;
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 800 !important;
     letter-spacing: 0.03em !important;
     border-bottom: none !important;
@@ -1160,7 +1160,7 @@ body::before {
     border-color: rgba(255, 255, 255, 0.14) !important;
     color: rgba(255, 255, 255, 0.9) !important;
     border-radius: 10px 0 0 10px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
 }
 .main-header .form-control-navbar::placeholder {
     color: rgba(255, 255, 255, 0.3) !important;
@@ -1180,7 +1180,7 @@ body::before {
 .main-header .badge {
     background: var(--col-accent) !important;
     color: #fff !important;
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 800 !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(10, 132, 255, 0.5) !important;
@@ -1195,7 +1195,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 .main-header .dropdown-item {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     color: rgba(255, 255, 255, 0.8) !important;
     border-radius: 8px !important;
 }
@@ -1226,7 +1226,7 @@ body::before {
 }
 .brand-link .brand-text,
 .main-sidebar .brand-text {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 800 !important;
     color: var(--col-white) !important;
     letter-spacing: 0.03em !important;
@@ -1239,7 +1239,7 @@ body::before {
     border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 .sidebar .user-panel .info a {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     color: rgba(255, 255, 255, 0.85) !important;
 }
 .sidebar .user-panel .info a:hover {
@@ -1251,7 +1251,7 @@ body::before {
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: rgba(255, 255, 255, 0.85) !important;
     border-radius: 10px 0 0 10px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
 }
 .sidebar .form-control-sidebar::placeholder {
     color: rgba(255, 255, 255, 0.28) !important;
@@ -1267,7 +1267,7 @@ body::before {
 }
 
 .nav-sidebar .nav-header {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.58rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.16em !important;
@@ -1277,7 +1277,7 @@ body::before {
 
 .nav-sidebar > .nav-item > .nav-link,
 .nav-sidebar .nav-link {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     color: rgba(255, 255, 255, 0.55) !important;
     border-radius: 10px !important;
     margin: 2px 8px !important;
@@ -1331,7 +1331,7 @@ body::before {
 .nav-sidebar .badge {
     background: rgba(10, 132, 255, 0.85) !important;
     color: #fff !important;
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 800 !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4) !important;
@@ -1346,7 +1346,7 @@ body::before {
     -webkit-backdrop-filter: blur(20px) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
     color: rgba(0, 0, 0, 0.856) !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
 }
 .main-footer a {
     color: rgba(0, 0, 0, 0.856) !important;
@@ -1359,7 +1359,7 @@ body::before {
    GLOBAL BUTTONS
 ============================================================================= */
 .btn {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     border-radius: 5px !important;
     font-weight: 600 !important;
 }
@@ -1411,14 +1411,14 @@ body::before {
     border: 1px solid var(--glass-border) !important;
     color: var(--col-dark) !important;
     border-radius: 10px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     box-shadow: var(--shadow-btn) !important;
 }
 .content-header .btn-primary {
     background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%) !important;
     border-color: transparent !important;
     border-radius: 10px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     box-shadow: 0 2px 10px rgba(10, 132, 255, 0.35) !important;
 }
 
@@ -1426,7 +1426,7 @@ body::before {
    GLOBAL FORM CONTROLS
 ============================================================================= */
 .form-control {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     border: 1px solid rgba(0, 0, 0, 0.09) !important;
     border-radius: 10px !important;
     background: rgba(255, 255, 255, 0.72) !important;
@@ -1443,7 +1443,7 @@ body::before {
 
 label,
 .col-form-label {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.65rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.11em !important;
@@ -1463,7 +1463,7 @@ select.form-control {
     background: rgba(255, 255, 255, 0.5) !important;
     border-color: rgba(0, 0, 0, 0.09) !important;
     color: var(--col-subtle) !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     border-radius: 10px !important;
 }
 
@@ -1471,13 +1471,13 @@ select.form-control {
    GLOBAL TABLES
 ============================================================================= */
 .table {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.87rem !important;
     color: var(--col-dark) !important;
 }
 
 .table thead th {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.63rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
@@ -1513,7 +1513,7 @@ select.form-control {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     gap: 4px !important;
     margin-bottom: 0 !important;
 }
@@ -1548,7 +1548,7 @@ select.form-control {
    ALERTS
 ============================================================================= */
 .alert {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     border: none !important;
     border-radius: var(--radius-sm) !important;
     border-left: 3px solid !important;
@@ -1579,7 +1579,7 @@ select.form-control {
    BADGES
 ============================================================================= */
 .badge {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 700 !important;
     font-size: 0.62rem !important;
     letter-spacing: 0.05em !important;
@@ -1630,7 +1630,7 @@ select.form-control {
     box-shadow:
         0 24px 64px rgba(0, 0, 0, 0.22),
         0 0 0 1px rgba(255, 255, 255, 0.3) !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     background: rgba(255, 255, 255, 0.82) !important;
     backdrop-filter: blur(32px) saturate(1.8) !important;
     -webkit-backdrop-filter: blur(32px) saturate(1.8) !important;
@@ -1645,7 +1645,7 @@ select.form-control {
 }
 
 .modal-title {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.85rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.06em !important;
@@ -1674,14 +1674,14 @@ select.form-control {
 
 .modal-body p,
 .modal-body li {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.88rem !important;
     color: var(--col-dark) !important;
     line-height: 1.6 !important;
 }
 .modal-body strong,
 .modal-body b {
-    font-family: "Syne", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-weight: 700 !important;
     color: var(--col-dark) !important;
 }
@@ -2117,16 +2117,14 @@ select.form-control {
 }
 
 /* Title & subtitle */
-.dark-mode .highcharts-title,
-.dark-mode .highcharts-subtitle {
+.dark-mode .highcharts-title text,
+.dark-mode .highcharts-subtitle text {
     fill: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Axis titles & labels */
 .dark-mode .highcharts-axis-title,
-.dark-mode .highcharts-axis-labels > text,
-.dark-mode .highcharts-xaxis-labels > text,
-.dark-mode .highcharts-yaxis-labels > text {
+.dark-mode .highcharts-axis-labels text {
     fill: rgba(142, 142, 147, 0.85) !important;
 }
 
@@ -2137,9 +2135,7 @@ select.form-control {
 }
 
 /* Grid lines */
-.dark-mode .highcharts-grid-line,
-.dark-mode .highcharts-xaxis-grid .highcharts-grid-line,
-.dark-mode .highcharts-yaxis-grid .highcharts-grid-line {
+.dark-mode .highcharts-grid-line {
     stroke: rgba(255, 255, 255, 0.06) !important;
 }
 
@@ -2148,11 +2144,10 @@ select.form-control {
     fill: rgba(28, 28, 34, 0.72) !important;
     stroke: rgba(255, 255, 255, 0.08) !important;
 }
-.dark-mode .highcharts-legend-item > text,
-.dark-mode .highcharts-legend-item-hidden > text {
-    fill: rgba(142, 142, 147, 0.85) !important;
+.dark-mode .highcharts-legend-item text {
+    fill: rgba(200, 200, 205, 0.9) !important;
 }
-.dark-mode .highcharts-legend-item-hidden > text {
+.dark-mode .highcharts-legend-item-hidden text {
     fill: rgba(142, 142, 147, 0.35) !important;
 }
 
@@ -2161,45 +2156,92 @@ select.form-control {
     fill: rgba(20, 20, 26, 0.95) !important;
     stroke: rgba(255, 255, 255, 0.1) !important;
 }
-.dark-mode .highcharts-tooltip text,
-.dark-mode .highcharts-tooltip > text {
+.dark-mode .highcharts-tooltip text {
     fill: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Column / bar series */
+/* Data labels — white for column/bar/line, dark auto handled by Highcharts for pie */
+.dark-mode .highcharts-column-series .highcharts-data-label text,
+.dark-mode .highcharts-bar-series .highcharts-data-label text,
+.dark-mode .highcharts-line-series .highcharts-data-label text,
+.dark-mode .highcharts-scatter-series .highcharts-data-label text {
+    fill: rgba(255, 255, 255, 0.85) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Pie data labels — keep dark for readability against colored slices */
+.dark-mode .highcharts-pie-series .highcharts-data-label text {
+    fill: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Pie connector lines */
+.dark-mode .highcharts-pie-series .highcharts-data-label-connector {
+    stroke: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Custom color palette — dark mode series points */
+.dark-mode .highcharts-color-0 .highcharts-point,
 .dark-mode .highcharts-series-0 .highcharts-point {
-    fill: var(--col-accent) !important;
+    fill: rgba(5, 141, 199, 0.85) !important;
 }
+
+.dark-mode .highcharts-color-1 .highcharts-point,
 .dark-mode .highcharts-series-1 .highcharts-point {
-    fill: #5e5ce6 !important;
+    fill: rgba(80, 180, 50, 0.85) !important;
 }
+
+.dark-mode .highcharts-color-2 .highcharts-point,
 .dark-mode .highcharts-series-2 .highcharts-point {
-    fill: #34c759 !important;
-}
-.dark-mode .highcharts-series-3 .highcharts-point {
-    fill: #ff9f0a !important;
-}
-.dark-mode .highcharts-series-4 .highcharts-point {
-    fill: #ff3b30 !important;
-}
-.dark-mode .highcharts-series-5 .highcharts-point {
-    fill: #32ade6 !important;
+    fill: rgba(237, 86, 27, 0.85) !important;
 }
 
-/* Line series */
-.dark-mode .highcharts-graph {
-    stroke: var(--col-accent) !important;
+/* Line series strokes */
+.dark-mode .highcharts-color-0 .highcharts-graph {
+    stroke: rgba(5, 141, 199, 0.85) !important;
+}
+.dark-mode .highcharts-color-1 .highcharts-graph {
+    stroke: rgba(80, 180, 50, 0.85) !important;
+}
+.dark-mode .highcharts-color-2 .highcharts-graph {
+    stroke: rgba(237, 86, 27, 0.85) !important;
 }
 
-/* Data labels */
-.dark-mode .highcharts-data-label text,
-.dark-mode .highcharts-data-label > text {
-    fill: rgb(0 0 0) !important;
+/* Markers */
+.dark-mode .highcharts-color-0 .highcharts-marker {
+    fill: rgba(5, 141, 199, 0.85) !important;
+}
+.dark-mode .highcharts-color-1 .highcharts-marker {
+    fill: rgba(80, 180, 50, 0.85) !important;
+}
+.dark-mode .highcharts-color-2 .highcharts-marker {
+    fill: rgba(237, 86, 27, 0.85) !important;
+}
+
+/* Legend symbols */
+.dark-mode .highcharts-color-0 .highcharts-point.highcharts-legend-item {
+    fill: rgba(5, 141, 199, 0.85) !important;
+}
+.dark-mode .highcharts-color-1 .highcharts-point.highcharts-legend-item {
+    fill: rgba(80, 180, 50, 0.85) !important;
+}
+.dark-mode .highcharts-color-2 .highcharts-point.highcharts-legend-item {
+    fill: rgba(237, 86, 27, 0.85) !important;
+}
+
+/* Scatter points */
+.dark-mode .highcharts-scatter-series .highcharts-point {
+    fill-opacity: 0.85 !important;
+    stroke: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Drilldown breadcrumbs */
 .dark-mode .highcharts-breadcrumbs-button text {
     fill: rgba(142, 142, 147, 0.85) !important;
+}
+.dark-mode .highcharts-breadcrumbs-button rect {
+    fill: rgba(255, 255, 255, 0.06) !important;
+    stroke: rgba(255, 255, 255, 0.1) !important;
 }
 .dark-mode .highcharts-breadcrumbs-separator text {
     fill: rgba(142, 142, 147, 0.45) !important;
@@ -2210,11 +2252,21 @@ select.form-control {
     fill: rgba(142, 142, 147, 0.65) !important;
 }
 
-/* Plot border */
-.dark-mode .highcharts-plot-border,
+/* Plot border & background */
+.dark-mode .highcharts-plot-border {
+    stroke: rgba(255, 255, 255, 0.06) !important;
+}
 .dark-mode .highcharts-plot-background {
     fill: transparent !important;
-    stroke: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Reset zoom button */
+.dark-mode .highcharts-reset-zoom rect {
+    fill: rgba(255, 255, 255, 0.08) !important;
+    stroke: rgba(255, 255, 255, 0.15) !important;
+}
+.dark-mode .highcharts-reset-zoom text {
+    fill: rgba(255, 255, 255, 0.75) !important;
 }
 
 /* Dark tile variants */
@@ -2369,7 +2421,7 @@ select.form-control {
 }
 
 .navbar-nav .user-menu .user-header p {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     color: rgba(255, 255, 255, 0.9) !important;
     margin-top: 8px !important;
 }
@@ -2386,7 +2438,7 @@ select.form-control {
 }
 
 .navbar-nav .user-menu .user-body a {
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.84rem !important;
     font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.65) !important;
@@ -2414,7 +2466,7 @@ select.form-control {
 .navbar-nav .user-menu .user-footer .btn {
     flex: 1 !important;
     border-radius: 9px !important;
-    font-family: "Figtree", sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
     font-size: 0.8rem !important;
     font-weight: 600 !important;
     padding: 7px 12px !important;
