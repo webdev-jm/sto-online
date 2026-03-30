@@ -169,7 +169,7 @@ new class extends Component
             },
             series: [{
                 name: 'Sales by Brand Tag',
-                colorByPoint: true,
+                styledMode: true,
                 data: data.data
             }],
             drilldown: {

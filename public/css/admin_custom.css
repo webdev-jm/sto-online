@@ -2107,168 +2107,6 @@ select.form-control {
     color: rgba(255, 255, 255, 0.692) !important;
 }
 
-/* =============================================================================
-   DARK MODE — HIGHCHARTS
-============================================================================= */
-
-/* Chart background */
-.dark-mode .highcharts-background {
-    fill: transparent !important;
-}
-
-/* Title & subtitle */
-.dark-mode .highcharts-title text,
-.dark-mode .highcharts-subtitle text {
-    fill: rgba(255, 255, 255, 0.85) !important;
-}
-
-/* Axis titles & labels */
-.dark-mode .highcharts-axis-title,
-.dark-mode .highcharts-axis-labels text {
-    fill: rgba(142, 142, 147, 0.85) !important;
-}
-
-/* Axis lines & tick marks */
-.dark-mode .highcharts-axis-line,
-.dark-mode .highcharts-tick {
-    stroke: rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Grid lines */
-.dark-mode .highcharts-grid-line {
-    stroke: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* Legend */
-.dark-mode .highcharts-legend-box {
-    fill: rgba(28, 28, 34, 0.72) !important;
-    stroke: rgba(255, 255, 255, 0.08) !important;
-}
-.dark-mode .highcharts-legend-item text {
-    fill: rgba(200, 200, 205, 0.9) !important;
-}
-.dark-mode .highcharts-legend-item-hidden text {
-    fill: rgba(142, 142, 147, 0.35) !important;
-}
-
-/* Tooltip */
-.dark-mode .highcharts-tooltip-box {
-    fill: rgba(20, 20, 26, 0.95) !important;
-    stroke: rgba(255, 255, 255, 0.1) !important;
-}
-.dark-mode .highcharts-tooltip text {
-    fill: rgba(255, 255, 255, 0.85) !important;
-}
-
-/* Data labels — white for column/bar/line, dark auto handled by Highcharts for pie */
-.dark-mode .highcharts-column-series .highcharts-data-label text,
-.dark-mode .highcharts-bar-series .highcharts-data-label text,
-.dark-mode .highcharts-line-series .highcharts-data-label text,
-.dark-mode .highcharts-scatter-series .highcharts-data-label text {
-    fill: rgba(255, 255, 255, 0.85) !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* Pie data labels — keep dark for readability against colored slices */
-.dark-mode .highcharts-pie-series .highcharts-data-label text {
-    fill: rgba(255, 255, 255, 0.9) !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Pie connector lines */
-.dark-mode .highcharts-pie-series .highcharts-data-label-connector {
-    stroke: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Custom color palette — dark mode series points */
-.dark-mode .highcharts-color-0 .highcharts-point,
-.dark-mode .highcharts-series-0 .highcharts-point {
-    fill: rgba(5, 141, 199, 0.85) !important;
-}
-
-.dark-mode .highcharts-color-1 .highcharts-point,
-.dark-mode .highcharts-series-1 .highcharts-point {
-    fill: rgba(80, 180, 50, 0.85) !important;
-}
-
-.dark-mode .highcharts-color-2 .highcharts-point,
-.dark-mode .highcharts-series-2 .highcharts-point {
-    fill: rgba(237, 86, 27, 0.85) !important;
-}
-
-/* Line series strokes */
-.dark-mode .highcharts-color-0 .highcharts-graph {
-    stroke: rgba(5, 141, 199, 0.85) !important;
-}
-.dark-mode .highcharts-color-1 .highcharts-graph {
-    stroke: rgba(80, 180, 50, 0.85) !important;
-}
-.dark-mode .highcharts-color-2 .highcharts-graph {
-    stroke: rgba(237, 86, 27, 0.85) !important;
-}
-
-/* Markers */
-.dark-mode .highcharts-color-0 .highcharts-marker {
-    fill: rgba(5, 141, 199, 0.85) !important;
-}
-.dark-mode .highcharts-color-1 .highcharts-marker {
-    fill: rgba(80, 180, 50, 0.85) !important;
-}
-.dark-mode .highcharts-color-2 .highcharts-marker {
-    fill: rgba(237, 86, 27, 0.85) !important;
-}
-
-/* Legend symbols */
-.dark-mode .highcharts-color-0 .highcharts-point.highcharts-legend-item {
-    fill: rgba(5, 141, 199, 0.85) !important;
-}
-.dark-mode .highcharts-color-1 .highcharts-point.highcharts-legend-item {
-    fill: rgba(80, 180, 50, 0.85) !important;
-}
-.dark-mode .highcharts-color-2 .highcharts-point.highcharts-legend-item {
-    fill: rgba(237, 86, 27, 0.85) !important;
-}
-
-/* Scatter points */
-.dark-mode .highcharts-scatter-series .highcharts-point {
-    fill-opacity: 0.85 !important;
-    stroke: rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Drilldown breadcrumbs */
-.dark-mode .highcharts-breadcrumbs-button text {
-    fill: rgba(142, 142, 147, 0.85) !important;
-}
-.dark-mode .highcharts-breadcrumbs-button rect {
-    fill: rgba(255, 255, 255, 0.06) !important;
-    stroke: rgba(255, 255, 255, 0.1) !important;
-}
-.dark-mode .highcharts-breadcrumbs-separator text {
-    fill: rgba(142, 142, 147, 0.45) !important;
-}
-
-/* No data label */
-.dark-mode .highcharts-no-data text {
-    fill: rgba(142, 142, 147, 0.65) !important;
-}
-
-/* Plot border & background */
-.dark-mode .highcharts-plot-border {
-    stroke: rgba(255, 255, 255, 0.06) !important;
-}
-.dark-mode .highcharts-plot-background {
-    fill: transparent !important;
-}
-
-/* Reset zoom button */
-.dark-mode .highcharts-reset-zoom rect {
-    fill: rgba(255, 255, 255, 0.08) !important;
-    stroke: rgba(255, 255, 255, 0.15) !important;
-}
-.dark-mode .highcharts-reset-zoom text {
-    fill: rgba(255, 255, 255, 0.75) !important;
-}
-
 /* Dark tile variants */
 .dark-mode .tile-maroon {
     background: linear-gradient(
@@ -2502,4 +2340,127 @@ select.form-control {
 .dark-mode .navbar-nav .user-menu.dropdown .dropdown-menu {
     background: rgba(14, 14, 18, 0.98) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* =============================================================================
+   DARK MODE — HIGHCHARTS
+============================================================================= */
+/* --- CONTAINER & BACKGROUND --- */
+.dark-mode .highcharts-container {
+    background-color: #1f1f1f;
+}
+.dark-mode .highcharts-background {
+    fill: #1f1f1f;
+}
+
+/* --- GLOBAL TEXT & LABELS (WHITE) --- */
+.dark-mode .highcharts-title,
+.dark-mode .highcharts-subtitle,
+.dark-mode .highcharts-axis-title,
+.dark-mode .highcharts-legend-item text,
+.dark-mode .highcharts-axis-labels text,
+.dark-mode .highcharts-data-label text,
+.dark-mode .highcharts-label text {
+    fill: #ffffff !important;
+    color: #ffffff !important; /* For HTML labels if used */
+    text-outline: none !important; /* Removes the "glow" around text */
+}
+
+/* --- TOOLTIP CUSTOMIZATION --- */
+.dark-mode .highcharts-tooltip-box {
+    fill: #333333;
+    fill-opacity: 0.95;
+    stroke: #ffffff;
+    stroke-width: 1px;
+}
+
+/* Targeting all parts of the tooltip text */
+.dark-mode .highcharts-tooltip text {
+    fill: #ffffff !important;
+}
+
+.dark-mode .highcharts-tooltip-header {
+    fill: #ffffff !important;
+    font-weight: bold;
+}
+
+/* --- BREADCRUMBS (For Drilldown) --- */
+/* The button background */
+.dark-mode .highcharts-breadcrumbs-button .highcharts-button-box {
+    fill: #444444;
+    stroke: #666666;
+}
+
+/* The text inside the breadcrumb */
+.dark-mode .highcharts-breadcrumbs-button text {
+    fill: #ffffff !important;
+}
+
+/* Hover state for breadcrumbs */
+.dark-mode .highcharts-breadcrumbs-button:hover .highcharts-button-box {
+    fill: #555555;
+    stroke: #ffffff;
+}
+
+/* --- AXIS & GRID --- */
+.dark-mode .highcharts-axis-line,
+.dark-mode .highcharts-tick {
+    stroke: #666;
+}
+.dark-mode .highcharts-grid-line {
+    stroke: #333;
+}
+
+/* --- SERIES COLORS --- */
+.dark-mode .highcharts-color-0 {
+    fill: rgba(5, 141, 199, 0.8);
+    filter: drop-shadow(0px 0px 2px rgba(5, 141, 199, 0.6));
+}
+
+.dark-mode .highcharts-color-1 {
+    fill: rgba(80, 180, 50, 0.8);
+    filter: drop-shadow(0px 0px 2px rgba(80, 180, 50, 0.6));
+}
+
+.dark-mode .highcharts-color-2 {
+    fill: rgba(237, 86, 27, 0.8);
+    filter: drop-shadow(0px 0px 2px rgba(237, 86, 27, 0.6));
+}
+
+/* Optional: Make the glow stronger on hover */
+.dark-mode .highcharts-series .highcharts-point:hover {
+    filter: drop-shadow(0px 0px 5px white);
+    transition: filter 0.2s;
+}
+
+.dark-mode .highcharts-tooltip table {
+    background-color: rgba(40, 40, 40, 0.95);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+    color: #ffffff !important;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .highcharts-tooltip h3 {
+    color: #058dc7; /* Give the name a brand color */
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+.dark-mode .highcharts-tooltip th {
+    text-align: left;
+    padding-right: 15px;
+    color: #bbb; /* Muted labels */
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.dark-mode .highcharts-tooltip td {
+    color: #ffffff; /* Bright white values */
+    font-weight: bold;
+    font-size: 12px;
 }
