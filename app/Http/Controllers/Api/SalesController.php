@@ -286,12 +286,6 @@ class SalesController extends Controller
             'total_cm_amount_vat' => $total_cm_amount_vat,
         ]);
 
-        DB::setDefaultConnection($account_branch->account->db_data->connection_name);
-
-        DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [$account_branch->account_id, $account_branch->id, date('Y', strtotime($request->date)), date('n', strtotime($request->date))]);
-
-        DB::setDefaultConnection('mysql');
-
         return $this->successResponse(new SalesResource($sale));
     }
 
@@ -311,10 +305,11 @@ class SalesController extends Controller
         $sale = Sale::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
+
         if(!empty($sale)) {
             return $this->successResponse(new SalesResource($sale));
         } else {
-            $this->validationError('Data not found.');
+            return $this->validationError('Data not found.');
         }
     }
 
@@ -482,15 +477,16 @@ class SalesController extends Controller
             ->where('id', $id)
             ->first();
 
-        if($sale->date != $request->date) {
-            DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
-                $account_branch->account_id, $account_branch->id,
-                date('Y', strtotime($sale->date)),
-                date('n', strtotime($sale->date))
-            ]);
-        }
-
         if(!empty($sale)) {
+
+            if($sale->date != $request->date) {
+                DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
+                    $account_branch->account_id, $account_branch->id,
+                    date('Y', strtotime($sale->date)),
+                    date('n', strtotime($sale->date))
+                ]);
+            }
+
             $sales_upload = $sale->sales_upload;
 
             $total_cm_quantity = $sales_upload->total_cm_quantity;

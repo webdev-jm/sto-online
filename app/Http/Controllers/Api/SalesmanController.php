@@ -21,21 +21,26 @@ class SalesmanController extends Controller
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        $sales = Salesman::where('account_branch_id', $account_branch->id)
-            ->paginate(10);
+
+        $query = Salesman::orderBy('created_at', 'desc')
+            ->where('account_id', $account_branch->account_id);
+
+        $sales = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
 
         return SalesmanResource::collection($sales);
     }
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -87,12 +92,12 @@ class SalesmanController extends Controller
         $salesman_data = new SalesmanResource($salesman);
 
         return $this->successResponse($salesman_data);
-        
+
     }
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -100,7 +105,7 @@ class SalesmanController extends Controller
         $account_branch = $check['account_branch'];
 
         if(!empty($id)) {
-            
+
             $salesman = Salesman::where('account_branch_id', $account_branch->id)
                 ->where('id', $id)
                 ->first();
@@ -117,7 +122,7 @@ class SalesmanController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -130,6 +135,21 @@ class SalesmanController extends Controller
             ],
             'name' => [
                 'required'
+            ],
+            'type' => [
+                'required'
+            ],
+            'district_code' => [
+                'required',
+                function($attribute, $value, $fail) use($account_branch) {
+                    // check if existed
+                    $check = District::where('account_branch_id', $account_branch->id)
+                        ->where('district_code', $value)
+                        ->first();
+                    if(empty($check)) {
+                        $fail('District code '.$value.' is not in the system.');
+                    }
+                }
             ]
         ]);
 
@@ -141,15 +161,21 @@ class SalesmanController extends Controller
             return $this->validationError('id is required');
         }
 
+        $district = District::where('account_branch_id', $account_branch->id)
+            ->where('district_code', $request->district_code)
+            ->first();
+
         $salesman = Salesman::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
         if(!empty($salesman)) {
             $salesman->update([
+                'district_id' => $district->id,
                 'code' => $request->code,
-                'name' => $request->name
+                'name' => $request->name,
+                'type' => $request->type
             ]);
-            
+
             return $this->successResponse(new SalesmanResource($salesman));
         } else {
             return $this->validationError('data not found.');

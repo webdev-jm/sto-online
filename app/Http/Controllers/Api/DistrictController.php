@@ -19,28 +19,32 @@ class DistrictController extends Controller
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
 
-        $districts = District::where('account_branch_id', $account_branch->id)
-            ->paginate(10);
+        $query = District::orderBy('created_at', 'desc')
+            ->where('account_id', $account_branch->account_id);
+
+        $districts = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
 
         return DistrictResource::collection($districts);
     }
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        
+
         $validator = Validator::make($request->all(), [
             'district_code' => [
                 'required',
@@ -79,7 +83,7 @@ class DistrictController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -102,7 +106,7 @@ class DistrictController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }

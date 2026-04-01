@@ -18,27 +18,32 @@ class AreaController extends Controller
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        $areas = Area::where('account_branch_id', $account_branch->id)
-            ->paginate(10);
-        
+
+        $query = Area::orderBy('created_at', 'desc')
+            ->where('account_id', $account_branch->account_id);
+
+        $areas = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
+
         return AreaResource::collection($areas);
     }
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        
+
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
@@ -66,7 +71,7 @@ class AreaController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -79,7 +84,7 @@ class AreaController extends Controller
         $area = Area::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
-        
+
         if(!empty($area)) {
             return $this->successResponse(new AreaResource($area));
         } else {
@@ -89,7 +94,7 @@ class AreaController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }

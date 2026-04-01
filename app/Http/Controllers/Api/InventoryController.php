@@ -63,7 +63,7 @@ class InventoryController extends Controller
                 function($attribute, $value, $fail) use($account_branch) {
                     $sku_code = $value;
 
-                    $map_result = $this->mapProductCode($account_branch->account_id, $sku_code);
+                    $map_result = $this->productMapping($account_branch->account_id, $sku_code);
                     $sku_code = $map_result[0];
 
                     if(strpos(trim($sku_code ?? ''), '-')) {
@@ -117,7 +117,7 @@ class InventoryController extends Controller
 
         $type = 1;
 
-        $map_result = $this->mapProductCode($account_branch->account_id, $request->sku_code);
+        $map_result = $this->productMapping($account_branch->account_id, $request->sku_code);
         $request->sku_code = $map_result[0];
         $type = $map_result[1] ?? $type;
 
@@ -268,7 +268,7 @@ class InventoryController extends Controller
 
             $type = 1;
 
-            $map_result = $this->mapProductCode($account_branch->account_id, $request->sku_code);
+            $map_result = $this->productMapping($account_branch->account_id, $request->sku_code);
             $request->sku_code = $map_result[0];
             $type = $map_result[1] ?? $type;
 
