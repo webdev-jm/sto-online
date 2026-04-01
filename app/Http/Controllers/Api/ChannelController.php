@@ -18,26 +18,30 @@ class ChannelController extends Controller
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        $channels = Channel::paginate(10);
+
+        $query = Channel::orderBy('created_at', 'desc');
+        $channels = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
 
         return ChannelResource::collection($channels);
     }
 
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        
+
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
@@ -63,7 +67,7 @@ class ChannelController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -76,7 +80,7 @@ class ChannelController extends Controller
 
         $channel = Channel::where('id', $id)
             ->first();
-        
+
         if(!empty($channel)) {
             return $this->successResponse(new ChannelResource($channel));
         } else {
@@ -86,7 +90,7 @@ class ChannelController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -121,4 +125,3 @@ class ChannelController extends Controller
         }
     }
 }
- 

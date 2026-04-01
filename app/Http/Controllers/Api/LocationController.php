@@ -20,25 +20,29 @@ class LocationController extends Controller
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
 
         $account_branch = $check['account_branch'];
-        $locations = Location::where('account_id', $account_branch->account_id)
-            ->paginate(10);
+        $query = Location::orderBy('created_at', 'desc')
+            ->where('account_id', $account_branch->account_id);
+
+        $locations = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
 
         return LocationResource::collection($locations);
     }
-    
+
     public function create(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
-        
+
         $account_branch = $check['account_branch'];
         $validator = Validator::make($request->all(), [
             'code' => [
@@ -79,7 +83,7 @@ class LocationController extends Controller
 
     public function show(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(!empty($check['error'])) {
             return $this->validationError($check['error']);
         }
@@ -90,7 +94,7 @@ class LocationController extends Controller
                 $location = Location::where('account_branch_id', $account_branch->id)
                     ->where('id', $id)
                     ->first();
-                
+
                 if(!empty($location)) {
                     return $this->successResponse(new LocationResource($location));
                 } else {
@@ -105,7 +109,7 @@ class LocationController extends Controller
 
     public function update(Request $request, $id) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
-        
+
         if(empty($id)) {
             return $this->validationError('id is required');
         }
@@ -137,14 +141,14 @@ class LocationController extends Controller
             $location = Location::where('account_branch_id', $account_branch->id)
                 ->where('id', $id)
                 ->first();
-            
+
             if(!empty($location)) {
 
                 $location->update([
                     'code' => $request->code,
                     'name' => $request->name
                 ]);
-                
+
                 return $this->successResponse(new LocationResource($location));
             } else {
                 return $this->successResponse('data not found');

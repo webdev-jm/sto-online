@@ -34,8 +34,12 @@ class CustomerController extends Controller
 
         $account_branch = $check['account_branch'];
 
-        $customers = Customer::where('account_branch_id', $account_branch->id)
-            ->paginate(10);
+        $query = Customer::orderBy('created_at', 'desc')
+            ->where('account_id', $account_branch->account_id);
+
+        $customers = $request->has('page')
+            ? $query->paginate(10)
+            : $query->get();
 
         return CustomerResource::collection($customers);
     }
