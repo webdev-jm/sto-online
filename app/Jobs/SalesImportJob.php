@@ -191,8 +191,5 @@ class SalesImportJob implements ShouldQueue
 
         }); // End of transaction
 
-        // logs
-        activity('upload')
-            ->log(':causer.name has uploaded sales data.');
     }
 }
