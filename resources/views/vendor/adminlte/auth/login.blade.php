@@ -89,21 +89,7 @@
 @stop
 
 @section('auth_footer')
-    {{-- Password reset link --}}
-    @if($password_reset_url)
-        {{-- <p class="my-0">
-            <a href="{{ $password_reset_url }}">
-                {{ __('adminlte::adminlte.i_forgot_my_password') }}
-            </a>
-        </p> --}}
-    @endif
-
-    {{-- Register link --}}
-    @if($register_url)
-        {{-- <p class="my-0">
-            <a href="{{ $register_url }}">
-                {{ __('adminlte::adminlte.register_a_new_membership') }}
-            </a>
-        </p> --}}
-    @endif
+    <a href="{{ route('google.login') }}" class="btn btn-danger btn-block">
+        <i class="fab fa-google"></i> Login with Google
+    </a>
 @stop
