@@ -25,6 +25,7 @@ use App\Http\Controllers\TemplateConverterControler;
 use App\Http\Controllers\ReturnToVendorController;
 use App\Http\Controllers\ProductMappingController;
 use App\Http\Controllers\ChannelMappingController;
+use App\Http\Controllers\Auth\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,9 @@ Route::get('/', function() {
 });
 
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 Route::middleware(['auth', 'admin'])->group(function() {
     Route::get('generate-ubo/{account_id}/{branch_id}', [CustomerController::class, 'generateUBO']);
