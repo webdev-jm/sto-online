@@ -20,11 +20,13 @@ use App\Http\Resources\SalesResource;
 use App\Http\Traits\ApiBranchKeyChecker;
 
 use App\Http\Traits\ProductMappingTrait;
+use App\Http\Traits\ChannelMappingTrait;
 
 class SalesController extends Controller
 {
     use ApiBranchKeyChecker;
     use ProductMappingTrait;
+    use ChannelMappingTrait;
 
     public function index(Request $request) {
         $check = $this->checkBranchKey($request->header('BRANCH-KEY'));
@@ -95,11 +97,15 @@ class SalesController extends Controller
             'channel_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
+                    $channel_code = $value;
+                    $mapping_result = $this->channelMapping($account_branch->account_id, $channel_code);
+                    $channel_code = $mapping_result[0];
+
                     // check if existed
-                    $check = Channel::where('code', $value)
+                    $check = Channel::where('code', $channel_code)
                         ->first();
                     if(empty($check)) {
-                        $fail('Channel code '.$value.' is not in the system.');
+                        $fail('Channel code '.$channel_code.' is not in the system.');
                     }
                 }
             ],
@@ -173,6 +179,9 @@ class SalesController extends Controller
                 $type = 3;
             }
         }
+
+        $channel_mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
+        $request->channel_code = $channel_mapping_result[0];
 
         // check data
         // Customer
@@ -363,11 +372,16 @@ class SalesController extends Controller
             'channel_code' => [
                 'required',
                 function($attribute, $value, $fail) use($account_branch) {
+
+                    $channel_code = $value;
+                    $mapping_result = $this->channelMapping($account_branch->account_id, $channel_code);
+                    $channel_code = $mapping_result[0];
+
                     // check if existed
-                    $check = Channel::where('code', $value)
+                    $check = Channel::where('code', $channel_code)
                         ->first();
                     if(empty($check)) {
-                        $fail('Channel code '.$value.' is not in the system.');
+                        $fail('Channel code '.$channel_code.' is not in the system.');
                     }
                 }
             ],
@@ -441,6 +455,9 @@ class SalesController extends Controller
                 $type = 3;
             }
         }
+
+        $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
+        $request->channel_code = $mapping_result[0];
 
         $category = 0;
         if(!empty($request->invoice_number) && strpos($request->invoice_number, '-')) {

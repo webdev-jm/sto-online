@@ -77,8 +77,6 @@ class LocationController extends Controller
         } else {
             return $this->validationError('Location '.$request->code.' already exists.');
         }
-
-        return $this->successResponse($data);
     }
 
     public function show(Request $request, $id) {
