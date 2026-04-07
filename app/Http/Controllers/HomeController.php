@@ -247,9 +247,15 @@ class HomeController extends Controller
         Session::forget('account_branch');
 
         $account = Account::findOrFail(decrypt($id));
-        auth()->user()->update([
-            'account_id' => $account->id
-        ]);
+
+        if(auth()->user()->type == 1) {
+            auth()->user()->update([
+                'account_id' => $account->id
+            ]);
+        } else {
+            $account_id = auth()->user()->account_id ?? decrypt($id);
+            $account = Account::findOrFail($account_id);
+        }
 
         $msg = NULL;
         if(empty(auth()->user()->accounts()->count())) {

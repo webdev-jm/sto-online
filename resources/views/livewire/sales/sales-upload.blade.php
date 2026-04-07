@@ -224,12 +224,34 @@
                                     {{number_format($data['price_inc_vat'], 2) ?? '-'}}
                                 </td>
                                 {{-- AMOUNT --}}
-                                <td class="align-middle text-right">
-                                    {{number_format($data['amount'], 2) ?? '-'}}
+                                @php
+                                    $check_amount = '';
+                                    // if the amount is not close to the computation based on sms price, mark it as warning
+                                    if($data['sms_price'] > 0) {
+                                        $difference = abs($data['sms_price'] - $data['amount']);
+                                        if($difference > 10000) { // allow a difference of 10000
+                                            $check_amount = ' text-warning font-weight-bold';
+                                        }
+                                    }
+                                @endphp
+                                <td class="align-middle text-right{{ $check_amount }}">
+                                    @if($check_amount)
+                                        <span title="Amount is not close to the computation based on BEVI price {{ number_format($data['sms_price'], 2) ?? 0 }}">
+                                            {{number_format($data['amount'], 2) ?? '-'}}
+                                        </span>
+                                    @else
+                                        {{number_format($data['amount'], 2) ?? '-'}}
+                                    @endif
                                 </td>
                                 {{-- AMOUNT INC VAT --}}
-                                <td class="align-middle text-right">
-                                    {{number_format($data['amount_inc_vat'], 2) ?? '-'}}
+                                <td class="align-middle text-right{{ $check_amount }}">
+                                    @if($check_amount)
+                                        <span title="Amount including VAT is not close to the computation based on BEVI price {{ number_format($data['sms_price'], 2) ?? 0 }}">
+                                            {{number_format($data['amount_inc_vat'], 2) ?? '-'}}
+                                        </span>
+                                    @else
+                                        {{number_format($data['amount_inc_vat'], 2) ?? '-'}}
+                                    @endif
                                 </td>
                                 {{-- LINE DISCOUNT --}}
                                 <td class="align-middle text-right">

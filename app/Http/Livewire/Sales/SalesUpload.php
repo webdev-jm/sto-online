@@ -26,6 +26,8 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 use App\Http\Traits\ProductMappingTrait;
 
+use App\Http\Traits\PriceCodeTrait;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);
 ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
@@ -33,6 +35,7 @@ ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
 
 class SalesUpload extends Component
 {
+    use PriceCodeTrait;
     use ProductMappingTrait;
     use WithFileUploads;
     use WithPagination;
@@ -176,6 +179,10 @@ class SalesUpload extends Component
         $locationCodes = [];
         $skuCodes = [];
 
+        $sms_account = $this->account->sms_account;
+        $account_code = $sms_account->account_code;
+        $company = $sms_account->company->name;
+
         foreach ($rows as $row) {
             if (count($row) < 6) continue;
 
@@ -237,6 +244,7 @@ class SalesUpload extends Component
             $sku_code = $mappingResult[0];
             $type = $mappingResult[1] ?? $type;
 
+            $uom = trim($row[7]);
             $quantity = (float)str_replace(',', '', trim($row[6]));
             $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
             $amount = (float)str_replace(',', '', trim($row[9]));
@@ -256,13 +264,17 @@ class SalesUpload extends Component
             $location = $locations->get($warehouse_code);
             $product = $products->get($sku_code);
 
+            // check if the amount is close to the computation based on sms price
+            $sms_price = $this->getProductPrice($account_code, $company, $sku_code, $quantity, $uom, false);
+
             $rowData = [
                 'type' => $type, 'check' => 0, 'date' => $invoice_date, 'document' => $invoice_number,
                 'category' => $category, 'customer_code' => $customer_code, 'location_code' => $warehouse_code,
-                'sku_code' => $original_sku_code, 'quantity' => $quantity, 'uom' => trim($row[7]),
+                'sku_code' => $original_sku_code, 'quantity' => $quantity, 'uom' => $uom,
                 'price_inc_vat' => $price_inc_vat, 'amount' => $amount, 'amount_inc_vat' => $amount_inc_vat,
-                'line_discount' => $line_discount, 'status' => 2,
+                'line_discount' => $line_discount, 'status' => 2, 'sms_price' => $sms_price
             ];
+
 
             if ($customer && $location && $product) {
                 $rowData = array_merge($rowData, [
