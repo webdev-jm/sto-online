@@ -21,8 +21,17 @@ class AssignedBranches extends Component
     public $form_message;
 
     protected $listeners = [
-        'updateBranches' => 'clear'
+        'updateBranches' => 'refreshBranches'
     ];
+
+    public function refreshBranches() {
+        $this->user->refresh();
+        $this->resetPage('branch-page');
+
+        $account_ids = $this->user->accounts()->pluck('id')->toArray();
+        $validBranchIds = AccountBranch::whereIn('account_id', $account_ids)->pluck('id')->toArray();
+        $this->selected = array_values(array_intersect((array) $this->selected, $validBranchIds));
+    }
 
     public function updatedSearch() {
         $this->resetPage('branch-page');
@@ -35,7 +44,10 @@ class AssignedBranches extends Component
     }
 
     public function selectAll() {
+        $account_ids = $this->user->accounts()->pluck('id')->toArray();
+
         $branches = AccountBranch::orderBy('account_id')
+            ->whereIn('account_id', $account_ids)
             ->when(!empty($this->search), function($query) {
                 $query->where('code', 'like', '%'.$this->search.'%')
                     ->orWhere('name', 'like', '%'.$this->search.'%')
@@ -45,7 +57,7 @@ class AssignedBranches extends Component
                     });
             })
             ->get();
-        
+
         $this->reset('selected');
 
         foreach($branches as $branch) {
@@ -68,7 +80,7 @@ class AssignedBranches extends Component
 
     public function mount($user) {
         $this->user = $user;
-    
+
         // get selected account
         foreach($this->user->account_branches as $branch) {
             $this->selected[] = $branch->id;

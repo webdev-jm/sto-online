@@ -29,11 +29,11 @@
                             src="{{$user->adminlte_image()}}"
                             alt="User profile picture">
                     </div>
-    
+
                     <h3 class="profile-username text-center">{{$user->name}}</h3>
-    
+
                     <p class="text-muted text-center">{{implode(', ', $user->getRoleNames()->toArray())}}</p>
-    
+
                     <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item p-1">
                             <b>Username</b>
@@ -86,35 +86,15 @@
 
         <div class="col-lg-9">
             @can('user assign account')
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Assign Accounts</h3>
-                </div>
-                <div class="card-body p-1">
-                    <livewire:user.assigned-accounts :user="$user" />
-                </div>
-            </div>
+                <livewire:user.assigned-accounts :user="$user" />
             @endcan
 
             @can('user assign branch')
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Assign Branches</h3>
-                </div>
-                <div class="card-body p-1">
-                    <livewire:user.assigned-branches :user="$user"/>
-                </div>
-            </div>
+                <livewire:user.assigned-branches :user="$user"/>
             @endcan
 
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">NOTIFICATIONS</h3>
-                </div>
-                <div class="card-body p-1">
-                    <livewire:user.assigned-notification :user="$user"/>
-                </div>
-            </div>
+            <livewire:user.assigned-notification :user="$user"/>
+
         </div>
     </div>
 

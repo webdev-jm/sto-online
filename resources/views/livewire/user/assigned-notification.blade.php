@@ -10,7 +10,7 @@
             <h3 class="card-title">NOTIFICATIONS</h3>
             <div class="card-tools">
                 @if(!$showAdd)
-                    <button class="btn btn-primary btn-xs" wire:click.prevent="showAdd">
+                    <button class="btn btn-primary btn-xs" wire:click.prevent="showAddForm">
                         <i class="fa fa-plus mr-1"></i>
                         ADD NOTIFICATION
                     </button>
@@ -58,7 +58,7 @@
 
                     </div>
                     <div class="card-footer text-right p-1">
-                        <button class="btn btn-secondary btn-xs" wire:click.prevent="showAdd">
+                        <button class="btn btn-secondary btn-xs" wire:click.prevent="showAddForm">
                             <i class="fa fa-ban mr-1"></i>
                             CANCEL
                         </button>
@@ -94,7 +94,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
         </div>
         <div class="card-footer">
             {{$user_notifications->links(data: ['scrollTo' => false])}}
