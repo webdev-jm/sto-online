@@ -17,13 +17,15 @@ class AssignedNotification extends Component
     public $user;
     public $notifications;
     public $frequencies;
-    
+
     public $showAdd = 0;
 
     public $notification_id;
     public $frequency_id;
 
-    public function showAdd() {
+    public $form_message;
+
+    public function showAddForm() {
         if($this->showAdd) {
             $this->showAdd = 0;
         } else {
@@ -62,7 +64,7 @@ class AssignedNotification extends Component
 
         $this->reset(['notification_id', 'frequency_id']);
         $this->showAdd = 0;
-        
+
     }
 
     public function mount($user) {

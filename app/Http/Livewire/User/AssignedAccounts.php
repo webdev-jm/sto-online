@@ -25,6 +25,22 @@ class AssignedAccounts extends Component
     }
 
     public function assign() {
+        $removedAccountIds = array_diff((array) $this->selected, $this->user->accounts()->pluck('id')->toArray());
+
+        $currentAccountIds = $this->user->accounts()->pluck('id')->toArray();
+        $removedAccountIds = array_diff($currentAccountIds, (array) $this->selected);
+
+        // Detach branches that belong to removed accounts
+        if (!empty($removedAccountIds)) {
+            $branchIdsToRemove = \App\Models\AccountBranch::whereIn('account_id', $removedAccountIds)
+                ->pluck('id')
+                ->toArray();
+
+            if (!empty($branchIdsToRemove)) {
+                $this->user->account_branches()->detach($branchIdsToRemove);
+            }
+        }
+
         $this->user->accounts()->sync($this->selected);
 
         $this->form_message = 'Accounts has been assigned.';
@@ -39,7 +55,7 @@ class AssignedAccounts extends Component
                     ->orWhere('short_name', 'like', '%'.$this->search.'%');
             })
             ->get();
-        
+
         $this->reset('selected');
 
         foreach($accounts as $account) {
@@ -63,16 +79,7 @@ class AssignedAccounts extends Component
     public function mount($user) {
         $this->user = $user;
 
-        $db2 = env('DB_DATABASE_2');
-    
-        // get selected account
-        $accounts = DB::connection('mysql')
-            ->table('account_user as au')
-            ->join($db2.'.accounts as a', 'a.id', '=', 'au.account_id')
-            ->where('au.user_id', $this->user->id)
-            ->get();
-
-        foreach($accounts as $account) {
+        foreach($this->user->accounts as $account) {
             $this->selected[] = $account->id;
         }
     }
