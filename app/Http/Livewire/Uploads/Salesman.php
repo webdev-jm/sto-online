@@ -52,7 +52,7 @@ class Salesman extends Component
                 if(!empty($data['district_code'])) {
                     $district = District::where('district_code', $data['district_code'])
                         ->first();
-                    if(empty($district)) {
+                    if(!empty($district)) {
                         $salesman->update([
                             'district_id' => $district->id
                         ]);

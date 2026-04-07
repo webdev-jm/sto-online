@@ -17,6 +17,8 @@ class CreateSalesReport extends Migration
             $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('account_branch_id');
             $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('salesman_id')->nullable();
+            $table->unsignedBigInteger('location_id')->nullable();
             $table->integer('year');
             $table->integer('month');
             $table->unsignedBigInteger('product_id');

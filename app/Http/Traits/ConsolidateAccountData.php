@@ -20,7 +20,7 @@ trait ConsolidateAccountData
             $years = [$year];
         }
 
-        $this->initSqliteSchema(); // ✅ ensure tables exist before writing
+        $this->initSqliteSchema(); // ensure tables exist before writing
 
         Account::where('id', '>=', '10')->chunk(100, function ($accounts) use ($years) {
             foreach ($accounts as $account) {
@@ -32,7 +32,7 @@ trait ConsolidateAccountData
 
                         $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
 
-                        // ✅ Write JSON
+                        // Write JSON
                         $filename = sprintf(
                             'reports/consolidated_account_data-%s-%s-%s.json',
                             $account->account_code, $y, $m
@@ -42,7 +42,7 @@ trait ConsolidateAccountData
                             json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
                         );
 
-                        // ✅ Write to SQLite
+                        // Write to SQLite
                         $this->importToSqlite($account, $y, $m, $allConsolidatedData);
                     }
                 }
@@ -65,6 +65,10 @@ trait ConsolidateAccountData
             area TEXT,
             customer_code TEXT,
             customer_name TEXT,
+            salesman_code TEXT,
+            salesman_name TEXT,
+            location_code TEXT,
+            location_name TEXT,
             channel_code TEXT,
             channel_name TEXT,
             customer_status INTEGER,
@@ -109,7 +113,7 @@ trait ConsolidateAccountData
             month INTEGER
         )');
 
-        // ✅ Indexes for common query patterns
+        // Indexes for common query patterns
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_sales_year_month ON sales_data (year, month)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_sales_customer ON sales_data (customer_code, customer_status)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_inventory_year_month ON inventory_data (year, month)');
@@ -120,8 +124,8 @@ trait ConsolidateAccountData
     {
         $sqlite = DB::connection('sqlite_reports');
 
-        // ✅ SQLite max variables = 999, chunk = floor(999 / column_count)
-        $salesChunk     = floor(999 / 17); // 58
+        // SQLite max variables = 999, chunk = floor(999 / column_count)
+        $salesChunk     = floor(999 / 21); // 58
         $inventoryChunk = floor(999 / 10); // 99
         $agingChunk     = floor(999 / 11); // 90
 
@@ -137,7 +141,7 @@ trait ConsolidateAccountData
             ->where('account_code', $account->account_code)
             ->where('year', $year)->where('month', $month)->delete();
 
-        // ✅ sales_data — 17 columns
+        // sales_data — 21 columns
         collect($data['sales_data'] ?? [])
             ->chunk($salesChunk)
             ->each(fn($chunk) => $sqlite->table('sales_data')->insert(
@@ -147,6 +151,10 @@ trait ConsolidateAccountData
                     'area'            => $account->area,
                     'customer_code'   => $row->customer_code   ?? null,
                     'customer_name'   => $row->customer_name   ?? null,
+                    'salesman_code'   => $row->salesman_code   ?? null,
+                    'salesman_name'   => $row->salesman_name   ?? null,
+                    'location_code'   => $row->location_code   ?? null,
+                    'location_name'   => $row->location_name   ?? null,
                     'channel_code'    => $row->channel_code    ?? null,
                     'channel_name'    => $row->channel_name    ?? null,
                     'customer_status' => $row->customer_status ?? 0,
@@ -162,7 +170,7 @@ trait ConsolidateAccountData
                 ])->all()
             ));
 
-        // ✅ inventory_data — 10 columns
+        // inventory_data — 10 columns
         collect($data['inventory_data'] ?? [])
             ->chunk($inventoryChunk)
             ->each(fn($chunk) => $sqlite->table('inventory_data')->insert(
@@ -180,7 +188,7 @@ trait ConsolidateAccountData
                 ])->all()
             ));
 
-        // ✅ inventory_aging — 11 columns
+        // inventory_aging — 11 columns
         collect($data['inventory_aging'] ?? [])
             ->chunk($agingChunk)
             ->each(fn($chunk) => $sqlite->table('inventory_aging')->insert(
@@ -220,6 +228,10 @@ trait ConsolidateAccountData
                 DB::raw("'" . $account->area . "' as area"),
                 'c.code as customer_code',
                 'c.name as customer_name',
+                's.code as salesman_code',
+                's.name as salesman_name',
+                'l.code as location_code',
+                'l.name as location_name',
                 'ch.code as channel_code',
                 'ch.name as channel_name',
                 'c.status as customer_status',
@@ -229,6 +241,8 @@ trait ConsolidateAccountData
             ])
             ->leftJoin('customers as c', 'c.id', '=', 'sr.customer_id')
             ->leftJoin($mysqlDb . '.channels as ch', 'ch.id', '=', 'c.channel_id')
+            ->leftJoin('salesmen as s', 's.id', '=', 'sr.salesman_id')
+            ->leftJoin('locations as l', 'l.id', '=', 'sr.location_id')
             ->when(!empty($year), fn($q) => $q->where('sr.year', $year))
             ->when(!empty($month), fn($q) => $q->where('sr.month', $month))
             ->get();

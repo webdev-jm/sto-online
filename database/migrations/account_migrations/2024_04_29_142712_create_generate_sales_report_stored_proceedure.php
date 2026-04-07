@@ -24,6 +24,8 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
                         s.account_id,
                         s.account_branch_id,
                         s.customer_id,
+                        s.salesman_id,
+                        s.location_id,
                         YEAR(s.date) as year,
                         MONTH(s.date) as month,
                         p.id as product_id,
@@ -60,7 +62,7 @@ class CreateGenerateSalesReportStoredProceedure extends Migration
                         AND
                             s.deleted_at IS NULL
                     GROUP BY
-                        account_id, account_branch_id, customer_id, year, month, p.id, p.stock_code, p.description, p.size, brand_classification, brand, category, uom;
+                        account_id, account_branch_id, customer_id, salesman_id, location_id, year, month, p.id, p.stock_code, p.description, p.size, brand_classification, brand, category, uom;
             END
         ');
     }

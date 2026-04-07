@@ -42,7 +42,7 @@ class GoogleController extends Controller
 
             Auth::login($user);
 
-            return redirect()->route('home'); // Redirect to dashboard
+            return redirect()->route('dashboard'); // Redirect to dashboard
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Something went wrong.');
         }

@@ -1558,21 +1558,29 @@ select.form-control {
     background: rgba(52, 199, 89, 0.12) !important;
     border-left-color: #34c759 !important;
     color: #1c6b34 !important;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
 }
 .alert-danger {
     background: rgba(255, 59, 48, 0.1) !important;
     border-left-color: #ff3b30 !important;
     color: #8b1a1a !important;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
 }
 .alert-warning {
     background: rgba(255, 159, 10, 0.1) !important;
     border-left-color: #ff9f0a !important;
     color: #7a4a00 !important;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
 }
 .alert-info {
     background: rgba(10, 132, 255, 0.08) !important;
     border-left-color: #0a84ff !important;
     color: #004e99 !important;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
 }
 
 /* =============================================================================

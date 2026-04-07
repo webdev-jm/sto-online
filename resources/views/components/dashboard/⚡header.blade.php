@@ -111,6 +111,15 @@ new class extends Component
                         <i class="fa fa-boxes mr-1"></i> INVENTORY &amp; SUPPLY CHAIN
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ $selected_tab === 'accounts' ? 'active' : '' }}"
+                       role="tab"
+                       wire:click.prevent="selectTab('accounts')"
+                       href="#">
+                        <i class="fa fa-building mr-1"></i> ACCOUNTS
+                    </a>
+                </li>
             </ul>
 
             <div class="dash-tab-body">
@@ -251,6 +260,19 @@ new class extends Component
                     </div>
                 </div>
 
+                {{-- ACCOUNTS TAB --}}
+                <div class="{{ $selected_tab === 'accounts' ? '' : 'd-none' }}">
+                    <div class="overlay-wrapper" style="position:relative;">
+                        <div class="overlay text-center align-middle" wire:loading>
+                            <i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                            <div class="text-bold pt-2">Loading...</div>
+                        </div>
+
+                        <livewire:dashboard.accounts :year="$globalYear"/>
+
+                    </div>
+                </div>
+
             </div>{{-- /.dash-tab-body --}}
         </div>{{-- /.dash-tabs-card --}}
 
@@ -278,5 +300,80 @@ new class extends Component
             'rgba(237,86,27,0.5)'
         ]
     });
+
+    (function (H) {
+        H.seriesTypes.pie.prototype.animate = function (init) {
+            const series = this,
+                chart = series.chart,
+                points = series.points,
+                {
+                    animation
+                } = series.options,
+                {
+                    startAngleRad
+                } = series;
+
+            function fanAnimate(point, startAngleRad) {
+                const graphic = point.graphic,
+                    args = point.shapeArgs;
+
+                if (graphic && args) {
+
+                    graphic
+                        // Set inital animation values
+                        .attr({
+                            start: startAngleRad,
+                            end: startAngleRad,
+                            opacity: 1
+                        })
+                        // Animate to the final position
+                        .animate({
+                            start: args.start,
+                            end: args.end
+                        }, {
+                            duration: animation.duration / points.length
+                        }, function () {
+                            // On complete, start animating the next point
+                            if (points[point.index + 1]) {
+                                fanAnimate(points[point.index + 1], args.end);
+                            }
+                            // On the last point, fade in the data labels, then
+                            // apply the inner size
+                            if (point.index === series.points.length - 1) {
+                                series.dataLabelsGroup.animate({
+                                    opacity: 1
+                                },
+                                void 0,
+                                function () {
+                                    points.forEach(point => {
+                                        point.opacity = 1;
+                                    });
+                                    series.update({
+                                        enableMouseTracking: true
+                                    }, false);
+                                    chart.update({
+                                        plotOptions: {
+                                            pie: {
+                                                innerSize: '40%',
+                                                borderRadius: 8
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                }
+            }
+
+            if (init) {
+                // Hide points on init
+                points.forEach(point => {
+                    point.opacity = 0;
+                });
+            } else {
+                fanAnimate(points[0], startAngleRad);
+            }
+        };
+    }(Highcharts));
 </script>
 @endscript
