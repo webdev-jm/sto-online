@@ -119,7 +119,7 @@
                     <h3 class="card-title">SHIPPING ADDRESSES MAPPING</h3>
                 </div>
                 <div class="card-body">
-                    
+
                 </div>
             </div>
         </div>
@@ -161,36 +161,42 @@
                     $('#modal-delete').modal('show');
                 });
 
-                $('body').on('click', '#btn-copy', function(e) {
-                    e.preventDefault();
-                    var token = $('#token-text').text();
-                    
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(token)
-                            .then(function() {
-                                alert("Text copied to clipboard!");
-                            })
-                            .catch(function(error) {
-                                console.error("Failed to copy text: ", error);
-                                alert("Failed to copy text to clipboard.");
-                            });
-                    } else {
-                        // Fallback: Create a temporary textarea to copy the text
-                        var textarea = document.createElement('textarea');
-                        textarea.value = token;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        try {
-                            document.execCommand('copy');
-                            alert("Text copied to clipboard!");
-                        } catch (error) {
-                            console.error("Failed to copy text: ", error);
-                            alert("Failed to copy text to clipboard.");
-                        }
-                        document.body.removeChild(textarea);
-                    }
-                });
+
             });
         </script>
     @endcan
+
+    <script>
+        $(function() {
+            $('body').on('click', '#btn-copy', function(e) {
+                e.preventDefault();
+                var token = $('#token-text').text();
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(token)
+                        .then(function() {
+                            alert("Text copied to clipboard!");
+                        })
+                        .catch(function(error) {
+                            console.error("Failed to copy text: ", error);
+                            alert("Failed to copy text to clipboard.");
+                        });
+                } else {
+                    // Fallback: Create a temporary textarea to copy the text
+                    var textarea = document.createElement('textarea');
+                    textarea.value = token;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert("Text copied to clipboard!");
+                    } catch (error) {
+                        console.error("Failed to copy text: ", error);
+                        alert("Failed to copy text to clipboard.");
+                    }
+                    document.body.removeChild(textarea);
+                }
+            });
+        });
+    </script>
 @stop

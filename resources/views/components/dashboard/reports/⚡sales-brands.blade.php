@@ -129,13 +129,6 @@ new class extends Component
     <script>
         let chart;
 
-        const DRILL_TITLES = [
-            null,
-            '— by Brand',
-            '— by Category',
-            '— by SKU',
-        ];
-
         const buildConfig = (data) => ({
             credits: { enabled: false },
             chart: {
@@ -168,7 +161,7 @@ new class extends Component
                 }
             },
             series: [{
-                name: 'Sales by Brand Tag',
+                name: 'BRAND CATEGORIES',
                 styledMode: true,
                 data: data.data
             }],
