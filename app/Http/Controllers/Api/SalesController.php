@@ -163,25 +163,25 @@ class SalesController extends Controller
         $type = 1;
 
         $mapping_result = $this->productMapping($account_branch->account_id, $request->sku_code);
-        $request->sku_code = $mapping_result[0];
+        $sku_code = $mapping_result[0];
         $type = $mapping_result[1] ?? $type;
 
-        if(strpos(trim($request->sku_code ?? ''), '-')) {
-            $sku_arr = explode('-', $request->sku_code);
+        if(strpos(trim($sku_code ?? ''), '-') !== false) {
+            $sku_arr = explode('-', $sku_code);
             if($sku_arr[0] == 'FG') { // Free Goods
-                $request->sku_code = end($sku_arr);
+                $sku_code = end($sku_arr);
                 // process when free goods
                 $type = 2;
             }
             if($sku_arr[0] == 'PRM') { // Promo
-                $request->sku_code = end($sku_arr);
+                $sku_code = end($sku_arr);
                 // process when promo
                 $type = 3;
             }
         }
 
         $channel_mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
-        $request->channel_code = $channel_mapping_result[0];
+        $channel_code = $channel_mapping_result[0];
 
         // check data
         // Customer
@@ -189,10 +189,10 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
         // Product
-        $product = SMSProduct::where('stock_code', $request->sku_code)
+        $product = SMSProduct::where('stock_code', $sku_code)
             ->first();
         // Channel
-        $channel = Channel::where('code', $request->channel_code)
+        $channel = Channel::where('code', $channel_code)
             ->first();
         // Salesman
         $salesman = Salesman::where('code', $request->salesman_code)
@@ -204,6 +204,21 @@ class SalesController extends Controller
             ->first();
 
         $current_date = date('Y-m-d');
+
+        $duplicate = Sale::where('account_branch_id', $account_branch->id)
+            ->where('customer_id',   $customer->id)
+            ->where('product_id',    $product->id)
+            ->where('salesman_id',   $salesman->id)
+            ->where('location_id',   $location->id)
+            ->where('document_number', $request->invoice_number)
+            ->where('date',          $request->date)
+            ->where('uom',           $request->uom)
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if ($duplicate) {
+            return $this->validationError('A sales record with the same invoice, customer, product, and date already exists.');
+        }
 
         $sales_upload = SalesUpload::where('account_id', $account_branch->account_id)
             ->where('account_branch_id', $account_branch->id)
@@ -294,6 +309,8 @@ class SalesController extends Controller
             'total_cm_amount' => $total_cm_amount,
             'total_cm_amount_vat' => $total_cm_amount_vat,
         ]);
+
+        $this->generateSalesReport($sale, $account_branch);
 
         return $this->successResponse(new SalesResource($sale));
     }
@@ -439,25 +456,25 @@ class SalesController extends Controller
         $type = 1;
 
         $mapping_result = $this->productMapping($account_branch->account_id, $request->sku_code);
-        $request->sku_code = $mapping_result[0];
+        $sku_code = $mapping_result[0];
         $type = $mapping_result[1] ?? $type;
 
-        if(strpos(trim($request->sku_code ?? ''), '-')) {
-            $sku_arr = explode('-', $request->sku_code);
+        if(strpos(trim($sku_code ?? ''), '-') !== false) {
+            $sku_arr = explode('-', $sku_code);
             if($sku_arr[0] == 'FG') { // Free Goods
-                $request->sku_code = end($sku_arr);
+                $sku_code = end($sku_arr);
                 // process when free goods
                 $type = 2;
             }
             if($sku_arr[0] == 'PRM') { // Promo
-                $request->sku_code = end($sku_arr);
+                $sku_code = end($sku_arr);
                 // process when promo
                 $type = 3;
             }
         }
 
         $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
-        $request->channel_code = $mapping_result[0];
+        $channel_code = $mapping_result[0];
 
         $category = 0;
         if(!empty($request->invoice_number) && strpos($request->invoice_number, '-')) {
@@ -473,10 +490,10 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
         // Product
-        $product = SMSProduct::where('stock_code', $request->sku_code)
+        $product = SMSProduct::where('stock_code', $sku_code)
             ->first();
         // Channel
-        $channel = Channel::where('code', $request->channel_code)
+        $channel = Channel::where('code', $channel_code)
             ->first();
         // Salesman
         $salesman = Salesman::where('code', $request->salesman_code)
@@ -543,6 +560,8 @@ class SalesController extends Controller
                 'price_inc_vat' => $request->price_inc_vat,
                 'amount' => $request->amount,
                 'amount_inc_vat' => $request->amount_inc_vat,
+                'type'     => $type,
+                'category' => $category,
             ]);
 
             // check if not FG or PROMO
@@ -571,17 +590,98 @@ class SalesController extends Controller
                 'total_cm_amount_vat' => $total_cm_amount_vat,
             ]);
 
-            DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [
-                $account_branch->account_id, $account_branch->id,
-                date('Y', strtotime($request->date)),
-                date('n', strtotime($request->date))
-            ]);
-
             DB::setDefaultConnection('mysql');
+
+            $this->generateSalesReport($sale, $account_branch);
 
             return $this->successResponse(new SalesResource($sale));
         } else {
+            DB::setDefaultConnection('mysql');
             return $this->validationError('Data not found.');
         }
+    }
+
+    private function generateSalesReport($sale, $account_branch): void {
+        $year  = date('Y', strtotime($sale->date));
+        $month = date('n', strtotime($sale->date));
+
+        // Get product details from the SMS
+        $product = SMSProduct::find($sale->product_id);
+
+        if (empty($product)) {
+            return;
+        }
+
+        // Define the grouping key — matches exactly what the stored procedure groups by
+        $groupKey = [
+            'account_id'            => $sale->account_id,
+            'account_branch_id'     => $sale->account_branch_id,
+            'customer_id'           => $sale->customer_id,
+            'salesman_id'           => $sale->salesman_id,
+            'location_id'           => $sale->location_id,
+            'year'                  => $year,
+            'month'                 => $month,
+            'product_id'            => $product->id,
+            'stock_code'            => $product->stock_code,
+            'description'           => $product->description,
+            'size'                  => $product->size,
+            'brand_classification'  => $product->core_group,
+            'brand'                 => $product->brand,
+            'category'              => $product->category,
+            'uom'                   => $sale->uom,
+        ];
+
+        DB::setDefaultConnection($account_branch->account->db_data->connection_name);
+
+        // Re-aggregate only for this specific grouping bucket
+        $aggregates = Sale::where('account_id',        $sale->account_id)
+            ->where('account_branch_id', $sale->account_branch_id)
+            ->where('customer_id',       $sale->customer_id)
+            ->where('salesman_id',       $sale->salesman_id)
+            ->where('location_id',       $sale->location_id)
+            ->where('product_id',        $sale->product_id)
+            ->where('uom',               $sale->uom)
+            ->whereYear('date',  $year)
+            ->whereMonth('date', $month)
+            ->whereNull('deleted_at')
+            ->selectRaw("
+                SUM(IF(category = 0 AND type = 1, quantity,       NULL)) as quantity,
+                SUM(IF(category = 0 AND type = 1, amount_inc_vat, NULL)) as sales,
+                SUM(IF(category = 0 AND type = 2, quantity,       NULL)) as fg_quantity,
+                SUM(IF(category = 0 AND type = 2, amount_inc_vat, NULL)) as fg_sales,
+                SUM(IF(category = 0 AND type = 3, quantity,       NULL)) as promo_quantity,
+                SUM(IF(category = 0 AND type = 3, amount_inc_vat, NULL)) as promo_sales,
+                SUM(ABS(IF(category = 1,          amount_inc_vat, 0)))   as credit_memo
+            ")
+            ->first();
+
+        DB::table('sales_report')->updateOrInsert(
+            // match condition — unique composite key
+            [
+                'account_id'        => $groupKey['account_id'],
+                'account_branch_id' => $groupKey['account_branch_id'],
+                'customer_id'       => $groupKey['customer_id'],
+                'salesman_id'       => $groupKey['salesman_id'],
+                'location_id'       => $groupKey['location_id'],
+                'year'              => $groupKey['year'],
+                'month'             => $groupKey['month'],
+                'product_id'        => $groupKey['product_id'],
+                'uom'               => $groupKey['uom'],
+            ],
+            // values to insert or update
+            array_merge($groupKey, [
+                'quantity'        => $aggregates->quantity       ?? 0,
+                'sales'           => $aggregates->sales          ?? 0,
+                'fg_quantity'     => $aggregates->fg_quantity    ?? 0,
+                'fg_sales'        => $aggregates->fg_sales       ?? 0,
+                'promo_quantity'  => $aggregates->promo_quantity ?? 0,
+                'promo_sales'     => $aggregates->promo_sales    ?? 0,
+                'credit_memo'     => $aggregates->credit_memo    ?? 0,
+                'parked_quantity' => 0,
+                'parked_amount'   => 0,
+            ])
+        );
+
+        DB::setDefaultConnection('mysql');
     }
 }
