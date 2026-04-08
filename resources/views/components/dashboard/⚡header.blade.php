@@ -5,6 +5,9 @@ use App\Http\Traits\ConsolidateAccountData;
 use App\Http\Traits\SalesDataAggregator;
 use Illuminate\Support\Facades\Artisan;
 
+use App\Exports\ReportsMultiSheetExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 new class extends Component
 {
     use ConsolidateAccountData;
@@ -60,6 +63,12 @@ new class extends Component
         Artisan::call('cache:clear');
         $this->setConsolidatedAccountData();
     }
+
+    public function exportData() {
+        $fileName = 'Reports_' . $this->globalYear . '.xlsx';
+
+        return Excel::download(new ReportsMultiSheetExport($this->globalYear), $fileName);
+    }
 };
 ?>
 
@@ -70,25 +79,33 @@ new class extends Component
         <button
             class="dash-type-btn {{ $this->type === 'sales' ? 'active' : '' }}"
             wire:click.prevent="selectType('sales')"
-            wire:loading.attr="disabled">
+            wire:loading.attr="disabled"
+            wire:target="selectType">
             <i class="fa fa-chart-bar"></i> REPORTS
-            <i class="fa fa-spinner fa-spin ml-1" wire:loading></i>
+            <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectType"></i>
         </button>
         <button
             class="dash-type-btn {{ $this->type === 'account-monitoring' ? 'active' : '' }}"
             wire:click.prevent="selectType('account-monitoring')"
-            wire:loading.attr="disabled">
+            wire:loading.attr="disabled"
+            wire:target="selectType">
             <i class="fa fa-binoculars"></i> ACCOUNT MONITORING
-            <i class="fa fa-spinner fa-spin ml-1" wire:loading></i>
+            <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectType"></i>
         </button>
     </div>
 
     @if($type === 'sales')
 
         {{-- ── REFRESH ────────────────────────────────────────────── --}}
-        <button class="btn-refresh" wire:click.prevent="refreshData" wire:loading.attr="disabled">
+        <button class="btn-refresh" wire:click.prevent="refreshData" wire:loading.attr="disabled" wire:target="refreshData">
             <i class="fa fa-sync-alt" wire:loading.class="fa-spin" wire:target="refreshData"></i>
             REFRESH DATA
+        </button>
+
+        {{-- EXPORT --}}
+        <button class="btn btn-primary btn-sm ml-2" wire:click.prevent="exportData" wire:loading.attr="disabled" wire:target="exportData">
+            <i class="fa fa-file-export mr-1"></i> EXPORT
+            <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="exportData"></i>
         </button>
 
         {{-- ── TABS CARD ──────────────────────────────────────────── --}}
