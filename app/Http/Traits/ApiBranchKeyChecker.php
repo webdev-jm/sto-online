@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Traits;
 
@@ -10,7 +10,7 @@ trait ApiBranchKeyChecker {
 
         $err = array();
 
-        if(empty(strlen(trim($branch_key)))) {
+        if(empty($branch_key)) {
             $err['BRANCH_KEY'] = 'BRANCH KEY is required.';
         }
 
@@ -18,7 +18,7 @@ trait ApiBranchKeyChecker {
 
         if(empty($account_branch)) {
             $err['INVALID_BRANCH_KEY'] = 'The provided BRANCH KEY is invalid.';
-            
+
             return [
                 'status' => !empty($err),
                 'account_branch' => $account_branch,
