@@ -96,7 +96,7 @@ trait SalesDataAggregator
                     'month'           => (int) $row->month,
                     'sales'           => (float) ($qtyPcs * $netPrice),
                     'qty_pcs'         => (float) $qtyPcs,
-                    'account_id'      => $account?->id,
+                    'account_id'      => $account->id ?? NULL,
                     'account_name'    => $row->account_name,
                     'short_name'      => $account?->short_name,
                     'area'            => $row->area,
@@ -130,7 +130,7 @@ trait SalesDataAggregator
                         'month'        => (int) $row->month,
                         'total'        => (float) $row->total,
                         'uom'          => $row->uom,
-                        'account_id'   => $account?->id,
+                        'account_id'   => $account->id ?? NULL,
                         'account_code' => $row->account_code,
                         'short_name'   => $account?->short_name,
                     ];
@@ -184,6 +184,28 @@ trait SalesDataAggregator
                 ];
             })->toArray();
         });
+    }
+
+    public function getAccountSalesData($year, $account_code) {
+        $sqlite = DB::connection('sqlite_reports');
+
+        $rows = $sqlite->table('sales_data')
+            ->where('year', $year)
+            ->where('account_code', $account_code)
+            ->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'customer_code'   => $row->customer_code,
+                'customer_name'   => $row->customer_name,
+                'salesman_code'   => $row->salesman_code ?? '',
+                'salesman_name'   => $row->salesman_name ?? '',
+                'customer_status' => $row->customer_status,
+                'sku'             => $row->stock_code,
+                'month'           => (int) $row->month,
+                'sales'           => (float) ($row->quantity * 0),
+            ];
+        })->toArray();
     }
 
     private function computeRemainingDays($expiryDate): int
