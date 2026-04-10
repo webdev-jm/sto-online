@@ -228,8 +228,8 @@ trait ConsolidateAccountData
                 DB::raw("'" . $account->area . "' as area"),
                 'c.code as customer_code',
                 'c.name as customer_name',
-                's.code as salesman_code',
-                's.name as salesman_name',
+                DB::raw("COALESCE(s.code, cs.code) as salesman_code"),
+                DB::raw("COALESCE(s.name, cs.name) as salesman_name"),
                 'l.code as location_code',
                 'l.name as location_name',
                 'ch.code as channel_code',
@@ -241,7 +241,8 @@ trait ConsolidateAccountData
             ])
             ->leftJoin('customers as c', 'c.id', '=', 'sr.customer_id')
             ->leftJoin($mysqlDb . '.channels as ch', 'ch.id', '=', 'c.channel_id')
-            ->leftJoin('salesmen as s', 's.id', '=', 'sr.salesman_id')
+            ->leftJoin('salesmen as s', 's.id', '=', 'sr.salesman_id')               // sales_report's salesman
+            ->leftJoin('salesmen as cs', 'cs.id', '=', 'c.salesman_id')              // customer's salesman (fallback)
             ->leftJoin('locations as l', 'l.id', '=', 'sr.location_id')
             ->when(!empty($year), fn($q) => $q->where('sr.year', $year))
             ->when(!empty($month), fn($q) => $q->where('sr.month', $month))
