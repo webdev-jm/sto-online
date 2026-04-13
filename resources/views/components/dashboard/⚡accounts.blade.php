@@ -48,5 +48,8 @@ new class extends Component
         <div class="col-lg-6">
             <livewire:dashboard.accounts.sales-per-salesman :year="$year" :account_id="$selected_account"/>
         </div>
+        <div class="col-lg-6">
+            <livewire:dashboard.accounts.sales-per-salesman-type :year="$year" :account_id="$selected_account"/>
+        </div>
     </div>
 </div>

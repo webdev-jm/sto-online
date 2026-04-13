@@ -80,8 +80,11 @@ trait SalesDataAggregator
                 $masterData[] = [
                     'customer_code'   => $row->customer_code,
                     'customer_name'   => $row->customer_name,
+                    'city'            => $row->city,
+                    'province'        => $row->province,
                     'salesman_code'   => $row->salesman_code ?? '',
                     'salesman_name'   => $row->salesman_name ?? '',
+                    'salesman_type'   => $row->salesman_type ?? '',
                     'location_code'   => $row->location_code ?? '',
                     'location_name'   => $row->location_name ?? '',
                     'channel_code'    => $row->channel_code,
@@ -184,28 +187,6 @@ trait SalesDataAggregator
                 ];
             })->toArray();
         });
-    }
-
-    public function getAccountSalesData($year, $account_code) {
-        $sqlite = DB::connection('sqlite_reports');
-
-        $rows = $sqlite->table('sales_data')
-            ->where('year', $year)
-            ->where('account_code', $account_code)
-            ->get();
-
-        return $rows->map(function ($row) {
-            return [
-                'customer_code'   => $row->customer_code,
-                'customer_name'   => $row->customer_name,
-                'salesman_code'   => $row->salesman_code ?? '',
-                'salesman_name'   => $row->salesman_name ?? '',
-                'customer_status' => $row->customer_status,
-                'sku'             => $row->stock_code,
-                'month'           => (int) $row->month,
-                'sales'           => (float) ($row->quantity * 0),
-            ];
-        })->toArray();
     }
 
     private function computeRemainingDays($expiryDate): int
