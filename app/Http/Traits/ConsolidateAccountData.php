@@ -65,8 +65,11 @@ trait ConsolidateAccountData
             area TEXT,
             customer_code TEXT,
             customer_name TEXT,
+            city TEXT,
+            province TEXT,
             salesman_code TEXT,
             salesman_name TEXT,
+            salesman_type TEXT,
             location_code TEXT,
             location_name TEXT,
             channel_code TEXT,
@@ -125,7 +128,7 @@ trait ConsolidateAccountData
         $sqlite = DB::connection('sqlite_reports');
 
         // SQLite max variables = 999, chunk = floor(999 / column_count)
-        $salesChunk     = floor(999 / 21); // 58
+        $salesChunk     = floor(999 / 24); // 41
         $inventoryChunk = floor(999 / 10); // 99
         $agingChunk     = floor(999 / 11); // 90
 
@@ -141,7 +144,7 @@ trait ConsolidateAccountData
             ->where('account_code', $account->account_code)
             ->where('year', $year)->where('month', $month)->delete();
 
-        // sales_data — 21 columns
+        // sales_data — 24 columns
         collect($data['sales_data'] ?? [])
             ->chunk($salesChunk)
             ->each(fn($chunk) => $sqlite->table('sales_data')->insert(
@@ -151,8 +154,11 @@ trait ConsolidateAccountData
                     'area'            => $account->area,
                     'customer_code'   => $row->customer_code   ?? null,
                     'customer_name'   => $row->customer_name   ?? null,
+                    'city'            => $row->city            ?? null,
+                    'province'        => $row->province        ?? null,
                     'salesman_code'   => $row->salesman_code   ?? null,
                     'salesman_name'   => $row->salesman_name   ?? null,
+                    'salesman_type'   => $row->salesman_type   ?? null,
                     'location_code'   => $row->location_code   ?? null,
                     'location_name'   => $row->location_name   ?? null,
                     'channel_code'    => $row->channel_code    ?? null,
@@ -228,8 +234,11 @@ trait ConsolidateAccountData
                 DB::raw("'" . $account->area . "' as area"),
                 'c.code as customer_code',
                 'c.name as customer_name',
+                'c.city as city',
+                'c.province as province',
                 DB::raw("COALESCE(s.code, cs.code) as salesman_code"),
                 DB::raw("COALESCE(s.name, cs.name) as salesman_name"),
+                DB::raw("COALESCE(s.type, cs.type) as salesman_type"),
                 'l.code as location_code',
                 'l.name as location_name',
                 'ch.code as channel_code',
