@@ -112,9 +112,9 @@ class CustomerController extends Controller
         }
 
         $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
-        $request->channel_code = $mapping_result[0];
+        $channel_code = $mapping_result[0];
 
-        $channel = Channel::where('code', $request->channel_code)
+        $channel = Channel::where('code', $channel_code)
             ->first();
         $salesman = Salesman::where('account_branch_id', $account_branch->id)
             ->where('code', $request->salesman_code)
@@ -261,9 +261,9 @@ class CustomerController extends Controller
         if(!empty($customer)) {
 
             $mapping_result = $this->channelMapping($account_branch->account_id, $request->channel_code);
-            $request->channel_code = $mapping_result[0];
+            $channel_code = $mapping_result[0];
 
-            $channel = Channel::where('code', $request->channel_code)
+            $channel = Channel::where('code', $channel_code)
                 ->first();
             $salesman = Salesman::where('account_branch_id', $account_branch->id)
                 ->where('code', $request->salesman_code)
