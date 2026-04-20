@@ -32,10 +32,10 @@ class SalesUpload extends Model
     }
 
     public function user() {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
     public function sales() {
-        return $this->hasMany('App\Models\Sale');
+        return $this->hasMany('App\Models\Sale', 'sales_upload_id', 'id');
     }
 }

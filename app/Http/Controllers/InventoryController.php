@@ -41,9 +41,13 @@ class InventoryController extends Controller
             ->where('account_id', $account->id)
             ->where('account_branch_id', $account_branch->id)
             ->when(!empty($search), function($query) use($search) {
-                $query->whereIn('user', function($qry) use($search) {
-                    $qry->where('name', 'like', '%'.$search.'%');
-                });
+                    $matchingUserIds = \DB::connection('mysql')
+                        ->table('users')
+                        ->where('name', 'like', '%' . $search . '%')
+                        ->whereNull('deleted_at')
+                        ->pluck('id');
+
+                    $query->whereIn('user_id', $matchingUserIds);
             })
             ->paginate(10)->onEachSide(1)
             ->appends(request()->query());

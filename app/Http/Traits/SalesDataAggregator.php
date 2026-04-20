@@ -80,8 +80,8 @@ trait SalesDataAggregator
                 $masterData[] = [
                     'customer_code'   => $row->customer_code,
                     'customer_name'   => $row->customer_name,
-                    'city'            => $row->city,
-                    'province'        => $row->province,
+                    'city'            => strtoupper($row->city),
+                    'province'        => strtoupper($row->province),
                     'salesman_code'   => $row->salesman_code ?? '',
                     'salesman_name'   => $row->salesman_name ?? '',
                     'salesman_type'   => $row->salesman_type ?? '',
