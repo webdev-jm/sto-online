@@ -31,20 +31,49 @@ new class extends Component
 
     public function chartUpdated() {
         $raw = $this->getYearlySalesData($this->year);
+        $collection = collect($raw);
 
-        $this->chart_data = collect($raw)
-            ->when($this->account_id, fn($col) => $col->where('account_id', $this->account_id))
+        // Filter by account if necessary
+        $filtered = $collection->when($this->account_id, fn($col) => $col->where('account_id', $this->account_id));
+
+        $drilldownSeries = [];
+
+        $mainData = $filtered
             ->groupBy('salesman_type')
-            ->map(function ($items) {
-                $first = $items->first();
+            ->map(function ($items, $type) use (&$drilldownSeries) {
+                $typeName = $type ?: 'Unknown Type';
+                // Normalize casing for the ID to prevent mismatches
+                $drillId = 'type_' . md5(strtoupper($typeName));
+
+                // Level 2: Individual Salesmen under this type
+                $drilldownSeries[] = [
+                    'id'   => $drillId,
+                    'name' => $typeName,
+                    'type' => 'pie', // Keep it as a pie chart for consistency
+                    'data' => $items->groupBy('salesman_name')
+                                ->map(fn($salesmanItems, $name) => [
+                                    'name' => $name ?: 'Unknown Salesman',
+                                    'y'    => round($salesmanItems->sum('sales'), 2),
+                                ])
+                                ->sortByDesc('y')
+                                ->values()
+                                ->toArray(),
+                ];
+
                 return [
-                    'name' => $first['salesman_type'] ?: 'Unknown',
-                    'y'    => round($items->sum('sales'), 2),
+                    'name'      => $typeName,
+                    'y'         => round($items->sum('sales'), 2),
+                    'drilldown' => $drillId,
                 ];
             })
             ->sortByDesc('y')
             ->values()
             ->toArray();
+
+        $this->chart_data = [
+            'series'    => $mainData,
+            'drilldown' => $drilldownSeries,
+        ];
 
         $this->dispatch('update-chart', data: $this->chart_data);
     }
@@ -73,13 +102,12 @@ new class extends Component
         : ['rgba(5,141,199,0.7)',  'rgba(80,180,50,0.7)',  'rgba(237,86,27,0.7)',
            'rgba(162,75,209,0.7)', 'rgba(255,196,0,0.7)',  'rgba(50,200,150,0.7)'];
 
-    const buildConfig = (data) => ({
+    const buildConfig = (chartData) => ({
         colors: getColors(),
         credits: { enabled: false },
         chart: { type: 'pie' },
         title: { text: null },
-        legend: { enabled: false },
-        accessibility: { announceNewData: { enabled: true } },
+        legend: { enabled: true }, // Enabled for drilldown context
         tooltip: {
             formatter: function () {
                 const val = Highcharts.numberFormat(this.y, 2);
@@ -91,24 +119,27 @@ new class extends Component
         plotOptions: {
             pie: {
                 allowPointSelect: true,
-                borderWidth: 2,
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    formatter: function () {
-                        return `<b>${this.point.name}</b><br>${Highcharts.numberFormat(this.percentage, 1)}%`;
-                    },
-                    distance: 20
-                },
-                showInLegend: true
+                    format: '<b>{point.name}</b>: {point.percentage:.1f}%'
+                }
             }
         },
+        // Main Series
         series: [{
-            enableMouseTracking: true,
-            animation: { duration: 1000 },
+            name: 'Salesman Types',
             colorByPoint: true,
-            data: data
-        }]
+            data: chartData.series || []
+        }],
+        // Drilldown Series
+        drilldown: {
+            series: chartData.drilldown || [],
+            activeDataLabelStyle: {
+                textDecoration: 'none',
+                fontStyle: 'italic'
+            }
+        }
     });
 
     const initChart = () => {
