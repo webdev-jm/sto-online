@@ -15,7 +15,8 @@ new class extends Component
         $this->accounts = Account::where('id', '>=', '10')
             ->get();
 
-        $this->selected_account = $this->accounts->first()->id ?? null;
+        // $this->selected_account = $this->accounts->first()->id ?? null;
+        // $this->selected_account = 1;
     }
 };
 ?>
