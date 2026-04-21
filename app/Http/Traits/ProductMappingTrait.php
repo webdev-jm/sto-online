@@ -7,7 +7,8 @@ use App\Models\ProductMapping;
 Trait ProductMappingTrait {
 
     public function productMapping($account_id, $stock_code) {
-        $product_mapping = ProductMapping::where('account_id', $account_id)
+        $product_mapping = ProductMapping::with('product')
+            ->where('account_id', $account_id)
             ->where('external_stock_code', $stock_code)
             ->first();
 

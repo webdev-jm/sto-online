@@ -24,8 +24,9 @@ class MappingList extends Component
 
     public function render()
     {
-        $products = SMSProduct::orderBy('stock_code', 'asc')
-            ->get();
+        $products = cache()->remember('sms_products_ordered', 3600, function () {
+            return SMSProduct::orderBy('stock_code', 'asc')->get();
+        });
 
         return view('livewire.product-mapping.mapping-list')->with([
             'products' => $products,

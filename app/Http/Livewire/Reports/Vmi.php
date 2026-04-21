@@ -161,44 +161,40 @@ class Vmi extends Component
         //     $param_data[$param] = $data;
         // }
 
+        // Batch all sales queries upfront (3 queries total instead of 3×N)
+        $months_param = [1, 2, 3];
+        $param_sales = [];
+        foreach($months_param as $param) {
+            $param_sales[$param] = Sale::select(
+                    'product_id',
+                    DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
+                    DB::raw('SUM(quantity) / '.$param.' as total')
+                )
+                ->whereIn('product_id', $product_ids)
+                ->where('account_id', $this->account_branch->account_id)
+                ->where('account_branch_id', $this->account_branch->id)
+                ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
+                    for($i = 1; $i <= $param; $i++) {
+                        $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
+                            $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
+                                ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+                        });
+                    }
+                })
+                ->groupBy('product_id', 'uom')
+                ->get()
+                ->groupBy('product_id');
+        }
+
         $data = array();
         foreach($inventories as $inventory) {
             if(!empty($inventory->total)) {
                 $product = $products->get($inventory->product_id);
-                $cs_total = $this->convertUom($product, $inventory->uom, $inventory->total, $targetUom = 'CS');
+                $cs_total = $this->convertUom($product, $inventory->uom, $inventory->total, 'CS');
 
-                $data[$inventory->product_id] = [
-                    'stock_code' => $product->stock_code,
-                    'description' => $product->description.' '.$product->size,
-                    'uom' => $inventory->uom,
-                    'total' => $inventory->total,
-                    'cs_total' => $cs_total,
-                ];
-
-                $months_param = [1, 2, 3];
                 $months_data = array();
                 foreach($months_param as $param) {
-                    $sales = Sale::select(
-                            'product_id',
-                            DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
-                            DB::raw('SUM(quantity) / '.$param.' as total')
-                        )
-                        ->where('product_id', $inventory->product_id)
-                        ->where('account_id', $this->account_branch->account_id)
-                        ->where('account_branch_id', $this->account_branch->id)
-                        ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
-                            for($i = 1; $i <= $param; $i++) {
-                                $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
-                                    $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
-                                        ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
-                                });
-                            }
-                        })
-                        ->groupBy('product_id', 'uom')
-                        ->get()
-                        ->groupBy('product_id');
-
-                    $sales_data = $sales->get($inventory->product_id);
+                    $sales_data = $param_sales[$param]->get($inventory->product_id);
 
                     $sales_cs_total = 0;
                     if(!empty($sales_data)) {
@@ -230,7 +226,14 @@ class Vmi extends Component
                     ];
                 }
 
-                $data[$inventory->product_id]['months_data'] = $months_data;
+                $data[$inventory->product_id] = [
+                    'stock_code' => $product->stock_code,
+                    'description' => $product->description.' '.$product->size,
+                    'uom' => $inventory->uom,
+                    'total' => $inventory->total,
+                    'cs_total' => $cs_total,
+                    'months_data' => $months_data,
+                ];
             }
 
         }

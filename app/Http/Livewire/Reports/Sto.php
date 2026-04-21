@@ -45,7 +45,7 @@ class Sto extends Component
     }
 
     public function loadReport() {
-        $accounts = Account::all();
+        $accounts = Account::with('db_data')->get();
 
         switch($this->report) {
             case 'account':

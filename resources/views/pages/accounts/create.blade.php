@@ -29,7 +29,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         {!! Form::label('sms_account_id', 'SMS Account') !!}
-                        {!! Form::select('sms_account_id', [], NULL, ['class' => 'form-control'.($errors->has('sms_account_id') ? ' is-invalid' : ''), 'form' => 'add_account']) !!}
+                        {!! Form::select('sms_account_id', [], NULL, ['class' => 'form-control'.($errors->has('sms_account_id') ? ' is-invalid' : ''), 'form' => 'add_account', 'id' => 'sms_account_id']) !!}
                         <small class="text-danger">{{$errors->first('sms_account_id')}}</small>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
         });
 
         $('#sms_account_id').select2({
-            ajax: { 
+            ajax: {
                 url: '{{route("sms-account.ajax")}}',
                 type: "POST",
                 dataType: 'json',

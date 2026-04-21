@@ -20,7 +20,7 @@ class Index extends Component
     public $date_to;
 
     public function exportData() {
-        $sales = Sale::with('customer', 'salesman', 'channel', 'location')
+        $sales = Sale::with('customer', 'customer.salesman', 'customer.channel', 'salesman', 'channel', 'location', 'product')
             ->where('account_branch_id', $this->account_branch->id)
             ->where('date', '>=', $this->date_from)
             ->where('date', '<=', $this->date_to)
