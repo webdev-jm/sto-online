@@ -149,18 +149,22 @@ class FormBuilder
 
     protected function buildAttributes(array $attributes): string
     {
+        // If 'name' is set but 'id' is not, use 'name' as the 'id'
+        if (isset($attributes['name']) && !isset($attributes['id'])) {
+            $attributes['id'] = $attributes['name'];
+        }
+
         $html = '';
         foreach ($attributes as $key => $value) {
-            if (is_null($value)) {
+            if (is_null($value) || $value === false) {
                 continue;
             }
-            if ($value === false) {
-                continue;
-            }
+
             if ($value === true) {
                 $html .= ' ' . $key;
                 continue;
             }
+
             $html .= ' ' . $key . '="' . e($value) . '"';
         }
         return $html;
