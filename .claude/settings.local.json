@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm bootstrap/cache/packages.php)",
+      "Bash(php artisan *)",
+      "Bash(php -l vendor/composer/installed.php)",
+      "Bash(xargs grep *)",
+      "WebFetch(domain:code.highcharts.com)",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(f['properties']['hc-key'], '|', f['properties']['name']\\) for f in data['features']]\")",
+      "Bash(python -c \"import json,sys; data=json.load\\(open\\('c:/Users/jm.renon/Documents/2026/PROJECTS/sto-online/public/vendor/highcharts/maps/ph-all.geo.json'\\)\\); [print\\(f['properties']['hc-key'],'|',f['properties']['name']\\) for f in data['features']]\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
