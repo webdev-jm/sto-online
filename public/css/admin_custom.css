@@ -2472,3 +2472,258 @@ select.form-control {
     font-weight: bold;
     font-size: 12px;
 }
+
+/* Year navigator wrapper */
+.stat-year-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-year-nav .stat-year-input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.stat-year-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--col-border);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: var(--col-dark);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        color 0.15s;
+}
+
+.stat-year-btn:hover {
+    background: var(--col-gold);
+    border-color: var(--col-gold);
+    color: #fff;
+}
+
+.stat-year-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.dark-mode .stat-year-btn {
+    background: #2d3748;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+.dark-mode .stat-year-btn:hover {
+    background: var(--col-gold);
+    border-color: var(--col-gold);
+    color: #fff;
+}
+
+/* =============================================================================
+   SKELETON LOADING
+============================================================================= */
+
+/* Shimmer keyframe */
+@keyframes sk-shimmer {
+    0% {
+        background-position: -600px 0;
+    }
+    100% {
+        background-position: 600px 0;
+    }
+}
+
+/* Shared shimmer mixin via utility */
+.chart-sk-shimmer,
+.sk-stat-card,
+.sk-chart-card,
+.sk-line {
+    background: linear-gradient(90deg, #e8edf2 25%, #f4f6f9 50%, #e8edf2 75%);
+    background-size: 1200px 100%;
+    animation: sk-shimmer 1.4s infinite linear;
+    border-radius: 6px;
+}
+
+/* Per-chart-component skeleton (between card-header and card-body) */
+.chart-sk {
+    padding: 0 1.25rem 1.25rem;
+    display: block; /* visible by default until chart renders */
+}
+
+/* Auto-hide once Highcharts has rendered into the sibling card-body */
+.chart-sk:has(~ .card-body .highcharts-container) {
+    display: none;
+}
+
+.chart-sk-shimmer {
+    height: 260px;
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* Tab-switch full skeleton */
+.tab-switch-sk {
+    padding: 0 4px;
+    width: 100%;
+}
+
+.tab-switch-sk-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.sk-stat-card {
+    flex: 1;
+    height: 90px;
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+}
+
+.sk-line {
+    height: 12px;
+    border-radius: 4px;
+}
+
+.sk-line-sm {
+    width: 40%;
+}
+.sk-line-lg {
+    width: 70%;
+    height: 22px;
+}
+
+.tab-switch-sk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.sk-chart-card {
+    height: 320px;
+    border-radius: var(--radius);
+}
+
+/* =============================================================================
+   SKELETON DARK MODE
+============================================================================= */
+.dark-mode .chart-sk-shimmer,
+.dark-mode .sk-stat-card,
+.dark-mode .sk-chart-card,
+.dark-mode .sk-line {
+    background: linear-gradient(90deg, #1e2736 25%, #2a3447 50%, #1e2736 75%);
+    background-size: 1200px 100%;
+    animation: sk-shimmer 1.4s infinite linear;
+}
+
+/* =============================================================================
+   SKELETON LOADING
+============================================================================= */
+
+/* Shimmer keyframe */
+@keyframes sk-shimmer {
+    0% {
+        background-position: -600px 0;
+    }
+    100% {
+        background-position: 600px 0;
+    }
+}
+
+/* Shared shimmer base */
+.chart-sk-shimmer,
+.sk-stat-card,
+.sk-chart-card,
+.sk-line {
+    background: linear-gradient(90deg, #e8edf2 25%, #f4f6f9 50%, #e8edf2 75%);
+    background-size: 1200px 100%;
+    animation: sk-shimmer 1.4s infinite linear;
+    border-radius: 6px;
+}
+
+/* Per-chart-component skeleton (between card-header and card-body) */
+.chart-sk {
+    padding: 0 1.25rem 1.25rem;
+    display: block;
+}
+
+/* Auto-hide once Highcharts has rendered into the sibling card-body */
+.chart-sk:has(~ .card-body .highcharts-container) {
+    display: none;
+}
+
+.chart-sk-shimmer {
+    height: 260px;
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* Tab-switch full skeleton */
+.tab-switch-sk {
+    padding: 0 4px;
+}
+
+.tab-switch-sk-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.sk-stat-card {
+    flex: 1;
+    height: 90px;
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+}
+
+.sk-line {
+    height: 12px;
+    border-radius: 4px;
+}
+
+.sk-line-sm {
+    width: 40%;
+}
+.sk-line-lg {
+    width: 70%;
+    height: 22px;
+}
+
+.tab-switch-sk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.sk-chart-card {
+    height: 320px;
+    border-radius: var(--radius);
+}
+
+/* Dark mode */
+.dark-mode .chart-sk-shimmer,
+.dark-mode .sk-stat-card,
+.dark-mode .sk-chart-card,
+.dark-mode .sk-line {
+    background: linear-gradient(90deg, #1e2736 25%, #2a3447 50%, #1e2736 75%);
+    background-size: 1200px 100%;
+    animation: sk-shimmer 1.4s infinite linear;
+}
