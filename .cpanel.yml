@@ -1,7 +1,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/kojiesanadmin/public_html/sto-online-test.bevi.ph
-    - rsync -av --delete
+    - rsync -r
       --exclude='.git'
       --exclude='.cpanel.yml'
       --exclude='.env'
@@ -13,6 +13,3 @@ deployment:
       --exclude='bootstrap/cache'
       --exclude='tests'
       ./ $DEPLOYPATH
-    - /usr/local/bin/php $DEPLOYPATH/artisan config:cache
-    - /usr/local/bin/php $DEPLOYPATH/artisan route:cache
-    - /usr/local/bin/php $DEPLOYPATH/artisan view:cache
