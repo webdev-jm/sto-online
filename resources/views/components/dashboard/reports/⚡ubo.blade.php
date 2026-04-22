@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -74,12 +74,15 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">UNIQUE BUYING OUTLET (UBO) {{ $year }}</h3>
         </div>
+        <div class="chart-sk">
+            <div class="chart-sk-shimmer"></div>
+        </div>
+
         <div class="card-body" wire:ignore>
             <div id="container-ubo"></div>
         </div>
     </div>
 </div>
-
 
 @script
 <script>

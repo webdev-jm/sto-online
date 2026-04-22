@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -41,8 +41,8 @@ new class extends Component
                 $item['province'] = isset($item['province']) ? mb_strtoupper($item['province']) : null;
                 $item['city']     = isset($item['city'])     ? mb_strtoupper($item['city'])     : null;
                 return $item;
-            });
-            // ->when($this->account_id, fn($col) => $col->where('account_id', $this->account_id));
+            })
+            ->when($this->account_id, fn($col) => $col->where('account_id', $this->account_id));
 
         $drilldownSeries = [];
 
@@ -106,8 +106,12 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">SALES BY PROVINCE {{ $this->year }}</h3>
         </div>
+        <div class="chart-sk">
+            <div class="chart-sk-shimmer"></div>
+        </div>
+
         <div class="card-body" wire:ignore>
-            <div id="container-sales-by-address" style="height: 600px;"></div>
+            <div id="container-sales-by-address" style="height: 500px;"></div>
         </div>
     </div>
 </div>

@@ -830,6 +830,50 @@ body,
     box-shadow: 0 0 0 3px rgba(246, 201, 14, 0.15);
 }
 
+/* Year navigator wrapper */
+.stat-year-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-year-nav .stat-year-input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.stat-year-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--col-border);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: var(--col-dark);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        color 0.15s;
+}
+
+.stat-year-btn:hover {
+    background: var(--col-gold);
+    border-color: var(--col-gold);
+    color: #fff;
+}
+
+.stat-year-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 /* Loading overlay */
 .dash-loading-overlay {
     position: absolute;
@@ -899,6 +943,18 @@ body,
 
 .dark-mode .stat-year-input:focus {
     border-color: var(--col-gold);
+}
+
+.dark-mode .stat-year-btn {
+    background: #2d3748;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+.dark-mode .stat-year-btn:hover {
+    background: var(--col-gold);
+    border-color: var(--col-gold);
+    color: #fff;
 }
 
 .dark-mode .dash-loading-overlay {
@@ -1210,3 +1266,5 @@ body,
 .dark-mode .list-group-item .col-lg-4:not(:last-child) {
     border-color: #2d3748;
 }
+
+

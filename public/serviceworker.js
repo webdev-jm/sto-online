@@ -1,4 +1,4 @@
-const version = "v1.0.28" + new Date().getTime();
+const version = "v1.0.29" + new Date().getTime();
 var staticCacheName = "pwa-v-sto-online" + version;
 var filesToCache = [
     "/offline",

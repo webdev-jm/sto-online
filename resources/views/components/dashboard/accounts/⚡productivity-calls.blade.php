@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -105,6 +105,10 @@ new class extends Component
         <div class="card-header">
             <h3 class="card-title">PRODUCTIVITY CALLS {{ $this->year }}</h3>
         </div>
+        <div class="chart-sk">
+            <div class="chart-sk-shimmer"></div>
+        </div>
+
         <div class="card-body" wire:ignore>
             <div id="container-productivity-calls" style="height: 500px;"></div>
         </div>
