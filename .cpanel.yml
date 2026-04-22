@@ -1,4 +1,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/kojiesanadmin/public_html/sto-online-test.bevi.ph
-    - rsync -r --exclude='.git' --exclude='.cpanel.yml' --exclude='.env' --exclude='node_modules' --exclude='storage/logs' --exclude='storage/framework/cache' --exclude='storage/framework/sessions' --exclude='storage/framework/views' --exclude='bootstrap/cache' --exclude='tests' ./ $DEPLOYPATH
+    - rsync -r --exclude='.git' --exclude='.cpanel.yml' ./ $DEPLOYPATH
