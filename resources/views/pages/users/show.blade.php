@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Users')
 
@@ -118,7 +118,7 @@
                 $('body').on('click', '.btn-delete', function(e) {
                     e.preventDefault();
                     var id = $(this).data('id');
-                    Livewire.emit('setDeleteModel', 'User', id);
+                    Livewire.dispatch('setDeleteModel', { type: 'User', model_id: id });
                     $('#modal-delete').modal('show');
                 });
             });

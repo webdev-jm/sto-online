@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Roles')
 
@@ -96,7 +96,7 @@
                 $('body').on('click', '.btn-delete', function(e) {
                     e.preventDefault();
                     var id = $(this).data('id');
-                    Livewire.emit('setDeleteModel', 'Role', id);
+                    Livewire.dispatch('setDeleteModel', { type: 'Role', model_id: id });
                     $('#modal-delete').modal('show');
                 });
             });
