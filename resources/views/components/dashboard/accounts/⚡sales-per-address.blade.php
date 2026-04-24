@@ -184,6 +184,7 @@ new class extends Component
             },
             mapNavigation: {
                 enabled: true,
+                enableTouchZoom: false,
                 buttonOptions: { verticalAlign: 'bottom' },
             },
             tooltip: {

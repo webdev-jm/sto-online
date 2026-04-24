@@ -16,6 +16,7 @@ use App\Http\Traits\GenerateMonthlyInventory;
 use App\Models\Inventory;
 use App\Models\InventoryUpload;
 use App\Models\Account;
+use App\Jobs\ConsolidateAccountDataJob;
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);
@@ -117,6 +118,7 @@ class InventoryImportJob implements ShouldQueue
                 ->performedOn($inventory_upload)
                 ->log(':causer.name has uploaded inventory data.');
 
+            ConsolidateAccountDataJob::dispatch($account);
         }
     }
 }

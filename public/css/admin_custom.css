@@ -2203,6 +2203,47 @@ select.form-control {
     }
 }
 
+@media (max-width: 768px) {
+    /* Type switcher — full width, buttons share space equally */
+    .dash-type-switcher {
+        width: 100%;
+    }
+    .dash-type-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 0.65rem;
+    }
+
+    /* Tab nav — scrollable on mobile */
+    .dash-tab-nav {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+        padding: 0 8px;
+    }
+    .dash-tab-nav::-webkit-scrollbar {
+        display: none;
+    }
+    .dash-tab-nav .nav-link {
+        padding: 12px 14px;
+        font-size: 0.65rem;
+    }
+
+    /* Tab body — tighter padding */
+    .dash-tab-body {
+        padding: 16px 12px;
+    }
+
+    /* Action bar — wrap on small screens */
+    .dash-tab-body > .d-flex,
+    .d-flex.align-items-center.gap-2.mb-2 {
+        flex-wrap: wrap;
+    }
+}
+
 /* =============================================================================
    USER MENU — RESKIN ONLY (structure unchanged)
 ============================================================================= */

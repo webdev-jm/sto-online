@@ -14,6 +14,7 @@ use App\Models\Sale;
 use App\Models\Account;
 
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ConsolidateAccountDataJob;
 
 class SalesImportJob implements ShouldQueue
 {
@@ -191,5 +192,6 @@ class SalesImportJob implements ShouldQueue
 
         }); // End of transaction
 
+        ConsolidateAccountDataJob::dispatch($account);
     }
 }

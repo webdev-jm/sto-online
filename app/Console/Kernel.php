@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('reports:consolidate')->dailyAt('01:00');
 
         $frequencies = NotificationFrequency::get();
         if(!empty($frequencies)) {
