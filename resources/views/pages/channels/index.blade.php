@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Channel - '.$account->short_name)
 
@@ -102,7 +102,7 @@
             $('body').on('click', '.btn-delete', function(e) {
                 e.preventDefault();
                 var id = $(this).data('id');
-                Livewire.emit('setDeleteModel', 'Channel', id);
+                Livewire.dispatch('setDeleteModel', { type: 'Channel', model_id: id });
                 $('#modal-delete').modal('show');
             });
         });

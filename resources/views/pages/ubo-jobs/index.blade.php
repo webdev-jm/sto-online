@@ -83,7 +83,7 @@
             }
         }).on('select2:select', function(e) {
             var account = e.params.data;
-            Livewire.emit('selectAccount', account.id);
+            Livewire.dispatch('selectAccount', { account_id: account.id });
         });
     });
 </script>

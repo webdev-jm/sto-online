@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Accounts')
 
@@ -100,7 +100,7 @@
                 $('body').on('click', '.btn-delete', function(e) {
                     e.preventDefault();
                     var id = $(this).data('id');
-                    Livewire.emit('setDeleteModel', 'Account', id);
+                    Livewire.dispatch('setDeleteModel', { type: 'Account', model_id: id });
                     $('#modal-delete').modal('show');
                 });
             });

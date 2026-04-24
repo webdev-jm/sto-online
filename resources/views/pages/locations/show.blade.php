@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Location Details - '.$account->short_name)
 
@@ -66,7 +66,7 @@
             $('body').on('click', '.btn-delete', function(e) {
                 e.preventDefault();
                 var id = $(this).data('id');
-                Livewire.emit('setDeleteModel', 'Location', id);
+                Livewire.dispatch('setDeleteModel', { type: 'Location', model_id: id });
                 $('#modal-delete').modal('show');
             });
         });
