@@ -7,10 +7,25 @@ use Illuminate\Support\Facades\DB;
 
 trait GenerateInventoryExpiry {
 
+    protected function ensureTenantConnection(\App\Models\AccountDatabase $dbData): void
+    {
+        $name = $dbData->connection_name;
+
+        if (!config()->has("database.connections.$name")) {
+            config()->set("database.connections.$name", array_merge(
+                config('database.connections.mysql'),
+                ['database' => $dbData->database_name]
+            ));
+        }
+    }
+
     public function generateInventoryExpiry($account_id, $account_branch_id, $year, $month) {
         $account = Account::find($account_id);
-        $connection = $account->db_data->connection_name;
+        $dbData = $account->db_data;
 
+        $this->ensureTenantConnection($dbData);
+
+        $connection = $dbData->connection_name;
         $db = DB::connection($connection);
 
         $inventories = $db->table('inventories')
