@@ -222,6 +222,8 @@ trait ConsolidateAccountData
     public function consolidateAccountData($account, $year = null, $month = null) {
         $account_db = $account->db_data;
 
+        $this->ensureTenantConnection($account_db);
+
         $originalConnection = DB::getDefaultConnection();
         DB::setDefaultConnection($account_db->connection_name);
 

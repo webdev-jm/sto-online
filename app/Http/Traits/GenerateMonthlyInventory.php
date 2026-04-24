@@ -11,9 +11,11 @@ trait GenerateMonthlyInventory {
 
     public function setMonthlyInventory($account_id, $account_branch_id, $year, $month) {
         $account = Account::find($account_id);
-        $connection = $account->db_data->connection_name;
+        $dbData = $account->db_data;
 
-        $db = DB::connection($connection);
+        $this->ensureTenantConnection($dbData);
+
+        $db = DB::connection($dbData->connection_name);
 
         $inventory_upload = $db->table('inventory_uploads')
             ->where('account_id', $account_id)

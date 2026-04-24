@@ -83,8 +83,12 @@ new class extends Component
 
     public function refreshData(): void
     {
-        Account::where('id', '>=', 10)
-            ->each(fn(Account $account) => ConsolidateAccountDataJob::dispatch($account));
+        $jobs = Account::where('id', '>=', 10)
+            ->get()
+            ->map(fn(Account $account) => new ConsolidateAccountDataJob($account))
+            ->all();
+
+        Bus::chain($jobs)->dispatch();
 
         session()->flash('message', 'Data refresh queued. Reports will update shortly.');
     }

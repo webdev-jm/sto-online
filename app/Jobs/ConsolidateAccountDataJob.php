@@ -8,7 +8,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
@@ -18,18 +17,8 @@ class ConsolidateAccountDataJob implements ShouldQueue
     use ConsolidateAccountData;
 
     public int $timeout = 0;
-    public int $tries = 3;
 
     public function __construct(public Account $account) {}
-
-    /**
-     * Serialize all consolidation jobs so only one writes to SQLite at a time.
-     * SQLite does not support concurrent writers.
-     */
-    public function middleware(): array
-    {
-        return [(new WithoutOverlapping('consolidate-account-reports'))->releaseAfter(30)];
-    }
 
     public function handle(): void
     {
