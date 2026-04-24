@@ -14,7 +14,7 @@ trait SalesDataAggregator
 
     public function getYearlySalesData(int $year): array
     {
-        return Cache::remember("sales_data_consolidated_{$year}", 60 * 60, function () use ($year) {
+        return Cache::remember("sales_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $sqlite = DB::connection('sqlite_reports');
 
@@ -112,7 +112,7 @@ trait SalesDataAggregator
 
     public function getYearlyInventoryData(int $year): array
     {
-        return Cache::remember("inventory_data_consolidated_{$year}", 60 * 60, function () use ($year) {
+        return Cache::remember("inventory_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $accounts = \App\Models\Account::where('id', '>=', 10)
                 ->get()
@@ -144,7 +144,7 @@ trait SalesDataAggregator
 
     public function getYearlyInventoryAgingData(int $year): array
     {
-        return Cache::remember("inventory_aging_data_consolidated_{$year}", 60 * 60, function () use ($year) {
+        return Cache::remember("inventory_aging_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $accounts = \App\Models\Account::where('id', '>=', 10)
                 ->get()

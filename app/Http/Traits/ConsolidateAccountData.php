@@ -14,40 +14,41 @@ trait ConsolidateAccountData
 
     public function setConsolidatedAccountData($year = NULL)
     {
-        if (empty($year)) {
-            $years = [2025, 2026];
-        } else {
-            $years = [$year];
-        }
+        $years = empty($year) ? [2025, 2026] : [$year];
 
-        $this->initSqliteSchema(); // ensure tables exist before writing
+        $this->initSqliteSchema();
 
         Account::where('id', '>=', '10')->chunk(100, function ($accounts) use ($years) {
             foreach ($accounts as $account) {
-                foreach ($years as $y) {
-                    foreach (range(1, 12) as $m) {
-                        foreach(AccountBranch::where('account_id', $account->id)->get() as $branch) {
-                            $this->setMonthlyInventory($account->id, $branch->id, $y, $m);
-                        }
-
-                        $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
-
-                        // Write JSON
-                        $filename = sprintf(
-                            'reports/consolidated_account_data-%s-%s-%s.json',
-                            $account->account_code, $y, $m
-                        );
-                        Storage::disk('local')->put(
-                            $filename,
-                            json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
-                        );
-
-                        // Write to SQLite
-                        $this->importToSqlite($account, $y, $m, $allConsolidatedData);
-                    }
-                }
+                $this->consolidateSingleAccount($account, $years);
             }
         });
+    }
+
+    public function consolidateSingleAccount(Account $account, array $years = [2025, 2026]): void
+    {
+        $this->initSqliteSchema();
+
+        foreach ($years as $y) {
+            foreach (range(1, 12) as $m) {
+                foreach (AccountBranch::where('account_id', $account->id)->get() as $branch) {
+                    $this->setMonthlyInventory($account->id, $branch->id, $y, $m);
+                }
+
+                $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
+
+                $filename = sprintf(
+                    'reports/consolidated_account_data-%s-%s-%s.json',
+                    $account->account_code, $y, $m
+                );
+                Storage::disk('local')->put(
+                    $filename,
+                    json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
+                );
+
+                $this->importToSqlite($account, $y, $m, $allConsolidatedData);
+            }
+        }
     }
 
     // ---------------------------------------------------------------

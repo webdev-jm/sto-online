@@ -1,16 +1,15 @@
 <?php
 
 use Livewire\Component;
-use App\Http\Traits\ConsolidateAccountData;
 use App\Http\Traits\SalesDataAggregator;
-use Illuminate\Support\Facades\Artisan;
+use App\Jobs\ConsolidateAccountDataJob;
+use App\Models\Account;
 
 use App\Exports\ReportsMultiSheetExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 new class extends Component
 {
-    use ConsolidateAccountData;
     use SalesDataAggregator;
 
     public $type = 'sales';
@@ -84,8 +83,10 @@ new class extends Component
 
     public function refreshData(): void
     {
-        Artisan::call('cache:clear');
-        $this->setConsolidatedAccountData();
+        Account::where('id', '>=', 10)
+            ->each(fn(Account $account) => ConsolidateAccountDataJob::dispatch($account));
+
+        session()->flash('message', 'Data refresh queued. Reports will update shortly.');
     }
 
     public function exportData()
