@@ -332,4 +332,9 @@ Route::group(['middleware' => 'auth'], function() {
 
     // ERROR LOGS
     Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('error-logs')->middleware('permission:error logs');
+
+    // API DOCUMENTATION
+    Route::get('api-docs', function () {
+        return view('pages.api-docs.index');
+    })->name('api-docs');
 });
