@@ -24,6 +24,10 @@
 
         {{-- User menu link --}}
         @if(Auth::user())
+
+            {{-- Dark mode toggle --}}
+            <livewire:darkmode-toggle />
+
             @if(config('adminlte.usermenu_enabled'))
                 @include('adminlte::partials.navbar.menu-item-dropdown-user-menu')
             @else
