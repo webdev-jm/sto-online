@@ -2661,6 +2661,81 @@ select.form-control {
 }
 
 /* =============================================================================
+   MOBILE RESPONSIVE — HEADER & SIDEBAR
+============================================================================= */
+
+/* Always white hamburger icon regardless of navbar-light / navbar-dark class.
+   admin_custom.css forces the header background to always be dark, so the
+   Bootstrap light-mode icon (dark SVG) becomes invisible. */
+.main-header .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+}
+.main-header .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.85)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+@media (max-width: 767.98px) {
+    /* Collapsed navbar panel — match the header's dark glass style */
+    .main-header .navbar-collapse {
+        background: rgba(20, 20, 24, 0.97) !important;
+        backdrop-filter: blur(28px) saturate(1.8) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+        padding: 8px 6px 12px !important;
+        border-radius: 0 0 14px 14px !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    .main-header .navbar-collapse .nav-link {
+        padding: 10px 14px !important;
+        border-radius: 10px !important;
+        margin: 1px 4px !important;
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .main-header .navbar-collapse .nav-link:hover,
+    .main-header .navbar-collapse .nav-link:focus {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #fff !important;
+    }
+
+    /* Submenu dropdowns inside the collapsed nav */
+    .main-header .navbar-collapse .dropdown-menu {
+        background: rgba(15, 15, 20, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        position: static !important;
+        float: none !important;
+        margin: 4px 8px !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+    }
+
+    .main-header .navbar-collapse .dropdown-item {
+        color: rgba(255, 255, 255, 0.7) !important;
+        border-radius: 8px !important;
+        padding: 8px 14px !important;
+    }
+
+    .main-header .navbar-collapse .dropdown-item:hover {
+        background: rgba(10, 132, 255, 0.18) !important;
+        color: #fff !important;
+    }
+
+    /* Sidebar overlay backdrop (AdminLTE creates #sidebar-overlay dynamically) */
+    #sidebar-overlay {
+        background: rgba(0, 0, 0, 0.5) !important;
+        opacity: 1 !important;
+    }
+
+    /* Keep the sidebar z-index above the overlay */
+    .main-sidebar {
+        z-index: 1045 !important;
+    }
+}
+
+/* =============================================================================
    SKELETON DARK MODE
 ============================================================================= */
 .dark-mode .chart-sk-shimmer,
