@@ -337,4 +337,9 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('api-docs', function () {
         return view('pages.api-docs.index');
     })->name('api-docs');
+
+    // USER GUIDE
+    Route::get('user-guide', function () {
+        return view('pages.user-guide.index');
+    })->name('user-guide');
 });
