@@ -390,6 +390,12 @@ return [
         //     'can'       => 'reports sto',
         //     'active'    => ['report-sto*']
         // ],
+        [
+            'text'   => 'API Docs',
+            'url'    => 'api-docs',
+            'icon'   => 'fa fa-fw fa-code',
+            'active' => ['api-docs'],
+        ],
     ],
 
     /*
