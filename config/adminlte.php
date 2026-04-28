@@ -391,6 +391,12 @@ return [
         //     'active'    => ['report-sto*']
         // ],
         [
+            'text'   => 'User Guide',
+            'url'    => 'user-guide',
+            'icon'   => 'fa fa-fw fa-book-open',
+            'active' => ['user-guide'],
+        ],
+        [
             'text'   => 'API Docs',
             'url'    => 'api-docs',
             'icon'   => 'fa fa-fw fa-code',
