@@ -42,6 +42,7 @@ class User extends Authenticatable
         'user_signature_url',
         'last_activity_time',
         'type',
+        'hub_user_id',
     ];
 
     /**

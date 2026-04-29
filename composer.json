@@ -6,14 +6,25 @@
         "framework",
         "laravel"
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../hub-auth-client",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bevi-webdev-jm/hub-auth-client": "@dev",
         "google-gemini-php/laravel": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.7",
         "jeroennoten/laravel-adminlte": "^3.8",
         "laravel/framework": "^10.0",
+        "laravel/passport": "^12.4",
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.26",
         "laravel/tinker": "^2.5",
