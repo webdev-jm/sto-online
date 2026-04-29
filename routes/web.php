@@ -26,6 +26,7 @@ use App\Http\Controllers\ReturnToVendorController;
 use App\Http\Controllers\ProductMappingController;
 use App\Http\Controllers\ChannelMappingController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Admin\HubAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -342,4 +343,9 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('user-guide', function () {
         return view('pages.user-guide.index');
     })->name('user-guide');
+
+    // HUB ADMIN
+    Route::get('/admin/hub', [HubAdminController::class, 'index'])
+        ->name('hub.admin')
+        ->middleware('role:admin');
 });
