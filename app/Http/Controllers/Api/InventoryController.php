@@ -66,7 +66,7 @@ class InventoryController extends Controller
                     $map_result = $this->productMapping($account_branch->account_id, $sku_code);
                     $sku_code = $map_result[0];
 
-                    if(strpos(trim($sku_code ?? ''), '-')) {
+                    if(strpos(trim($sku_code ?? ''), '-') !== false) {
                         $sku_arr = explode('-', $sku_code);
                         if($sku_arr[0] == 'FG') { // Free Goods
                             $sku_code = end($sku_arr);
@@ -228,7 +228,7 @@ class InventoryController extends Controller
                     $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
                     $sku_code = $mapping_result[0];
 
-                    if(strpos(trim($sku_code ?? ''), '-')) {
+                    if(strpos(trim($sku_code ?? ''), '-') !== false) {
                         $sku_arr = explode('-', $sku_code);
                         if($sku_arr[0] == 'FG') { // Free Goods
                             $sku_code = end($sku_arr);
@@ -308,7 +308,7 @@ class InventoryController extends Controller
                     'inventory' => $request->inventory
                 ]);
 
-                $total_inventory = ($inventory_upload->total_inventory - $inventory->inventory) + $request->inventory;
+                $total_inventory += $request->inventory;
                 $inventory_upload->update([
                     'total_inventory' => $total_inventory
                 ]);

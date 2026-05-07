@@ -81,7 +81,7 @@ class SalesController extends Controller
                     $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
                     $sku_code = $mapping_result[0];
 
-                    if(strpos(trim($sku_code ?? ''), '-')) {
+                    if(strpos(trim($sku_code ?? ''), '-') !== false) {
                         $sku_arr = explode('-', $sku_code);
                         $sku_code = end($sku_arr);
                     }
@@ -373,7 +373,7 @@ class SalesController extends Controller
                     $mapping_result = $this->productMapping($account_branch->account_id, $sku_code);
                     $sku_code = $mapping_result[0];
 
-                    if(strpos(trim($sku_code ?? ''), '-')) {
+                    if(strpos(trim($sku_code ?? ''), '-') !== false) {
                         $sku_arr = explode('-', $sku_code);
                         $sku_code = end($sku_arr);
                     }
@@ -504,14 +504,14 @@ class SalesController extends Controller
             ->where('account_branch_id', $account_branch->id)
             ->first();
 
-        DB::setDefaultConnection($account_branch->account->db_data->connection_name);
-
         // check
         $sale = Sale::where('account_branch_id', $account_branch->id)
             ->where('id', $id)
             ->first();
 
         if(!empty($sale)) {
+
+            DB::setDefaultConnection($account_branch->account->db_data->connection_name);
 
             if($sale->date != $request->date) {
                 DB::statement('CALL generate_sales_report(?, ?, ?, ?)', [

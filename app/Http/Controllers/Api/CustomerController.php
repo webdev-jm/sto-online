@@ -126,13 +126,17 @@ class CustomerController extends Controller
             $province_id = $province->id;
         }
 
-        $city = Municipality::where('municipality_name', $request->city)->first();
+        $city = Municipality::where('municipality_name', $request->city)
+            ->where('province_id', $province_id)
+            ->first();
         $city_id = NULL;
         if(!empty($city)) {
             $city_id = $city->id;
         }
 
-        $barangay = Barangay::where('barangay_name', $request->brgy)->first();
+        $barangay = Barangay::where('barangay_name', $request->brgy)
+            ->where('municipality_id', $city_id)
+            ->first();
         $barangay_id = NULL;
         if(!empty($barangay)) {
             $barangay_id = $barangay->id;
