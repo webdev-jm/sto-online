@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call([ChannelSeeder::class]);
         
         $this->call([TemplateSeeder::class]);
+        $this->call([UploadTemplateSeeder::class]);
 
         $this->call([RegionSeeder::class]);
         $this->call([ProvinceSeeder::class]);

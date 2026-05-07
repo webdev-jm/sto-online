@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Location as Loc;
 
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Traits\UploadMappingTrait;
 
 class Location extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use UploadMappingTrait;
     protected $paginationTheme = 'bootstrap';
 
     public $file;
@@ -25,6 +27,9 @@ class Location extends Component
     public $account;
     public $account_branch;
     public $err_msg;
+
+    public array $uploadColumns = [];
+    public ?int $uploadStartRow = null;
 
     public $perPage = 10;
 
@@ -68,28 +73,38 @@ class Location extends Component
         $path1 = $this->file->store('location-uploads');
         $path = storage_path('app').'/'.$path1;
         $data = Excel::toArray([], $path)[0];
-        $header = $data[1];
+
+        $hasMappedColumns = !empty($this->uploadColumns);
+        $startRow = $this->uploadStartRow ?? 2;
+        $headerRow = $startRow - 1;
+        $cols = $this->uploadColumns;
+
+        $codeIdx = $this->resolveUploadColumn($cols, 'code', 0);
+        $nameIdx = $this->resolveUploadColumn($cols, 'name', 1);
+
+        $header = $data[$headerRow] ?? [];
 
         $this->reset('location_data');
-        if($this->checkHeader($header) == 0) {
-            foreach($data as $key => $row) {
-                if($key > 1) {
-                    // check duplicate
-                    $location = Loc::where('account_id', $this->account->id)
-                        ->where('account_branch_id', $this->account_branch->id)
-                        ->where('code', $row[0])
-                        ->where('name', $row[1])
-                        ->first();
+        if ($hasMappedColumns || $this->checkHeader($header) === 0) {
+            foreach ($data as $key => $row) {
+                if ($key >= $startRow) {
+                    $code = $row[$codeIdx] ?? null;
+                    $name = $row[$nameIdx] ?? null;
 
-                    $check = 0;
-                    if(!empty($location)) {
-                        $check = 1;
+                    if (empty($code)) {
+                        continue;
                     }
 
+                    $location = Loc::where('account_id', $this->account->id)
+                        ->where('account_branch_id', $this->account_branch->id)
+                        ->where('code', $code)
+                        ->where('name', $name)
+                        ->first();
+
                     $this->location_data[] = [
-                        'check' => $check,
-                        'code' => $row[0],
-                        'name' => $row[1],
+                        'check' => $location ? 1 : 0,
+                        'code'  => $code,
+                        'name'  => $name,
                     ];
                 }
             }
@@ -144,9 +159,14 @@ class Location extends Component
         return $err;
     }
 
-    public function mount() {
+    public function mount(): void
+    {
         $this->account = Session::get('account');
         $this->account_branch = Session::get('account_branch');
+
+        $mapping = $this->getUploadColumnMapping($this->account->id, 'location');
+        $this->uploadColumns = $mapping['columns'];
+        $this->uploadStartRow = $mapping['start_row'];
     }
 
     public function render()

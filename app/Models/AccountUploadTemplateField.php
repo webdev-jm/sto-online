@@ -18,4 +18,9 @@ class AccountUploadTemplateField extends Model
         'file_column_name',
         'file_column_number',
     ];
+
+    public function upload_template_field()
+    {
+        return $this->belongsTo(UploadTemplateField::class);
+    }
 }
