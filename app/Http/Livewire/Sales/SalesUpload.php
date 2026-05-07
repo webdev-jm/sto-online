@@ -29,11 +29,6 @@ use App\Http\Traits\ProductMappingTrait;
 use App\Http\Traits\PriceCodeTrait;
 use App\Http\Traits\UploadMappingTrait;
 
-ini_set('memory_limit', '-1');
-ini_set('max_execution_time', 0);
-ini_set('sqlsrv.ClientBufferMaxKBSize','1000000'); // Setting to 512M
-ini_set('pdo_sqlsrv.client_buffer_max_kb_size','1000000');
-
 class SalesUpload extends Component
 {
     use PriceCodeTrait;
@@ -72,12 +67,10 @@ class SalesUpload extends Component
 
     public function maintainCustomer($customer_code) {
         $this->dispatch('maintainCustomer', $customer_code);
-        $this->dispatch('maintainCustomer');
     }
 
     public function maintainLocation($location_code) {
         $this->dispatch('maintainLocation', $location_code);
-        $this->dispatch('maintainLocation');
     }
 
     public function saveUpload() {
@@ -133,6 +126,9 @@ class SalesUpload extends Component
     }
 
     public function updatedFile() {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
         $this->validate([
             'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
         ]);

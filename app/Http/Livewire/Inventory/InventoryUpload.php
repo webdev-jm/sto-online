@@ -253,9 +253,11 @@ class InventoryUpload extends Component
                 }
             }
 
-            usort($this->inventory_data, function($a, $b) {
-                return $b['check'] <=> $a['check'];
-            });
+            if (!empty($this->inventory_data)) {
+                usort($this->inventory_data, function($a, $b) {
+                    return $b['check'] <=> $a['check'];
+                });
+            }
 
         } else {
             $this->err_msg = 'Invalid format. Please provide an excel with the correct format or configure an upload mapping for this account.';
@@ -274,7 +276,7 @@ class InventoryUpload extends Component
 
         $err = 0;
         foreach ($requiredHeaders as $index => $requiredHeader) {
-            if (trim(strtolower($header[$index]) ?? '') !== strtolower($requiredHeader)) {
+            if (trim(strtolower($header[$index] ?? '')) !== strtolower($requiredHeader)) {
                 $err++;
             }
         }
