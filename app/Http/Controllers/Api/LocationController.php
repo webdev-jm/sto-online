@@ -60,6 +60,7 @@ class LocationController extends Controller
 
         // check for duplication
         $check = Location::where('code', $request->code)
+            ->where('account_branch_id', $account_branch->id)
             ->first();
         if(empty($check)) {
             // create new location
@@ -70,8 +71,6 @@ class LocationController extends Controller
                 'name' => $request->name,
             ]);
             $location->save();
-
-            $location_data = new LocationResource($location);
 
             return $this->successResponse(new LocationResource($location));
         } else {
@@ -96,7 +95,7 @@ class LocationController extends Controller
                 if(!empty($location)) {
                     return $this->successResponse(new LocationResource($location));
                 } else {
-                    return $this->successResponse('data not found');
+                    return $this->validationError('data not found');
                 }
 
             }
@@ -134,23 +133,19 @@ class LocationController extends Controller
             return $this->validationError($validator->errors());
         }
 
-        // check if exists
-        if(!empty($account_branch)) {
-            $location = Location::where('account_branch_id', $account_branch->id)
-                ->where('id', $id)
-                ->first();
+        $location = Location::where('account_branch_id', $account_branch->id)
+            ->where('id', $id)
+            ->first();
 
-            if(!empty($location)) {
+        if(!empty($location)) {
+            $location->update([
+                'code' => $request->code,
+                'name' => $request->name
+            ]);
 
-                $location->update([
-                    'code' => $request->code,
-                    'name' => $request->name
-                ]);
-
-                return $this->successResponse(new LocationResource($location));
-            } else {
-                return $this->successResponse('data not found');
-            }
+            return $this->successResponse(new LocationResource($location));
+        } else {
+            return $this->validationError('data not found');
         }
     }
 }

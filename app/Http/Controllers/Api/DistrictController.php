@@ -27,7 +27,7 @@ class DistrictController extends Controller
         $account_branch = $check['account_branch'];
 
         $query = District::orderBy('created_at', 'desc')
-            ->where('account_id', $account_branch->account_id);
+            ->where('account_branch_id', $account_branch->id);
 
         $districts = $request->has('page')
             ? $query->paginate(10)

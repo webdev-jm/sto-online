@@ -111,6 +111,10 @@ class ChannelController extends Controller
             ]
         ]);
 
+        if($validator->fails()) {
+            return $this->validationError($validator->errors());
+        }
+
         $channel = Channel::where('id', $id)
             ->first();
         if(!empty($channel)) {

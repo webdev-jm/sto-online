@@ -201,6 +201,9 @@ class StoController extends Controller
                 DB::raw('SUM(IF(year = '.$year.', sales, NULL)) as fy_current'),
                 DB::raw('SUM(IF(year = '.$year.', sales, NULL)) / '.$divisor.' as avg_current')
             )
+            ->whereIn('year', [$prev_year, $year])
+            ->where('month', '>=', $start_month)
+            ->where('month', '<=', $end_month)
             ->groupBy(['area_code', 'area_name']);
 
         $sql = 'not accessible';
