@@ -47,7 +47,7 @@ class AreaController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)->whereNull('deleted_at')
             ],
             'name' => [
                 'required'
@@ -107,7 +107,7 @@ class AreaController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => [
                 'required',
-                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)->ignore($id)
+                Rule::unique($account_branch->account->db_data->connection_name.'.'.(new Area)->getTable())->where('account_branch_id', $account_branch->id)->whereNull('deleted_at')->ignore($id)
             ],
             'name' => [
                 'required'
