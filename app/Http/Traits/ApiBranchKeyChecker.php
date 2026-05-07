@@ -26,6 +26,26 @@ trait ApiBranchKeyChecker {
             ];
         }
 
+        if(! auth()->check()) {
+            $err['UNAUTHENTICATED'] = 'User is not authenticated.';
+
+            return [
+                'status' => true,
+                'account_branch' => null,
+                'error' => $err,
+            ];
+        }
+
+        if(empty($account_branch->account) || empty($account_branch->account->db_data)) {
+            $err['ACCOUNT_CONFIG'] = 'Account database configuration is missing.';
+
+            return [
+                'status' => true,
+                'account_branch' => null,
+                'error' => $err,
+            ];
+        }
+
         // check if account branch is assigned to the user
         $check = $account_branch->users()->where('id', auth()->user()->id)->first();
         if(empty($check)) {
