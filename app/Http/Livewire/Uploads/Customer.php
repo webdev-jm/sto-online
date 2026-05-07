@@ -31,6 +31,7 @@ use App\Jobs\CustomerImportJob;
 use Illuminate\Support\Str;
 
 use App\Http\Traits\ChannelMappingTrait;
+use App\Http\Traits\UploadMappingTrait;
 
 class Customer extends Component
 {
@@ -39,12 +40,16 @@ class Customer extends Component
     protected $paginationTheme = 'bootstrap';
 
     use ChannelMappingTrait;
+    use UploadMappingTrait;
 
     public ?array $customer_data = [];
     public $file;
     public AccountModel $account;
-    public $account_branch; // Type hint if AccountBranch model exists, e.g., AccountBranch $account_branch
+    public $account_branch;
     public $err_msg;
+
+    public array $uploadColumns = [];
+    public ?int $uploadStartRow = null;
 
     public $perPage = 10;
 
@@ -108,18 +113,24 @@ class Customer extends Component
         }
 
         $firstSheetData = $excelSheets[0];
-        if (count($firstSheetData) < 2) { // Needs at least a header and one data row
+        if (count($firstSheetData) < 2) {
             $this->err_msg = 'The Excel file does not contain enough data (requires a header and at least one data row).';
             return;
         }
 
-        $headerRow = $firstSheetData[1];
-        if ($this->checkHeader($headerRow) !== 0) {
-            $this->err_msg = 'Invalid Excel header format. Please ensure all required columns are present in the correct order: Code, Name, Address, Salesman Code, Channel Code, Channel Name, Province, City/Town, Barangay, Street, Postal Code.';
-            return;
+        $hasMappedColumns = !empty($this->uploadColumns);
+        $startRow = $this->uploadStartRow ?? 2;
+        $cols = $this->uploadColumns;
+
+        if (!$hasMappedColumns) {
+            $headerRow = $firstSheetData[$startRow - 1] ?? [];
+            if ($this->checkHeader($headerRow) !== 0) {
+                $this->err_msg = 'Invalid Excel header format. Please ensure all required columns are present in the correct order: Code, Name, Address, Salesman Code, Channel Code, Channel Name, Province, City/Town, Barangay, Street, Postal Code.';
+                return;
+            }
         }
 
-        $dataRows = array_slice($firstSheetData, 2);
+        $dataRows = array_slice($firstSheetData, $startRow);
 
         if (empty($dataRows)) {
             $this->err_msg = 'The Excel file contains a header but no data rows.';
@@ -143,10 +154,21 @@ class Customer extends Component
 
             $channels = Channel::get();
 
+            $provinceIdx   = $this->resolveUploadColumn($cols, 'province', 6);
+            $cityIdx       = $this->resolveUploadColumn($cols, 'city', 7);
+            $barangayIdx   = $this->resolveUploadColumn($cols, 'barangay', 8);
+            $codeIdx       = $this->resolveUploadColumn($cols, 'code', 0);
+            $nameIdx       = $this->resolveUploadColumn($cols, 'name', 1);
+            $addressIdx    = $this->resolveUploadColumn($cols, 'address', 2);
+            $salesmanIdx   = $this->resolveUploadColumn($cols, 'salesman_code', 3);
+            $channelCodeIdx= $this->resolveUploadColumn($cols, 'channel_code', 4);
+            $streetIdx     = $this->resolveUploadColumn($cols, 'street', 9);
+            $postalIdx     = $this->resolveUploadColumn($cols, 'postal_code', 10);
+
             // Pre-fetch address entities
-            $provinceNames = collect($dataRows)->pluck(6)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
-            $cityNames = collect($dataRows)->pluck(7)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
-            $brgyNames = collect($dataRows)->pluck(8)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+            $provinceNames = collect($dataRows)->pluck($provinceIdx)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+            $cityNames     = collect($dataRows)->pluck($cityIdx)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
+            $brgyNames     = collect($dataRows)->pluck($barangayIdx)->map(fn($name) => trim($name ?? ''))->unique()->filter()->all();
 
             $dbProvinces = Province::whereIn('province_name', $provinceNames)->get()->keyBy('province_name');
             $dbMunicipalities = Municipality::whereIn('municipality_name', $cityNames)->get()->keyBy('municipality_name');
@@ -158,19 +180,28 @@ class Customer extends Component
             $channels,
             $dbProvinces,
             $dbMunicipalities,
-            $dbBarangays
+            $dbBarangays,
+            $codeIdx,
+            $nameIdx,
+            $addressIdx,
+            $salesmanIdx,
+            $channelCodeIdx,
+            $provinceIdx,
+            $cityIdx,
+            $barangayIdx,
+            $streetIdx,
+            $postalIdx
         ) {
-                $code = trim($row[0] ?? '');
-                $name = trim($row[1] ?? '');
-                $address = trim($row[2] ?? '');
-                $salesmanCode = trim($row[3] ?? '');
-                $channel_code = trim($row[4] ?? '');
-                // $channel_name = trim($row[5] ?? ''); // Not directly used if looking up by code
-                $provinceName = trim($row[6] ?? '');
-                $cityName = trim($row[7] ?? '');
-                $brgyName = trim($row[8] ?? '');
-                $street = trim($row[9] ?? '');
-                $postalCode = trim($row[10] ?? '');
+                $code         = trim($row[$codeIdx] ?? '');
+                $name         = trim($row[$nameIdx] ?? '');
+                $address      = trim($row[$addressIdx] ?? '');
+                $salesmanCode = trim($row[$salesmanIdx] ?? '');
+                $channel_code = trim($row[$channelCodeIdx] ?? '');
+                $provinceName = trim($row[$provinceIdx] ?? '');
+                $cityName     = trim($row[$cityIdx] ?? '');
+                $brgyName     = trim($row[$barangayIdx] ?? '');
+                $street       = trim($row[$streetIdx] ?? '');
+                $postalCode   = trim($row[$postalIdx] ?? '');
 
                 // Map channel code using ChannelMappingTrait
                 [$channel_code, $channel_name_mapped] = $this->channelMapping($this->account->id, $channel_code);
@@ -322,9 +353,14 @@ class Customer extends Component
         return (1 - ($distance / $maxLength)) * 100.0;
     }
 
-    public function mount() {
+    public function mount(): void
+    {
         $this->account = Session::get('account');
         $this->account_branch = Session::get('account_branch');
+
+        $mapping = $this->getUploadColumnMapping($this->account->id, 'customer');
+        $this->uploadColumns = $mapping['columns'];
+        $this->uploadStartRow = $mapping['start_row'];
     }
 
     public function render()

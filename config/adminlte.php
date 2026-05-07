@@ -354,6 +354,13 @@ return [
                     'active'    => ['channel-mapping*']
                 ],
                 [
+                    'text'      => 'Upload Mapping',
+                    'url'       => '/upload-mapping',
+                    'icon'      => 'fa fa-fw fa-upload',
+                    'can'       => 'upload mapping access',
+                    'active'    => ['upload-mapping*']
+                ],
+                [
                     'text'      => 'Templates',
                     'url'       => '/template',
                     'icon'      => 'fa fa-fw fa-file-excel',

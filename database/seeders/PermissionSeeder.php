@@ -22,6 +22,10 @@ class PermissionSeeder extends Seeder
                 'channel mapping access' => 'Allow user to access channel mapping list and details.',
                 'channel mapping create' => 'Allow user to add channel mapping.',
             ],
+            'Upload Mapping' => [
+                'upload mapping access' => 'Allow user to access upload mapping list and details.',
+                'upload mapping create' => 'Allow user to configure upload column mapping per account.',
+            ],
             'Product Mapping' => [
                 'product mapping access' => 'Allow user to access product mapping list and details.',
                 'product mapping create' => 'Allow user to add product mapping.',
@@ -175,13 +179,12 @@ class PermissionSeeder extends Seeder
             ]
         ];
 
-        foreach($permissions_arr as $module => $permissions) {
-            foreach($permissions as $permission => $description) {
-                Permission::create([
-                    'name' => $permission,
-                    'module' => $module,
-                    'description' => $description,
-                ]);
+        foreach ($permissions_arr as $module => $permissions) {
+            foreach ($permissions as $permission => $description) {
+                Permission::firstOrCreate(
+                    ['name' => $permission],
+                    ['module' => $module, 'description' => $description]
+                );
             }
         }
 

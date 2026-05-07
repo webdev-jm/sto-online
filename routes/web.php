@@ -25,6 +25,7 @@ use App\Http\Controllers\TemplateConverterControler;
 use App\Http\Controllers\ReturnToVendorController;
 use App\Http\Controllers\ProductMappingController;
 use App\Http\Controllers\ChannelMappingController;
+use App\Http\Controllers\UploadMappingController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\HubAdminController;
 
@@ -98,6 +99,12 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'permission:channel mapping access'], function() {
         Route::get('channel-mapping', [ChannelMappingController::class, 'index'])->name('channel-mapping.index');
         Route::get('channel-mapping/{id}/entry', [ChannelMappingController::class, 'entry'])->name('channel-mapping.entry')->middleware('permission:channel mapping create');
+    });
+
+    // UPLOAD MAPPING
+    Route::group(['middleware' => 'permission:upload mapping access'], function() {
+        Route::get('upload-mapping', [UploadMappingController::class, 'index'])->name('upload-mapping.index');
+        Route::get('upload-mapping/{id}/entry', [UploadMappingController::class, 'entry'])->name('upload-mapping.entry')->middleware('permission:upload mapping create');
     });
 
     // PURCHASE ORDER

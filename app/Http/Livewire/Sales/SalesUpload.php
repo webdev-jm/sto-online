@@ -27,6 +27,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Http\Traits\ProductMappingTrait;
 
 use App\Http\Traits\PriceCodeTrait;
+use App\Http\Traits\UploadMappingTrait;
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 0);
@@ -37,6 +38,7 @@ class SalesUpload extends Component
 {
     use PriceCodeTrait;
     use ProductMappingTrait;
+    use UploadMappingTrait;
     use WithFileUploads;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
@@ -56,6 +58,9 @@ class SalesUpload extends Component
 
     public $header_err;
     public $page;
+
+    public array $uploadColumns = [];
+    public ?int $uploadStartRow = null;
 
     protected $listeners = [
         'checkData' => 'updateData'
@@ -165,14 +170,20 @@ class SalesUpload extends Component
             return;
         }
 
-        $header = $data[1];
+        $hasMappedColumns = !empty($this->uploadColumns);
+        $startRow = $this->uploadStartRow ?? 2;
+        $headerRow = $startRow - 1;
 
-        if ($this->checkHeader($header) !== 0) {
-            $this->err_msg = 'Invalid header format. Please provide an excel file with the correct column structure.';
-            return;
+        if (!$hasMappedColumns) {
+            $header = $data[$headerRow] ?? [];
+            if ($this->checkHeader($header) !== 0) {
+                $this->err_msg = 'Invalid header format. Please provide an excel file with the correct column structure.';
+                return;
+            }
         }
 
-        $rows = array_slice($data, 2);
+        $rows = array_slice($data, $startRow);
+        $cols = $this->uploadColumns;
 
         // 1. Collect all unique codes in a single pass
         $customerCodes = [];
@@ -184,12 +195,16 @@ class SalesUpload extends Component
         $company = $sms_account->company->name;
 
         foreach ($rows as $row) {
-            if (count($row) < 6) continue;
+            if (count($row) < 1) continue;
 
-            if (!empty($row[1])) $customerCodes[trim($row[1])] = true;
-            if (!empty($row[4])) $locationCodes[trim($row[4])] = true;
+            $cCol = $this->resolveUploadColumn($cols, 'customer_code', 1);
+            $wCol = $this->resolveUploadColumn($cols, 'warehouse_code', 4);
+            $sCol = $this->resolveUploadColumn($cols, 'sku_code', 5);
 
-            $sku_code = trim($row[5] ?? '');
+            if (!empty($row[$cCol])) $customerCodes[trim($row[$cCol])] = true;
+            if (!empty($row[$wCol])) $locationCodes[trim($row[$wCol])] = true;
+
+            $sku_code = trim($row[$sCol] ?? '');
             if (strpos($sku_code, '-') !== false) {
                 $sku_arr = explode('-', $sku_code);
                 if ($sku_arr[0] === 'FG' || $sku_arr[0] === 'PRM') {
@@ -223,13 +238,14 @@ class SalesUpload extends Component
         $existenceCheckPayload = [];
 
         foreach ($rows as $index => $row) {
-            if (count($row) < 12) continue;
+            if (count($row) < 1) continue;
 
-            $invoice_date = $row[0];
-            $customer_code = trim($row[1]);
-            $invoice_number = trim($row[3]);
-            $warehouse_code = trim($row[4]);
-            $original_sku_code = trim($row[5]);
+            $c = $cols;
+            $invoice_date      = $row[$this->resolveUploadColumn($c, 'invoice_date', 0)];
+            $customer_code     = trim($row[$this->resolveUploadColumn($c, 'customer_code', 1)]);
+            $invoice_number    = trim($row[$this->resolveUploadColumn($c, 'invoice_number', 3)]);
+            $warehouse_code    = trim($row[$this->resolveUploadColumn($c, 'warehouse_code', 4)]);
+            $original_sku_code = trim($row[$this->resolveUploadColumn($c, 'sku_code', 5)]);
 
             $sku_code = $original_sku_code;
             $type = 1;
@@ -244,12 +260,12 @@ class SalesUpload extends Component
             $sku_code = $mappingResult[0];
             $type = $mappingResult[1] ?? $type;
 
-            $uom = trim($row[7]);
-            $quantity = (float)str_replace(',', '', trim($row[6]));
-            $price_inc_vat = (float)str_replace(',', '', trim($row[8]));
-            $amount = (float)str_replace(',', '', trim($row[9]));
-            $amount_inc_vat = (float)str_replace(',', '', trim($row[10]));
-            $line_discount = (float)str_replace(',', '', trim($row[11]));
+            $quantity      = (float)str_replace(',', '', trim($row[$this->resolveUploadColumn($c, 'quantity', 6)]));
+            $uom           = trim($row[$this->resolveUploadColumn($c, 'uom', 7)]);
+            $price_inc_vat = (float)str_replace(',', '', trim($row[$this->resolveUploadColumn($c, 'price_inc_vat', 8)]));
+            $amount        = (float)str_replace(',', '', trim($row[$this->resolveUploadColumn($c, 'amount', 9)]));
+            $amount_inc_vat= (float)str_replace(',', '', trim($row[$this->resolveUploadColumn($c, 'amount_inc_vat', 10)]));
+            $line_discount = (float)str_replace(',', '', trim($row[$this->resolveUploadColumn($c, 'line_discount', 11)]));
 
             $category = 0;
             if ((!empty($invoice_number) && strpos($invoice_number, '-') !== false && explode('-', $invoice_number)[0] === 'PSC') || ($amount < 0)) {
@@ -404,9 +420,14 @@ class SalesUpload extends Component
         return $err;
     }
 
-    public function mount() {
+    public function mount(): void
+    {
         $this->account = Session::get('account');
         $this->account_branch = Session::get('account_branch');
+
+        $mapping = $this->getUploadColumnMapping($this->account->id, 'sales');
+        $this->uploadColumns = $mapping['columns'];
+        $this->uploadStartRow = $mapping['start_row'];
     }
 
     public function render()

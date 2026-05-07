@@ -14,11 +14,13 @@ use App\Models\Salesman as Sale;
 use App\Models\District;
 
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Traits\UploadMappingTrait;
 
 class Salesman extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use UploadMappingTrait;
     protected $paginationTheme = 'bootstrap';
 
     public $salesman_data;
@@ -26,6 +28,9 @@ class Salesman extends Component
     public $account;
     public $account_branch;
     public $err_msg;
+
+    public array $uploadColumns = [];
+    public ?int $uploadStartRow = null;
 
     public $perPage = 10;
 
@@ -80,26 +85,38 @@ class Salesman extends Component
         $path1 = $this->file->store('salesman-uploads');
         $path = storage_path('app').'/'.$path1;
         $data = Excel::toArray([], $path)[0];
-        $header = $data[0];
+
+        $hasMappedColumns = !empty($this->uploadColumns);
+        $startRow = $this->uploadStartRow ?? 1;
+        $headerRow = $startRow - 1;
+        $cols = $this->uploadColumns;
+
+        $codeIdx     = $this->resolveUploadColumn($cols, 'code', 0);
+        $nameIdx     = $this->resolveUploadColumn($cols, 'name', 1);
+        $typeIdx     = $this->resolveUploadColumn($cols, 'type', 2);
+        $districtIdx = $this->resolveUploadColumn($cols, 'district_code', 3);
+
+        $header = $data[$headerRow] ?? [];
 
         $this->reset('salesman_data');
-        if($this->checkHeader($header) == 0) {
+        if ($hasMappedColumns || $this->checkHeader($header) === 0) {
             $current_salesmen = Sale::where('account_id', $this->account->id)
                 ->where('account_branch_id', $this->account_branch->id)
                 ->get()
                 ->keyBy('code');
 
-            foreach($data as $key => $row) {
-                if($key > 0) {
-                    $check = $current_salesmen->get($row[0]);
+            foreach ($data as $key => $row) {
+                if ($key >= $startRow) {
+                    $code = $row[$codeIdx] ?? null;
+                    $check = $current_salesmen->get($code);
 
-                    if(!empty($row[0])) {
+                    if (!empty($code)) {
                         $this->salesman_data[] = [
-                            'check' => empty($check) ? 0 : 1,
-                            'code' => $row[0],
-                            'name' => $row[1],
-                            'type' => $row[2],
-                            'district_code' => $row[3]
+                            'check'         => empty($check) ? 0 : 1,
+                            'code'          => $code,
+                            'name'          => $row[$nameIdx] ?? '',
+                            'type'          => $row[$typeIdx] ?? '',
+                            'district_code' => $row[$districtIdx] ?? '',
                         ];
                     }
                 }
@@ -156,9 +173,14 @@ class Salesman extends Component
         return $err;
     }
 
-    public function mount() {
+    public function mount(): void
+    {
         $this->account = Session::get('account');
         $this->account_branch = Session::get('account_branch');
+
+        $mapping = $this->getUploadColumnMapping($this->account->id, 'salesman');
+        $this->uploadColumns = $mapping['columns'];
+        $this->uploadStartRow = $mapping['start_row'];
     }
 
     public function render()
