@@ -196,6 +196,8 @@ new class extends Component
                 @if(in_array('sales', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'sales' ? '' : 'd-none' }}">
 
+                        <livewire:dashboard.insight :year="$globalYear" type="sales" wire:key="insight-sales-{{ $globalYear }}" />
+
                         {{-- Stat cards + year navigator --}}
                         <div class="stat-row">
                             <div class="stat-card stat-col-3">
@@ -276,6 +278,8 @@ new class extends Component
                 {{-- ── INVENTORIES TAB ────────────────────────────── --}}
                 @if(in_array('inventories', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'inventories' ? '' : 'd-none' }}">
+
+                        <livewire:dashboard.insight :year="$globalYear" type="inventories" wire:key="insight-inventories-{{ $globalYear }}" />
 
                         {{-- Stat cards + year navigator --}}
                         <div class="stat-row">

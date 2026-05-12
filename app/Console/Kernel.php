@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('reports:consolidate')->dailyAt('01:00');
+        $schedule->command('rag:index')->dailyAt('02:00');
 
         $frequencies = NotificationFrequency::get();
         if(!empty($frequencies)) {

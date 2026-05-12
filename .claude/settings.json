@@ -1,7 +1,46 @@
 {
   "permissions": {
     "allow": [
-      "mcp__laravel-boost__get-absolute-url"
+      "mcp__laravel-boost__get-absolute-url",
+      "Bash(Get-ChildItem -Directory)",
+      "PowerShell(ls -d \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\")",
+      "Bash(grep -r 'protected $casts\\\\|public static function casts' app/ '--include=*.php')",
+      "Bash(grep -o \"'App\\\\\\\\[^']*'\")",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\" -Force | Where-Object {$_.PSIsContainer} | Select-Object Name)",
+      "PowerShell(head -20)",
+      "PowerShell(\"---\")",
+      "Bash(grep -r \"Http\\\\\\\\\\\\\\\\Resources\" app/ --include=\"*.php\")",
+      "Bash(grep -r \"namespace App\\\\\\\\\\\\\\\\Http\\\\\\\\\\\\\\\\Resources\" app/ --include=\"*.php\")",
+      "Bash(xargs head -30)",
+      "Bash(grep -r \"Laravel\\\\\\\\\\\\\\\\Ui\\\\|laravelui\" config/ app/ --include=\"*.php\")",
+      "Bash(composer update *)",
+      "Bash(composer show *)",
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\database\\\\migrations\" -Recurse -Filter \"*000003*\")",
+      "Bash(vendor/bin/phpunit --migrate-configuration)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\" -Directory)",
+      "Bash(Get-ChildItem -Recurse -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\app\\\\Http\\\\Controllers\" -Filter \"*.php\")",
+      "Bash(Select-Object FullName)",
+      "Bash(cd /c/Users/jm.renon/Documents\\\\2026\\\\PROJECTS\\\\sales-order && grep -rn \"public function\" app/Http/Requests/ | grep -v \": \" | head -30)",
+      "Read(//c/Users/jm.renon/**)",
+      "Bash(grep -rn 'function.*$id' app/Http/Controllers/)",
+      "Bash(grep -rn \"function.*\\\\$\" app/Models/)",
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\app\\\\Http\\\\Requests\" -Recurse -Filter \"*.php\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\database\" -Recurse)",
+      "PowerShell(ls \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\vendor\\\\spatie\\\\laravel-permission\" -Recurse | Select-Object FullName | Where-Object { $_.FullName -match \"database|migrat|stubs\" })",
+      "Bash(Format-Hex \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\database\\\\seeders\\\\TerritorySeeder.php\")",
+      "Bash(Select-Object -First 3)",
+      "Bash(Get-Content \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order\\\\.env\")",
+      "Bash(Select-String \"DB_|APP_URL\")",
+      "Bash(Select-Object -First 20)",
+      "Bash(Get-Content storage/logs/laravel.log -Tail 40)",
+      "Bash(Select-String -Pattern \"EXCEPT|ERROR|sales.order|SalesOrder\")",
+      "Bash(Select-Object -Last 20)",
+      "Bash(Find c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sto-online\\\\app\\\\Http\\\\Livewire -type f -name \"*.php\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sto-online\\\\app\\\\Models\" -Filter \"*.php\")",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(php -r 'try { $db = new PDO\\('\\\\''sqlite:storage/app/reports/sales.sqlite'\\\\''\\); $tables = []; foreach \\($db->query\\(\"SELECT name FROM sqlite_master WHERE type='\\\\''table'\\\\'' ORDER BY name\"\\) as $row\\) { $tables[] = $row[0]; } echo implode\\(PHP_EOL, $tables\\); } catch\\(Exception $e\\) { echo '\\\\''Error: '\\\\'' . $e->getMessage\\(\\); }')",
+      "Bash(git checkout *)"
     ]
   }
 }

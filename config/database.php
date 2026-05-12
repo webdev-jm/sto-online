@@ -48,6 +48,9 @@ return [
             'database' => storage_path('app/reports/sales.sqlite'),
             'prefix'   => '',
             'foreign_key_constraints' => false,
+            'options'  => [
+                \PDO::ATTR_TIMEOUT => 60,
+            ],
         ],
 
         'mysql' => [
