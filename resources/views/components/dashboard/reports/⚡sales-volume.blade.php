@@ -119,9 +119,12 @@ new class extends Component
             type: 'line',
             events: {
                 drillup: function () {
+                    this.xAxis[0].update({ categories: data.categories }, false);
                     this.setTitle({ text: null });
                 },
                 drilldown: function (e) {
+                    const accountNames = (e.seriesOptions.data ?? []).map(p => p.name);
+                    this.xAxis[0].update({ categories: accountNames }, false);
                     this.setTitle({ text: `${e.point.series.name} — ${e.point.category} by Account` });
                 }
             }
