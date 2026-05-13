@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -66,8 +66,9 @@ new class extends Component
                         'data' => collect($accountItems)
                                     ->groupBy('stock_code')
                                     ->map(fn($skuItems, $sku) => [
-                                        'name' => $sku ?: 'Unknown SKU',
-                                        'y'    => round(collect($skuItems)->sum('total_inventory'), 2),
+                                        'name'        => $sku ?: 'Unknown SKU',
+                                        'y'           => round(collect($skuItems)->sum('total_inventory'), 2),
+                                        'description' => trim((collect($skuItems)->first()['name'] ?? '') . ' ' . (collect($skuItems)->first()['size'] ?? '')),
                                     ])
                                     ->sortByDesc('y')
                                     ->values()
@@ -180,7 +181,12 @@ new class extends Component
         tooltip: {
             formatter: function () {
                 const val = Highcharts.numberFormat(this.y, 2);
-                return `<b>${this.point.name}</b><br>Quantity: <b>${val} PCS</b>`;
+                let tip = `<b>${this.point.name}</b>`;
+                if (this.point.description) {
+                    tip += `<br><span style="font-size:0.9em;color:#666">${this.point.description}</span>`;
+                }
+                tip += `<br>Quantity: <b>${val} PCS</b>`;
+                return tip;
             }
         },
         plotOptions: {

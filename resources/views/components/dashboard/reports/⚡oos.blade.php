@@ -35,21 +35,23 @@ new class extends Component
                 'month'      => $items->max('month'),
             ]);
 
-        $assignedSkusByAccount = $inventoryData
+        $assignedProductsByAccount = $inventoryData
             ->pluck('account_code')
             ->unique()
             ->mapWithKeys(fn($accountCode) => [
                 $accountCode => collect($this->getAssignedProducts($accountCode))
-                    ->pluck('stock_code')
-                    ->toArray()
+                    ->keyBy('stock_code')
             ]);
+
+        $assignedSkusByAccount = $assignedProductsByAccount
+            ->map(fn($products) => $products->keys()->toArray());
 
         $inventorySkusByAccount = $inventoryData
             ->groupBy('account_code')
             ->map(fn($items) => $items->pluck('sku')->unique()->toArray());
 
         $this->table_data = $assignedSkusByAccount
-            ->flatMap(function($skus, $accountCode) use ($inventorySkusByAccount, $accountMetaByCode) {
+            ->flatMap(function($skus, $accountCode) use ($inventorySkusByAccount, $accountMetaByCode, $assignedProductsByAccount) {
                 if (!isset($inventorySkusByAccount[$accountCode])) {
                     return [];
                 }
@@ -58,10 +60,13 @@ new class extends Component
                 $missingSkus = array_diff($skus, $inventorySkus);
                 $meta = $accountMetaByCode[$accountCode] ?? [];
 
+                $products = $assignedProductsByAccount[$accountCode] ?? collect();
+
                 return collect($missingSkus)->map(fn($sku) => [
                     'account_code' => $accountCode,
                     'short_name'   => $meta['short_name'] ?? null,
                     'sku'          => $sku,
+                    'description'  => trim(($products->get($sku)?->description ?? '') . ' ' . ($products->get($sku)?->size ?? '')),
                     'month'        => $meta['month'] ?? null,
                 ]);
             })
@@ -89,7 +94,7 @@ new class extends Component
                     @foreach ($table_data as $index => $item)
                         <tr>
                             <td>{{ $item['account_code'] }} - {{ $item['short_name'] }}</td>
-                            <td>{{ $item['sku'] }}</td>
+                            <td title="{{ $item['description'] }}">{{ $item['sku'] }}</td>
                             <td>{{ \DateTime::createFromFormat('!m', $item['month'])->format('M') }}</td>
                         </tr>
                     @endforeach

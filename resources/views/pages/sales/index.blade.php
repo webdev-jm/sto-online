@@ -1,4 +1,4 @@
-﻿@extends('adminlte::page')
+@extends('adminlte::page')
 
 @section('title', 'Sales - '.$account->short_name)
 
