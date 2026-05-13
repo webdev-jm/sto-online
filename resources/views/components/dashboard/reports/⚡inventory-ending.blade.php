@@ -156,6 +156,7 @@ new class extends Component
             return [
                 'account'       => $first['short_name'],
                 'sku'           => $first['sku'],
+                'description'   => $first['name'] ?? '',
                 'total'         => $row['total'],
                 'sell_in'       => $sell_in,
                 'sell_out'      => $sell_out,
@@ -199,7 +200,7 @@ new class extends Component
                     @foreach($table_data as $data)
                         <tr>
                             <td>{{ $data['account'] }}</td>
-                            <td>{{ $data['sku'] }}</td>
+                            <td title="{{ $data['description'] }}">{{ $data['sku'] }}</td>
                             <td>{{ number_format($data['total'] ?? 0) }}</td>
                             <td>{{ number_format($data['sell_in'] ?? 0) }}</td>
                             <td>{{ number_format($data['sell_out'] ?? 0) }}</td>
