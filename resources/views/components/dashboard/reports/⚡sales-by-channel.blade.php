@@ -10,7 +10,9 @@ new class extends Component
 
     #[Reactive]
     public $year;
-    public $chart_data = [];
+    public $chart_data    = [];
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     public function mount($year) {
         $this->year = $year;
@@ -18,11 +20,34 @@ new class extends Component
         $this->chartUpdated();
     }
 
-    public function updatedYear() {
+    public function updatedYear(): void
+    {
         $this->chartUpdated();
+        $this->generateInsight();
     }
 
-    public function chartUpdated() {
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        $this->insight = app(\App\Services\OllamaService::class)->chat([
+            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+            ['role' => 'user',   'content' => $this->buildInsightSummary()],
+        ]);
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        if (empty($this->chart_data['data'])) {
+            return "No channel sales data available for {$this->year}.";
+        }
+        $channels = collect($this->chart_data['data'])->sortByDesc('y')
+            ->map(fn($d) => "{$d['name']}: ₱" . number_format($d['y'], 2))->implode(', ');
+        return "Sales by channel for {$this->year}: {$channels}.";
+    }
+
+    public function chartUpdated(): void
+    {
         $raw = $this->getYearlySalesData($this->year);
         $collection = collect($raw);
 
@@ -74,7 +99,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">SALES BY CHANNEL {{ $year }}</h3>
@@ -85,6 +110,13 @@ new class extends Component
 
         <div class="card-body" wire:ignore>
             <div id="container-channel"></div>
+        </div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
         </div>
     </div>
 </div>

@@ -10,7 +10,9 @@ new class extends Component
 
     #[Reactive]
     public $year;
-    public $chart_data = [];
+    public $chart_data    = [];
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     const EXPIRY_BUCKETS = [
         '1–3 Months'  => [1,  3],
@@ -24,11 +26,36 @@ new class extends Component
         $this->chartUpdated();
     }
 
-    public function updatedYear() {
+    public function updatedYear(): void
+    {
         $this->chartUpdated();
+        $this->generateInsight();
     }
 
-    public function chartUpdated() {
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        $this->insight = app(\App\Services\OllamaService::class)->chat([
+            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+            ['role' => 'user',   'content' => $this->buildInsightSummary()],
+        ]);
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        if (empty($this->chart_data['data'])) {
+            return "No inventory aging data available for {$this->year}.";
+        }
+        $buckets = collect($this->chart_data['data'])
+            ->map(fn($d) => "{$d['name']}: " . number_format($d['y'], 0) . " pcs")->implode(', ');
+        $highest = collect($this->chart_data['data'])->sortByDesc('y')->first();
+        return "Inventory aging distribution for {$this->year}: {$buckets}. "
+            . "Largest bucket: {$highest['name']}.";
+    }
+
+    public function chartUpdated(): void
+    {
         $raw = $this->getYearlyInventoryAgingData($this->year);
 
         $bucketGroups = array_map(fn() => collect(), array_flip(array_keys(self::EXPIRY_BUCKETS)));
@@ -113,7 +140,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">INVENTORY AGING</h3>
@@ -124,6 +151,13 @@ new class extends Component
 
         <div class="card-body" wire:ignore>
             <div id="container-aging"></div>
+        </div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
         </div>
     </div>
 </div>

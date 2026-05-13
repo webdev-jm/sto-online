@@ -12,7 +12,9 @@ new class extends Component
 
     #[Reactive]
     public $year;
-    public $table_data = [];
+    public $table_data    = [];
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     public function mount($year) {
         $this->year = $year;
@@ -21,11 +23,37 @@ new class extends Component
 
     }
 
-    public function updatedYear() {
+    public function updatedYear(): void
+    {
         $this->chartUpdated();
+        $this->generateInsight();
     }
 
-    public function chartUpdated() {
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        $this->insight = app(\App\Services\OllamaService::class)->chat([
+            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+            ['role' => 'user',   'content' => $this->buildInsightSummary()],
+        ]);
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        $total     = count($this->table_data);
+        $distCount = collect($this->table_data)->pluck('account_code')->unique()->count();
+        if ($total === 0) {
+            return "No out-of-stock items recorded for {$this->year}.";
+        }
+        $topDist = collect($this->table_data)->groupBy('account_code')
+            ->map->count()->sortByDesc(fn($c) => $c)->keys()->first();
+        return "{$total} out-of-stock SKUs across {$distCount} distributors for {$this->year}. "
+            . "Most affected: {$topDist}.";
+    }
+
+    public function chartUpdated(): void
+    {
         $inventoryData = collect($this->getYearlyInventoryData($this->year));
 
         $accountMetaByCode = $inventoryData
@@ -76,7 +104,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">OUT OF STOCK (OOS) {{ $year }}</h3>
@@ -101,6 +129,12 @@ new class extends Component
                 </tbody>
             </table>
         </div>
-        <div class="card-footer"></div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
+        </div>
     </div>
 </div>
