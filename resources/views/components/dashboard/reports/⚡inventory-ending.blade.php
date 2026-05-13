@@ -20,6 +20,8 @@ new class extends Component
     public $raw_table_data = [];
     public $products;
     public $search         = '';
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     public function mount($year) {
         $this->year = $year;
@@ -31,8 +33,33 @@ new class extends Component
         $this->chartUpdated();
     }
 
-    public function updatedYear() {
+    public function updatedYear(): void
+    {
         $this->chartUpdated();
+        $this->generateInsight();
+    }
+
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        $this->insight = app(\App\Services\OllamaService::class)->chat([
+            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+            ['role' => 'user',   'content' => $this->buildInsightSummary()],
+        ]);
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        $total     = count($this->raw_table_data);
+        $distCount = collect($this->raw_table_data)->pluck('account')->unique()->count();
+        if ($total === 0) {
+            return "No ending inventory data available for {$this->year}.";
+        }
+        $negCount = collect($this->raw_table_data)
+            ->filter(fn($r) => (($r['total'] + $r['sell_in']) - $r['sell_out']) < 0)->count();
+        return "{$total} SKUs tracked across {$distCount} distributors for {$this->year}. "
+            . "{$negCount} SKUs have a negative projected ending balance.";
     }
 
     public function updatedSearch() {
@@ -169,7 +196,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">ENDING INVENTORY {{ $year }} <i class="fa fa-spinner fa-spin fa-sm" wire:loading></i></h3>
@@ -222,6 +249,12 @@ new class extends Component
                 </tbody>
             </table>
         </div>
-        <div class="card-footer"></div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
+        </div>
     </div>
 </div>

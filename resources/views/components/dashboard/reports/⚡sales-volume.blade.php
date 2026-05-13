@@ -10,7 +10,9 @@ new class extends Component
 
     #[Reactive]
     public $year;
-    public $chart_data = [];
+    public $chart_data    = [];
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     public function mount($year) {
        $this->year = $year;
@@ -18,11 +20,39 @@ new class extends Component
         $this->chartUpdated();
     }
 
-    public function updatedYear() {
+    public function updatedYear(): void
+    {
         $this->chartUpdated();
+        $this->generateInsight();
     }
 
-    public function chartUpdated() {
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        $this->insight = app(\App\Services\OllamaService::class)->chat([
+            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+            ['role' => 'user',   'content' => $this->buildInsightSummary()],
+        ]);
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        $currSeries = collect($this->chart_data['data'] ?? [])->firstWhere('name', $this->year)['data'] ?? [];
+        $categories = $this->chart_data['categories'] ?? [];
+        if (empty($currSeries)) {
+            return "No sales volume data available for {$this->year}.";
+        }
+        $peak     = collect($currSeries)->sortByDesc('y')->first();
+        $peakIdx  = array_search($peak, $currSeries);
+        $peakMonth = $categories[$peakIdx] ?? 'N/A';
+        $total    = collect($currSeries)->sum('y');
+        return "Monthly sales volume (pcs) for {$this->year}. Total: " . number_format($total, 0)
+            . " pcs. Peak month: {$peakMonth} with " . number_format($peak['y'], 0) . " pcs.";
+    }
+
+    public function chartUpdated(): void
+    {
         $raw      = $this->getYearlySalesData($this->year);
         $prev_raw = $this->getYearlySalesData($this->year - 1);
 
@@ -94,7 +124,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">MONTHLY SALES VOLUME {{ $this->year }}</h3>
@@ -105,6 +135,13 @@ new class extends Component
 
         <div class="card-body" wire:ignore>
             <div id="container-volume"></div>
+        </div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
         </div>
     </div>
 </div>
