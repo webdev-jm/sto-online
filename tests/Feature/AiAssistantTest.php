@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\AiUnavailableException;
 use App\Http\Livewire\AiAssistant;
 use App\Models\Account;
 use App\Models\User;
+use App\Services\OllamaService;
 use App\Services\RagService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
@@ -148,6 +150,66 @@ class AiAssistantTest extends TestCase
             ->set('userInput', 'What is my top product?')
             ->call('sendMessage')
             ->assertSet('messages.1.content', 'Top product is Kojie.San Soap.');
+    }
+
+    // ---------------------------------------------------------------------------
+    // AI Unavailable Error Handling
+    // ---------------------------------------------------------------------------
+
+    public function test_generate_insights_appends_error_message_when_ollama_is_unreachable(): void
+    {
+        $this->actingAsUser();
+
+        $mock = Mockery::mock(OllamaService::class);
+        $mock->shouldReceive('chat')
+            ->once()
+            ->andThrow(new AiUnavailableException('AI service is unreachable.'));
+
+        $this->app->instance(OllamaService::class, $mock);
+
+        Livewire::test(AiAssistant::class)
+            ->call('generateInsights')
+            ->assertSet('insightsGenerated', false)
+            ->assertSet('isLoading', false)
+            ->assertCount('messages', 1)
+            ->assertSet('messages.0.role', 'assistant')
+            ->assertSet('messages.0.content', 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.');
+    }
+
+    public function test_send_message_appends_error_message_when_ollama_is_unreachable(): void
+    {
+        $this->actingAsUser();
+
+        $mock = Mockery::mock(OllamaService::class);
+        $mock->shouldReceive('chat')
+            ->once()
+            ->andThrow(new AiUnavailableException('AI service is unreachable.'));
+
+        $this->app->instance(OllamaService::class, $mock);
+
+        Livewire::test(AiAssistant::class)
+            ->set('userInput', 'Show me my top products')
+            ->call('sendMessage')
+            ->assertSet('isLoading', false)
+            ->assertCount('messages', 2)
+            ->assertSet('messages.0.role', 'user')
+            ->assertSet('messages.1.role', 'assistant')
+            ->assertSet('messages.1.content', 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.');
+    }
+
+    public function test_generate_insights_appends_error_message_when_ollama_returns_http_error(): void
+    {
+        Http::fake(['*/api/chat' => Http::response('Internal Server Error', 500)]);
+
+        $this->actingAsUser();
+
+        Livewire::test(AiAssistant::class)
+            ->call('generateInsights')
+            ->assertSet('insightsGenerated', false)
+            ->assertSet('isLoading', false)
+            ->assertCount('messages', 1)
+            ->assertSet('messages.0.role', 'assistant')
+            ->assertSet('messages.0.content', 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.');
     }
 
     // ---------------------------------------------------------------------------

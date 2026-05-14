@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use App\Exceptions\AiUnavailableException;
 use App\Services\OllamaService;
 use App\Services\RagService;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ new class extends Component
 
     public string $type    = 'sales'; // 'sales' or 'inventories'
     public string $insight = '';
+    public string $error   = '';
     public string $scope   = 'Overall';
     public bool $isGenerating = false;
     public bool $hasGenerated = false;
@@ -31,6 +33,7 @@ new class extends Component
     public function resetInsight(): void
     {
         $this->insight      = '';
+        $this->error        = '';
         $this->hasGenerated = false;
         $this->scope        = 'Overall';
     }
@@ -38,6 +41,7 @@ new class extends Component
     public function generateInsight(): void
     {
         $this->isGenerating = true;
+        $this->error        = '';
 
         $account = session('account');
         $label   = $this->type === 'sales' ? 'Sales Performance' : 'Inventory & Supply Chain';
@@ -91,7 +95,13 @@ new class extends Component
             ],
         ];
 
-        $reply = trim(app(OllamaService::class)->chat($messages));
+        try {
+            $reply = trim(app(OllamaService::class)->chat($messages));
+        } catch (AiUnavailableException $e) {
+            $this->error        = 'Unable to reach the AI service. Please ensure Ollama is running and try again.';
+            $this->isGenerating = false;
+            return;
+        }
 
         // Collapse 3+ consecutive newlines to at most 2
         $this->insight      = preg_replace('/\n{3,}/', "\n\n", $reply);
@@ -436,6 +446,14 @@ new class extends Component
             </span>
         </button>
     </div>
+
+    {{-- ── ERROR ───────────────────────────────────────────────────────────── --}}
+    @if($error)
+        <div class="ai-insight-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ $error }}
+        </div>
+    @endif
 
     {{-- ── BODY ─────────────────────────────────────────────────────────────── --}}
     @if($isGenerating && !$hasGenerated)
@@ -795,6 +813,23 @@ new class extends Component
 }
 .ai-insight-empty p { margin: 0; }
 .ai-insight-empty strong { color: var(--col-dark, #1c1c1e); }
+.ai-insight-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin: 12px 16px 0;
+    border-radius: 8px;
+    background: rgba(255, 59, 48, .08);
+    border: 1px solid rgba(255, 59, 48, .25);
+    color: #c0392b;
+    font-size: .82rem;
+}
+.dark-mode .ai-insight-error {
+    background: rgba(255, 59, 48, .12);
+    border-color: rgba(255, 59, 48, .3);
+    color: #ff6b6b;
+}
 
 /* Dark mode */
 .dark-mode .ai-insight-card {

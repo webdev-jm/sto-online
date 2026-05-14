@@ -12,7 +12,7 @@ new class extends Component
 {
     use SalesDataAggregator;
 
-    public $type = 'sales';
+    public $type = 'account-monitoring';
     public $selected_tab = 'sales';
     public $globalYear;
     public $header_data = [];
