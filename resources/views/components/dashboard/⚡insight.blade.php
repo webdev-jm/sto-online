@@ -408,135 +408,6 @@ new class extends Component
 };
 ?>
 
-<div class="ai-insight-card">
-
-    {{-- ── HEADER ──────────────────────────────────────────────────────────── --}}
-    <div class="ai-insight-header">
-        <div class="ai-insight-meta">
-            <div class="ai-insight-icon">
-                <i class="fas fa-robot"></i>
-            </div>
-            <div>
-                <div class="ai-insight-label">AI Insight</div>
-                <div class="ai-insight-title">
-                    {{ $year }} &mdash; {{ $type === 'sales' ? 'Sales Performance' : 'Inventory &amp; Supply Chain' }}
-                </div>
-                @if($hasGenerated)
-                    <div class="ai-insight-scope-badge {{ $scope === 'Overall' ? 'ai-insight-scope-badge--overall' : 'ai-insight-scope-badge--account' }}">
-                        <i class="fas {{ $scope === 'Overall' ? 'fa-globe' : 'fa-building' }}"></i>
-                        {{ $scope }}
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <button
-            type="button"
-            class="ai-insight-btn {{ $hasGenerated ? 'ai-insight-btn--regen' : '' }}"
-            wire:click="generateInsight"
-            wire:loading.attr="disabled"
-            wire:target="generateInsight"
-        >
-            <span wire:loading.remove wire:target="generateInsight">
-                <i class="fas {{ $hasGenerated ? 'fa-sync-alt' : 'fa-lightbulb' }}"></i>
-                {{ $hasGenerated ? 'Regenerate' : 'Generate Insight' }}
-            </span>
-            <span wire:loading wire:target="generateInsight" style="display:none;">
-                <i class="fas fa-circle-notch fa-spin"></i> Analysing…
-            </span>
-        </button>
-    </div>
-
-    {{-- ── ERROR ───────────────────────────────────────────────────────────── --}}
-    @if($error)
-        <div class="ai-insight-error">
-            <i class="fas fa-exclamation-circle"></i>
-            {{ $error }}
-        </div>
-    @endif
-
-    {{-- ── BODY ─────────────────────────────────────────────────────────────── --}}
-    @if($isGenerating && !$hasGenerated)
-
-        {{-- Loading state --}}
-        <div class="ai-insight-loading">
-            <div class="ai-insight-pulse"></div>
-            <div class="ai-insight-pulse ai-insight-pulse--delay"></div>
-            <div class="ai-insight-pulse ai-insight-pulse--delay2"></div>
-            <span>Ollama is analysing your data&hellip;</span>
-        </div>
-
-    @elseif($hasGenerated && $insight)
-
-        {{-- Result — parse into labelled sections --}}
-        @php
-            $sectionDefs = [
-                'Key Trends'      => ['icon' => 'fa-chart-line',          'cls' => 'trends'],
-                'Risks'           => ['icon' => 'fa-exclamation-triangle', 'cls' => 'risks'],
-                'Recommendations' => ['icon' => 'fa-lightbulb',           'cls' => 'recs'],
-            ];
-
-            // Split raw text into named sections
-            $sections = [];
-            $current  = null;
-            foreach (explode("\n", $this->insight) as $line) {
-                $trimmed = trim($line);
-                $matched = false;
-                foreach (array_keys($sectionDefs) as $header) {
-                    if (stripos($trimmed, $header) !== false && strlen($trimmed) <= strlen($header) + 2) {
-                        $current        = $header;
-                        $sections[$current] = [];
-                        $matched        = true;
-                        break;
-                    }
-                }
-                if (!$matched && $current !== null && $trimmed !== '') {
-                    // Strip leading bullet characters
-                    $sections[$current][] = ltrim($trimmed, '•·-– ');
-                }
-            }
-
-            // If parsing found nothing (unexpected model format), fall back
-            $parseFailed = empty(array_filter($sections));
-        @endphp
-
-        @if($parseFailed)
-            <div class="ai-insight-body">
-                {!! nl2br(e($insight)) !!}
-            </div>
-        @else
-            <div class="ai-insight-sections">
-                @foreach($sectionDefs as $header => $def)
-                    @if(!empty($sections[$header]))
-                        <div class="ai-insight-section ai-insight-section--{{ $def['cls'] }}">
-                            <div class="ai-insight-section-header">
-                                <span class="ai-insight-section-icon">
-                                    <i class="fas {{ $def['icon'] }}"></i>
-                                </span>
-                                <span class="ai-insight-section-title">{{ $header }}</span>
-                            </div>
-                            <ul class="ai-insight-bullets">
-                                @foreach($sections[$header] as $bullet)
-                                    <li>{{ $bullet }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
-        @endif
-
-    @else
-
-        {{-- Empty state --}}
-        <div class="ai-insight-empty">
-            <i class="fas fa-lightbulb ai-insight-empty-icon"></i>
-            <p>Click <strong>Generate Insight</strong> for an AI-powered analysis of this data.</p>
-        </div>
-
-    @endif
-</div>
-
 @once
 <style>
 .ai-insight-card {
@@ -850,3 +721,132 @@ new class extends Component
 }
 </style>
 @endonce
+
+<div class="ai-insight-card">
+
+    {{-- ── HEADER ──────────────────────────────────────────────────────────── --}}
+    <div class="ai-insight-header">
+        <div class="ai-insight-meta">
+            <div class="ai-insight-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <div class="ai-insight-label">AI Insight</div>
+                <div class="ai-insight-title">
+                    {{ $year }} &mdash; {{ $type === 'sales' ? 'Sales Performance' : 'Inventory &amp; Supply Chain' }}
+                </div>
+                @if($hasGenerated)
+                    <div class="ai-insight-scope-badge {{ $scope === 'Overall' ? 'ai-insight-scope-badge--overall' : 'ai-insight-scope-badge--account' }}">
+                        <i class="fas {{ $scope === 'Overall' ? 'fa-globe' : 'fa-building' }}"></i>
+                        {{ $scope }}
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <button
+            type="button"
+            class="ai-insight-btn {{ $hasGenerated ? 'ai-insight-btn--regen' : '' }}"
+            wire:click="generateInsight"
+            wire:loading.attr="disabled"
+            wire:target="generateInsight"
+        >
+            <span wire:loading.remove wire:target="generateInsight">
+                <i class="fas {{ $hasGenerated ? 'fa-sync-alt' : 'fa-lightbulb' }}"></i>
+                {{ $hasGenerated ? 'Regenerate' : 'Generate Insight' }}
+            </span>
+            <span wire:loading wire:target="generateInsight" style="display:none;">
+                <i class="fas fa-circle-notch fa-spin"></i> Analysing…
+            </span>
+        </button>
+    </div>
+
+    {{-- ── ERROR ───────────────────────────────────────────────────────────── --}}
+    @if($error)
+        <div class="ai-insight-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ $error }}
+        </div>
+    @endif
+
+    {{-- ── BODY ─────────────────────────────────────────────────────────────── --}}
+    @if($isGenerating && !$hasGenerated)
+
+        {{-- Loading state --}}
+        <div class="ai-insight-loading">
+            <div class="ai-insight-pulse"></div>
+            <div class="ai-insight-pulse ai-insight-pulse--delay"></div>
+            <div class="ai-insight-pulse ai-insight-pulse--delay2"></div>
+            <span>Ollama is analysing your data&hellip;</span>
+        </div>
+
+    @elseif($hasGenerated && $insight)
+
+        {{-- Result — parse into labelled sections --}}
+        @php
+            $sectionDefs = [
+                'Key Trends'      => ['icon' => 'fa-chart-line',          'cls' => 'trends'],
+                'Risks'           => ['icon' => 'fa-exclamation-triangle', 'cls' => 'risks'],
+                'Recommendations' => ['icon' => 'fa-lightbulb',           'cls' => 'recs'],
+            ];
+
+            // Split raw text into named sections
+            $sections = [];
+            $current  = null;
+            foreach (explode("\n", $this->insight) as $line) {
+                $trimmed = trim($line);
+                $matched = false;
+                foreach (array_keys($sectionDefs) as $header) {
+                    if (stripos($trimmed, $header) !== false && strlen($trimmed) <= strlen($header) + 2) {
+                        $current        = $header;
+                        $sections[$current] = [];
+                        $matched        = true;
+                        break;
+                    }
+                }
+                if (!$matched && $current !== null && $trimmed !== '') {
+                    // Strip leading bullet characters
+                    $sections[$current][] = ltrim($trimmed, '•·-– ');
+                }
+            }
+
+            // If parsing found nothing (unexpected model format), fall back
+            $parseFailed = empty(array_filter($sections));
+        @endphp
+
+        @if($parseFailed)
+            <div class="ai-insight-body">
+                {!! nl2br(e($insight)) !!}
+            </div>
+        @else
+            <div class="ai-insight-sections">
+                @foreach($sectionDefs as $header => $def)
+                    @if(!empty($sections[$header]))
+                        <div class="ai-insight-section ai-insight-section--{{ $def['cls'] }}">
+                            <div class="ai-insight-section-header">
+                                <span class="ai-insight-section-icon">
+                                    <i class="fas {{ $def['icon'] }}"></i>
+                                </span>
+                                <span class="ai-insight-section-title">{{ $header }}</span>
+                            </div>
+                            <ul class="ai-insight-bullets">
+                                @foreach($sections[$header] as $bullet)
+                                    <li>{{ $bullet }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        @endif
+
+    @else
+
+        {{-- Empty state --}}
+        <div class="ai-insight-empty">
+            <i class="fas fa-lightbulb ai-insight-empty-icon"></i>
+            <p>Click <strong>Generate Insight</strong> for an AI-powered analysis of this data.</p>
+        </div>
+
+    @endif
+</div>
