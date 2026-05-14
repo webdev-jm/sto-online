@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\AiUnavailableException;
 use App\Models\User;
 use App\Services\OllamaService;
 use App\Services\RagService;
@@ -151,6 +152,74 @@ class DashboardInsightTest extends TestCase
             ->call('generateInsight')
             ->assertSet('hasGenerated', true)
             ->assertSet('insight', 'RAG-powered sales insight.');
+    }
+
+    // ---------------------------------------------------------------------------
+    // AI Unavailable Error Handling
+    // ---------------------------------------------------------------------------
+
+    public function test_generate_insight_shows_error_when_ollama_is_unreachable(): void
+    {
+        $this->actingAsAdmin();
+
+        $mock = Mockery::mock(OllamaService::class);
+        $mock->shouldReceive('chat')
+            ->once()
+            ->andThrow(new AiUnavailableException('AI service is unreachable.'));
+
+        $this->app->instance(OllamaService::class, $mock);
+
+        Livewire::test('dashboard.insight', ['year' => 2025, 'type' => 'sales'])
+            ->call('generateInsight')
+            ->assertSet('hasGenerated', false)
+            ->assertSet('isGenerating', false)
+            ->assertSet('insight', '')
+            ->assertSet('error', 'Unable to reach the AI service. Please ensure Ollama is running and try again.');
+    }
+
+    public function test_generate_insight_shows_error_when_ollama_returns_http_error(): void
+    {
+        Http::fake(['*/api/chat' => Http::response('Internal Server Error', 500)]);
+
+        $this->actingAsAdmin();
+
+        Livewire::test('dashboard.insight', ['year' => 2025, 'type' => 'sales'])
+            ->call('generateInsight')
+            ->assertSet('hasGenerated', false)
+            ->assertSet('isGenerating', false)
+            ->assertSet('insight', '')
+            ->assertSet('error', 'Unable to reach the AI service. Please ensure Ollama is running and try again.');
+    }
+
+    public function test_generate_insight_clears_error_on_successful_retry(): void
+    {
+        $this->actingAsAdmin();
+
+        // First call fails, sets error
+        $failMock = Mockery::mock(OllamaService::class);
+        $failMock->shouldReceive('chat')
+            ->once()
+            ->andThrow(new AiUnavailableException('AI service is unreachable.'));
+
+        $this->app->instance(OllamaService::class, $failMock);
+
+        $component = Livewire::test('dashboard.insight', ['year' => 2025, 'type' => 'sales'])
+            ->call('generateInsight')
+            ->assertSet('error', 'Unable to reach the AI service. Please ensure Ollama is running and try again.');
+
+        // Second call succeeds — swap mock and retry
+        $successMock = Mockery::mock(OllamaService::class);
+        $successMock->shouldReceive('chat')
+            ->once()
+            ->andReturn('Recovery insight.');
+
+        $this->app->instance(OllamaService::class, $successMock);
+
+        $component
+            ->call('generateInsight')
+            ->assertSet('error', '')
+            ->assertSet('hasGenerated', true)
+            ->assertSet('insight', 'Recovery insight.');
     }
 
     public function test_generate_inventory_insight_uses_rag_when_account_in_session(): void

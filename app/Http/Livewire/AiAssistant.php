@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Exceptions\AiUnavailableException;
 use App\Services\OllamaService;
 use App\Services\RagService;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ class AiAssistant extends Component
     public bool $isLoading = false;
     public bool $insightsGenerated = false;
     public string $userInput = '';
+    public string $error = '';
 
     /** @var array<int, array{role: string, content: string}> */
     public array $messages = [];
@@ -132,7 +134,13 @@ class AiAssistant extends Component
             ['role' => 'user', 'content' => 'Briefly introduce yourself and let me know how you can help me with (Beauty Elements Ventures) BEV Portal.'],
         ];
 
-        $reply = app(OllamaService::class)->chat($messages);
+        try {
+            $reply = app(OllamaService::class)->chat($messages);
+        } catch (AiUnavailableException) {
+            $this->messages[] = ['role' => 'assistant', 'content' => 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.'];
+            $this->isLoading = false;
+            return;
+        }
 
         $this->messages[] = ['role' => 'assistant', 'content' => $reply];
         $this->insightsGenerated = true;
@@ -166,7 +174,15 @@ class AiAssistant extends Component
             $this->messages
         );
 
-        $this->messages[] = ['role' => 'assistant', 'content' => app(OllamaService::class)->chat($history)];
+        try {
+            $aiReply = app(OllamaService::class)->chat($history);
+        } catch (AiUnavailableException) {
+            $this->messages[] = ['role' => 'assistant', 'content' => 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.'];
+            $this->isLoading  = false;
+            return;
+        }
+
+        $this->messages[] = ['role' => 'assistant', 'content' => $aiReply];
         $this->isLoading  = false;
     }
 
