@@ -63,123 +63,6 @@ new class extends Component
 };
 ?>
 
-<div class="mon-wrap">
-
-    {{-- ── CARD ───────────────────────────────────────────────────── --}}
-    <div class="mon-card">
-
-        {{-- ── HEADER ─────────────────────────────────────────────── --}}
-        <div class="mon-card-header">
-            <div class="mon-card-title-group">
-                <div class="mon-card-icon">
-                    <i class="fa fa-binoculars"></i>
-                </div>
-                <div>
-                    <div class="mon-card-label">ACCOUNT MONITORING</div>
-                    <div class="mon-card-title">
-                        Sales &amp; Inventory Status
-                        <i class="fa fa-spinner fa-spin mon-spinner" wire:loading></i>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Year navigator --}}
-            <div class="mon-year-nav">
-                <button class="mon-year-btn"
-                    wire:click="$set('year', {{ (int)$this->year - 1 }})"
-                    wire:loading.attr="disabled"
-                    title="Previous year">
-                    <i class="fa fa-chevron-left"></i>
-                </button>
-                <input type="number"
-                    class="mon-year-input"
-                    wire:model.live="year"
-                    min="2000" max="2100"
-                    placeholder="Year">
-                <button class="mon-year-btn"
-                    wire:click="$set('year', {{ (int)$this->year + 1 }})"
-                    wire:loading.attr="disabled"
-                    title="Next year">
-                    <i class="fa fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-
-        {{-- ── LEGEND ──────────────────────────────────────────────── --}}
-        <div class="mon-legend">
-            <span class="mon-legend-item">
-                <span class="mon-dot mon-dot--ok"></span> Has Data
-            </span>
-            <span class="mon-legend-item">
-                <span class="mon-dot mon-dot--none"></span> No Data
-            </span>
-            <span class="mon-legend-item mon-legend-abbr">
-                <strong>S</strong> = Sales &nbsp;|&nbsp; <strong>I</strong> = Inventory
-            </span>
-        </div>
-
-        {{-- ── TABLE ──────────────────────────────────────────────── --}}
-        <div class="mon-table-wrap">
-            <table class="mon-table">
-                <thead>
-                    <tr>
-                        <th class="mon-th-sticky mon-th-account">CODE</th>
-                        <th class="mon-th-sticky mon-th-name">NAME</th>
-                        @php $currentMonth = (int) date('m'); $currentYear = date('Y'); @endphp
-                        @foreach(['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'] as $idx => $mon)
-                            @php $isCurrent = $this->year == $currentYear && $idx + 1 === $currentMonth; @endphp
-                            <th colspan="2" class="mon-th-month {{ $isCurrent ? 'mon-th-month--current' : '' }}">
-                                {{ $mon }}
-                                @if($isCurrent)<span class="mon-current-dot"></span>@endif
-                            </th>
-                        @endforeach
-                    </tr>
-                    <tr class="mon-sub-row">
-                        <th class="mon-th-sticky mon-th-account"></th>
-                        <th class="mon-th-sticky mon-th-name"></th>
-                        @foreach(range(1, 12) as $m)
-                            @php $isCurrent = $this->year == $currentYear && $m === $currentMonth; @endphp
-                            <th class="mon-th-sub {{ $isCurrent ? 'mon-th-sub--current' : '' }}">S</th>
-                            <th class="mon-th-sub {{ $isCurrent ? 'mon-th-sub--current' : '' }}">I</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($this->accounts as $account)
-                        <tr class="mon-row" wire:key="account-{{ $account->id }}">
-                            <td class="mon-td-sticky mon-td-code">{{ $account->account_code }}</td>
-                            <td class="mon-td-sticky mon-td-name">{{ $account->short_name }}</td>
-                            @for($m = 1; $m <= 12; $m++)
-                                @php $isCurrent = $this->year == $currentYear && $m === $currentMonth; @endphp
-                                <td class="mon-td {{ $isCurrent ? 'mon-td--current' : '' }}">
-                                    @if($this->checkSalesStatus($account->id, $m) === 'Has Data')
-                                        <span class="mon-badge mon-badge--ok"><i class="fa fa-check"></i></span>
-                                    @else
-                                        <span class="mon-badge mon-badge--none"><i class="fa fa-minus"></i></span>
-                                    @endif
-                                </td>
-                                <td class="mon-td {{ $isCurrent ? 'mon-td--current' : '' }}">
-                                    @if($this->checkInventoryStatus($account->id, $m) === 'Has Data')
-                                        <span class="mon-badge mon-badge--ok"><i class="fa fa-check"></i></span>
-                                    @else
-                                        <span class="mon-badge mon-badge--none"><i class="fa fa-minus"></i></span>
-                                    @endif
-                                </td>
-                            @endfor
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        {{-- ── FOOTER / PAGINATION ─────────────────────────────────── --}}
-        <div class="mon-footer">
-            {{ $this->accounts->links(data: ['scrollTo' => false]) }}
-        </div>
-
-    </div>{{-- /.mon-card --}}
-</div>
-
 @once
 <style>
 /* ── Wrapper ──────────────────────────────────────────── */
@@ -488,3 +371,120 @@ new class extends Component
 .dark-mode .mon-footer      { border-top-color: rgba(255,255,255,.06); }
 </style>
 @endonce
+
+<div class="mon-wrap">
+
+    {{-- ── CARD ───────────────────────────────────────────────────── --}}
+    <div class="mon-card">
+
+        {{-- ── HEADER ─────────────────────────────────────────────── --}}
+        <div class="mon-card-header">
+            <div class="mon-card-title-group">
+                <div class="mon-card-icon">
+                    <i class="fa fa-binoculars"></i>
+                </div>
+                <div>
+                    <div class="mon-card-label">ACCOUNT MONITORING</div>
+                    <div class="mon-card-title">
+                        Sales &amp; Inventory Status
+                        <i class="fa fa-spinner fa-spin mon-spinner" wire:loading></i>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Year navigator --}}
+            <div class="mon-year-nav">
+                <button class="mon-year-btn"
+                    wire:click="$set('year', {{ (int)$this->year - 1 }})"
+                    wire:loading.attr="disabled"
+                    title="Previous year">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+                <input type="number"
+                    class="mon-year-input"
+                    wire:model.live="year"
+                    min="2000" max="2100"
+                    placeholder="Year">
+                <button class="mon-year-btn"
+                    wire:click="$set('year', {{ (int)$this->year + 1 }})"
+                    wire:loading.attr="disabled"
+                    title="Next year">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        {{-- ── LEGEND ──────────────────────────────────────────────── --}}
+        <div class="mon-legend">
+            <span class="mon-legend-item">
+                <span class="mon-dot mon-dot--ok"></span> Has Data
+            </span>
+            <span class="mon-legend-item">
+                <span class="mon-dot mon-dot--none"></span> No Data
+            </span>
+            <span class="mon-legend-item mon-legend-abbr">
+                <strong>S</strong> = Sales &nbsp;|&nbsp; <strong>I</strong> = Inventory
+            </span>
+        </div>
+
+        {{-- ── TABLE ──────────────────────────────────────────────── --}}
+        <div class="mon-table-wrap">
+            <table class="mon-table">
+                <thead>
+                    <tr>
+                        <th class="mon-th-sticky mon-th-account">CODE</th>
+                        <th class="mon-th-sticky mon-th-name">NAME</th>
+                        @php $currentMonth = (int) date('m'); $currentYear = date('Y'); @endphp
+                        @foreach(['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'] as $idx => $mon)
+                            @php $isCurrent = $this->year == $currentYear && $idx + 1 === $currentMonth; @endphp
+                            <th colspan="2" class="mon-th-month {{ $isCurrent ? 'mon-th-month--current' : '' }}">
+                                {{ $mon }}
+                                @if($isCurrent)<span class="mon-current-dot"></span>@endif
+                            </th>
+                        @endforeach
+                    </tr>
+                    <tr class="mon-sub-row">
+                        <th class="mon-th-sticky mon-th-account"></th>
+                        <th class="mon-th-sticky mon-th-name"></th>
+                        @foreach(range(1, 12) as $m)
+                            @php $isCurrent = $this->year == $currentYear && $m === $currentMonth; @endphp
+                            <th class="mon-th-sub {{ $isCurrent ? 'mon-th-sub--current' : '' }}">S</th>
+                            <th class="mon-th-sub {{ $isCurrent ? 'mon-th-sub--current' : '' }}">I</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($this->accounts as $account)
+                        <tr class="mon-row" wire:key="account-{{ $account->id }}">
+                            <td class="mon-td-sticky mon-td-code">{{ $account->account_code }}</td>
+                            <td class="mon-td-sticky mon-td-name">{{ $account->short_name }}</td>
+                            @for($m = 1; $m <= 12; $m++)
+                                @php $isCurrent = $this->year == $currentYear && $m === $currentMonth; @endphp
+                                <td class="mon-td {{ $isCurrent ? 'mon-td--current' : '' }}">
+                                    @if($this->checkSalesStatus($account->id, $m) === 'Has Data')
+                                        <span class="mon-badge mon-badge--ok"><i class="fa fa-check"></i></span>
+                                    @else
+                                        <span class="mon-badge mon-badge--none"><i class="fa fa-minus"></i></span>
+                                    @endif
+                                </td>
+                                <td class="mon-td {{ $isCurrent ? 'mon-td--current' : '' }}">
+                                    @if($this->checkInventoryStatus($account->id, $m) === 'Has Data')
+                                        <span class="mon-badge mon-badge--ok"><i class="fa fa-check"></i></span>
+                                    @else
+                                        <span class="mon-badge mon-badge--none"><i class="fa fa-minus"></i></span>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        {{-- ── FOOTER / PAGINATION ─────────────────────────────────── --}}
+        <div class="mon-footer">
+            {{ $this->accounts->links(data: ['scrollTo' => false]) }}
+        </div>
+
+    </div>{{-- /.mon-card --}}
+</div>
