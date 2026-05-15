@@ -10,13 +10,16 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public $table_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
         $this->loadChartData();
     }
 
@@ -49,10 +52,7 @@ new class extends Component
 
     public function loadChartData(): void
     {
-        $raw = $this->getYearlySalesData($this->year);
-
-        // Group, Sum, Sort
-        $ranked = collect($raw)
+        $ranked = $this->getSalesData($this->year, $this->account_id)
             ->groupBy('sku')
             ->map(function($items) {
                 return [

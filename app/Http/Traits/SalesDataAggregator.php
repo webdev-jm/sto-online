@@ -189,6 +189,24 @@ trait SalesDataAggregator
         });
     }
 
+    protected function getSalesData(int $year, ?int $account_id = null): \Illuminate\Support\Collection
+    {
+        $data = collect($this->getYearlySalesData($year));
+        return $account_id ? $data->where('account_id', $account_id) : $data;
+    }
+
+    protected function getInventoryData(int $year, ?int $account_id = null): \Illuminate\Support\Collection
+    {
+        $data = collect($this->getYearlyInventoryData($year));
+        return $account_id ? $data->where('account_id', $account_id) : $data;
+    }
+
+    protected function getInventoryAgingData(int $year, ?int $account_id = null): \Illuminate\Support\Collection
+    {
+        $data = collect($this->getYearlyInventoryAgingData($year));
+        return $account_id ? $data->where('account_id', $account_id) : $data;
+    }
+
     private function computeRemainingDays($expiryDate): int
     {
         if (empty($expiryDate)) return 0;

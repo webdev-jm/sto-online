@@ -8,6 +8,8 @@ use Livewire\WithPagination;
 use App\Models\SMSProduct;
 use App\Models\MonthlyInventory;
 use App\Models\Sale;
+use App\Services\OllamaService;
+use App\Exceptions\AiUnavailableException;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -24,44 +26,106 @@ class Vmi extends Component
     public $year, $month, $parameter, $month_param;
     public $search;
 
+    public array $ai_recommendations = [];
+    public bool $ai_loading = false;
+    public ?string $ai_error = null;
+
     public $months_arr = [
         1 => '1 MONTH',
         2 => '2 MONTHS',
         3 => '3 MONTHS',
+        6 => '6 MONTHS',
     ];
 
-    public function updatedSearch() {
+    public function updatedSearch(): void
+    {
         $this->resetPage('inventory-page');
     }
 
-    public function updatedMonth() {
-        if($this->month > 12) {
+    public function updatedMonth(): void
+    {
+        if ($this->month > 12) {
             $this->month = 12;
-        } else if($this->month < 1) {
+        } elseif ($this->month < 1) {
             $this->month = 1;
         }
     }
 
-    public function mount($account_branch) {
+    public function mount($account_branch): void
+    {
         $this->account_branch = $account_branch;
 
         $this->year = date('Y');
-        // $this->month = date('n');
-         $this->month = 4;
+        $this->month = 4;
 
         $this->parameter = 4;
         $this->month_param = 1;
     }
 
+    public function getAiRecommendations(): void
+    {
+        $this->ai_error = null;
+        $this->ai_loading = true;
+
+        ['data' => $data] = $this->computeData();
+
+        $payload = collect($data)->map(fn($row, $pid) => [
+            'product_id'            => $pid,
+            'stock_code'            => $row['stock_code'],
+            'inventory_cs'          => $row['cs_total'],
+            'monthly_sales_cs'      => collect($row['months_data'])->pluck('sto')->values(),
+            'weeks_coverage_target' => $this->parameter,
+        ])->values()->toJson();
+
+        try {
+            $content = app(OllamaService::class)->chat([
+                [
+                    'role'    => 'system',
+                    'content' => 'You are a VMI (Vendor Managed Inventory) analyst. '
+                        . 'Given inventory and monthly sales data, return ONLY a valid JSON array '
+                        . 'with no extra text. Each element: {"product_id": <int>, "recommended_order": <number>, "reason": "<short reason>"}. '
+                        . 'Base recommendations on sales trend (acceleration/deceleration), '
+                        . 'current inventory vs target weeks of coverage, and seasonal patterns.',
+                ],
+                [
+                    'role'    => 'user',
+                    'content' => $payload,
+                ],
+            ]);
+
+            $recommendations = json_decode($content, true) ?? [];
+            $this->ai_recommendations = collect($recommendations)->keyBy('product_id')->toArray();
+        } catch (AiUnavailableException $e) {
+            $this->ai_recommendations = [];
+            $this->ai_error = 'AI service is unavailable. Please try again later.';
+        }
+
+        $this->ai_loading = false;
+    }
+
     public function render()
     {
+        ['data' => $data, 'inventories' => $inventories] = $this->computeData();
 
-        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
-        $prev_date1 = $curr_date->startOfMonth()->subMonth();
-        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
-        $prev_date2 = $curr_date->startOfMonth()->subMonth(2);
-        $curr_date = new Carbon($this->year.'-'.$this->month.'-01');
-        $prev_date3 = $curr_date->startOfMonth()->subMonth(3);
+        return view('livewire.reports.vmi')->with([
+            'data'        => $data,
+            'inventories' => $inventories,
+        ]);
+    }
+
+    private function buildPrevDates(): array
+    {
+        $prev_dates = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $d = new Carbon($this->year . '-' . $this->month . '-01');
+            $prev_dates[$i] = $d->startOfMonth()->subMonth($i);
+        }
+        return $prev_dates;
+    }
+
+    private function computeData(): array
+    {
+        $prev_dates = $this->buildPrevDates();
 
         $inventories = MonthlyInventory::select(
                 'product_id',
@@ -70,18 +134,18 @@ class Vmi extends Component
             )
             ->where('account_id', $this->account_branch->account_id)
             ->where('account_branch_id', $this->account_branch->id)
-            ->where('year', $prev_date1->year)
-            ->where('month', $prev_date1->month)
+            ->where('year', $prev_dates[1]->year)
+            ->where('month', $prev_dates[1]->month)
             ->where('total', '>', 0)
-            ->when(!empty($this->search), function($query) {
-                $query->whereExists(function($qry) {
+            ->when(!empty($this->search), function ($query) {
+                $query->whereExists(function ($qry) {
                     $qry->select(DB::raw(1))
-                        ->from(env('DB_DATABASE_2').'.products')
+                        ->from(env('DB_DATABASE_2') . '.products')
                         ->whereColumn('products.id', 'monthly_inventories.product_id')
-                        ->where(function($qry1) {
-                            $qry1->where('stock_code', 'like', '%'.$this->search.'%')
-                                ->orWhere('description', 'like', '%'.$this->search.'%')
-                                ->orWhere('size', 'like', '%'.$this->search.'%');
+                        ->where(function ($qry1) {
+                            $qry1->where('stock_code', 'like', '%' . $this->search . '%')
+                                ->orWhere('description', 'like', '%' . $this->search . '%')
+                                ->orWhere('size', 'like', '%' . $this->search . '%');
                         });
                 });
             })
@@ -89,95 +153,25 @@ class Vmi extends Component
             ->paginate(20, ['*'], 'inventory-page');
 
         $product_ids = $inventories->pluck('product_id')->toArray();
-        $products = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');
+        $products    = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');
 
-        // $months_param = [1, 2, 3];
-        // $param_data = array();
-        // foreach($months_param as $param) {
-        //     $sales = Sale::select(
-        //             'product_id',
-        //             DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
-        //             DB::raw('SUM(quantity) / '.$param.' as total')
-        //         )
-        //         ->whereIn('product_id', $product_ids)
-        //         ->where('account_id', $this->account_branch->account_id)
-        //         ->where('account_branch_id', $this->account_branch->id)
-        //         ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
-        //             for($i = 1; $i <= $param; $i++) {
-        //                 $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
-        //                     $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
-        //                         ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
-        //                 });
-        //             }
-        //         })
-        //         ->groupBy('product_id', 'uom')
-        //         ->get()
-        //         ->groupBy('product_id');
+        $months_param = [1, 2, 3, 6];
+        $param_sales  = [];
 
-        //     $data = array();
-        //     foreach($inventories as $inventory) {
-        //         if(!empty($inventory->total)) {
-        //             $product = $products->get($inventory->product_id);
-        //             $cs_total = $this->csConversion($product, $inventory->uom, $inventory->total);
-
-        //             $sales_data = $sales->get($inventory->product_id);
-
-        //             $sales_cs_total = 0;
-        //             if(!empty($sales_data)) {
-        //                 foreach($sales_data as $val) {
-        //                     $sales_cs_total += $this->csConversion($product, $val->uom, $val->total);
-        //                 }
-        //             }
-
-        //             $w_cov = 0;
-        //             if(!empty($cs_total) && !empty($sales_cs_total)) {
-        //                 $w_cov = $cs_total / $sales_cs_total;
-        //             }
-
-        //             $w_cov_needed = 0;
-        //             if(!empty($w_cov) && !empty($this->parameter)) {
-        //                 $w_cov_needed = $this->parameter - $w_cov;
-        //             }
-
-        //             $vmi = 0;
-        //             if(!empty($w_cov_needed) && !empty($sales_cs_total)) {
-        //                 $vmi = $w_cov_needed * $sales_cs_total;
-        //             }
-
-        //             $data[] = [
-        //                 'stock_code' => $product->stock_code,
-        //                 'description' => $product->description.' '.$product->size,
-        //                 'uom' => $inventory->uom,
-        //                 'total' => $inventory->total,
-        //                 'cs_total' => $cs_total,
-        //                 'sto' => $sales_cs_total ?? 0,
-        //                 'w_cov' => $w_cov,
-        //                 'w_cov_needed' => $w_cov_needed,
-        //                 'vmi' => $vmi,
-        //             ];
-        //         }
-        //     }
-
-        //     $param_data[$param] = $data;
-        // }
-
-        // Batch all sales queries upfront (3 queries total instead of 3×N)
-        $months_param = [1, 2, 3];
-        $param_sales = [];
-        foreach($months_param as $param) {
+        foreach ($months_param as $param) {
             $param_sales[$param] = Sale::select(
                     'product_id',
                     DB::raw('CASE WHEN TRIM(uom) = "CAS" THEN "CS" ELSE TRIM(uom) END as uom'),
-                    DB::raw('SUM(quantity) / '.$param.' as total')
+                    DB::raw('SUM(quantity) / ' . $param . ' as total')
                 )
                 ->whereIn('product_id', $product_ids)
                 ->where('account_id', $this->account_branch->account_id)
                 ->where('account_branch_id', $this->account_branch->id)
-                ->where(function($query) use($prev_date1, $prev_date2, $prev_date3, $param) {
-                    for($i = 1; $i <= $param; $i++) {
-                        $query->orWhere(function($qry) use($prev_date1, $prev_date2, $prev_date3, $i) {
-                            $qry->where(DB::raw('MONTH(date)'), ${'prev_date'.$i}->month)
-                                ->where(DB::raw('YEAR(date)'), ${'prev_date'.$i}->year);
+                ->where(function ($query) use ($prev_dates, $param) {
+                    for ($i = 1; $i <= $param; $i++) {
+                        $query->orWhere(function ($qry) use ($prev_dates, $i) {
+                            $qry->where(DB::raw('MONTH(date)'), $prev_dates[$i]->month)
+                                ->where(DB::raw('YEAR(date)'), $prev_dates[$i]->year);
                         });
                     }
                 })
@@ -186,61 +180,57 @@ class Vmi extends Component
                 ->groupBy('product_id');
         }
 
-        $data = array();
-        foreach($inventories as $inventory) {
-            if(!empty($inventory->total)) {
-                $product = $products->get($inventory->product_id);
+        $data = [];
+        foreach ($inventories as $inventory) {
+            if (!empty($inventory->total)) {
+                $product  = $products->get($inventory->product_id);
                 $cs_total = $this->convertUom($product, $inventory->uom, $inventory->total, 'CS');
 
-                $months_data = array();
-                foreach($months_param as $param) {
-                    $sales_data = $param_sales[$param]->get($inventory->product_id);
-
+                $months_data = [];
+                foreach ($months_param as $param) {
+                    $sales_data     = $param_sales[$param]->get($inventory->product_id);
                     $sales_cs_total = 0;
-                    if(!empty($sales_data)) {
-                        foreach($sales_data as $val) {
+
+                    if (!empty($sales_data)) {
+                        foreach ($sales_data as $val) {
                             $sales_cs_total += $this->convertUom($product, $val->uom, $val->total, 'CS');
                         }
                     }
 
                     $w_cov = 0;
-                    if(!empty($cs_total) && !empty($sales_cs_total)) {
+                    if (!empty($cs_total) && !empty($sales_cs_total)) {
                         $w_cov = $cs_total / $sales_cs_total;
                     }
 
                     $w_cov_needed = 0;
-                    if(!empty($w_cov) && !empty($this->parameter)) {
+                    if (!empty($w_cov) && !empty($this->parameter)) {
                         $w_cov_needed = $this->parameter - $w_cov;
                     }
 
                     $vmi = 0;
-                    if(!empty($w_cov_needed) && !empty($sales_cs_total)) {
+                    if (!empty($w_cov_needed) && !empty($sales_cs_total)) {
                         $vmi = $w_cov_needed * $sales_cs_total;
                     }
 
                     $months_data[$param] = [
-                        'sto' => $sales_cs_total ?? 0,
-                        'w_cov' => $w_cov,
+                        'sto'          => $sales_cs_total ?? 0,
+                        'w_cov'        => $w_cov,
                         'w_cov_needed' => $w_cov_needed,
-                        'vmi' => $vmi,
+                        'vmi'          => $vmi,
                     ];
                 }
 
                 $data[$inventory->product_id] = [
-                    'stock_code' => $product->stock_code,
-                    'description' => $product->description.' '.$product->size,
-                    'uom' => $inventory->uom,
-                    'total' => $inventory->total,
-                    'cs_total' => $cs_total,
+                    'stock_code'  => $product->stock_code,
+                    'description' => $product->description . ' ' . $product->size,
+                    'uom'         => $inventory->uom,
+                    'total'       => $inventory->total,
+                    'cs_total'    => $cs_total,
                     'months_data' => $months_data,
                 ];
             }
-
         }
 
-        return view('livewire.reports.vmi')->with([
-            'data' => $data,
-            'inventories' => $inventories
-        ]);
+        return ['data' => $data, 'inventories' => $inventories];
     }
 }

@@ -44,4 +44,16 @@ class ReportController extends Controller
     public function sto_report() {
         return view('pages.reports.sto');
     }
+
+    public function account_dashboard(): \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+    {
+        $account = $this->checkAccount();
+        if ($account instanceof \Illuminate\Http\RedirectResponse) {
+            return $account;
+        }
+
+        return view('pages.reports.account-dashboard')->with([
+            'account' => $account,
+        ]);
+    }
 }

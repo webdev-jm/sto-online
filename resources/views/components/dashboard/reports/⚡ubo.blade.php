@@ -10,13 +10,15 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
-
+        $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
@@ -50,8 +52,7 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw = $this->getYearlySalesData($this->year);
-        $collection = collect($raw)->where('customer_status', 0);
+        $collection = $this->getSalesData($this->year, $this->account_id)->where('customer_status', 0);
 
         $drilldown = [];
 
@@ -61,27 +62,31 @@ new class extends Component
                 $monthLabel = \DateTime::createFromFormat('!m', $month)->format('M');
                 $drillId    = "month_{$month}";
 
-                // Per-account UBO count for this month
-                $drilldown[] = [
-                    'id'   => $drillId,
+                $point = [
                     'name' => $monthLabel,
-                    'type' => 'column',
-                    'data' => collect($items)
-                                ->groupBy('account_name')
-                                ->map(fn($accountItems, $accountName) => [
-                                    'name' => $accountName ?: 'Unknown',
-                                    'y'    => collect($accountItems)->groupBy('customer_code')->count(),
-                                ])
-                                ->sortByDesc('y')
-                                ->values()
-                                ->toArray(),
+                    'y'    => collect($items)->groupBy('customer_code')->count(),
                 ];
 
-                return [
-                    'name'      => $monthLabel,
-                    'y'         => collect($items)->groupBy('customer_code')->count(),
-                    'drilldown' => $drillId,
-                ];
+                if (!$this->account_id) {
+                    $point['drilldown'] = $drillId;
+
+                    $drilldown[] = [
+                        'id'   => $drillId,
+                        'name' => $monthLabel,
+                        'type' => 'column',
+                        'data' => collect($items)
+                                    ->groupBy('account_name')
+                                    ->map(fn($accountItems, $accountName) => [
+                                        'name' => $accountName ?: 'Unknown',
+                                        'y'    => collect($accountItems)->groupBy('customer_code')->count(),
+                                    ])
+                                    ->sortByDesc('y')
+                                    ->values()
+                                    ->toArray(),
+                    ];
+                }
+
+                return $point;
             })
             ->values()
             ->toArray();

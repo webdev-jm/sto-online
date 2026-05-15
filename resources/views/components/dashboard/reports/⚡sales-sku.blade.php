@@ -10,12 +10,15 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
@@ -47,38 +50,42 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw = $this->getYearlySalesData($this->year);
-        $collection = collect($raw);
+        $collection = $this->getSalesData($this->year, $this->account_id);
 
         $drilldown = [];
 
         $top10 = $collection
             ->groupBy('sku')
             ->map(function ($items) use (&$drilldown) {
-                $sku       = $items->first()['sku'];
-                $fullName  = $items->first()['full_name'];
-                $drillId   = 'sku_' . md5($sku);
+                $sku      = $items->first()['sku'];
+                $fullName = $items->first()['full_name'];
+                $drillId  = 'sku_' . md5($sku);
 
-                $drilldown[] = [
-                    'id'   => $drillId,
-                    'name' => $fullName ?: $sku,
-                    'type' => 'bar',
-                    'data' => $items->groupBy('short_name')
-                                ->map(fn($i, $account) => [
-                                    'name' => $account ?: 'Unknown',
-                                    'y'    => round($i->sum('sales'), 2),
-                                ])
-                                ->sortByDesc('y')
-                                ->values()
-                                ->toArray(),
-                ];
-
-                return [
+                $point = [
                     'name'      => $sku,
                     'full_name' => $fullName,
                     'y'         => round($items->sum('sales'), 2),
-                    'drilldown' => $drillId,
                 ];
+
+                if (!$this->account_id) {
+                    $point['drilldown'] = $drillId;
+
+                    $drilldown[] = [
+                        'id'   => $drillId,
+                        'name' => $fullName ?: $sku,
+                        'type' => 'bar',
+                        'data' => $items->groupBy('short_name')
+                                    ->map(fn($i, $account) => [
+                                        'name' => $account ?: 'Unknown',
+                                        'y'    => round($i->sum('sales'), 2),
+                                    ])
+                                    ->sortByDesc('y')
+                                    ->values()
+                                    ->toArray(),
+                    ];
+                }
+
+                return $point;
             })
             ->sortByDesc('y')
             ->take(10)
