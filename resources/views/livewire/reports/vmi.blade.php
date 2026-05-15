@@ -379,6 +379,19 @@
                         <i class="fa fa-spinner fa-spin mr-1"></i> ANALYZING...
                     </span>
                 </button>
+
+                <button wire:click.prevent="exportData"
+                        wire:loading.attr="disabled"
+                        wire:target="exportData"
+                        class="btn btn-sm btn-success"
+                        style="font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:0.08em; border-radius:8px; padding:5px 11px;">
+                    <span wire:loading.remove wire:target="exportData">
+                        <i class="fa fa-download mr-1"></i> EXPORT
+                    </span>
+                    <span wire:loading wire:target="exportData">
+                        <i class="fa fa-spinner fa-spin mr-1"></i> EXPORTING...
+                    </span>
+                </button>
             </div>
 
             {{-- AI error alert --}}
