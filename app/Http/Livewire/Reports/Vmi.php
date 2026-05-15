@@ -69,23 +69,19 @@ class Vmi extends Component
 
         ['data' => $data] = $this->computeData();
 
-        $payload = collect($data)->map(fn($row, $pid) => [
-            'product_id'            => $pid,
-            'stock_code'            => $row['stock_code'],
-            'inventory_cs'          => $row['cs_total'],
-            'monthly_sales_cs'      => collect($row['months_data'])->pluck('sto')->values(),
-            'weeks_coverage_target' => $this->parameter,
-        ])->values()->toJson();
+        $round2 = fn(float $v): float => round($v, 2);
+
+        $payload = collect($data)->map(fn ($row, $pid) => [
+            'id'   => $pid,
+            'sale' => collect($row['months_data'])->pluck('sto')->map($round2)->values(),
+            'gap'  => collect($row['months_data'])->pluck('w_cov_needed')->map($round2)->values(),
+        ])->values()->toJson(JSON_UNESCAPED_UNICODE);
 
         try {
             $content = app(OllamaService::class)->chat([
                 [
                     'role'    => 'system',
-                    'content' => 'You are a VMI (Vendor Managed Inventory) analyst. '
-                        . 'Given inventory and monthly sales data, return ONLY a valid JSON array '
-                        . 'with no extra text. Each element: {"product_id": <int>, "recommended_order": <number>, "reason": "<short reason>"}. '
-                        . 'Base recommendations on sales trend (acceleration/deceleration), '
-                        . 'current inventory vs target weeks of coverage, and seasonal patterns.',
+                    'content' => 'VMI analyst. Target WOC=' . $this->parameter . '. Each item: id=product int, sale=[1mo,2mo,3mo,6mo] avg monthly sales (CS), gap=[1mo,2mo,3mo,6mo] coverage gap vs target (positive=understocked, negative=overstocked). Write a 2-3 sentence analysis per product covering stock status, sales trend, and action needed. OUTPUT: raw JSON array only, no markdown. Each element: {"product_id":<id>,"analysis":"<2-3 sentence text>"}',
                 ],
                 [
                     'role'    => 'user',
@@ -93,8 +89,9 @@ class Vmi extends Component
                 ],
             ]);
 
-            $recommendations = json_decode($content, true) ?? [];
-            $this->ai_recommendations = collect($recommendations)->keyBy('product_id')->toArray();
+            $this->ai_recommendations = collect(json_decode($content, true) ?? [])
+                ->keyBy('product_id')
+                ->toArray();
         } catch (AiUnavailableException $e) {
             $this->ai_recommendations = [];
             $this->ai_error = 'AI service is unavailable. Please try again later.';

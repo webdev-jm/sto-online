@@ -167,8 +167,9 @@ class VmiTest extends TestCase
     {
         ['branch' => $branch] = $this->setupAccountContext();
 
+        // AI returns analysis per product; with no seeded inventory the page is empty so recommendations will be [].
         $fakeResponse = json_encode([
-            ['product_id' => 1, 'recommended_order' => 10.5, 'reason' => 'Low coverage trend'],
+            ['product_id' => 1, 'analysis' => 'Understocked — coverage below target'],
         ]);
 
         $mock = $this->mock(OllamaService::class);
@@ -178,8 +179,7 @@ class VmiTest extends TestCase
             ->call('getAiRecommendations')
             ->assertSet('ai_loading', false)
             ->assertSet('ai_error', null)
-            ->assertSet('ai_recommendations.1.recommended_order', 10.5)
-            ->assertSet('ai_recommendations.1.reason', 'Low coverage trend');
+            ->assertSet('ai_recommendations.1.analysis', 'Understocked — coverage below target');
     }
 
     public function test_ai_recommendations_are_empty_when_service_unavailable(): void

@@ -35,17 +35,18 @@
         .vmi-table {
             border-collapse: separate !important;
             border-spacing: 0 !important;
-            width: 100% !important;
+            width: max-content !important;
+            min-width: 100% !important;
         }
 
         /* ── Primary headers (Month 1 / 2 / 3 / 6) ──────── */
         .vmi-table thead tr:first-child th {
             font-family: 'Syne', sans-serif !important;
             font-weight: 800 !important;
-            font-size: 0.62rem !important;
-            letter-spacing: 0.1em !important;
+            font-size: 0.56rem !important;
+            letter-spacing: 0.08em !important;
             text-transform: uppercase !important;
-            padding: 10px 8px !important;
+            padding: 6px 5px !important;
             border: none !important;
             white-space: nowrap !important;
         }
@@ -55,7 +56,7 @@
             background: rgba(0, 0, 0, 0.45) !important;
             backdrop-filter: blur(8px) !important;
             color: rgba(255, 255, 255, 0.75) !important;
-            font-size: 0.58rem !important;
+            font-size: 0.52rem !important;
             vertical-align: middle !important;
             border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
         }
@@ -64,12 +65,12 @@
         .vmi-table thead tr:last-child th {
             font-family: 'Syne', sans-serif !important;
             font-weight: 700 !important;
-            font-size: 0.55rem !important;
-            letter-spacing: 0.08em !important;
+            font-size: 0.49rem !important;
+            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
             background: rgba(0, 0, 0, 0.28) !important;
             color: rgba(255, 255, 255, 0.918) !important;
-            padding: 5px 6px !important;
+            padding: 3px 5px !important;
             border: none !important;
             white-space: nowrap !important;
         }
@@ -96,8 +97,8 @@
 
         .vmi-table tbody td {
             font-family: 'Figtree', sans-serif !important;
-            font-size: 0.78rem !important;
-            padding: 9px 10px !important;
+            font-size: 0.71rem !important;
+            padding: 5px 7px !important;
             border-color: rgba(0, 0, 0, 0.04) !important;
             vertical-align: middle !important;
             color: var(--col-dark) !important;
@@ -106,7 +107,7 @@
         /* Stock code accent */
         .vmi-table tbody td.text-accent {
             font-family: 'Syne', sans-serif !important;
-            font-size: 0.72rem !important;
+            font-size: 0.65rem !important;
             font-weight: 700 !important;
             letter-spacing: 0.04em !important;
             color: var(--col-accent) !important;
@@ -117,7 +118,17 @@
             background: rgba(10, 132, 255, 0.04) !important;
             font-weight: 700 !important;
             font-family: 'Syne', sans-serif !important;
-            font-size: 0.73rem !important;
+            font-size: 0.66rem !important;
+        }
+
+        .vmi-table tbody td.col-highlight.text-danger,
+        .vmi-table tbody td.col-ai.text-danger {
+            color: #dc3545 !important;
+        }
+
+        .vmi-table tbody td.col-highlight.text-success,
+        .vmi-table tbody td.col-ai.text-success {
+            color: #28a745 !important;
         }
 
         /* Separator on body cells too */
@@ -127,46 +138,47 @@
 
         /* ── AI reason cell ──────────────────────────────── */
         .ai-reason-cell {
-            font-size: 0.68rem !important;
+            font-size: 0.62rem !important;
             color: var(--col-subtle) !important;
-            max-width: 180px !important;
+            max-width: 260px !important;
+            min-width: 180px !important;
             white-space: normal !important;
-            line-height: 1.3 !important;
+            line-height: 1.35 !important;
         }
 
         /* ── Filter inputs ───────────────────────────────── */
         .vmi-filter-bar {
             display: flex;
             align-items: flex-end;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
 
         .vmi-filter-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
 
         .vmi-filter-label {
             font-family: 'Syne', sans-serif;
-            font-size: 0.58rem;
+            font-size: 0.52rem;
             font-weight: 700;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--col-subtle);
         }
 
         .vmi-filter-input {
-            width: 90px;
-            padding: 7px 10px;
+            width: 72px;
+            padding: 5px 8px;
             border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 10px;
+            border-radius: 8px;
             background: rgba(255, 255, 255, 0.7);
             color: var(--col-dark);
             font-family: 'Figtree', sans-serif;
-            font-size: 0.84rem;
+            font-size: 0.78rem;
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -181,9 +193,9 @@
             align-items: center;
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 10px;
-            padding: 0 10px;
-            gap: 6px;
+            border-radius: 8px;
+            padding: 0 8px;
+            gap: 5px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -202,10 +214,10 @@
             outline: none;
             background: transparent;
             font-family: 'Figtree', sans-serif;
-            font-size: 0.84rem;
+            font-size: 0.78rem;
             color: var(--col-dark);
-            padding: 8px 0;
-            width: 200px;
+            padding: 5px 0;
+            width: 160px;
         }
 
         .vmi-search-input::placeholder {
@@ -317,6 +329,14 @@
         .dark-mode .vmi-loading-overlay {
             background: rgba(10, 10, 18, 0.65);
         }
+
+        .text-danger {
+            color: var(--col-danger) !important;
+        }
+
+        .text-success {
+            color: var(--col-success) !important;
+        }
     </style>
 
     <div class="card">
@@ -327,7 +347,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-2">
 
             {{-- Filter bar --}}
             <div class="vmi-filter-bar" wire:loading.class="loading">
@@ -351,9 +371,9 @@
                 <button wire:click="getAiRecommendations"
                         wire:loading.attr="disabled"
                         class="btn btn-sm btn-warning ml-auto"
-                        style="font-family:'Syne',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; border-radius:10px; padding:8px 14px;">
+                        style="font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:0.08em; border-radius:8px; padding:5px 11px;">
                     <span wire:loading.remove wire:target="getAiRecommendations">
-                        <i class="fa fa-robot mr-1"></i> AI RECOMMEND
+                        <i class="fa fa-robot mr-1"></i> AI ANALYZE
                     </span>
                     <span wire:loading wire:target="getAiRecommendations">
                         <i class="fa fa-spinner fa-spin mr-1"></i> ANALYZING...
@@ -376,7 +396,7 @@
                 </div>
 
                 {{-- Table --}}
-                <div class="table-responsive" style="border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--glass-border);">
+                <div class="table-responsive" style="border-radius: var(--radius-sm); overflow-x: auto; overflow-y: visible; border: 1px solid var(--glass-border); -webkit-overflow-scrolling: touch;">
                     <table class="table vmi-table m-0" wire:loading.class="opacity-50">
                         <thead>
                             <tr>
@@ -388,7 +408,7 @@
                                     <th colspan="4" class="text-center bg-month-{{ $n }}">{{ $label }} AVG</th>
                                 @endforeach
 
-                                <th colspan="2" class="text-center bg-ai">AI RECOMMEND</th>
+                                <th colspan="1" class="text-center bg-ai">AI ANALYSIS</th>
                             </tr>
                             <tr>
                                 @foreach($months_arr as $n => $label)
@@ -398,8 +418,7 @@
                                     <th class="text-center col-highlight">TO ORDER</th>
                                 @endforeach
 
-                                <th class="text-center group-sep" style="background:rgba(255,214,10,0.18)!important; color:#7a5a00!important;">SUGGESTED ORDER</th>
-                                <th class="text-center" style="background:rgba(255,214,10,0.18)!important; color:#7a5a00!important;">REASON</th>
+                                <th class="text-center group-sep" style="background:rgba(255,214,10,0.18)!important; color:#7a5a00!important;">ANALYSIS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -407,24 +426,20 @@
                                 @php $p_id = $inventory->product_id; @endphp
                                 <tr>
                                     <td class="text-accent">{{ $data[$p_id]['stock_code'] }}</td>
-                                    <td class="text-truncate" style="max-width: 180px;">{{ $data[$p_id]['description'] }}</td>
+                                    <td class="text-truncate" style="max-width: 140px;">{{ $data[$p_id]['description'] }}</td>
                                     <td class="text-right font-weight-bold">{{ number_format($data[$p_id]['cs_total'], 1) }}</td>
 
                                     @foreach($data[$p_id]['months_data'] as $val)
                                         <td class="text-right group-sep">{{ number_format($val['sto'], 1) }}</td>
                                         <td class="text-right">{{ number_format($val['w_cov'], 1) }}</td>
                                         <td class="text-right text-muted">{{ number_format($val['w_cov_needed'], 1) }}</td>
-                                        <td class="text-right col-highlight {{ $val['vmi'] < 1 ? 'text-danger' : 'text-success' }}">
+                                        <td class="text-right col-highlight {{ $val['vmi'] < 0 ? 'text-danger' : 'text-success' }}">
                                             {{ number_format($val['vmi'], 1) }}
                                         </td>
                                     @endforeach
 
-                                    @php $ai = $ai_recommendations[$p_id] ?? null; @endphp
-                                    <td class="text-right col-ai group-sep {{ isset($ai['recommended_order']) && $ai['recommended_order'] < 1 ? 'text-danger' : 'text-success' }}">
-                                        {{ isset($ai['recommended_order']) ? number_format($ai['recommended_order'], 1) : '—' }}
-                                    </td>
-                                    <td class="ai-reason-cell">
-                                        {{ $ai['reason'] ?? '' }}
+                                    <td class="ai-reason-cell group-sep">
+                                        {{ $ai_recommendations[$p_id]['analysis'] ?? '' }}
                                     </td>
                                 </tr>
                             @endforeach

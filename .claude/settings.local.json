@@ -13,7 +13,16 @@
       "Bash(ls tests/Feature/Reports/)",
       "Bash(head -20 app/Models/SMSProduct.php)",
       "Bash(head -10 app/Models/MonthlyInventory.php)",
-      "Bash(xargs head -40)"
+      "Bash(xargs head -40)",
+      "Bash(dir /s /b \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sto-online\\\\resources\\\\views\\\\components\")",
+      "Bash(Get-ChildItem -Recurse -Directory -Force)",
+      "Bash(dir /s /b)",
+      "PowerShell(cd \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\centralized-app\"; Get-ChildItem -Depth 0 -Directory | Where-Object {$_.Name -ne 'vendor'} | Select-Object Name)",
+      "Skill(livewire-development)",
+      "Skill(livewire-development:*)",
+      "Bash(grep -rn \"Illuminate\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\Facades\\\\\\\\\\\\\\\\Process\" \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\centralized-app\\\\app\")",
+      "Bash(npm install *)",
+      "Bash(Select-String -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\centralized-app\\\\.env\" -Pattern \"NODE_BINARY\")"
     ]
   }
 }
