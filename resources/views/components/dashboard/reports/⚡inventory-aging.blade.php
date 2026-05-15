@@ -10,6 +10,8 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
@@ -21,8 +23,9 @@ new class extends Component
         '18+ Months'  => [13, null],
     ];
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
@@ -56,7 +59,7 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw = $this->getYearlyInventoryAgingData($this->year);
+        $raw = $this->getInventoryAgingData($this->year, $this->account_id)->all();
 
         $bucketGroups = array_map(fn() => collect(), array_flip(array_keys(self::EXPIRY_BUCKETS)));
 

@@ -13,6 +13,23 @@
             background: linear-gradient(135deg, #af52de 0%, #5e2490 100%) !important;
             color: #fff !important;
         }
+        .bg-month-6 {
+            background: linear-gradient(135deg, #ff375f 0%, #a2003e 100%) !important;
+            color: #fff !important;
+        }
+
+        /* ── AI recommendation column ────────────────────── */
+        .bg-ai {
+            background: linear-gradient(135deg, #ffd60a 0%, #ff9f0a 100%) !important;
+            color: #1a1a1a !important;
+        }
+        .col-ai {
+            background: rgba(255, 214, 10, 0.07) !important;
+            font-weight: 700 !important;
+        }
+        .dark-mode .col-ai {
+            background: rgba(255, 214, 10, 0.1) !important;
+        }
 
         /* ── Table base ──────────────────────────────────── */
         .vmi-table {
@@ -21,7 +38,7 @@
             width: 100% !important;
         }
 
-        /* ── Primary headers (Month 1 / 2 / 3) ──────────── */
+        /* ── Primary headers (Month 1 / 2 / 3 / 6) ──────── */
         .vmi-table thead tr:first-child th {
             font-family: 'Syne', sans-serif !important;
             font-weight: 800 !important;
@@ -108,6 +125,15 @@
             border-left: 1px solid rgba(0, 0, 0, 0.06) !important;
         }
 
+        /* ── AI reason cell ──────────────────────────────── */
+        .ai-reason-cell {
+            font-size: 0.68rem !important;
+            color: var(--col-subtle) !important;
+            max-width: 180px !important;
+            white-space: normal !important;
+            line-height: 1.3 !important;
+        }
+
         /* ── Filter inputs ───────────────────────────────── */
         .vmi-filter-bar {
             display: flex;
@@ -158,7 +184,6 @@
             border-radius: 10px;
             padding: 0 10px;
             gap: 6px;
-            margin-left: auto;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -248,6 +273,10 @@
             color: rgba(255, 255, 255, 0.3) !important;
         }
 
+        .dark-mode .ai-reason-cell {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
         /* ── Wire loading ────────────────────────────────── */
         .vmi-table-wrap {
             position: relative;
@@ -319,7 +348,26 @@
                     <i class="fa fa-spinner fa-spin" wire:loading style="color: var(--col-accent);"></i>
                     <input type="text" class="vmi-search-input" wire:model.live.blur="search" placeholder="Quick search..." wire:loading.attr="disabled">
                 </div>
+                <button wire:click="getAiRecommendations"
+                        wire:loading.attr="disabled"
+                        class="btn btn-sm btn-warning ml-auto"
+                        style="font-family:'Syne',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; border-radius:10px; padding:8px 14px;">
+                    <span wire:loading.remove wire:target="getAiRecommendations">
+                        <i class="fa fa-robot mr-1"></i> AI RECOMMEND
+                    </span>
+                    <span wire:loading wire:target="getAiRecommendations">
+                        <i class="fa fa-spinner fa-spin mr-1"></i> ANALYZING...
+                    </span>
+                </button>
             </div>
+
+            {{-- AI error alert --}}
+            @if($ai_error)
+                <div class="alert alert-warning alert-dismissible" style="font-size:0.8rem;">
+                    <i class="fa fa-exclamation-triangle mr-1"></i> {{ $ai_error }}
+                    <button type="button" class="close" wire:click="$set('ai_error', null)"><span>&times;</span></button>
+                </div>
+            @endif
 
             <div class="vmi-table-wrap">
                 <div wire:loading class="vmi-loading-overlay">
@@ -335,25 +383,23 @@
                                 <th rowspan="2" class="text-center align-middle px-2">STOCK CODE</th>
                                 <th rowspan="2" class="text-center align-middle px-2">DESCRIPTION</th>
                                 <th rowspan="2" class="text-center align-middle px-2">INV TOTAL CS</th>
-                                <th colspan="4" class="text-center bg-month-1">1 MONTH AVG</th>
-                                <th colspan="4" class="text-center bg-month-2">2 MONTHS AVG</th>
-                                <th colspan="4" class="text-center bg-month-3">3 MONTHS AVG</th>
+
+                                @foreach($months_arr as $n => $label)
+                                    <th colspan="4" class="text-center bg-month-{{ $n }}">{{ $label }} AVG</th>
+                                @endforeach
+
+                                <th colspan="2" class="text-center bg-ai">AI RECOMMEND</th>
                             </tr>
                             <tr>
-                                <th class="text-center group-sep">STO CS</th>
-                                <th class="text-center">WEEK COV</th>
-                                <th class="text-center">COV NEED</th>
-                                <th class="text-center col-highlight">TO ORDER</th>
+                                @foreach($months_arr as $n => $label)
+                                    <th class="text-center group-sep">STO CS</th>
+                                    <th class="text-center">WEEK COV</th>
+                                    <th class="text-center">COV NEED</th>
+                                    <th class="text-center col-highlight">TO ORDER</th>
+                                @endforeach
 
-                                <th class="text-center group-sep">STO CS</th>
-                                <th class="text-center">WEEK COV</th>
-                                <th class="text-center">COV NEED</th>
-                                <th class="text-center col-highlight">TO ORDER</th>
-
-                                <th class="text-center group-sep">STO CS</th>
-                                <th class="text-center">WEEK COV</th>
-                                <th class="text-center">COV NEED</th>
-                                <th class="text-center col-highlight">TO ORDER</th>
+                                <th class="text-center group-sep" style="background:rgba(255,214,10,0.18)!important; color:#7a5a00!important;">SUGGESTED ORDER</th>
+                                <th class="text-center" style="background:rgba(255,214,10,0.18)!important; color:#7a5a00!important;">REASON</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -372,6 +418,14 @@
                                             {{ number_format($val['vmi'], 1) }}
                                         </td>
                                     @endforeach
+
+                                    @php $ai = $ai_recommendations[$p_id] ?? null; @endphp
+                                    <td class="text-right col-ai group-sep {{ isset($ai['recommended_order']) && $ai['recommended_order'] < 1 ? 'text-danger' : 'text-success' }}">
+                                        {{ isset($ai['recommended_order']) ? number_format($ai['recommended_order'], 1) : '—' }}
+                                    </td>
+                                    <td class="ai-reason-cell">
+                                        {{ $ai['reason'] ?? '' }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

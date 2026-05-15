@@ -16,12 +16,19 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
+    public ?string $account_code = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
+        if ($account_id) {
+            $this->account_code = Account::find($account_id)?->account_code;
+        }
         $this->chartUpdated();
     }
 
@@ -81,6 +88,10 @@ new class extends Component
                 )
                 ->get();
         });
+
+        if ($this->account_code) {
+            $rows = $rows->where('account_code', $this->account_code)->values();
+        }
 
         if (!$rows->isEmpty()) {
 

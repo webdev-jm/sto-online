@@ -10,12 +10,15 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
@@ -50,8 +53,8 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw      = $this->getYearlySalesData($this->year);
-        $prev_raw = $this->getYearlySalesData($this->year - 1);
+        $raw      = $this->getSalesData($this->year, $this->account_id)->all();
+        $prev_raw = $this->getSalesData($this->year - 1, $this->account_id)->all();
 
         $monthlySums     = collect($raw)->groupBy('month')->map(fn($i) => $i->sum('sales'));
         $prevMonthlySums = collect($prev_raw)->groupBy('month')->map(fn($i) => $i->sum('sales'));
@@ -69,46 +72,52 @@ new class extends Component
                 $currDrillId = "curr_{$m}";
                 $prevDrillId = "prev_{$m}";
 
-                $currData[] = [
-                    'name'      => $monthLabel,
-                    'y'         => round($monthlySums[$m] ?? 0, 2),
-                    'drilldown' => $currDrillId,
+                $currPoint = [
+                    'name' => $monthLabel,
+                    'y'    => round($monthlySums[$m] ?? 0, 2),
                 ];
-                $prevData[] = [
-                    'name'      => $monthLabel,
-                    'y'         => round($prevMonthlySums[$m] ?? 0, 2),
-                    'drilldown' => $prevDrillId,
+                $prevPoint = [
+                    'name' => $monthLabel,
+                    'y'    => round($prevMonthlySums[$m] ?? 0, 2),
                 ];
 
-                $drilldown[] = [
-                    'id'   => $currDrillId,
-                    'name' => "{$monthLabel} {$this->year}",
-                    'type' => 'pie',          // ← change from 'column'
-                    'data' => collect($raw)
-                                ->where('month', $m)
-                                ->groupBy('account_name')
-                                ->map(fn($i, $k) => [
-                                    'name' => $k,
-                                    'y'    => round($i->sum('sales'), 2),
-                                ])
-                                ->values()
-                                ->toArray(),
-                ];
+                if (!$this->account_id) {
+                    $currPoint['drilldown'] = $currDrillId;
+                    $prevPoint['drilldown'] = $prevDrillId;
 
-                $drilldown[] = [
-                    'id'   => $prevDrillId,
-                    'name' => "{$monthLabel} " . ($this->year - 1),
-                    'type' => 'pie',          // ← change from 'column'
-                    'data' => collect($prev_raw)
-                                ->where('month', $m)
-                                ->groupBy('account_name')
-                                ->map(fn($i, $k) => [
-                                    'name' => $k,
-                                    'y'    => round($i->sum('sales'), 2),
-                                ])
-                                ->values()
-                                ->toArray(),
-                ];
+                    $drilldown[] = [
+                        'id'   => $currDrillId,
+                        'name' => "{$monthLabel} {$this->year}",
+                        'type' => 'pie',
+                        'data' => collect($raw)
+                                    ->where('month', $m)
+                                    ->groupBy('account_name')
+                                    ->map(fn($i, $k) => [
+                                        'name' => $k,
+                                        'y'    => round($i->sum('sales'), 2),
+                                    ])
+                                    ->values()
+                                    ->toArray(),
+                    ];
+
+                    $drilldown[] = [
+                        'id'   => $prevDrillId,
+                        'name' => "{$monthLabel} " . ($this->year - 1),
+                        'type' => 'pie',
+                        'data' => collect($prev_raw)
+                                    ->where('month', $m)
+                                    ->groupBy('account_name')
+                                    ->map(fn($i, $k) => [
+                                        'name' => $k,
+                                        'y'    => round($i->sum('sales'), 2),
+                                    ])
+                                    ->values()
+                                    ->toArray(),
+                    ];
+                }
+
+                $currData[] = $currPoint;
+                $prevData[] = $prevPoint;
             }
         }
 

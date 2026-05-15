@@ -14,9 +14,14 @@
                 </span>
             </div>
         </div>
-        <a href="/home" class="btn-change-branch">
-            <i class="fa fa-user mr-2"></i>Change Account
-        </a>
+        <div>
+            <a href="/home" class="btn-change-branch">
+                <i class="fa fa-user mr-2"></i>Change Account
+            </a>
+            <a href="{{ route('report.account-dashboard') }}" class="btn-change-branch">
+                <i class="fa fa-tachometer-alt mr-2"></i>View Dashboard
+            </a>
+        </div>
     </div>
 @stop
 

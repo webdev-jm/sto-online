@@ -16,6 +16,8 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $table_data     = [];
     public $raw_table_data = [];
     public $products;
@@ -23,8 +25,9 @@ new class extends Component
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
 
         $this->products = Cache::remember('products_cache', 60 * 60, function () {
             return SMSProduct::get()->keyBy('stock_code');
@@ -88,6 +91,9 @@ new class extends Component
         $raw       = Cache::remember($cache_key, 60 * 15, fn() => $this->getYearlyInventoryData($this->year));
 
         $inventories = collect($raw);
+        if ($this->account_id) {
+            $inventories = $inventories->where('account_id', $this->account_id);
+        }
 
         $api_url   = config('services.sysprodata.url');
         $api_token = config('services.sysprodata.token');

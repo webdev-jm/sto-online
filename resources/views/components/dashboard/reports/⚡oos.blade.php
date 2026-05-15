@@ -12,15 +12,16 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $table_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
+        $this->account_id = $account_id;
         $this->chartUpdated();
-
-
     }
 
     public function updatedYear(): void
@@ -54,7 +55,7 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $inventoryData = collect($this->getYearlyInventoryData($this->year));
+        $inventoryData = $this->getInventoryData($this->year, $this->account_id);
 
         $accountMetaByCode = $inventoryData
             ->groupBy('account_code')

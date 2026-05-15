@@ -10,13 +10,15 @@ new class extends Component
 
     #[Reactive]
     public $year;
+    #[Reactive]
+    public ?int $account_id = null;
     public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
-    public function mount($year) {
+    public function mount($year, $account_id = null): void {
         $this->year = $year;
-
+        $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
@@ -48,8 +50,7 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw = $this->getYearlySalesData($this->year);
-        $collection = collect($raw);
+        $collection = $this->getSalesData($this->year, $this->account_id);
 
         $total_sales = $collection->sum('sales');
 
@@ -65,26 +66,30 @@ new class extends Component
                 $first   = $items->first();
                 $drillId = 'channel_' . md5($first['channel_code']);
 
-                // Build per-account drilldown for this channel
-                $drilldown[] = [
-                    'id'   => $drillId,
+                $point = [
                     'name' => $first['channel_code'],
-                    'type' => 'column',
-                    'data' => $items->groupBy('short_name')
-                                ->map(fn($i, $account) => [
-                                    'name' => $account ?: 'Unknown',
-                                    'y'    => round($i->sum('sales'), 2),
-                                ])
-                                ->sortByDesc('y')
-                                ->values()
-                                ->toArray(),
+                    'y'    => (float) $items->sum('sales'),
                 ];
 
-                return [
-                    'name'      => $first['channel_code'],
-                    'y'         => (float) $items->sum('sales'),
-                    'drilldown' => $drillId,
-                ];
+                if (!$this->account_id) {
+                    $point['drilldown'] = $drillId;
+
+                    $drilldown[] = [
+                        'id'   => $drillId,
+                        'name' => $first['channel_code'],
+                        'type' => 'column',
+                        'data' => $items->groupBy('short_name')
+                                    ->map(fn($i, $account) => [
+                                        'name' => $account ?: 'Unknown',
+                                        'y'    => round($i->sum('sales'), 2),
+                                    ])
+                                    ->sortByDesc('y')
+                                    ->values()
+                                    ->toArray(),
+                    ];
+                }
+
+                return $point;
             })
             ->values()
             ->toArray();
