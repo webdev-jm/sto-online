@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -38,10 +38,13 @@ new class extends Component
     public function generateInsight(): void
     {
         $this->loadingInsight = true;
-        $this->insight = app(\App\Services\OllamaService::class)->chat([
-            ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
-            ['role' => 'user',   'content' => $this->buildInsightSummary()],
-        ]);
+        try {
+            $this->insight = app(\App\Services\OllamaService::class)->chat([
+                ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given chart data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+                ['role' => 'user',   'content' => $this->buildInsightSummary()],
+            ]);
+        } catch (\App\Exceptions\AiUnavailableException) {
+        }
         $this->loadingInsight = false;
     }
 
