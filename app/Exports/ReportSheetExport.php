@@ -14,17 +14,19 @@ class ReportSheetExport implements FromQuery, WithTitle, WithHeadings, WithCusto
     protected $tableName;
     protected $sheetTitle;
     protected $year;
+    protected $connection;
 
-    public function __construct(string $tableName, string $sheetTitle, int $year)
+    public function __construct(string $tableName, string $sheetTitle, int $year, string $connection = 'sqlite_reports')
     {
-        $this->tableName = $tableName;
+        $this->tableName  = $tableName;
         $this->sheetTitle = $sheetTitle;
-        $this->year = $year;
+        $this->year       = $year;
+        $this->connection = $connection;
     }
 
     public function query()
     {
-        return DB::connection('sqlite_reports')
+        return DB::connection($this->connection)
             ->table($this->tableName)
             ->where('year', $this->year)
             ->orderBy('id');
@@ -32,8 +34,7 @@ class ReportSheetExport implements FromQuery, WithTitle, WithHeadings, WithCusto
 
     public function headings(): array
     {
-        // Get column names from the first record
-        $firstRecord = DB::connection('sqlite_reports')
+        $firstRecord = DB::connection($this->connection)
             ->table($this->tableName)
             ->where('year', $this->year)
             ->first();

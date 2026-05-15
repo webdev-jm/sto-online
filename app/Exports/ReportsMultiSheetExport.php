@@ -19,7 +19,7 @@ class ReportsMultiSheetExport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            new ReportSheetExport('sales_data', 'Sales Data', $this->year),
+            new ReportSheetExport('consolidated_sales_reports', 'Sales Data', $this->year, 'mysql'),
             new ReportSheetExport('inventory_data', 'Inventory Data', $this->year),
             new ReportSheetExport('inventory_aging', 'Inventory Aging', $this->year),
         ];
