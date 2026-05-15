@@ -5,7 +5,6 @@ namespace App\Http\Traits;
 use App\Models\Account;
 use App\Models\AccountBranch;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Traits\GenerateMonthlyInventory;
 
 trait ConsolidateAccountData
@@ -37,16 +36,8 @@ trait ConsolidateAccountData
 
                 $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
 
-                $filename = sprintf(
-                    'reports/consolidated_account_data-%s-%s-%s.json',
-                    $account->account_code, $y, $m
-                );
-                Storage::disk('local')->put(
-                    $filename,
-                    json_encode($allConsolidatedData, JSON_PRETTY_PRINT)
-                );
-
-                $this->importToSqlite($account, $y, $m, $allConsolidatedData);
+                $this->importSalesDataToMysql($account, $y, $m, $allConsolidatedData);
+                $this->importInventoryDataToSqlite($account, $y, $m, $allConsolidatedData);
             }
         }
     }
@@ -58,34 +49,6 @@ trait ConsolidateAccountData
     private function initSqliteSchema(): void
     {
         $sqlite = DB::connection('sqlite_reports');
-
-        $sqlite->statement('CREATE TABLE IF NOT EXISTS sales_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            account_code TEXT,
-            account_name TEXT,
-            area TEXT,
-            customer_code TEXT,
-            customer_name TEXT,
-            city TEXT,
-            province TEXT,
-            salesman_code TEXT,
-            salesman_name TEXT,
-            salesman_type TEXT,
-            location_code TEXT,
-            location_name TEXT,
-            channel_code TEXT,
-            channel_name TEXT,
-            customer_status INTEGER,
-            stock_code TEXT,
-            description TEXT,
-            size TEXT,
-            brand TEXT,
-            uom TEXT,
-            year INTEGER,
-            month INTEGER,
-            quantity REAL DEFAULT 0,
-            sales REAL DEFAULT 0
-        )');
 
         $sqlite->statement('CREATE TABLE IF NOT EXISTS inventory_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,25 +80,82 @@ trait ConsolidateAccountData
             month INTEGER
         )');
 
-        // Indexes for common query patterns
-        $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_sales_year_month ON sales_data (year, month)');
-        $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_sales_customer ON sales_data (customer_code, customer_status)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_inventory_year_month ON inventory_data (year, month)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_aging_stock ON inventory_aging (stock_code, expiry_date)');
     }
 
-    private function importToSqlite(Account $account, int $year, int $month, array $data): void
+    private function importSalesDataToMysql(Account $account, int $year, int $month, array $data): void
+    {
+        $rows = collect($data['sales_data'] ?? [])
+            ->map(fn($row) => [
+                'account_code'         => $account->account_code,
+                'account_name'         => $account->account_name,
+                'account_description'  => null,
+                'area'                 => $account->area,
+                'customer_code'        => $row->customer_code   ?? '',
+                'customer_name'        => $row->customer_name   ?? null,
+                'province'             => $row->province        ?? null,
+                'city'                 => $row->city            ?? null,
+                'brgy'                 => null,
+                'salesman_code'        => $row->salesman_code   ?? null,
+                'salesman_name'        => $row->salesman_name   ?? null,
+                'salesman_type'        => $row->salesman_type   ?? null,
+                'location_code'        => $row->location_code   ?? null,
+                'location_name'        => $row->location_name   ?? null,
+                'channel_code'         => $row->channel_code    ?? null,
+                'channel_name'         => $row->channel_name    ?? null,
+                'customer_status'      => $row->customer_status ?? 0,
+                'year'                 => $year,
+                'month'                => $month,
+                'stock_code'           => $row->stock_code      ?? null,
+                'description'          => $row->description     ?? null,
+                'size'                 => $row->size            ?? null,
+                'brand_classification' => null,
+                'brand'                => $row->brand           ?? null,
+                'category'             => null,
+                'uom'                  => $row->uom             ?? null,
+                'quantity'             => (float) ($row->quantity      ?? 0),
+                'sales'                => (float) ($row->sales         ?? 0),
+                'fg_quantity'          => (float) ($row->fg_quantity   ?? 0),
+                'fg_sales'             => (float) ($row->fg_sales      ?? 0),
+                'promo_quantity'       => (float) ($row->promo_quantity ?? 0),
+                'promo_sales'          => (float) ($row->promo_sales   ?? 0),
+                'credit_memo'          => (float) ($row->credit_memo   ?? 0),
+                'parked_quantity'      => null,
+                'parked_amount'        => null,
+                'created_at'           => now(),
+                'updated_at'           => now(),
+            ])
+            ->all();
+
+        $uniqueBy = ['account_code', 'year', 'month', 'customer_code', 'stock_code', 'uom'];
+
+        $updateColumns = [
+            'account_name', 'account_description', 'area',
+            'customer_name', 'province', 'city', 'brgy',
+            'salesman_code', 'salesman_name', 'salesman_type',
+            'location_code', 'location_name', 'channel_code', 'channel_name', 'customer_status',
+            'description', 'size', 'brand_classification', 'brand', 'category',
+            'quantity', 'sales', 'fg_quantity', 'fg_sales',
+            'promo_quantity', 'promo_sales', 'credit_memo',
+            'parked_quantity', 'parked_amount', 'updated_at',
+        ];
+
+        collect($rows)
+            ->chunk(500)
+            ->each(fn($chunk) =>
+                DB::connection('mysql')
+                    ->table('consolidated_sales_reports')
+                    ->upsert($chunk->values()->all(), $uniqueBy, $updateColumns)
+            );
+    }
+
+    private function importInventoryDataToSqlite(Account $account, int $year, int $month, array $data): void
     {
         $sqlite = DB::connection('sqlite_reports');
 
-        // SQLite max variables = 999, chunk = floor(999 / column_count)
-        $salesChunk     = floor(999 / 24); // 41
         $inventoryChunk = floor(999 / 10); // 99
         $agingChunk     = floor(999 / 11); // 90
-
-        $sqlite->table('sales_data')
-            ->where('account_code', $account->account_code)
-            ->where('year', $year)->where('month', $month)->delete();
 
         $sqlite->table('inventory_data')
             ->where('account_code', $account->account_code)
@@ -144,38 +164,6 @@ trait ConsolidateAccountData
         $sqlite->table('inventory_aging')
             ->where('account_code', $account->account_code)
             ->where('year', $year)->where('month', $month)->delete();
-
-        // sales_data — 24 columns
-        collect($data['sales_data'] ?? [])
-            ->chunk($salesChunk)
-            ->each(fn($chunk) => $sqlite->table('sales_data')->insert(
-                $chunk->map(fn($row) => [
-                    'account_code'    => $account->account_code,
-                    'account_name'    => $account->account_name,
-                    'area'            => $account->area,
-                    'customer_code'   => $row->customer_code   ?? null,
-                    'customer_name'   => $row->customer_name   ?? null,
-                    'city'            => $row->city            ?? null,
-                    'province'        => $row->province        ?? null,
-                    'salesman_code'   => $row->salesman_code   ?? null,
-                    'salesman_name'   => $row->salesman_name   ?? null,
-                    'salesman_type'   => $row->salesman_type   ?? null,
-                    'location_code'   => $row->location_code   ?? null,
-                    'location_name'   => $row->location_name   ?? null,
-                    'channel_code'    => $row->channel_code    ?? null,
-                    'channel_name'    => $row->channel_name    ?? null,
-                    'customer_status' => $row->customer_status ?? 0,
-                    'stock_code'      => $row->stock_code      ?? null,
-                    'description'     => $row->description     ?? null,
-                    'size'            => $row->size            ?? null,
-                    'brand'           => $row->brand           ?? null,
-                    'uom'             => $row->uom             ?? null,
-                    'year'            => $year,
-                    'month'           => $month,
-                    'quantity'        => (float) ($row->quantity ?? 0),
-                    'sales'           => (float) ($row->sales   ?? 0),
-                ])->all()
-            ));
 
         // inventory_data — 10 columns
         collect($data['inventory_data'] ?? [])
@@ -250,6 +238,9 @@ trait ConsolidateAccountData
                 'sr.year', 'sr.month',
                 'sr.stock_code', 'sr.description', 'sr.size',
                 'sr.brand', 'sr.uom', 'sr.quantity', 'sr.sales',
+                'sr.fg_quantity', 'sr.fg_sales',
+                'sr.promo_quantity', 'sr.promo_sales',
+                'sr.credit_memo',
             ])
             ->leftJoin('customers as c', 'c.id', '=', 'sr.customer_id')
             ->leftJoin($mysqlDb . '.channels as ch', 'ch.id', '=', 'c.channel_id')

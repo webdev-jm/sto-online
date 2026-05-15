@@ -16,10 +16,10 @@ trait SalesDataAggregator
     {
         return Cache::remember("sales_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
-            $sqlite = DB::connection('sqlite_reports');
+            $mysql = DB::connection('mysql');
 
             // Pull distinct stock codes for price calculation
-            $stockCodes = $sqlite->table('sales_data')
+            $stockCodes = $mysql->table('consolidated_sales_reports')
                 ->where('year', $year)
                 ->distinct()
                 ->pluck('stock_code');
@@ -60,8 +60,8 @@ trait SalesDataAggregator
                 }
             }
 
-            // Query SQLite — one query for the entire year
-            $rows = $sqlite->table('sales_data')
+            // Query MySQL — one query for the entire year
+            $rows = $mysql->table('consolidated_sales_reports')
                 ->where('year', $year)
                 ->get();
 
