@@ -14,7 +14,10 @@ use App\Exceptions\AiUnavailableException;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+use App\Exports\VmiReportExport;
 use App\Http\Traits\UomConversionTrait;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Vmi extends Component
 {
@@ -100,6 +103,16 @@ class Vmi extends Component
         $this->ai_loading = false;
     }
 
+    public function exportData(): BinaryFileResponse
+    {
+        ['data' => $data] = $this->computeData(paginate: false);
+
+        return Excel::download(
+            new VmiReportExport($data, $this->months_arr, $this->year, $this->month, $this->parameter),
+            'STO VMI Report-' . time() . '.xlsx'
+        );
+    }
+
     public function render()
     {
         ['data' => $data, 'inventories' => $inventories] = $this->computeData();
@@ -120,7 +133,7 @@ class Vmi extends Component
         return $prev_dates;
     }
 
-    private function computeData(): array
+    private function computeData(bool $paginate = true): array
     {
         $prev_dates = $this->buildPrevDates();
 
@@ -147,7 +160,11 @@ class Vmi extends Component
                 });
             })
             ->groupBy('product_id', 'uom')
-            ->paginate(20, ['*'], 'inventory-page');
+            ->when(
+                $paginate,
+                fn ($q) => $q->paginate(20, ['*'], 'inventory-page'),
+                fn ($q) => $q->get()
+            );
 
         $product_ids = $inventories->pluck('product_id')->toArray();
         $products    = SMSProduct::whereIn('id', $product_ids)->get()->keyBy('id');

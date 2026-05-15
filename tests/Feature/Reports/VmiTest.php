@@ -195,4 +195,13 @@ class VmiTest extends TestCase
             ->assertSet('ai_recommendations', [])
             ->assertSet('ai_error', 'AI service is unavailable. Please try again later.');
     }
+
+    public function test_export_data_returns_excel_download(): void
+    {
+        ['branch' => $branch] = $this->setupAccountContext();
+
+        Livewire::test(Vmi::class, ['account_branch' => $branch])
+            ->call('exportData')
+            ->assertFileDownloaded();
+    }
 }
