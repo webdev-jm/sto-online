@@ -32,7 +32,7 @@ class Customer extends Model
     ];
 
     public function getConnectionName() {
-        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+        return auth()->check() ? auth()->user()->account?->db_data?->connection_name : null;
     }
 
     public function account() {
@@ -65,5 +65,17 @@ class Customer extends Model
 
     public function ubo_detail() {
         return $this->hasMany('App\Models\CustomerUboDetail');
+    }
+
+    public function locationProvince() {
+        return $this->belongsTo('App\Models\Province', 'province_id');
+    }
+
+    public function locationMunicipality() {
+        return $this->belongsTo('App\Models\Municipality', 'municipality_id');
+    }
+
+    public function locationBarangay() {
+        return $this->belongsTo('App\Models\Barangay', 'barangay_id');
     }
 }

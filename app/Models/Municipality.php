@@ -9,6 +9,8 @@ class Municipality extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'province_id',
         'municipality_name'

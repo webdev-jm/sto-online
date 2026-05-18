@@ -8,6 +8,10 @@ use App\Models\SalesmanCustomer;
 use App\Models\Channel;
 use App\Models\CustomerUbo;
 use App\Models\CustomerUboDetail;
+use App\Models\Region;
+use App\Models\Province;
+use App\Models\Municipality;
+use App\Models\Barangay;
 
 use App\Models\SMSAccount;
 use App\Models\AccountBranch;
@@ -238,11 +242,14 @@ class CustomerController extends Controller
             $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
         }
 
+        $regions = Region::orderBy('region_name')->get(['id', 'region_name']);
+
         return view('pages.customers.create')->with([
             'account' => $account,
             'account_branch' => $account_branch,
             'salesmen' => $salesmen_arr,
-            'channels' => $channel_arr
+            'channels' => $channel_arr,
+            'regions' => $regions,
         ]);
     }
 
@@ -261,18 +268,21 @@ class CustomerController extends Controller
         $account = Session::get('account');
 
         $customer = new Customer([
-            'account_id' => $account->id,
+            'account_id'        => $account->id,
             'account_branch_id' => $account_branch->id,
-            'salesman_id' => $request->salesman_id,
-            'channel_id' => $request->channel_id,
-            'code' => $request->code,
-            'name' => $request->name,
-            'address' => $request->address,
-            'street' => $request->street,
-            'brgy' => $request->barangay,
-            'city' => $request->city,
-            'province' => $request->province,
-            'postal_code' => $request->postal_code,
+            'salesman_id'       => $request->salesman_id,
+            'channel_id'        => $request->channel_id,
+            'province_id'       => $request->province_id,
+            'municipality_id'   => $request->municipality_id,
+            'barangay_id'       => $request->barangay_id,
+            'code'              => $request->code,
+            'name'              => $request->name,
+            'address'           => $request->address,
+            'street'            => $request->street,
+            'brgy'              => Barangay::find($request->barangay_id)?->barangay_name,
+            'city'              => Municipality::find($request->municipality_id)?->municipality_name,
+            'province'          => Province::find($request->province_id)?->province_name,
+            'postal_code'       => $request->postal_code,
         ]);
         $customer->save();
 
@@ -333,7 +343,7 @@ class CustomerController extends Controller
         }
         $account = Session::get('account');
 
-        $customer = Customer::findOrFail(decrypt($id));
+        $customer = Customer::with('locationProvince.region')->findOrFail(decrypt($id));
 
         // SALESMEN OPTIONS
         $salesmen = Salesman::where('account_id', $account->id)->get();
@@ -349,12 +359,15 @@ class CustomerController extends Controller
             $channel_arr[$channel->id] = '['.$channel->code.'] '.$channel->name;
         }
 
+        $regions = Region::orderBy('region_name')->get(['id', 'region_name']);
+
         return view('pages.customers.edit')->with([
-            'account' => $account,
+            'account'        => $account,
             'account_branch' => $account_branch,
-            'customer' => $customer,
-            'salesmen' => $salesmen_arr,
-            'channels' => $channel_arr
+            'customer'       => $customer,
+            'salesmen'       => $salesmen_arr,
+            'channels'       => $channel_arr,
+            'regions'        => $regions,
         ]);
     }
 
@@ -399,18 +412,20 @@ class CustomerController extends Controller
         }
 
         $customer->update([
-            'area_id' => $request->area_id,
-            'channel_id' => $request->channel_id,
-            'salesman_id' => $request->salesman_id,
-            'channel_id' => $request->channel_id,
-            'code' => $request->code,
-            'name' => $request->name,
-            'address' => $request->address,
-            'street' => $request->street,
-            'brgy' => $request->barangay,
-            'city' => $request->city,
-            'province' => $request->province,
-            'postal_code' => $request->postal_code
+            'area_id'         => $request->area_id,
+            'channel_id'      => $request->channel_id,
+            'salesman_id'     => $request->salesman_id,
+            'province_id'     => $request->province_id,
+            'municipality_id' => $request->municipality_id,
+            'barangay_id'     => $request->barangay_id,
+            'code'            => $request->code,
+            'name'            => $request->name,
+            'address'         => $request->address,
+            'street'          => $request->street,
+            'brgy'            => Barangay::find($request->barangay_id)?->barangay_name,
+            'city'            => Municipality::find($request->municipality_id)?->municipality_name,
+            'province'        => Province::find($request->province_id)?->province_name,
+            'postal_code'     => $request->postal_code,
         ]);
 
         $changes_arr['changes'] = $customer->getChanges();
@@ -558,5 +573,42 @@ class CustomerController extends Controller
 
     public function uboJobRun() {
 
+    }
+
+    /**
+     * Return district and area info for a salesman (used by customer form AJAX).
+     */
+    public function salesmanInfo(int $id): \Illuminate\Http\JsonResponse
+    {
+        $salesman = Salesman::with('district.areas')->findOrFail($id);
+
+        return response()->json([
+            'district_code' => $salesman->district?->district_code,
+            'areas'         => $salesman->district?->areas
+                ->map(fn($area) => ['code' => $area->code, 'name' => $area->name])
+                ->values()
+                ->toArray() ?? [],
+        ]);
+    }
+
+    public function locationProvinces(int $regionId): \Illuminate\Http\JsonResponse
+    {
+        return response()->json(
+            Province::where('region_id', $regionId)->orderBy('province_name')->get(['id', 'province_name'])
+        );
+    }
+
+    public function locationMunicipalities(int $provinceId): \Illuminate\Http\JsonResponse
+    {
+        return response()->json(
+            Municipality::where('province_id', $provinceId)->orderBy('municipality_name')->get(['id', 'municipality_name'])
+        );
+    }
+
+    public function locationBarangays(int $municipalityId): \Illuminate\Http\JsonResponse
+    {
+        return response()->json(
+            Barangay::where('municipality_id', $municipalityId)->orderBy('barangay_name')->get(['id', 'barangay_name'])
+        );
     }
 }

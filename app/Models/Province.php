@@ -9,6 +9,8 @@ class Province extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'region_id',
         'province_name',
