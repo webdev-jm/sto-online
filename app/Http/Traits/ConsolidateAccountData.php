@@ -83,17 +83,15 @@ trait ConsolidateAccountData
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_inventory_year_month ON inventory_data (year, month)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_aging_stock ON inventory_aging (stock_code, expiry_date)');
 
-        $sqlite->statement('CREATE TABLE IF NOT EXISTS consolidated_sales_reports (
+        $sqlite->statement('CREATE TABLE IF NOT EXISTS sales_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             account_code TEXT NOT NULL,
-            account_name TEXT NOT NULL,
-            account_description TEXT,
+            account_name TEXT,
             area TEXT,
-            customer_code TEXT NOT NULL,
+            customer_code TEXT,
             customer_name TEXT,
-            province TEXT,
             city TEXT,
-            brgy TEXT,
+            province TEXT,
             salesman_code TEXT,
             salesman_name TEXT,
             salesman_type TEXT,
@@ -104,40 +102,21 @@ trait ConsolidateAccountData
             customer_status INTEGER DEFAULT 0,
             year INTEGER NOT NULL,
             month INTEGER NOT NULL,
-            stock_code TEXT NOT NULL,
+            stock_code TEXT,
             description TEXT,
             size TEXT,
-            brand_classification TEXT,
             brand TEXT,
-            category TEXT,
-            uom TEXT NOT NULL,
+            uom TEXT,
             quantity REAL DEFAULT 0,
-            sales REAL DEFAULT 0,
-            fg_quantity REAL,
-            fg_sales REAL,
-            promo_quantity REAL,
-            promo_sales REAL,
-            credit_memo REAL,
-            parked_quantity REAL,
-            parked_amount REAL,
-            created_at TEXT,
-            updated_at TEXT
+            sales REAL DEFAULT 0
         )');
-
-        foreach (['area', 'salesman_code', 'salesman_name', 'salesman_type', 'location_code', 'location_name', 'channel_code', 'channel_name', 'customer_status', 'created_at', 'updated_at'] as $col) {
-            try {
-                $sqlite->statement("ALTER TABLE consolidated_sales_reports ADD COLUMN {$col} TEXT");
-            } catch (\Exception $e) {
-                // Column already exists — safe to ignore
-            }
-        }
     }
 
     private function importSalesDataToSqlite(Account $account, int $year, int $month, array $data): void
     {
         $sqlite = DB::connection('sqlite_reports');
 
-        $sqlite->table('consolidated_sales_reports')
+        $sqlite->table('sales_data')
             ->where('account_code', $account->account_code)
             ->where('year', $year)
             ->where('month', $month)
@@ -145,49 +124,36 @@ trait ConsolidateAccountData
 
         $rows = collect($data['sales_data'] ?? [])
             ->map(fn($row) => [
-                'account_code'         => $account->account_code,
-                'account_name'         => $account->account_name,
-                'account_description'  => '',
-                'area'                 => $account->area,
-                'customer_code'        => $row->customer_code   ?? '',
-                'customer_name'        => $row->customer_name   ?? null,
-                'province'             => $row->province        ?? null,
-                'city'                 => $row->city            ?? null,
-                'brgy'                 => null,
-                'salesman_code'        => $row->salesman_code   ?? null,
-                'salesman_name'        => $row->salesman_name   ?? null,
-                'salesman_type'        => $row->salesman_type   ?? null,
-                'location_code'        => $row->location_code   ?? null,
-                'location_name'        => $row->location_name   ?? null,
-                'channel_code'         => $row->channel_code    ?? null,
-                'channel_name'         => $row->channel_name    ?? null,
-                'customer_status'      => $row->customer_status ?? 0,
-                'year'                 => $year,
-                'month'                => $month,
-                'stock_code'           => $row->stock_code      ?? null,
-                'description'          => $row->description     ?? null,
-                'size'                 => $row->size            ?? null,
-                'brand_classification' => null,
-                'brand'                => $row->brand           ?? null,
-                'category'             => null,
-                'uom'                  => $row->uom             ?? null,
-                'quantity'             => (float) ($row->quantity      ?? 0),
-                'sales'                => (float) ($row->sales         ?? 0),
-                'fg_quantity'          => (float) ($row->fg_quantity   ?? 0),
-                'fg_sales'             => (float) ($row->fg_sales      ?? 0),
-                'promo_quantity'       => (float) ($row->promo_quantity ?? 0),
-                'promo_sales'          => (float) ($row->promo_sales   ?? 0),
-                'credit_memo'          => (float) ($row->credit_memo   ?? 0),
-                'parked_quantity'      => null,
-                'parked_amount'        => null,
-                'created_at'           => now(),
-                'updated_at'           => now(),
+                'account_code'    => $account->account_code,
+                'account_name'    => $account->account_name,
+                'area'            => $account->area,
+                'customer_code'   => $row->customer_code   ?? '',
+                'customer_name'   => $row->customer_name   ?? null,
+                'city'            => $row->city            ?? null,
+                'province'        => $row->province        ?? null,
+                'salesman_code'   => $row->salesman_code   ?? null,
+                'salesman_name'   => $row->salesman_name   ?? null,
+                'salesman_type'   => $row->salesman_type   ?? null,
+                'location_code'   => $row->location_code   ?? null,
+                'location_name'   => $row->location_name   ?? null,
+                'channel_code'    => $row->channel_code    ?? null,
+                'channel_name'    => $row->channel_name    ?? null,
+                'customer_status' => $row->customer_status ?? 0,
+                'year'            => $year,
+                'month'           => $month,
+                'stock_code'      => $row->stock_code      ?? null,
+                'description'     => $row->description     ?? null,
+                'size'            => $row->size            ?? null,
+                'brand'           => $row->brand           ?? null,
+                'uom'             => $row->uom             ?? null,
+                'quantity'        => (float) ($row->quantity ?? 0),
+                'sales'           => (float) ($row->sales   ?? 0),
             ])
             ->all();
 
         collect($rows)
             ->chunk(500)
-            ->each(fn($chunk) => $sqlite->table('consolidated_sales_reports')->insert($chunk->values()->all()));
+            ->each(fn($chunk) => $sqlite->table('sales_data')->insert($chunk->values()->all()));
     }
 
     private function importInventoryDataToSqlite(Account $account, int $year, int $month, array $data): void
