@@ -36,7 +36,7 @@ trait ConsolidateAccountData
 
                 $allConsolidatedData = $this->consolidateAccountData($account, $y, $m);
 
-                $this->importSalesDataToMysql($account, $y, $m, $allConsolidatedData);
+                $this->importSalesDataToSqlite($account, $y, $m, $allConsolidatedData);
                 $this->importInventoryDataToSqlite($account, $y, $m, $allConsolidatedData);
             }
         }
@@ -82,15 +82,72 @@ trait ConsolidateAccountData
 
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_inventory_year_month ON inventory_data (year, month)');
         $sqlite->statement('CREATE INDEX IF NOT EXISTS idx_aging_stock ON inventory_aging (stock_code, expiry_date)');
+
+        $sqlite->statement('CREATE TABLE IF NOT EXISTS consolidated_sales_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_code TEXT NOT NULL,
+            account_name TEXT NOT NULL,
+            account_description TEXT,
+            area TEXT,
+            customer_code TEXT NOT NULL,
+            customer_name TEXT,
+            province TEXT,
+            city TEXT,
+            brgy TEXT,
+            salesman_code TEXT,
+            salesman_name TEXT,
+            salesman_type TEXT,
+            location_code TEXT,
+            location_name TEXT,
+            channel_code TEXT,
+            channel_name TEXT,
+            customer_status INTEGER DEFAULT 0,
+            year INTEGER NOT NULL,
+            month INTEGER NOT NULL,
+            stock_code TEXT NOT NULL,
+            description TEXT,
+            size TEXT,
+            brand_classification TEXT,
+            brand TEXT,
+            category TEXT,
+            uom TEXT NOT NULL,
+            quantity REAL DEFAULT 0,
+            sales REAL DEFAULT 0,
+            fg_quantity REAL,
+            fg_sales REAL,
+            promo_quantity REAL,
+            promo_sales REAL,
+            credit_memo REAL,
+            parked_quantity REAL,
+            parked_amount REAL,
+            created_at TEXT,
+            updated_at TEXT
+        )');
+
+        foreach (['area', 'salesman_code', 'salesman_name', 'salesman_type', 'location_code', 'location_name', 'channel_code', 'channel_name', 'customer_status', 'created_at', 'updated_at'] as $col) {
+            try {
+                $sqlite->statement("ALTER TABLE consolidated_sales_reports ADD COLUMN {$col} TEXT");
+            } catch (\Exception $e) {
+                // Column already exists — safe to ignore
+            }
+        }
     }
 
-    private function importSalesDataToMysql(Account $account, int $year, int $month, array $data): void
+    private function importSalesDataToSqlite(Account $account, int $year, int $month, array $data): void
     {
+        $sqlite = DB::connection('sqlite_reports');
+
+        $sqlite->table('consolidated_sales_reports')
+            ->where('account_code', $account->account_code)
+            ->where('year', $year)
+            ->where('month', $month)
+            ->delete();
+
         $rows = collect($data['sales_data'] ?? [])
             ->map(fn($row) => [
                 'account_code'         => $account->account_code,
                 'account_name'         => $account->account_name,
-                'account_description'  => null,
+                'account_description'  => '',
                 'area'                 => $account->area,
                 'customer_code'        => $row->customer_code   ?? '',
                 'customer_name'        => $row->customer_name   ?? null,
@@ -128,26 +185,9 @@ trait ConsolidateAccountData
             ])
             ->all();
 
-        $uniqueBy = ['account_code', 'year', 'month', 'customer_code', 'stock_code', 'uom'];
-
-        $updateColumns = [
-            'account_name', 'account_description', 'area',
-            'customer_name', 'province', 'city', 'brgy',
-            'salesman_code', 'salesman_name', 'salesman_type',
-            'location_code', 'location_name', 'channel_code', 'channel_name', 'customer_status',
-            'description', 'size', 'brand_classification', 'brand', 'category',
-            'quantity', 'sales', 'fg_quantity', 'fg_sales',
-            'promo_quantity', 'promo_sales', 'credit_memo',
-            'parked_quantity', 'parked_amount', 'updated_at',
-        ];
-
         collect($rows)
             ->chunk(500)
-            ->each(fn($chunk) =>
-                DB::connection('mysql')
-                    ->table('consolidated_sales_reports')
-                    ->upsert($chunk->values()->all(), $uniqueBy, $updateColumns)
-            );
+            ->each(fn($chunk) => $sqlite->table('consolidated_sales_reports')->insert($chunk->values()->all()));
     }
 
     private function importInventoryDataToSqlite(Account $account, int $year, int $month, array $data): void

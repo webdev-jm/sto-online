@@ -170,6 +170,15 @@ new class extends Component
                         <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('accounts')"></i>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $selected_tab === 'trends' ? 'active' : '' }}"
+                       role="tab"
+                       wire:click.prevent="selectTab('trends')"
+                       href="#">
+                        <i class="fa fa-chart-area mr-1"></i> TRENDS
+                        <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('trends')"></i>
+                    </a>
+                </li>
             </ul>
 
             <div class="dash-tab-body">
@@ -344,6 +353,21 @@ new class extends Component
                 @if(in_array('accounts', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'accounts' ? '' : 'd-none' }}">
                         <livewire:dashboard.accounts :year="$globalYear" />
+                    </div>
+                @endif
+
+                {{-- ── TRENDS TAB ─────────────────────────────────── --}}
+                @if(in_array('trends', $this->initializedTabs))
+                    <div class="{{ $selected_tab === 'trends' ? '' : 'd-none' }}">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <livewire:dashboard.reports.trends-sales :year="$globalYear" wire:key="ts-{{ $globalYear }}" />
+                            </div>
+                            <div class="col-lg-6">
+                                <livewire:dashboard.reports.trends-inventory :year="$globalYear" wire:key="ti-{{ $globalYear }}" />
+                            </div>
+                        </div>
+                        <livewire:dashboard.reports.trends-growth :year="$globalYear" wire:key="tg-{{ $globalYear }}" />
                     </div>
                 @endif
 

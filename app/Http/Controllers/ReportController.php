@@ -45,6 +45,20 @@ class ReportController extends Controller
         return view('pages.reports.sto');
     }
 
+    public function trends_report(): \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+    {
+        $account_branch = $this->checkBranch();
+        if ($account_branch instanceof \Illuminate\Http\RedirectResponse) {
+            return $account_branch;
+        }
+        $account = Session::get('account');
+
+        return view('pages.reports.trends')->with([
+            'account_branch' => $account_branch,
+            'account'        => $account,
+        ]);
+    }
+
     public function account_dashboard(): \Illuminate\Http\RedirectResponse|\Illuminate\View\View
     {
         $account = $this->checkAccount();

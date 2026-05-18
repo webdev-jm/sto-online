@@ -733,7 +733,7 @@ new class extends Component
             <div>
                 <div class="ai-insight-label">AI Insight</div>
                 <div class="ai-insight-title">
-                    {{ $year }} &mdash; {{ $type === 'sales' ? 'Sales Performance' : 'Inventory &amp; Supply Chain' }}
+                    {{ $year }} &mdash; {{ $type === 'sales' ? 'Sales Performance' : 'Inventory & Supply Chain' }}
                 </div>
                 @if($hasGenerated)
                     <div class="ai-insight-scope-badge {{ $scope === 'Overall' ? 'ai-insight-scope-badge--overall' : 'ai-insight-scope-badge--account' }}">
