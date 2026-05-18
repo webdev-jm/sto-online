@@ -31,4 +31,5 @@
 <script src="{{ asset('vendor/highcharts/modules/drilldown.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/data.js') }}"></script>
 <script src="{{ asset('vendor/highcharts/modules/accessibility.js') }}"></script>
+<script src="{{ asset('vendor/highcharts/modules/map.js') }}"></script>
 @stop
