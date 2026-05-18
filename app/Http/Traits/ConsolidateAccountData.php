@@ -151,8 +151,10 @@ trait ConsolidateAccountData
             ])
             ->all();
 
+        $salesChunk = floor(999 / 24); // 24 columns per row
+
         collect($rows)
-            ->chunk(500)
+            ->chunk($salesChunk)
             ->each(fn($chunk) => $sqlite->table('sales_data')->insert($chunk->values()->all()));
     }
 

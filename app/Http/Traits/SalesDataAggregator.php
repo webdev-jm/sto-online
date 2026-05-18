@@ -96,6 +96,7 @@ trait SalesDataAggregator
                     'brand'           => $product->brand,
                     'brand_tag'       => $product->brand_tag,
                     'category'        => $product->category,
+                    'year'            => (int) $row->year,
                     'month'           => (int) $row->month,
                     'sales'           => (float) ($qtyPcs * $netPrice),
                     'qty_pcs'         => (float) $qtyPcs,
