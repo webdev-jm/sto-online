@@ -9,6 +9,8 @@ class ConsolidatedSalesReport extends Model
 {
     use HasFactory;
 
+    protected $connection = 'sqlite_reports';
+
     protected $fillable = [
         'account_code',
         'account_name',

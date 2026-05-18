@@ -16,10 +16,10 @@ trait SalesDataAggregator
     {
         return Cache::remember("sales_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
-            $mysql = DB::connection('mysql');
+            $sqlite = DB::connection('sqlite_reports');
 
             // Pull distinct stock codes for price calculation
-            $stockCodes = $mysql->table('consolidated_sales_reports')
+            $stockCodes = $sqlite->table('consolidated_sales_reports')
                 ->where('year', $year)
                 ->distinct()
                 ->pluck('stock_code');
@@ -60,8 +60,8 @@ trait SalesDataAggregator
                 }
             }
 
-            // Query MySQL — one query for the entire year
-            $rows = $mysql->table('consolidated_sales_reports')
+            // Query SQLite — one query for the entire year
+            $rows = $sqlite->table('consolidated_sales_reports')
                 ->where('year', $year)
                 ->get();
 
@@ -205,6 +205,21 @@ trait SalesDataAggregator
     {
         $data = collect($this->getYearlyInventoryAgingData($year));
         return $account_id ? $data->where('account_id', $account_id) : $data;
+    }
+
+    /**
+     * Returns an ordered array of the last $count months (oldest → newest),
+     * each with 'year', 'month', and a display 'label' (e.g. "Dec '24").
+     */
+    protected function getRollingMonthPlan(int $count = 18): array
+    {
+        $now  = \Carbon\Carbon::now();
+        $plan = [];
+        for ($i = $count - 1; $i >= 0; $i--) {
+            $d      = $now->copy()->subMonths($i);
+            $plan[] = ['year' => (int) $d->year, 'month' => (int) $d->month, 'label' => $d->format("M 'y")];
+        }
+        return $plan;
     }
 
     private function computeRemainingDays($expiryDate): int
