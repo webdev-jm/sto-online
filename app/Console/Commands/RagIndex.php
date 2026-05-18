@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Services\RagService;
 use Illuminate\Console\Command;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RagIndex extends Command
 {
@@ -16,6 +18,8 @@ class RagIndex extends Command
 
     public function handle(RagService $rag): int
     {
+        $this->ensureTableExists();
+
         $accountCode = $this->option('account_code');
         $type        = $this->option('type');
 
@@ -39,6 +43,38 @@ class RagIndex extends Command
 
         $this->info('RAG indexing complete.');
         return self::SUCCESS;
+    }
+
+    private function ensureTableExists(): void
+    {
+        $schema = Schema::connection('sqlite_reports');
+
+        if (!$schema->hasTable('rag_document_chunks')) {
+            $schema->create('rag_document_chunks', function (Blueprint $table) {
+                $table->id();
+                $table->string('source_table');
+                $table->unsignedBigInteger('source_id');
+                $table->string('account_code');
+                $table->text('content');
+                $table->string('content_hash', 64)->nullable();
+                $table->json('embedding');
+                $table->json('metadata')->nullable();
+                $table->timestamp('created_at')->nullable();
+
+                $table->unique(['source_table', 'source_id']);
+                $table->index('account_code');
+            });
+
+            $this->info('Created rag_document_chunks table.');
+            return;
+        }
+
+        $schema->table('rag_document_chunks', function (Blueprint $table) use ($schema) {
+            if (!$schema->hasColumn('rag_document_chunks', 'content_hash')) {
+                $table->string('content_hash', 64)->nullable();
+                $this->info('Added missing column: content_hash.');
+            }
+        });
     }
 
     private function indexSalesData(RagService $rag, ?string $accountCode): void

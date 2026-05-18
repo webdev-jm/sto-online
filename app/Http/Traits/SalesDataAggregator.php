@@ -19,7 +19,7 @@ trait SalesDataAggregator
             $sqlite = DB::connection('sqlite_reports');
 
             // Pull distinct stock codes for price calculation
-            $stockCodes = $sqlite->table('consolidated_sales_reports')
+            $stockCodes = $sqlite->table('sales_data')
                 ->where('year', $year)
                 ->distinct()
                 ->pluck('stock_code');
@@ -61,7 +61,7 @@ trait SalesDataAggregator
             }
 
             // Query SQLite — one query for the entire year
-            $rows = $sqlite->table('consolidated_sales_reports')
+            $rows = $sqlite->table('sales_data')
                 ->where('year', $year)
                 ->get();
 
