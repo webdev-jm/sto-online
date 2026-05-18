@@ -9,6 +9,8 @@ class Barangay extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'municipality_id',
         'barangay_name',

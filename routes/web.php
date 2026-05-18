@@ -181,6 +181,12 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('customer/parked', [CustomerController::class, 'parked'])->name('customer.parked')->middleware('permission:customer parked');
 
+        Route::get('customer/salesman/{id}/info', [CustomerController::class, 'salesmanInfo'])->name('customer.salesman.info');
+
+        Route::get('customer/location/provinces/{regionId}', [CustomerController::class, 'locationProvinces'])->name('customer.location.provinces');
+        Route::get('customer/location/municipalities/{provinceId}', [CustomerController::class, 'locationMunicipalities'])->name('customer.location.municipalities');
+        Route::get('customer/location/barangays/{municipalityId}', [CustomerController::class, 'locationBarangays'])->name('customer.location.barangays');
+
         Route::get('customer/{id}', [CustomerController::class, 'show'])->name('customer.show');
 
         Route::get('customer/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit')->middleware('permission:customer edit');

@@ -42,14 +42,14 @@ class CustomerAddRequest extends FormRequest
             'street' => [
                 'required'
             ],
-            'barangay' => [
-                'required'
+            'province_id' => [
+                'required', 'integer', 'exists:provinces,id'
             ],
-            'city' => [
-                'required'
+            'municipality_id' => [
+                'required', 'integer', 'exists:municipalities,id'
             ],
-            'province' => [
-                'required'
+            'barangay_id' => [
+                'required', 'integer', 'exists:barangays,id'
             ],
             'postal_code' => [
                 'max:255'

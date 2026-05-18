@@ -21,7 +21,7 @@ class Salesman extends Model
     ];
 
     public function getConnectionName() {
-        return auth()->check() ? auth()->user()->account->db_data->connection_name : null;
+        return auth()->check() ? auth()->user()->account?->db_data?->connection_name : null;
     }
 
     public function account() {

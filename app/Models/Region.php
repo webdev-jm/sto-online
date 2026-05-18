@@ -9,6 +9,8 @@ class Region extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'region_name',
         'description'

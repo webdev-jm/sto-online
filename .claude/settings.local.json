@@ -30,7 +30,8 @@
       "Bash(Get-Content \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\RAG-AI\\\\app\\\\Livewire\\\\SystemSettings.php\")",
       "Bash(findstr livewire *)",
       "Bash(Get-ChildItem -Path . -Directory)",
-      "mcp__laravel-boost__database-connections"
+      "mcp__laravel-boost__database-connections",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sto-online\" -Directory)"
     ]
   }
 }
