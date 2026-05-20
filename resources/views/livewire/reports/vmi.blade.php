@@ -439,7 +439,7 @@
                                 @php $p_id = $inventory->product_id; @endphp
                                 <tr>
                                     <td class="text-accent">{{ $data[$p_id]['stock_code'] }}</td>
-                                    <td class="text-truncate" style="max-width: 140px;">{{ $data[$p_id]['description'] }}</td>
+                                    <td style="max-width: 140px;">{{ $data[$p_id]['description'] }}</td>
                                     <td class="text-right font-weight-bold">{{ number_format($data[$p_id]['cs_total'], 1) }}</td>
 
                                     @foreach($data[$p_id]['months_data'] as $val)

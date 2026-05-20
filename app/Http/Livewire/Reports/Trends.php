@@ -129,18 +129,27 @@ class Trends extends Component
 
         // SKU comparison: recent 6 vs prior 6
         $recentBySku = $recent->groupBy('stock_code')->map(fn($g) => ['name' => $g->first()->description, 'total' => $g->sum('total')]);
-        $priorBySku  = $prior->groupBy('stock_code')->map(fn($g) => $g->sum('total'));
+        $priorBySku  = $prior->groupBy('stock_code')->map(fn($g) => ['name' => $g->first()->description, 'total' => $g->sum('total')]);
 
-        $skuChanges = $recentBySku
-            ->filter(fn($data, $sku) => isset($priorBySku[$sku]) && $priorBySku[$sku] > 0)
-            ->map(fn($data, $sku) => [
-                'sku'        => $sku,
-                'name'       => $data['name'],
-                'curr'       => $data['total'],
-                'prev'       => (float) $priorBySku[$sku],
-                'change_pct' => round((($data['total'] - $priorBySku[$sku]) / $priorBySku[$sku]) * 100, 1),
-            ])
-            ->values();
+        $allSkus = $recentBySku->keys()->merge($priorBySku->keys())->unique();
+
+        $skuChanges = $allSkus->map(function ($sku) use ($recentBySku, $priorBySku) {
+            $prior  = $priorBySku->get($sku);
+            $recent = $recentBySku->get($sku);
+
+            if (!$prior || $prior['total'] <= 0) {
+                return null;
+            }
+
+            $curr      = $recent ? (float) $recent['total'] : 0.0;
+            $prev      = (float) $prior['total'];
+            $name      = $recent ? $recent['name'] : $prior['name'];
+            $changePct = round((($curr - $prev) / $prev) * 100, 1);
+
+            return ['sku' => $sku, 'name' => $name, 'curr' => $curr, 'prev' => $prev, 'change_pct' => $changePct];
+        })
+        ->filter()
+        ->values();
 
         $this->recent_label = $plan[12]['label'] . ' – ' . $plan[17]['label'];
         $this->prior_label  = $plan[6]['label']  . ' – ' . $plan[11]['label'];
@@ -153,8 +162,10 @@ class Trends extends Component
         ];
 
         $this->sku_table = [
-            'growers'   => $skuChanges->sortByDesc('change_pct')->take(5)->values()->toArray(),
-            'decliners' => $skuChanges->sortBy('change_pct')->take(5)->values()->toArray(),
+            'growers'   => $skuChanges->filter(fn($r) => $r['change_pct'] > 0)
+                                      ->sortByDesc('change_pct')->take(5)->values()->toArray(),
+            'decliners' => $skuChanges->filter(fn($r) => $r['change_pct'] < 0)
+                                      ->sortBy('change_pct')->take(5)->values()->toArray(),
         ];
     }
 

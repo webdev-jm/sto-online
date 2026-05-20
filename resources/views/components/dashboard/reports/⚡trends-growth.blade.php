@@ -64,20 +64,27 @@ new class extends Component
 
         // SKU comparison: recent 6 months vs prior 6 months
         $recentBySku = $recent->groupBy('sku')->map(fn($rows) => ['name' => $rows->first()['name'], 'total' => $rows->sum('sales')]);
-        $priorBySku  = $prior->groupBy('sku')->map(fn($rows) => $rows->sum('sales'));
+        $priorBySku  = $prior->groupBy('sku')->map(fn($rows) => ['name' => $rows->first()['name'], 'total' => $rows->sum('sales')]);
 
-        $skuChanges = $recentBySku
-            ->filter(fn($data, $sku) => isset($priorBySku[$sku]) && $priorBySku[$sku] > 0)
-            ->map(function ($data, $sku) use ($priorBySku) {
-                return [
-                    'sku'        => $sku,
-                    'name'       => $data['name'],
-                    'curr'       => $data['total'],
-                    'prev'       => $priorBySku[$sku],
-                    'change_pct' => round((($data['total'] - $priorBySku[$sku]) / $priorBySku[$sku]) * 100, 1),
-                ];
-            })
-            ->values();
+        $allSkus = $recentBySku->keys()->merge($priorBySku->keys())->unique();
+
+        $skuChanges = $allSkus->map(function ($sku) use ($recentBySku, $priorBySku) {
+            $prior  = $priorBySku->get($sku);
+            $recent = $recentBySku->get($sku);
+
+            if (!$prior || $prior['total'] <= 0) {
+                return null;
+            }
+
+            $curr      = $recent ? (float) $recent['total'] : 0.0;
+            $prev      = (float) $prior['total'];
+            $name      = $recent ? $recent['name'] : $prior['name'];
+            $changePct = round((($curr - $prev) / $prev) * 100, 1);
+
+            return ['sku' => $sku, 'name' => $name, 'curr' => $curr, 'prev' => $prev, 'change_pct' => $changePct];
+        })
+        ->filter()
+        ->values();
 
         $this->recent_label = $plan[12]['label'] . ' – ' . $plan[17]['label'];
         $this->prior_label  = $plan[6]['label']  . ' – ' . $plan[11]['label'];
@@ -90,8 +97,10 @@ new class extends Component
         ];
 
         $this->sku_table = [
-            'growers'   => $skuChanges->sortByDesc('change_pct')->take(5)->values()->toArray(),
-            'decliners' => $skuChanges->sortBy('change_pct')->take(5)->values()->toArray(),
+            'growers'   => $skuChanges->filter(fn($r) => $r['change_pct'] > 0)
+                                      ->sortByDesc('change_pct')->take(5)->values()->toArray(),
+            'decliners' => $skuChanges->filter(fn($r) => $r['change_pct'] < 0)
+                                      ->sortBy('change_pct')->take(5)->values()->toArray(),
         ];
     }
 };
@@ -120,7 +129,7 @@ new class extends Component
             <div class="stat-card stat-col-3">
                 <div class="stat-card-icon"><i class="fa fa-calendar-week"></i></div>
                 <div class="stat-card-body">
-                    <span class="stat-card-label">MoM Growth</span>
+                    <span class="stat-card-label">Prior Month Growth</span>
                     <span class="stat-card-value" style="color: {{ ($growth_stats['mom'] ?? 0) >= 0 ? '#28a745' : '#dc3545' }}">
                         @if($growth_stats['mom'] !== null)
                             {{ $growth_stats['mom'] >= 0 ? '+' : '' }}{{ number_format($growth_stats['mom'], 1) }}%
@@ -177,8 +186,8 @@ new class extends Component
                                 <tr>
                                     <td class="text-nowrap small">{{ $row['sku'] }}</td>
                                     <td class="small">{{ $row['name'] }}</td>
-                                    <td class="text-right small">{{ number_format($row['prev'], 0) }}</td>
-                                    <td class="text-right small">{{ number_format($row['curr'], 0) }}</td>
+                                    <td class="text-right small">₱ {{ number_format($row['prev'], 0) }}</td>
+                                    <td class="text-right small">₱ {{ number_format($row['curr'], 0) }}</td>
                                     <td class="text-right font-weight-bold text-success small">+{{ $row['change_pct'] }}%</td>
                                 </tr>
                             @empty
@@ -214,8 +223,8 @@ new class extends Component
                                 <tr>
                                     <td class="text-nowrap small">{{ $row['sku'] }}</td>
                                     <td class="small">{{ $row['name'] }}</td>
-                                    <td class="text-right small">{{ number_format($row['prev'], 0) }}</td>
-                                    <td class="text-right small">{{ number_format($row['curr'], 0) }}</td>
+                                    <td class="text-right small">₱ {{ number_format($row['prev'], 0) }}</td>
+                                    <td class="text-right small">₱ {{ number_format($row['curr'], 0) }}</td>
                                     <td class="text-right font-weight-bold text-danger small">{{ $row['change_pct'] }}%</td>
                                 </tr>
                             @empty

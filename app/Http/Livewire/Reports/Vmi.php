@@ -76,6 +76,7 @@ class Vmi extends Component
 
         $payload = collect($data)->map(fn ($row, $pid) => [
             'id'   => $pid,
+            'stock_code' => $row['stock_code'],
             'sale' => collect($row['months_data'])->pluck('sto')->map($round2)->values(),
             'gap'  => collect($row['months_data'])->pluck('w_cov_needed')->map($round2)->values(),
         ])->values()->toJson(JSON_UNESCAPED_UNICODE);

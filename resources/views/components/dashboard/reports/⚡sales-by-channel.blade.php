@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -106,7 +106,6 @@ new class extends Component
     }
 };
 ?>
-
 <div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
