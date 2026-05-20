@@ -1,7 +1,7 @@
 <div style="position:relative;">
 
     {{-- LOADING OVERLAY --}}
-    <div wire:loading wire:target="file"
+    {{-- <div wire:loading wire:target="file"
          class="d-flex align-items-center justify-content-center"
          style="position:absolute;top:0;left:0;width:100%;height:100%;
                 background:rgba(255,255,255,0.85);z-index:9999;">
@@ -9,21 +9,13 @@
             <i class="fa fa-spinner fa-spin fa-2x text-primary mb-2 d-block"></i>
             <strong>Processing file, please wait...</strong>
         </div>
-    </div>
+    </div> --}}
 
-    @if($mode === 'modal')
-    <div class="modal-content">
-        <div class="modal-header">
-            <h4 class="modal-title">Salesman Upload</h4>
-        </div>
-        <div class="modal-body">
-    @else
     <div class="card card-default mb-0">
         <div class="card-header">
-            <h3 class="card-title">SALESMAN UPLOAD</h3>
+            <h3 class="card-title">AREA UPLOAD</h3>
         </div>
         <div class="card-body">
-    @endif
 
             @if(!empty($err_msg))
             <div class="alert alert-danger">
@@ -53,24 +45,18 @@
                         <li>
                             <b>NAME</b> - <span>Required, Second column in the excel</span>
                         </li>
-                        <li>
-                            <b>TYPE OF SALESMAN</b> - <span>Required, Third column in the excel</span>
-                        </li>
-                        <li>
-                            <b>DISTRICT CODE</b> - <span>Optional, Fourth column in the excel</span>
-                        </li>
                     </ul>
 
                     <p>
-                        <a href="{{asset('/templates/salesman-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading salesman data.
+                        <a href="{{asset('/templates/area-upload-template.xlsx')}}"><i class="fa fa-download fa-sm mr-1"></i>Download</a> the template for uploading area data.
                     </p>
                 </div>
 
                 {{-- PREVIEW --}}
-                @if(!empty($salesman_data))
+                @if(!empty($area_data))
                 <div class="col-12">
                     <label>PREVIEW <span wire:loading><i class="fa fa-spinner fa-spin mr-1"></i></span></label>
-                    <label class="float-right">COUNT: {{count($salesman_data)}}</label>
+                    <label class="float-right">COUNT: {{count($area_data)}}</label>
                 </div>
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered table-striped table-sm">
@@ -79,28 +65,21 @@
                                 <th></th>
                                 <th>CODE</th>
                                 <th>NAME</th>
-                                <th>TYPE</th>
-                                <th>DISTRICT CODE</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($paginatedData as $data)
                             <tr>
                                 <td class="text-center align-middle">
-                                    @switch($data['check'])
-                                        @case(0)
-                                            <i class="fa fa-check-circle text-success"></i>
-                                        @break
-                                        @case(1)
-                                            <i class="fa fa-times-circle text-danger d-block"></i>
-                                            <small class="text-danger">exists</small>
-                                        @break
-                                    @endswitch
+                                    @if($data['check'] == 0)
+                                        <i class="fa fa-check-circle text-success fa-sm"></i>
+                                    @else
+                                        <i class="fa fa-times-circle text-danger fa-sm"></i>
+                                        <small class="text-danger">Duplicate</small>
+                                    @endif
                                 </td>
                                 <td>{{$data['code'] ?? '-'}}</td>
                                 <td>{{$data['name'] ?? '-'}}</td>
-                                <td>{{$data['type'] ?? '-'}}</td>
-                                <td>{{$data['district_code'] ?? '-'}}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -115,27 +94,13 @@
             </div>
 
         </div>
-
-        @if($mode === 'modal')
-        <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            @if(!empty($salesman_data))
-                <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">
-                    <span wire:loading wire:target="uploadData"><i class="fa fa-spinner fa-spin mr-1"></i></span>
-                    Upload
-                </button>
-            @endif
-        </div>
-        @else
         <div class="card-footer">
-            @if(!empty($salesman_data))
+            @if(!empty($area_data))
                 <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">
                     <span wire:loading wire:target="uploadData"><i class="fa fa-spinner fa-spin mr-1"></i></span>
                     Upload
                 </button>
             @endif
         </div>
-        @endif
-
     </div>
 </div>

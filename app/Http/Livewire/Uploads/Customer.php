@@ -53,6 +53,10 @@ class Customer extends Component
 
     public $perPage = 10;
 
+    public string $mode = 'modal';
+    public string $redirectRoute = 'customer.index';
+    public string $activeTab = '';
+
     public $upload_triggered = false;
     public $page;
 
@@ -82,7 +86,9 @@ class Customer extends Component
         activity('upload')
         ->log(':causer.name has uploaded customer data on ['.$this->account->short_name.']');
 
-        return redirect()->route('customer.index')->with([
+        $params = $this->activeTab ? ['tab' => $this->activeTab] : [];
+
+        return redirect()->route($this->redirectRoute, $params)->with([
             'message_success' => 'Customer data has been added to queue to process.',
             'upload_data' => $upload_data
         ]);
@@ -371,7 +377,8 @@ class Customer extends Component
         }
 
         return view('livewire.uploads.customer')->with([
-            'paginatedData' => $paginatedData
+            'paginatedData' => $paginatedData,
+            'mode'          => $this->mode,
         ]);
     }
 }

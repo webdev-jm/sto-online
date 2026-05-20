@@ -1,9 +1,29 @@
-<div>
+<div style="position:relative;">
+
+    {{-- LOADING OVERLAY --}}
+    <div wire:loading wire:target="file"
+         class="d-flex align-items-center justify-content-center"
+         style="position:absolute;top:0;left:0;width:100%;height:100%;
+                background:rgba(255,255,255,0.85);z-index:9999;">
+        <div class="text-center">
+            <i class="fa fa-spinner fa-spin fa-2x text-primary mb-2 d-block"></i>
+            <strong>Processing file, please wait...</strong>
+        </div>
+    </div>
+
+    @if($mode === 'modal')
     <div class="modal-content">
         <div class="modal-header">
             <h4 class="modal-title">Customer Upload</h4>
         </div>
         <div class="modal-body">
+    @else
+    <div class="card card-default mb-0">
+        <div class="card-header">
+            <h3 class="card-title">CUSTOMER UPLOAD</h3>
+        </div>
+        <div class="card-body">
+    @endif
 
             @if(!empty($err_msg))
             <div class="alert alert-danger">
@@ -27,39 +47,17 @@
                  {{-- COLUMN DESCRIPTIONS --}}
                  <div class="col-12">
                     <ul>
-                        <li>
-                            <b>CODE</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>NAME</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>ADDRESS</b> - <span>Optional</span>
-                        </li>
-                        <li>
-                            <b>SALESMAN CODE</b> - <span>Optional</span>
-                        </li>
-                        <li>
-                            <b>CHANNEL CODE</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>CHANNEL NAME</b> - <span>Optional</span>
-                        </li>
-                        <li>
-                            <b>PROVINCE</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>CITY/TOWN</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>BARANGAY</b> - <span>Required</span>
-                        </li>
-                        <li>
-                            <b>STREET</b> - <span>Optional</span>
-                        </li>
-                        <li>
-                            <b>POSTAL CODE</b> - <span>Optional</span>
-                        </li>
+                        <li><b>CODE</b> - <span>Required</span></li>
+                        <li><b>NAME</b> - <span>Required</span></li>
+                        <li><b>ADDRESS</b> - <span>Optional</span></li>
+                        <li><b>SALESMAN CODE</b> - <span>Optional</span></li>
+                        <li><b>CHANNEL CODE</b> - <span>Required</span></li>
+                        <li><b>CHANNEL NAME</b> - <span>Optional</span></li>
+                        <li><b>PROVINCE</b> - <span>Required</span></li>
+                        <li><b>CITY/TOWN</b> - <span>Required</span></li>
+                        <li><b>BARANGAY</b> - <span>Required</span></li>
+                        <li><b>STREET</b> - <span>Optional</span></li>
+                        <li><b>POSTAL CODE</b> - <span>Optional</span></li>
                     </ul>
 
                     <p>
@@ -69,7 +67,7 @@
 
                 @if(empty($customer_data))
                 <div class="col-12" wire:loading>
-                    <label><i class="fa fa-spinner fa-spin mr-1"></i></span>Loading</label>
+                    <label><i class="fa fa-spinner fa-spin mr-1"></i>Loading</label>
                 </div>
                 @endif
 
@@ -144,14 +142,10 @@
                                                 <i class="fa fa-check-circle text-success"></i>
                                             @endif
                                         </td>
-                                        <td class="align-middle">
-                                            {{$data['postal_code'] ?? '-'}}
-                                        </td>
+                                        <td class="align-middle">{{$data['postal_code'] ?? '-'}}</td>
                                         <td>
                                             @if(!empty($data['similar']) && $data['check'] == 0)
-                                                @php
-                                                $ubo = $data['similar'];
-                                                @endphp
+                                                @php $ubo = $data['similar']; @endphp
                                                 <small class="text-warning font-weight-bold">This customer may already exist. Please review the details below. This customer will be automatically designated as a parked customer.</small>
                                                 <br>
                                                 <b>UBO ID: </b>{{$ubo['ubo_id']}} <b>NAME: </b>{{$ubo['name']}} <b>ADDRESS: </b>{{$ubo['address']}}
@@ -172,11 +166,27 @@
             </div>
 
         </div>
+
+        @if($mode === 'modal')
         <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             @if(!empty($customer_data))
-                <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">Upload</button>
+                <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">
+                    <span wire:loading wire:target="uploadData"><i class="fa fa-spinner fa-spin mr-1"></i></span>
+                    Upload
+                </button>
             @endif
         </div>
+        @else
+        <div class="card-footer">
+            @if(!empty($customer_data))
+                <button type="button" class="btn btn-primary" wire:click.prevent="uploadData" wire:loading.attr="disabled">
+                    <span wire:loading wire:target="uploadData"><i class="fa fa-spinner fa-spin mr-1"></i></span>
+                    Upload
+                </button>
+            @endif
+        </div>
+        @endif
+
     </div>
 </div>
