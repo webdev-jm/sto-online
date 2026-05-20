@@ -25,6 +25,26 @@ class RagService
     }
 
     /**
+     * Generate embeddings for multiple texts in a single Ollama request.
+     *
+     * @param  string[]  $texts
+     * @return float[][]
+     */
+    public function embedBatch(array $texts): array
+    {
+        if (empty($texts)) {
+            return [];
+        }
+
+        $response = Http::timeout(120)->post(config('services.ollama.url') . '/api/embed', [
+            'model' => config('services.ollama.embed_model', config('services.ollama.model')),
+            'input' => $texts,
+        ]);
+
+        return $response->json('embeddings') ?? [];
+    }
+
+    /**
      * Upsert a document chunk with its embedding into the rag_document_chunks table.
      * Skips re-embedding if content has not changed since the last index run.
      *

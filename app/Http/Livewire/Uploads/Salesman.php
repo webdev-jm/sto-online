@@ -34,6 +34,10 @@ class Salesman extends Component
 
     public $perPage = 10;
 
+    public string $mode = 'modal';
+    public string $redirectRoute = 'salesman.index';
+    public string $activeTab = '';
+
     public $upload_triggered = false;
     public $page;
 
@@ -72,7 +76,9 @@ class Salesman extends Component
         activity('upload')
         ->log(':causer.name has uploaded salesman data on ['.$this->account->short_name.']');
 
-        return redirect()->route('salesman.index')->with([
+        $params = $this->activeTab ? ['tab' => $this->activeTab] : [];
+
+        return redirect()->route($this->redirectRoute, $params)->with([
             'message_success' => 'Salesman data has been uploaded.'
         ]);
     }
@@ -191,7 +197,8 @@ class Salesman extends Component
         }
 
         return view('livewire.uploads.salesman')->with([
-            'paginatedData' => $paginatedData
+            'paginatedData' => $paginatedData,
+            'mode'          => $this->mode,
         ]);
     }
 }

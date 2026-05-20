@@ -26,6 +26,7 @@ use App\Http\Controllers\ReturnToVendorController;
 use App\Http\Controllers\ProductMappingController;
 use App\Http\Controllers\ChannelMappingController;
 use App\Http\Controllers\UploadMappingController;
+use App\Http\Controllers\UnifiedUploadController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\HubAdminController;
 
@@ -83,6 +84,9 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('account/get-ajax/{id}', [AccountBranchController::class, 'getAjax'])->name('account.get-ajax');
     Route::post('sms-account/ajax', [AccountController::class, 'smsAjax'])->name('sms-account.ajax');
     Route::get('sms-account/get-ajax/{id}', [AccountController::class, 'smsGetAjax'])->name('sms-account.get-ajax');
+
+    // UNIFIED UPLOADS
+    Route::get('uploads', [UnifiedUploadController::class, 'index'])->name('uploads.index');
 
     // TEMPLATE CONVERTER
     Route::group(['middleware' => 'permission:template converter access'], function() {

@@ -33,6 +33,10 @@ class Location extends Component
 
     public $perPage = 10;
 
+    public string $mode = 'modal';
+    public string $redirectRoute = 'location.index';
+    public string $activeTab = '';
+
     public $upload_triggered = false;
     public $page;
 
@@ -60,7 +64,9 @@ class Location extends Component
         activity('upload')
         ->log(':causer.name has uploaded location data on ['.$this->account->short_name.']');
 
-        return redirect()->route('location.index')->with([
+        $params = $this->activeTab ? ['tab' => $this->activeTab] : [];
+
+        return redirect()->route($this->redirectRoute, $params)->with([
             'message_success' => 'Location data has been uploaded.'
         ]);
     }
@@ -177,7 +183,8 @@ class Location extends Component
         }
 
         return view('livewire.uploads.location')->with([
-            'paginatedData' => $paginatedData
+            'paginatedData' => $paginatedData,
+            'mode'          => $this->mode,
         ]);
     }
 }

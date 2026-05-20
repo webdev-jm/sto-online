@@ -74,6 +74,7 @@ class PermissionSeeder extends Seeder
                 'district edit'     => 'Allow user to edit district',
                 'district delete'   => 'Allow user to delete district',
                 'district restore'  => 'Allow user to restore district data',
+                'district upload'   => 'Allow user to upload district data.',
             ],
             'Channel' => [
                 'channel access'   => 'Allow user to access channel list and details',
@@ -89,6 +90,7 @@ class PermissionSeeder extends Seeder
                 'area edit'     => 'Allow user to edit area.',
                 'area delete'   => 'Allow user to delete area.',
                 'area restore'  => 'Allow user to restore area data.',
+                'area upload'   => 'Allow user to upload area data.',
             ],
             'Location' => [
                 'location access'   => 'Allow user to access location list and details',

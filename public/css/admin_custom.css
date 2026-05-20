@@ -590,6 +590,13 @@ body::before {
         rgba(30, 58, 95, 0.88) 100%
     );
 }
+.tile-teal {
+    background: linear-gradient(
+        135deg,
+        rgba(15, 118, 110, 0.82) 0%,
+        rgba(10, 90, 84, 0.88) 100%
+    );
+}
 
 /* =============================================================================
    EMPTY STATE
@@ -2185,6 +2192,13 @@ select.form-control {
         135deg,
         rgba(52, 95, 144, 0.78) 0%,
         rgba(42, 79, 122, 0.86) 100%
+    );
+}
+.dark-mode .tile-teal {
+    background: linear-gradient(
+        135deg,
+        rgba(20, 148, 140, 0.78) 0%,
+        rgba(15, 118, 110, 0.86) 100%
     );
 }
 
