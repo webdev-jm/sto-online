@@ -89,10 +89,10 @@ new class extends Component
         tooltip: {
             formatter: function () {
                 const val = this.y;
-                if (val >= 1_000_000_000) return `<b>${this.x}</b><br>₱ ${Highcharts.numberFormat(val / 1_000_000_000, 2)}B`;
-                if (val >= 1_000_000)     return `<b>${this.x}</b><br>₱ ${Highcharts.numberFormat(val / 1_000_000, 2)}M`;
-                if (val >= 1_000)         return `<b>${this.x}</b><br>₱ ${Highcharts.numberFormat(val / 1_000, 2)}K`;
-                return `<b>${this.x}</b><br>₱ ${Highcharts.numberFormat(val, 2)}`;
+                if (val >= 1_000_000_000) return `<b>${this.name}</b><br>₱ ${Highcharts.numberFormat(val / 1_000_000_000, 2)}B`;
+                if (val >= 1_000_000)     return `<b>${this.name}</b><br>₱ ${Highcharts.numberFormat(val / 1_000_000, 2)}M`;
+                if (val >= 1_000)         return `<b>${this.name}</b><br>₱ ${Highcharts.numberFormat(val / 1_000, 2)}K`;
+                return `<b>${this.name}</b><br>₱ ${Highcharts.numberFormat(val, 2)}`;
             }
         },
         series: data.series,

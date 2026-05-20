@@ -13,7 +13,9 @@ new class extends Component
     #[Reactive]
     public $account_id;
 
-    public $chart_data = [];
+    public $chart_data    = [];
+    public string $insight        = '';
+    public bool   $loadingInsight = false;
 
     public function mount($year, $account_id): void
     {
@@ -25,11 +27,41 @@ new class extends Component
     public function updatedYear(): void
     {
         $this->chartUpdated();
+        $this->generateInsight();
     }
 
     public function updatedAccountId(): void
     {
         $this->chartUpdated();
+        $this->generateInsight();
+    }
+
+    public function generateInsight(): void
+    {
+        $this->loadingInsight = true;
+        try {
+            $this->insight = app(\App\Services\OllamaService::class)->chat([
+                ['role' => 'system', 'content' => 'You are a business data analyst for a Philippine FMCG distributor. Given geographic sales data, respond with exactly one concise insight sentence. No markdown, no bullet points, no labels.'],
+                ['role' => 'user',   'content' => $this->buildInsightSummary()],
+            ]);
+        } catch (\App\Exceptions\AiUnavailableException) {
+        }
+        $this->loadingInsight = false;
+    }
+
+    private function buildInsightSummary(): string
+    {
+        if (empty($this->chart_data['data'])) {
+            return "No geographic sales data available for {$this->year}.";
+        }
+
+        $provinces = collect($this->chart_data['data'])
+            ->sortByDesc('value')
+            ->take(5)
+            ->map(fn($d) => "{$d['name']}: ₱" . number_format($d['value'], 2))
+            ->implode(', ');
+
+        return "Sales by province for {$this->year}: {$provinces}.";
     }
 
     public function chartUpdated(): void
@@ -101,7 +133,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">SALES BY PROVINCE {{ $this->year }}</h3>
@@ -111,7 +143,14 @@ new class extends Component
         </div>
 
         <div class="card-body" wire:ignore>
-            <div id="container-sales-by-address" style="height: 500px;"></div>
+            <div id="container-sales-by-address"></div>
+        </div>
+        <div class="card-footer text-xs text-muted">
+            @if($loadingInsight)
+                <i class="fa fa-spinner fa-spin fa-sm mr-1"></i> Generating insight...
+            @else
+                {{ $insight }}
+            @endif
         </div>
     </div>
 </div>

@@ -13,12 +13,13 @@ new class extends Component
     use SalesDataAggregator;
 
     public $type = 'sales';
-    public $selected_tab = 'sales';
+    public $selected_tab = 'trends';
     public $globalYear;
     public $header_data = [];
+    public $selected_account;
 
     /** Tracks which tabs have ever been visited so components aren't mounted until needed. */
-    public array $initializedTabs = ['sales'];
+    public array $initializedTabs = ['trends'];
 
     public function mount(): void
     {
@@ -265,8 +266,9 @@ new class extends Component
                                 <livewire:dashboard.reports.sales-by-channel :year="$globalYear" />
                             </div>
                             <div class="col-lg-6">
-                                <livewire:dashboard.reports.area :year="$globalYear" />
-                                <livewire:dashboard.reports.top-distributor :year="$globalYear" />
+                                {{-- <livewire:dashboard.reports.area :year="$globalYear" />
+                                <livewire:dashboard.reports.top-distributor :year="$globalYear" /> --}}
+                                <livewire:dashboard.accounts.sales-per-address :year="$globalYear" :account_id="$selected_account"/>
                             </div>
                         </div>
 

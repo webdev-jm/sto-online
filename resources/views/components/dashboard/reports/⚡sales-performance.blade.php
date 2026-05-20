@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
@@ -91,31 +91,31 @@ new class extends Component
                     $drilldown[] = [
                         'id'   => $currDrillId,
                         'name' => "{$monthLabel} {$this->year}",
-                        'type' => 'pie',
+                        'type' => 'column',
                         'data' => collect($raw)
-                                    ->where('month', $m)
-                                    ->groupBy('account_name')
-                                    ->map(fn($i, $k) => [
-                                        'name' => $k,
-                                        'y'    => round($i->sum('sales'), 2),
-                                    ])
-                                    ->values()
-                                    ->toArray(),
+                                      ->where('month', $m)
+                                      ->groupBy('account_name')
+                                      ->map(fn($i, $k) => [
+                                          'name' => $k,
+                                          'y'    => round($i->sum('sales'), 2),
+                                      ])
+                                      ->values()
+                                      ->toArray(),
                     ];
 
                     $drilldown[] = [
                         'id'   => $prevDrillId,
                         'name' => "{$monthLabel} " . ($this->year - 1),
-                        'type' => 'pie',
+                        'type' => 'column',
                         'data' => collect($prev_raw)
-                                    ->where('month', $m)
-                                    ->groupBy('account_name')
-                                    ->map(fn($i, $k) => [
-                                        'name' => $k,
-                                        'y'    => round($i->sum('sales'), 2),
-                                    ])
-                                    ->values()
-                                    ->toArray(),
+                                      ->where('month', $m)
+                                      ->groupBy('account_name')
+                                      ->map(fn($i, $k) => [
+                                          'name' => $k,
+                                          'y'    => round($i->sum('sales'), 2),
+                                      ])
+                                      ->values()
+                                      ->toArray(),
                     ];
                 }
 
