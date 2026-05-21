@@ -3,6 +3,8 @@
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
 use App\Http\Traits\SalesDataAggregator;
+use App\Models\Province;
+use Illuminate\Support\Facades\Cache;
 
 new class extends Component
 {
@@ -177,13 +179,149 @@ new class extends Component
             }
         });
 
-        return salesData.map(item => ({
-            'hc-key':   lookup.get(item.name) ?? null,
-            name:       item.name,
-            value:      item.value,
-            drilldown:  item.drilldown,
-            accounts:   item.accounts ?? [],
-        })).filter(item => item['hc-key'] !== null);
+        // Aliases for province names that differ between our data and the geoJSON.
+        // Keys are the UPPERCASE database values; values are the geoJSON hc-key.
+        const aliases = {
+            // Mindoro — geoJSON uses "Mindoro Oriental" / "Mindoro Occidental"
+            'ORIENTAL MINDORO':           'ph-mr',
+            'EAST MINDORO':               'ph-mr',
+            'OCCIDENTAL MINDORO':         'ph-mc',
+            'WEST MINDORO':               'ph-mc',
+
+            // Quezon — geoJSON uses plain "Quezon"
+            'QUEZON PROVINCE':            'ph-qz',
+            'QUEZON PROV':                'ph-qz',
+            'QUEZON PROV.':               'ph-qz',
+
+            // North Cotabato — geoJSON uses "Cotabato"
+            'NORTH COTABATO':             'ph-nc',
+            'NORTHERN COTABATO':          'ph-nc',
+            'NORTE DE COTABATO':          'ph-nc',
+            'COTABATO PROVINCE':          'ph-nc',
+            'COTABATO (NORTH)':           'ph-nc',
+            'NORTH COTABATO PROVINCE':    'ph-nc',
+
+            // Davao de Oro — geoJSON still uses old name "Compostela Valley"
+            'DAVAO DE ORO':               'ph-cl',
+            'DAVAO DE ORO PROVINCE':      'ph-cl',
+
+            // Davao del Norte / del Sur / Oriental word-order variants
+            'DAVAO ORIENTAL':             'ph-do',
+            'ORIENTAL DAVAO':             'ph-do',
+            'NORTH DAVAO':                'ph-dv',
+            'DAVAO NORTE':                'ph-dv',
+            'SOUTH DAVAO':                'ph-ds',
+            'DAVAO SUR':                  'ph-ds',
+
+            // Maguindanao — geoJSON has single entry; split into two provinces since 2022
+            'MAGUINDANAO DEL NORTE':      'ph-mg',
+            'MAGUINDANAO DEL SUR':        'ph-mg',
+            'NORTH MAGUINDANAO':          'ph-mg',
+            'SOUTH MAGUINDANAO':          'ph-mg',
+
+            // Surigao — geoJSON uses "Surigao del Norte" / "Surigao del Sur"
+            'SURIGAO NORTE':              'ph-di',
+            'NORTH SURIGAO':              'ph-di',
+            'SURIGAO SUR':                'ph-ss',
+            'SOUTH SURIGAO':              'ph-ss',
+
+            // Agusan — geoJSON uses "Agusan del Norte" / "Agusan del Sur"
+            'AGUSAN NORTE':               'ph-an',
+            'NORTH AGUSAN':               'ph-an',
+            'AGUSAN SUR':                 'ph-as',
+            'SOUTH AGUSAN':               'ph-as',
+
+            // Lanao — geoJSON uses "Lanao del Norte" / "Lanao del Sur"
+            'LANAO NORTE':                'ph-ln',
+            'NORTH LANAO':                'ph-ln',
+            'LANAO SUR':                  'ph-ls',
+            'SOUTH LANAO':                'ph-ls',
+
+            // Zamboanga — geoJSON uses "Zamboanga del Norte" / "Zamboanga del Sur"
+            'ZAMBOANGA NORTE':            'ph-zn',
+            'NORTH ZAMBOANGA':            'ph-zn',
+            'ZAMBOANGA SUR':              'ph-zs',
+            'SOUTH ZAMBOANGA':            'ph-zs',
+
+            // Negros — geoJSON uses "Negros Occidental" / "Negros Oriental"
+            'OCCIDENTAL NEGROS':          'ph-nd',
+            'WEST NEGROS':                'ph-nd',
+            'NEGROS DEL NORTE':           'ph-nd',
+            'ORIENTAL NEGROS':            'ph-nr',
+            'EAST NEGROS':                'ph-nr',
+
+            // Samar — geoJSON uses "Samar" (Western), "Eastern Samar", "Northern Samar"
+            'WESTERN SAMAR':              'ph-sm',
+            'WEST SAMAR':                 'ph-sm',
+            'SAMAR (WESTERN)':            'ph-sm',
+            'SAMAR DEL ESTE':             'ph-es',
+            'SAMAR (EASTERN)':            'ph-es',
+            'EAST SAMAR':                 'ph-es',
+            'SAMAR DEL NORTE':            'ph-ns',
+            'SAMAR (NORTHERN)':           'ph-ns',
+            'NORTH SAMAR':                'ph-ns',
+
+            // Tawi-Tawi — common hyphen-drop and merged spelling
+            'TAWI TAWI':                  'ph-tt',
+            'TAWITAWI':                   'ph-tt',
+
+            // Kalinga — geoJSON key is "Kalinga"; old combined province name still in use
+            'KALINGA-APAYAO':             'ph-ap',
+            'KALINGA APAYAO':             'ph-ap',
+
+            // Mountain Province abbreviations
+            'MT. PROVINCE':               'ph-mt',
+            'MT PROVINCE':                'ph-mt',
+            'MOUNTAIN PROV.':             'ph-mt',
+            'MOUNTAIN PROV':              'ph-mt',
+
+            // Ilocos — occasional "Province" suffix in data
+            'ILOCOS NORTE PROVINCE':      'ph-in',
+            'NORTH ILOCOS':               'ph-in',
+            'ILOCOS SUR PROVINCE':        'ph-is',
+            'SOUTH ILOCOS':               'ph-is',
+
+            // Camarines — occasional misspelling
+            'CAMARINES NORTE PROVINCE':   'ph-cn',
+            'CAMARINES SUR PROVINCE':     'ph-cs',
+            'CAM. NORTE':                 'ph-cn',
+            'CAM. SUR':                   'ph-cs',
+
+            // Leyte
+            'LEYTE DEL SUR':              'ph-sl',
+            'SOUTH LEYTE':                'ph-sl',
+
+            // Misamis
+            'MISAMIS OR.':                'ph-mn',
+            'MISAMIS OCC.':               'ph-md',
+
+            // Compostela Valley legacy name handled above via 'DAVAO DE ORO'
+            'COMPOSTELA VALLEY':          'ph-cl',
+            'COMP. VALLEY':               'ph-cl',
+        };
+        Object.entries(aliases).forEach(([alias, hcKey]) => lookup.set(alias, hcKey));
+
+        const mapPoints    = [];
+        const unmatchedItems = [];
+
+        salesData.forEach(item => {
+            const hcKey = lookup.get(item.name) ?? null;
+            const point = {
+                'hc-key':  hcKey,
+                name:      item.name,
+                value:     item.value,
+                drilldown: item.drilldown,
+                accounts:  item.accounts ?? [],
+            };
+            if (hcKey !== null) {
+                mapPoints.push(point);
+            } else {
+                unmatchedItems.push(point);
+                console.warn('[SalesByAddress] No geoJSON match for province:', item.name);
+            }
+        });
+
+        return { mapPoints, unmatchedItems };
     };
 
     const tooltipFormatter = function () {
@@ -204,6 +342,8 @@ new class extends Component
 
     const buildConfig = (chartData) => {
         drilldownData = chartData.drilldown ?? [];
+
+        const { mapPoints } = buildMapData(chartData.data ?? []);
 
         return {
             credits: { enabled: false },
@@ -232,7 +372,7 @@ new class extends Component
             },
             series: [{
                 name: 'Sales by Province',
-                data: buildMapData(chartData.data ?? []),
+                data: mapPoints,
                 joinBy: 'hc-key',
                 nullColor: '#F0F0F0',
                 borderColor: '#A0A0A0',
