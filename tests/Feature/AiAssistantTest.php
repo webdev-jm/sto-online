@@ -38,8 +38,6 @@ class AiAssistantTest extends TestCase
 
     public function test_toggle_opens_and_closes_widget(): void
     {
-        Http::fake(['*/api/chat' => Http::response($this->ollamaResponse('Hello!'))]);
-
         $this->actingAsUser();
 
         Livewire::test(AiAssistant::class)
@@ -48,6 +46,30 @@ class AiAssistantTest extends TestCase
             ->assertSet('isOpen', true)
             ->call('toggle')
             ->assertSet('isOpen', false);
+    }
+
+    public function test_toggle_sets_loading_immediately_on_first_open(): void
+    {
+        $this->actingAsUser();
+
+        Livewire::test(AiAssistant::class)
+            ->call('toggle')
+            ->assertSet('isOpen', true)
+            ->assertSet('isLoading', true)
+            ->assertSet('insightsGenerated', false);
+    }
+
+    public function test_toggle_does_not_set_loading_when_already_opened_before(): void
+    {
+        Http::fake(['*/api/chat' => Http::response($this->ollamaResponse('Hello!'))]);
+
+        $this->actingAsUser();
+
+        Livewire::test(AiAssistant::class)
+            ->call('generateInsights')   // simulate Alpine x-init completing
+            ->call('toggle')             // close
+            ->call('toggle')             // reopen — insights already done
+            ->assertSet('isLoading', false);
     }
 
     // ---------------------------------------------------------------------------
@@ -69,31 +91,34 @@ class AiAssistantTest extends TestCase
             ->assertSet('messages.0.content', 'I am your STO assistant!');
     }
 
-    public function test_toggle_generates_insights_only_once(): void
+    public function test_generate_insights_is_idempotent(): void
     {
         Http::fake(['*/api/chat' => Http::response($this->ollamaResponse('Hi there!'))]);
 
         $this->actingAsUser();
 
         $component = Livewire::test(AiAssistant::class)
-            ->call('toggle')
-            ->assertCount('messages', 1);
+            ->call('generateInsights')
+            ->assertCount('messages', 1)
+            ->assertSet('insightsGenerated', true);
 
         Http::fake(['*/api/chat' => Http::response($this->ollamaResponse('Second call'))]);
 
         $component
-            ->call('toggle')  // close
-            ->call('toggle')  // reopen — should NOT call Ollama again
+            ->call('generateInsights')  // should return early — already done
             ->assertCount('messages', 1);
     }
 
     // ---------------------------------------------------------------------------
-    // Send Message (no account in session — no RAG)
+    // Send Message (no account in session — global RAG only)
     // ---------------------------------------------------------------------------
 
     public function test_send_message_appends_user_and_assistant_messages(): void
     {
-        Http::fake(['*/api/chat' => Http::response($this->ollamaResponse('Here is the answer.'))]);
+        Http::fake([
+            '*/api/embed' => Http::response(['embeddings' => []]),
+            '*/api/chat'  => Http::response($this->ollamaResponse('Here is the answer.')),
+        ]);
 
         $this->actingAsUser();
 
@@ -176,9 +201,36 @@ class AiAssistantTest extends TestCase
             ->assertSet('messages.0.content', 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.');
     }
 
+    public function test_send_message_calls_rag_even_without_account(): void
+    {
+        Http::fake([
+            '*/api/embed' => Http::response(['embeddings' => [[[1.0, 0.0]]]])  ,
+            '*/api/chat'  => Http::response($this->ollamaResponse('Here is global info.')),
+        ]);
+
+        $this->actingAsUser();
+
+        $ragMock = Mockery::mock(RagService::class);
+        $ragMock->shouldReceive('retrieve')
+            ->once()
+            ->with('Tell me about the API', '')
+            ->andReturn(['GET /api/sales — list all sales records.']);
+
+        $this->app->instance(RagService::class, $ragMock);
+
+        Livewire::test(AiAssistant::class)
+            ->set('userInput', 'Tell me about the API')
+            ->call('sendMessage')
+            ->assertSet('messages.1.content', 'Here is global info.');
+    }
+
     public function test_send_message_appends_error_message_when_ollama_is_unreachable(): void
     {
         $this->actingAsUser();
+
+        $ragMock = Mockery::mock(RagService::class);
+        $ragMock->shouldReceive('retrieve')->once()->andReturn([]);
+        $this->app->instance(RagService::class, $ragMock);
 
         $mock = Mockery::mock(OllamaService::class);
         $mock->shouldReceive('chat')

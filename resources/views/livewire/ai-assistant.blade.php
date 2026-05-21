@@ -2,7 +2,8 @@
 
     {{-- Chat Panel --}}
     @if($isOpen)
-        <div class="card shadow" style="width: 320px; height: 420px; display: flex; flex-direction: column; margin-bottom: 0.75rem;">
+        <div class="card shadow" style="width: 320px; height: 420px; display: flex; flex-direction: column; margin-bottom: 0.75rem;"
+             x-init="$wire.generateInsights()">
             <div class="card-header bg-primary text-white py-2 d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-robot mr-1"></i> AI Assistant</span>
                 <button type="button" class="btn btn-sm text-white p-0" wire:click="toggle" style="line-height:1;">

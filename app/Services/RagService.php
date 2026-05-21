@@ -85,6 +85,9 @@ class RagService
     /**
      * Retrieve the top-K most relevant chunks for a query and account.
      *
+     * Uses a cursor + running min-heap so only topK entries are held in memory
+     * regardless of how many chunks are indexed.
+     *
      * @return string[]
      */
     public function retrieve(string $query, string $accountCode, int $topK = 5): array
@@ -95,21 +98,31 @@ class RagService
             return [];
         }
 
-        $chunks = DB::connection('sqlite_reports')
+        $top = [];
+
+        $cursor = DB::connection('sqlite_reports')
             ->table('rag_document_chunks')
             ->where(fn($q) => $q->where('account_code', $accountCode)->orWhere('account_code', 'global'))
-            ->get();
+            ->select(['content', 'embedding'])
+            ->cursor();
 
-        return collect($chunks)
-            ->map(fn($chunk) => [
-                'content' => $chunk->content,
-                'score'   => $this->cosineSimilarity($queryVector, json_decode($chunk->embedding, true) ?? []),
-            ])
-            ->sortByDesc('score')
-            ->take($topK)
-            ->pluck('content')
-            ->values()
-            ->all();
+        foreach ($cursor as $chunk) {
+            $score = $this->cosineSimilarity($queryVector, json_decode($chunk->embedding, true) ?? []);
+
+            if (\count($top) < $topK) {
+                $top[] = ['content' => $chunk->content, 'score' => $score];
+                if (\count($top) === $topK) {
+                    usort($top, fn($a, $b) => $a['score'] <=> $b['score']);
+                }
+            } elseif ($score > $top[0]['score']) {
+                $top[0] = ['content' => $chunk->content, 'score' => $score];
+                usort($top, fn($a, $b) => $a['score'] <=> $b['score']);
+            }
+        }
+
+        usort($top, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        return array_column($top, 'content');
     }
 
     /**

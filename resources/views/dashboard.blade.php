@@ -17,8 +17,6 @@
 
 @section('content')
     <livewire:dashboard.header />
-
-    @livewire('ai-assistant')
 @stop
 
 @section('css')
