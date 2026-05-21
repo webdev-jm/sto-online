@@ -13,13 +13,13 @@ new class extends Component
     use SalesDataAggregator;
 
     public $type = 'sales';
-    public $selected_tab = 'trends';
+    public $selected_tab = 'sales';
     public $globalYear;
     public $header_data = [];
     public $selected_account;
 
     /** Tracks which tabs have ever been visited so components aren't mounted until needed. */
-    public array $initializedTabs = ['trends'];
+    public array $initializedTabs = ['sales'];
 
     public function mount(): void
     {
@@ -340,12 +340,15 @@ new class extends Component
 
                         {{-- Inventory charts --}}
                         <div class="row">
-                            <div class="col-lg-8">
+                            <div class="col-lg-12">
                                 <livewire:dashboard.reports.inventory-aging :year="$globalYear" />
-                                <livewire:dashboard.reports.inventory-ending :year="$globalYear" />
                             </div>
-                            <div class="col-lg-4">
-                                <livewire:dashboard.reports.oos :year="$globalYear" />
+                            <div class="col-lg-6">
+                                <livewire:dashboard.reports.inventory-ending :year="$globalYear" />
+                                {{-- <livewire:dashboard.reports.oos :year="$globalYear" /> --}}
+                            </div>
+                            <div class="col-lg-6">
+                                <livewire:dashboard.reports.inventory-inactive :year="$globalYear" />
                             </div>
                         </div>
                     </div>

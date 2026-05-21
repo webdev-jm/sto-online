@@ -20,8 +20,10 @@ new class extends Component
     public ?int $account_id = null;
     public $table_data     = [];
     public $raw_table_data = [];
+    public $brands         = [];
     public $products;
     public $search         = '';
+    public $selectedBrand  = '';
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
@@ -68,23 +70,27 @@ new class extends Component
             . "{$negCount} SKUs have a negative projected ending balance.";
     }
 
-    public function updatedSearch() {
-        $this->applySearch();
+    public function updatedSearch(): void
+    {
+        $this->applyFilters();
     }
 
-    public function applySearch() {
-        if (empty($this->search)) {
-            $this->table_data = $this->raw_table_data;
-            return;
-        }
+    public function updatedSelectedBrand(): void
+    {
+        $this->applyFilters();
+    }
 
-        $term = strtolower($this->search);
+    public function applyFilters(): void
+    {
+        $term  = strtolower($this->search);
+        $brand = $this->selectedBrand;
 
         $this->table_data = collect($this->raw_table_data)
-            ->filter(fn($row) =>
+            ->when($brand, fn($c) => $c->filter(fn($row) => $row['brand'] === $brand))
+            ->when($term,  fn($c) => $c->filter(fn($row) =>
                 str_contains(strtolower($row['account']), $term) ||
                 str_contains(strtolower($row['sku']), $term)
-            )
+            ))
             ->values()
             ->toArray();
     }
@@ -164,6 +170,8 @@ new class extends Component
                 ->get();
         });
 
+        $this->brands = [];
+
         $this->raw_table_data = $grouped->map(function ($row) use ($responses, $sales_data) {
             $first        = $row['first'];
             $product      = $this->products->get($first['sku']);
@@ -193,6 +201,7 @@ new class extends Component
                 'account'       => $first['short_name'],
                 'sku'           => $first['sku'],
                 'description'   => $first['name'] ?? '',
+                'brand'         => $product?->brand ?? '',
                 'total'         => $row['total'],
                 'sell_in'       => $sell_in,
                 'sell_out'      => $sell_out,
@@ -200,7 +209,8 @@ new class extends Component
             ];
         })->values()->toArray();
 
-        $this->applySearch();
+        $this->brands = collect($this->raw_table_data)->pluck('brand')->filter()->unique()->sort()->values()->toArray();
+        $this->applyFilters();
     }
 };
 ?>
@@ -209,11 +219,17 @@ new class extends Component
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">ENDING INVENTORY {{ $year }} <i class="fa fa-spinner fa-spin fa-sm" wire:loading></i></h3>
-            <div class="card-tools m-0">
+            <div class="card-tools m-0 d-flex" style="gap: 4px;">
+                <select class="form-control form-control-sm" wire:model.live="selectedBrand">
+                    <option value="">All Brands</option>
+                    @foreach ($brands as $brand)
+                        <option value="{{ $brand }}">{{ $brand }}</option>
+                    @endforeach
+                </select>
                 <input type="text" class="form-control form-control-sm" placeholder="Search" wire:model.live.debounce.300ms="search">
             </div>
         </div>
-        <div class="card-body table-responsive p-0" style="max-height: 300px; overflow-y: auto;">
+        <div class="card-body table-responsive p-0" style="max-height: 500px; overflow-y: auto;">
 
             <table class="table table-bordered table-sm table-hover m-0 text-xs">
                 <colgroup>
@@ -232,7 +248,7 @@ new class extends Component
                     </tr>
                 </thead>
 
-                <tbody wire:loading.remove wire:target="search, chartUpdated">
+                <tbody wire:loading.remove wire:target="search, selectedBrand, chartUpdated">
                     @foreach($table_data as $data)
                         <tr>
                             <td>{{ $data['account'] }}</td>
@@ -246,9 +262,9 @@ new class extends Component
                     @endforeach
                 </tbody>
 
-                <tbody wire:loading wire:target="search, chartUpdated">
+                <tbody wire:loading wire:target="search, selectedBrand, chartUpdated">
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
                                 <div class="spinner-border spinner-border-sm text-secondary mr-2"></div>
                                 <span class="text-muted text-xs">Searching...</span>
