@@ -8,10 +8,6 @@
         <h1>[{{$account->account_code}}] {{$account->short_name}} - {{'['.$account_branch->code.'] '.$account_branch->name}} - REPORTS</h1>
     </div>
     <div class="col-lg-6 text-right">
-        <a href="{{route('report.trends')}}" class="btn btn-info btn-sm">
-            <i class="fa fa-chart-area mr-1"></i>
-            TRENDS REPORT
-        </a>
         @can('report vmi')
             <a href="{{route('report.vmi')}}" class="btn btn-warning btn-sm">
                 <i class="fa fa-chart-area mr-1"></i>
