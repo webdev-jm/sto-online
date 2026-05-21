@@ -51,65 +51,56 @@
             </div>
             @endif
 
-            <div class="row mb-2">
-                <div class="col-lg-6">
-                    <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>
-                </div>
-            </div>
-            <ul class="list-group">
-                @foreach($customers as $customer)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->code}}</p>
-                            <small class="font-weight-bold text-muted">CODE</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->name}}</p>
-                            <small class="font-weight-bold text-muted">NAME</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->address}}</p>
-                            <small class="font-weight-bold text-muted">ADDRESS</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->salesman->code ?? '-'}}</p>
-                            <small class="font-weight-bold text-muted">SALESMAN</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{$customer->channel->code ?? '-'}}</p>
-                            <small class="font-weight-bold text-muted">CHANNEL</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">
+            <b>{{$customers->total()}} total result{{$customers->total() > 1 ? 's' : ''}}</b>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CODE</th>
+                            <th>NAME</th>
+                            <th>ADDRESS</th>
+                            <th>SALESMAN</th>
+                            <th>CHANNEL</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($customers as $customer)
+                        <tr>
+                            <td class="align-middle font-weight-bold p-0">{{$customer->code}}</td>
+                            <td class="align-middle p-0">{{$customer->name}}</td>
+                            <td class="align-middle p-0">{{$customer->address}}</td>
+                            <td class="align-middle p-0">{{$customer->salesman->code ?? '-'}}</td>
+                            <td class="align-middle p-0">{{$customer->channel->code ?? '-'}}</td>
+                            <td class="align-middle text-center text-nowrap p-0">
                                 @if(empty($customer->deleted_at))
-                                    <a href="{{route('customer.show', encrypt($customer->id))}}" class="btn btn-info btn-xs" title="view details">
+                                    <a href="{{route('customer.show', encrypt($customer->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('customer edit')
-                                        <a href="{{route('customer.edit', encrypt($customer->id))}}" class="btn btn-success btn-xs" title="edit">
+                                        <a href="{{route('customer.edit', encrypt($customer->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('customer delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($customer->id)}}" title="delete">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($customer->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('customer restore')
-                                        <a href="{{route('customer.restore', encrypt($customer->id))}}" class="btn btn-warning btn-xs"  title="restore">
+                                        <a href="{{route('customer.restore', encrypt($customer->id))}}" class="btn btn-warning btn-xs" title="Restore">
                                             <i class="fa fa-recycle"></i>
                                         </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <small class="font-weight-bold text-muted">ACTION</small>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

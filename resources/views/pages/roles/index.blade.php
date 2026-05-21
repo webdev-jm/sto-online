@@ -35,40 +35,41 @@
             </div>
 
             <b>{{$roles->total()}} total result{{$roles->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($roles as $role)
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-lg-4 text-center">
-                                <p class="m-0">{{$role->name}}</p>
-                                <b>NAME</b>
-                            </div>
-                            <div class="col-lg-4 text-center">
-                                <p class="m-0">{{$role->users()->count()}}</p>
-                                <b>NO OF USERS</b>
-                            </div>
-                            <div class="col-lg-4 text-center">
-                                <p class="m-0">
-                                    <a href="{{route('role.show', encrypt($role->id))}}" class="btn btn-info btn-xs">
-                                        <i class="fa fa-list"></i>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>NAME</th>
+                            <th>NO OF USERS</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($roles as $role)
+                        <tr>
+                            <td class="align-middle">{{$role->name}}</td>
+                            <td class="align-middle">{{$role->users()->count()}}</td>
+                            <td class="align-middle text-center text-nowrap">
+                                <a href="{{route('role.show', encrypt($role->id))}}" class="btn btn-info btn-xs" title="View details">
+                                    <i class="fa fa-list"></i>
+                                </a>
+                                @can('role edit')
+                                    <a href="{{route('role.edit', encrypt($role->id))}}" class="btn btn-success btn-xs" title="Edit">
+                                        <i class="fa fa-pen"></i>
                                     </a>
-                                    @can('role edit')
-                                        <a href="{{route('role.edit', encrypt($role->id))}}" class="btn btn-success btn-xs">
-                                            <i class="fa fa-pen"></i>
-                                        </a>
-                                    @endcan
-                                    @can('role delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($role->id)}}">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    @endcan
-                                </p>
-                                <b>ACTION</b>
-                            </div>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
+                                @endcan
+                                @can('role delete')
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($role->id)}}" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

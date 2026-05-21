@@ -35,68 +35,60 @@
             </div>
 
             <b>{{$users->total()}} total result{{$users->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($users as $user)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-2 text-center align-middle">
-                            <p class="m-0 align-middle">
-                                <img class="img-circle elevation-2" src="{{asset(!empty($user->profile_picture_url) ? $user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="30px" height="30px">
 
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>USER STATUS</th>
+                            <th>NAME</th>
+                            <th>EMAIL</th>
+                            <th>ROLE/S</th>
+                            <th>STATUS</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr>
+                            <td class="align-middle text-nowrap">
+                                <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($user->profile_picture_url) ? $user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="25px" height="25px">
                                 @if(Cache::has('user-is-online-' . $user->id))
-                                    <span class="text-success ml-1">Online</span>
+                                    <span class="text-success">Online</span>
                                 @else
-                                    <span class="text-muted ml-1">Offline</span>
+                                    <span class="text-muted">Offline</span>
                                 @endif
-                            </p>
-                            <b>USER STATUS</b>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">
-                                {{$user->name}}
-                            </p>
-                            <b>NAME</b>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">{{$user->email}}</p>
-                            <b>EMAIL</b>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">{{implode(', ', $user->getRoleNames()->toArray())}}</p>
-                            <b>ROLE/S</b>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">
+                            </td>
+                            <td class="align-middle">{{$user->name}}</td>
+                            <td class="align-middle">{{$user->email}}</td>
+                            <td class="align-middle">{{implode(', ', $user->getRoleNames()->toArray())}}</td>
+                            <td class="align-middle">
                                 @if($user->status == 0)
                                     <span class="text-success">Active</span>
                                 @else
                                     <span class="text-danger">Inactive</span>
                                 @endif
-                            </p>
-                            <b>STATUS</b>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">
-                                <a href="{{route('user.show', encrypt($user->id))}}" class="btn btn-info btn-xs">
+                            </td>
+                            <td class="align-middle text-center text-nowrap">
+                                <a href="{{route('user.show', encrypt($user->id))}}" class="btn btn-info btn-xs" title="View details">
                                     <i class="fa fa-list"></i>
                                 </a>
                                 @can('user edit')
-                                    <a href="{{route('user.edit', encrypt($user->id))}}" class="btn btn-success btn-xs">
+                                    <a href="{{route('user.edit', encrypt($user->id))}}" class="btn btn-success btn-xs" title="Edit">
                                         <i class="fa fa-pen"></i>
                                     </a>
                                 @endcan
                                 @can('user delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($user->id)}}">
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($user->id)}}" title="Delete">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 @endcan
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="card-footer">
             {{$users->links(data: ['scrollTo' => false])}}

@@ -41,50 +41,51 @@
             </div>
 
             <b>{{$salesmen->total()}} total result{{$salesmen->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($salesmen as $salesman)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0 font-weight-bold">{{$salesman->code}}</p>
-                            <small class="font-weight-bold text-muted">CODE</small>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0 font-weight-bold">{{$salesman->name}}</p>
-                            <small class="font-weight-bold text-muted">NAME</small>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0 font-weight-bold">{{$salesman->type ?? '-'}}</p>
-                            <small class="font-weight-bold text-muted">TYPE OF SALESMAN</small>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CODE</th>
+                            <th>NAME</th>
+                            <th>TYPE OF SALESMAN</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($salesmen as $salesman)
+                        <tr>
+                            <td class="align-middle font-weight-bold">{{$salesman->code}}</td>
+                            <td class="align-middle">{{$salesman->name}}</td>
+                            <td class="align-middle">{{$salesman->type ?? '-'}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($salesman->deleted_at))
-                                    <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('salesman.show', encrypt($salesman->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('salesman edit')
-                                        <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-xs">
+                                        <a href="{{route('salesman.edit', encrypt($salesman->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('salesman delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($salesman->id)}}">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($salesman->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('salesman restore')
-                                        <a href="{{route('salesman.restore', encrypt($salesman->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('salesman.restore', encrypt($salesman->id))}}" class="btn btn-warning btn-xs" title="Restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

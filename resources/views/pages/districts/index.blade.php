@@ -36,42 +36,47 @@
             </div>
 
             <b>{{$districts->total()}} total result{{$districts->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($districts as $district)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-6 text-center">
-                            <p class="m-0 font-weight-bold">{{$district->district_code}}</p>
-                            <small class="font-weight-bold text-muted">DISTRICT CODE</small>
-                        </div>
-                        <div class="col-lg-6 text-center">
-                            <p class="m-0">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>DISTRICT CODE</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($districts as $district)
+                        <tr>
+                            <td class="align-middle font-weight-bold">{{$district->district_code}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($district->deleted_at))
-                                    <a href="{{route('district.show', encrypt($district->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('district.show', encrypt($district->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('district edit')
-                                        <a href="{{route('district.edit', encrypt($district->id))}}" class="btn btn-success btn-xs">
+                                        <a href="{{route('district.edit', encrypt($district->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('district delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($district->id)}}">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($district->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('district restore')
-                                        <a href="{{route('district.restore', encrypt($district->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('district.restore', encrypt($district->id))}}" class="btn btn-warning btn-xs" title="Restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">
