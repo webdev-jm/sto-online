@@ -36,46 +36,49 @@
             </div>
 
             <b>{{$areas->total()}} total result{{$areas->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($areas as $area)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$area->code}}</p>
-                            <small class="font-weight-bold text-muted">CODE</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$area->name}}</p>
-                            <small class="font-weight-bold text-muted">NAME</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CODE</th>
+                            <th>NAME</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($areas as $area)
+                        <tr>
+                            <td class="align-middle font-weight-bold">{{$area->code}}</td>
+                            <td class="align-middle">{{$area->name}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($area->deleted_at))
-                                    <a href="{{route('area.show', encrypt($area->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('area.show', encrypt($area->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('area edit')
-                                        <a href="{{route('area.edit', encrypt($area->id))}}" class="btn btn-success btn-xs">
+                                        <a href="{{route('area.edit', encrypt($area->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('area delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($area->id)}}">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($area->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('area restore')
-                                        <a href="{{route('area.restore', encrypt($area->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('area.restore', encrypt($area->id))}}" class="btn btn-warning btn-xs" title="Restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

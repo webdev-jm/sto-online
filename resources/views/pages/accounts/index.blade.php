@@ -35,44 +35,43 @@
             </div>
 
             <b>{{$accounts->total()}} total result{{$accounts->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($accounts as $account)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$account->account_code}}</p>
-                            <b>ACCOUNT CODE</b>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$account->account_name}}</p>
-                            <b>ACCOUNT NAME</b>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">{{$account->short_name}}</p>
-                            <b>SHORT NAME</b>
-                        </div>
-                        <div class="col-lg-3 text-center">
-                            <p class="m-0">
-                                <a href="{{route('account.show', encrypt($account->id))}}" class="btn btn-info btn-xs">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ACCOUNT CODE</th>
+                            <th>ACCOUNT NAME</th>
+                            <th>SHORT NAME</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($accounts as $account)
+                        <tr>
+                            <td class="align-middle font-weight-bold">{{$account->account_code}}</td>
+                            <td class="align-middle">{{$account->account_name}}</td>
+                            <td class="align-middle">{{$account->short_name}}</td>
+                            <td class="align-middle text-center text-nowrap">
+                                <a href="{{route('account.show', encrypt($account->id))}}" class="btn btn-info btn-xs" title="View details">
                                     <i class="fa fa-list"></i>
                                 </a>
                                 @can('account edit')
-                                    <a href="{{route('account.edit', encrypt($account->id))}}" class="btn btn-success btn-xs">
+                                    <a href="{{route('account.edit', encrypt($account->id))}}" class="btn btn-success btn-xs" title="Edit">
                                         <i class="fa fa-pen"></i>
                                     </a>
                                 @endcan
                                 @can('account delete')
-                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($account->id)}}">
+                                    <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($account->id)}}" title="Delete">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 @endcan
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

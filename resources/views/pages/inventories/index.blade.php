@@ -44,51 +44,54 @@
             @endif
 
             <b>{{$inventory_uploads->total()}} total result{{$inventory_uploads->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($inventory_uploads as $inventory)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{date('Y-m-d H:i:s a', strtotime($inventory->created_at))}}</p>
-                            <small class="font-weight-bold text-muted">CREATED AT</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$inventory->user->name}}</p>
-                            <small class="font-weight-bold text-muted">NAME</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CREATED AT</th>
+                            <th>NAME</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($inventory_uploads as $inventory)
+                        <tr>
+                            <td class="align-middle">{{date('Y-m-d H:i:s a', strtotime($inventory->created_at))}}</td>
+                            <td class="align-middle">{{$inventory->user->name}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($inventory->deleted_at))
-                                    <a href="{{route('inventory.show', encrypt($inventory->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('inventory.show', encrypt($inventory->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('inventory edit')
-                                        <a href="{{route('inventory.edit', encrypt($inventory->id))}}" class="btn btn-success btn-xs">
+                                        <a href="{{route('inventory.edit', encrypt($inventory->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('inventory export')
-                                        <a href="{{route('inventory.export', encrypt($inventory->id))}}" class="btn btn-primary btn-xs">
+                                        <a href="{{route('inventory.export', encrypt($inventory->id))}}" class="btn btn-primary btn-xs" title="Export">
                                             <i class="fa fa-download"></i>
                                         </a>
                                     @endcan
                                     @can('inventory delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($inventory->id)}}">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($inventory->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('inventory restore')
-                                        <a href="{{route('inventory.restore', encrypt($inventory->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('inventory.restore', encrypt($inventory->id))}}" class="btn btn-warning btn-xs" title="Restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

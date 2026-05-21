@@ -43,64 +43,61 @@
             @endif
 
             <b>{{$sales_uploads->total()}} total result{{$sales_uploads->total() > 1 ? 's' : ''}}</b>
-            <ul class="list-group">
-                @foreach($sales_uploads as $sale)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{date('Y-m-d H:i:s a', strtotime($sale->created_at))}}</p>
-                            <small class="font-weight-bold text-muted">CREATED AT</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">
-                                <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($sale->user->profile_picture_url) ? $sale->user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="30px" height="30px">
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CREATED AT</th>
+                            <th>USER</th>
+                            <th>COUNT</th>
+                            <th>AMOUNT</th>
+                            <th>CM AMOUNT</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($sales_uploads as $sale)
+                        <tr>
+                            <td class="align-middle">{{date('Y-m-d H:i:s a', strtotime($sale->created_at))}}</td>
+                            <td class="align-middle text-nowrap">
+                                <img class="img-circle elevation-2 mr-1" src="{{asset(!empty($sale->user->profile_picture_url) ? $sale->user->profile_picture_url.'-small.jpg': '/images/Windows_10_Default_Profile_Picture.svg')}}" alt="User Avatar" width="25px" height="25px">
                                 {{$sale->user->name ?? '-'}}
-                            </p>
-                            <small class="font-weight-bold text-muted">USER</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{number_format($sale->sku_count) ?? 0}}</p>
-                            <small class="font-weight-bold text-muted">COUNT</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{number_format($sale->total_amount_vat, 2) ?? 0}}</p>
-                            <small class="font-weight-bold text-muted">AMOUNT</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0 font-weight-bold">{{number_format($sale->total_cm_amount_vat, 2) ?? 0}}</p>
-                            <small class="font-weight-bold text-muted">CM AMOUNT</small>
-                        </div>
-                        <div class="col-lg-2 text-center">
-                            <p class="m-0">
+                            </td>
+                            <td class="align-middle">{{number_format($sale->sku_count) ?? 0}}</td>
+                            <td class="align-middle">{{number_format($sale->total_amount_vat, 2) ?? 0}}</td>
+                            <td class="align-middle">{{number_format($sale->total_cm_amount_vat, 2) ?? 0}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($sale->deleted_at))
-                                    <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('sales.show', encrypt($sale->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
-                                    <a href="{{route('sales.export', encrypt($sale->id))}}" class="btn btn-primary btn-xs">
+                                    <a href="{{route('sales.export', encrypt($sale->id))}}" class="btn btn-primary btn-xs" title="Export">
                                         <i class="fa fa-download"></i>
                                     </a>
                                     @can('sales edit')
-                                        <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs">
+                                        <a href="{{route('sales.edit', encrypt($sale->id))}}" class="btn btn-success btn-xs" title="Edit">
                                             <i class="fa fa-pen"></i>
                                         </a>
                                     @endcan
                                     @can('sales delete')
-                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($sale->id)}}">
+                                        <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($sale->id)}}" title="Delete">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     @endcan
                                 @else
                                     @can('sales restore')
-                                        <a href="{{route('sales.restore', encrypt($sale->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a>
+                                        <a href="{{route('sales.restore', encrypt($sale->id))}}" class="btn btn-warning btn-xs" title="Restore">
+                                            <i class="fa fa-recycle"></i>
+                                        </a>
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">

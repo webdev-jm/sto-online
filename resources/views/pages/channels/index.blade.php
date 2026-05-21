@@ -35,46 +35,42 @@
                 </div>
             </div>
 
-            <ul class="list-group">
-                @foreach($channels as $channel)
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$channel->code}}</p>
-                            <small class="font-weight-bold text-muted">CODE</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0 font-weight-bold">{{$channel->name}}</p>
-                            <small class="font-weight-bold text-muted">NAME</small>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <p class="m-0">
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CODE</th>
+                            <th>NAME</th>
+                            <th class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($channels as $channel)
+                        <tr>
+                            <td class="align-middle font-weight-bold">{{$channel->code}}</td>
+                            <td class="align-middle">{{$channel->name}}</td>
+                            <td class="align-middle text-center text-nowrap">
                                 @if(empty($channel->deleted_at))
-                                    <a href="{{route('channel.show', encrypt($channel->id))}}" class="btn btn-info btn-xs">
+                                    <a href="{{route('channel.show', encrypt($channel->id))}}" class="btn btn-info btn-xs" title="View details">
                                         <i class="fa fa-list"></i>
                                     </a>
                                     @can('channel edit')
-                                        {{-- <a href="{{route('channel.edit', encrypt($channel->id))}}" class="btn btn-success btn-xs">
-                                            <i class="fa fa-pen"></i>
-                                        </a> --}}
+                                        {{-- <a href="{{route('channel.edit', encrypt($channel->id))}}" class="btn btn-success btn-xs"><i class="fa fa-pen"></i></a> --}}
                                     @endcan
                                     @can('channel delete')
-                                        {{-- <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($channel->id)}}">
-                                            <i class="fa fa-trash"></i>
-                                        </a> --}}
+                                        {{-- <a href="" class="btn btn-danger btn-xs btn-delete" data-id="{{encrypt($channel->id)}}"><i class="fa fa-trash"></i></a> --}}
                                     @endcan
                                 @else
                                     @can('channel restore')
-                                        {{-- <a href="{{route('channel.restore', encrypt($channel->id))}}" class="btn btn-warning btn-xs"  title="restore"><i class="fa fa-recycle"></i></a> --}}
+                                        {{-- <a href="{{route('channel.restore', encrypt($channel->id))}}" class="btn btn-warning btn-xs" title="Restore"><i class="fa fa-recycle"></i></a> --}}
                                     @endcan
                                 @endif
-                            </p>
-                            <b>ACTION</b>
-                        </div>
-                    </div>
-                </li>
-                @endforeach
-            </ul>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
         <div class="card-footer">
