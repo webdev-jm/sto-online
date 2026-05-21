@@ -169,7 +169,7 @@
             @endcan
 
             @canany(['location upload', 'area upload', 'district upload', 'salesman upload', 'customer upload'])
-            <a href="{{ route('uploads.index') }}" class="menu-tile tile-teal">
+            {{-- <a href="{{ route('uploads.index') }}" class="menu-tile tile-teal">
                 <div class="tile-glow"></div>
                 <div class="tile-icon"><i class="fa fa-file-upload"></i></div>
                 <div class="tile-content">
@@ -177,7 +177,7 @@
                     <span class="tile-desc">Upload reference data</span>
                 </div>
                 <i class="fa fa-chevron-right tile-arrow"></i>
-            </a>
+            </a> --}}
             @endcanany
 
         </div>
