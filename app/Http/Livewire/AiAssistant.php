@@ -121,12 +121,16 @@ class AiAssistant extends Component
         $this->isOpen = !$this->isOpen;
 
         if ($this->isOpen && !$this->insightsGenerated) {
-            $this->generateInsights();
+            $this->isLoading = true;
         }
     }
 
     public function generateInsights(): void
     {
+        if ($this->insightsGenerated) {
+            return;
+        }
+
         $this->isLoading = true;
 
         $messages = [
@@ -161,12 +165,11 @@ class AiAssistant extends Component
 
         // RAG: retrieve relevant chunks from the reporting SQLite
         $systemPrompt = $this->systemPrompt;
-        $account      = session('account');
-        if ($account) {
-            $chunks = app(RagService::class)->retrieve($input, $account->account_code);
-            if (!empty($chunks)) {
-                $systemPrompt .= "\n\nRelevant business data:\n" . implode("\n---\n", $chunks);
-            }
+        $account      = session('account') ?? session('account_branch')?->account;
+        $accountCode  = $account?->account_code ?? '';
+        $chunks       = app(RagService::class)->retrieve($input, $accountCode);
+        if (!empty($chunks)) {
+            $systemPrompt .= "\n\nRelevant business data:\n" . implode("\n---\n", $chunks);
         }
 
         $history = array_merge(

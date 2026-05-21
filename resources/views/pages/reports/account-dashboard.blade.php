@@ -20,6 +20,8 @@
 
 @section('content')
     <livewire:dashboard.account-report :account="$account" />
+
+    @livewire('ai-assistant')
 @stop
 
 @section('css')
