@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'name' => 'STO ONLINE',
+    'name' => 'OnePortal',
     'manifest' => [
         'name' => env('APP_NAME', 'My PWA App'),
-        'short_name' => 'STO ONLINE',
+        'short_name' => 'OnePortal',
         'start_url' => '/',
         'background_color' => '#ffffff',
         'theme_color' => '#000000',
@@ -59,8 +59,8 @@ return [
         ],
         'shortcuts' => [
             [
-                'name' => 'STO ONLINE',
-                'description' => 'Sales to Outlet Online',
+                'name' => 'OnePortal',
+                'description' => 'OnePortal',
                 'url' => '/home',
                 'icons' => [
                     "src" => "/images/icons/icon-72x72.png",
@@ -68,8 +68,8 @@ return [
                 ]
             ],
             [
-                'name' => 'STO ONLINE',
-                'description' => 'Sales to Outlet Online',
+                'name' => 'OnePortal',
+                'description' => 'OnePortal',
                 'url' => '/home'
             ]
         ],

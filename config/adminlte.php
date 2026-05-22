@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'BEV PORTAL',
+    'title' => 'OnePortal',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b><span class="text-bev">BEV</span> PORTAL</b>',
-    'logo_img' => '/images/BEV-LOGO.png',
+    'logo' => '<b>OnePortal</b>',
+    'logo_img' => '/images/OnePortal-Logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => '/images/BEV-LOGO.png',
+            'path' => '/images/OnePortal-Logo.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -109,7 +109,7 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => '/images/BEV-LOGO.png',
+            'path' => '/images/OnePortal-Logo.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
