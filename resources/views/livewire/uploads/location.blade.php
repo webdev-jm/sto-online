@@ -1,16 +1,5 @@
 <div style="position:relative;">
 
-    {{-- LOADING OVERLAY --}}
-    <div wire:loading wire:target="file"
-         class="d-flex align-items-center justify-content-center"
-         style="position:absolute;top:0;left:0;width:100%;height:100%;
-                background:rgba(255,255,255,0.85);z-index:9999;">
-        <div class="text-center">
-            <i class="fa fa-spinner fa-spin fa-2x text-primary mb-2 d-block"></i>
-            <strong>Processing file, please wait...</strong>
-        </div>
-    </div>
-
     @if($mode === 'modal')
     <div class="modal-content">
         <div class="modal-header">
