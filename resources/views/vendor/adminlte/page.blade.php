@@ -1,7 +1,7 @@
 @extends('adminlte::master')
 
 @section('meta_tags')
-<link rel="shortcut icon" href="{{asset('/images/OnePortal-Logo.png')}}" type="image/x-icon">
+<link rel="shortcut icon" href="{{asset('/images/OnePortal.png')}}" type="image/x-icon">
 @endsection
 
 @inject('layoutHelper', 'JeroenNoten\LaravelAdminLte\Helpers\LayoutHelper')
