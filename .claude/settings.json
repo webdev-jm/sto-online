@@ -64,7 +64,8 @@
       "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; $app = require '\\\\''bootstrap/app.php'\\\\''; $app->make\\('\\\\''Illuminate\\\\Contracts\\\\Console\\\\Kernel'\\\\''\\)->bootstrap\\(\\); DB::table\\('\\\\''migrations'\\\\''\\)->insert\\(['\\\\''migration'\\\\'' => '\\\\''2024_10_15_132554_create_paf_brand_approvals_table'\\\\'', '\\\\''batch'\\\\'' => 4]\\); echo '\\\\''Done'\\\\'';')",
       "mcp__laravel-boost__get-config",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jm.renon\\\\Documents\\\\2025\\\\PROJECT-DOCS\\\\sales-order\\\\vendor\" -Filter \"Fluent.php\" -Recurse -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object -First 1 FullName)"
+      "Bash(Select-Object -First 1 FullName)",
+      "Bash(dir \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\centralized-app\\\\tests\\\\Feature\" /B)"
     ]
   }
 }

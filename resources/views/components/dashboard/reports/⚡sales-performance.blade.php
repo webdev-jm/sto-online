@@ -138,6 +138,13 @@ new class extends Component
 };
 ?>
 
+<style>
+    #container-performance .highcharts-drilldown-axis-label {
+        pointer-events: none !important;
+        cursor: default !important;
+    }
+</style>
+
 <div wire:init="generateInsight">
     <div class="card">
         <div class="card-header">
@@ -165,100 +172,21 @@ new class extends Component
 
     let chart;
 
-    const initChart = () => {
+    $wire.on('update-chart', (event) => {
+        if (chart) { chart.destroy(); }
         chart = Highcharts.chart('container-performance', {
             credits: { enabled: false },
             chart: {
                 type: 'column',
                 events: {
-                    drillup: function () {
-                        const categories = this.userOptions.xAxis.categories;
+                    drilldown: function (e) {
+                        const categories = e.seriesOptions.data.map(p => p.name);
                         this.xAxis[0].setCategories(categories, false);
                         this.redraw();
-                    }
-                }
-            },
-            title: { text: null },
-            accessibility: { announceNewData: { enabled: true } },
-            xAxis: {
-                categories: $wire.chart_data.categories,
-                crosshair: true,
-            },
-            yAxis: {
-                title: { text: 'Sales' }
-            },
-            legend: { enabled: false },
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            const val = this.y;
-                            if (val >= 1_000_000_000) return '₱ ' + Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
-                            if (val >= 1_000_000)     return '₱ ' + Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
-                            if (val >= 1_000)         return '₱ ' + Highcharts.numberFormat(val / 1_000, 1) + 'K';
-                            return '₱ ' + Highcharts.numberFormat(val, 2);
-                        }
-                    }
-                },
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            const val = this.y;
-                            let abbreviated;
-                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
-                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
-                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
-                            else                       abbreviated = Highcharts.numberFormat(val, 2);
-                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
-                        }
                     },
-                    showInLegend: true
-                }
-            },
-            tooltip: {
-                formatter: function () {
-                    if (this.series.type === 'pie') {
-                        // Drilldown tooltip
-                        return `<span style="font-size:11px">${this.series.name}</span><br>
-                                <b>${this.point.name}</b><br>
-                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
-                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
-                    }
-                    // Top level column tooltip
-                    return `<span style="font-size:11px">${this.series.name}</span><br>
-                            <b>${this.point.name}</b><br>
-                            ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
-                }
-            },
-            series: $wire.chart_data.data,
-            drilldown: {
-                series: $wire.chart_data.drilldown,
-                activeDataLabelStyle: {
-                    textDecoration: 'none',
-                    color: 'inherit'
-                }
-            }
-        });
-    }
-
-    initChart();
-
-    $wire.on('update-chart', (event) => {
-        chart.destroy();
-        chart = Highcharts.chart('container-performance', {
-            credits: { enabled: false },
-            chart: {
-                type: 'column',
-                events: {
                     drillup: function () {
                         const categories = event.data.categories;
                         this.xAxis[0].setCategories(categories, false);
-
                         this.yAxis[0].setTitle({ text: 'Sales' }, false);
                         this.redraw();
                     }
@@ -288,34 +216,9 @@ new class extends Component
                         }
                     }
                 },
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            const val = this.y;
-                            let abbreviated;
-                            if (val >= 1_000_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000_000, 1) + 'B';
-                            else if (val >= 1_000_000) abbreviated = Highcharts.numberFormat(val / 1_000_000, 1) + 'M';
-                            else if (val >= 1_000)     abbreviated = Highcharts.numberFormat(val / 1_000, 1) + 'K';
-                            else                       abbreviated = Highcharts.numberFormat(val, 2);
-                            return `<b>${this.point.name}</b>: ₱ ${abbreviated} (${Highcharts.numberFormat(this.percentage, 1)}%)`;
-                        }
-                    },
-                    showInLegend: true
-                }
             },
             tooltip: {
                 formatter: function () {
-                    if (this.series.type === 'pie') {
-                        // Drilldown tooltip
-                        return `<span style="font-size:11px">${this.series.name}</span><br>
-                                <b>${this.point.name}</b><br>
-                                ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>
-                                (${Highcharts.numberFormat(this.percentage, 1)}%)`;
-                    }
-                    // Top level column tooltip
                     return `<span style="font-size:11px">${this.series.name}</span><br>
                             <b>${this.point.name}</b><br>
                             ₱ <b>${Highcharts.numberFormat(this.y, 2)}</b>`;
