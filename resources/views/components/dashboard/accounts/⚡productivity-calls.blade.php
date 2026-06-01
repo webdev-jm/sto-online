@@ -8,19 +8,27 @@ use App\Models\Account;
 new class extends Component
 {
     #[Reactive]
-    public $year;
+    public $date_from;
+    #[Reactive]
+    public $date_to;
     #[Reactive]
     public $account_id;
     public $chart_data = [];
 
-    public function mount($year, $account_id): void
+    public function mount($date_from, $date_to, $account_id): void
     {
-        $this->year       = $year;
+        $this->date_from  = $date_from;
+        $this->date_to    = $date_to;
         $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
-    public function updatedYear(): void
+    public function updatedDateFrom(): void
+    {
+        $this->chartUpdated();
+    }
+
+    public function updatedDateTo(): void
     {
         $this->chartUpdated();
     }
@@ -40,37 +48,52 @@ new class extends Component
 
         $account = Account::find($this->account_id);
 
+        $startOfRange = \Carbon\Carbon::parse($this->date_from . '-01')->startOfMonth();
+        $endOfRange   = \Carbon\Carbon::parse($this->date_to   . '-01')->endOfMonth();
+
         $rows = DB::connection($account->db_data->connection_name)
             ->table('sales as s')
             ->select([
                 's.document_number as document_number',
                 DB::raw("COALESCE(sm.name, csm.name, 'Unknown Salesman') as salesman_name"),
+                DB::raw('YEAR(s.date) as year'),
                 DB::raw('MONTH(s.date) as month'),
             ])
             ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
             ->leftJoin('salesmen as sm', 'sm.id', '=', 's.salesman_id')
             ->leftJoin('salesmen as csm', 'csm.id', '=', 'c.salesman_id')
-            ->whereYear('s.date', $this->year)
+            ->whereBetween('s.date', [$startOfRange, $endOfRange])
             ->whereNull('s.deleted_at')
             ->distinct()
             ->get();
 
         $collection = $rows->map(fn($row) => [
             'document_number' => $row->document_number,
-            'salesman_name' => $row->salesman_name,
-            'month'         => (int) $row->month,
+            'salesman_name'   => $row->salesman_name,
+            'year'            => (int) $row->year,
+            'month'           => (int) $row->month,
         ]);
 
-        $activeMonthNumbers = $collection->pluck('month')->unique()->sort()->values();
-        $categories = $activeMonthNumbers->map(fn($m) => \Carbon\Carbon::create($this->year, $m, 1)->format('F'))->toArray();
+        // Build an ordered month plan for the selected range
+        $from = \Carbon\Carbon::parse($this->date_from . '-01');
+        $to   = \Carbon\Carbon::parse($this->date_to   . '-01');
+        $plan = [];
+        $cur  = $from->copy();
+        while ($cur->lte($to)) {
+            $plan[] = ['year' => $cur->year, 'month' => $cur->month, 'label' => $cur->format("M 'y")];
+            $cur->addMonth();
+        }
+
+        $categories = array_column($plan, 'label');
 
         $salesmenNames = $collection->pluck('salesman_name')->unique()->values();
 
-        $series = $salesmenNames->map(function ($salesman) use ($collection, $activeMonthNumbers) {
-            $monthlyData = $activeMonthNumbers->map(fn($monthNum) =>
+        $series = $salesmenNames->map(function ($salesman) use ($collection, $plan) {
+            $monthlyData = collect($plan)->map(fn($m) =>
                 $collection
                     ->where('salesman_name', $salesman)
-                    ->where('month', $monthNum)
+                    ->where('year', $m['year'])
+                    ->where('month', $m['month'])
                     ->groupBy('document_number')
                     ->count()
             );
@@ -103,7 +126,7 @@ new class extends Component
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">PRODUCTIVITY CALLS {{ $this->year }}</h3>
+            <h3 class="card-title">PRODUCTIVITY CALLS</h3>
         </div>
         <div class="chart-sk">
             <div class="chart-sk-shimmer"></div>

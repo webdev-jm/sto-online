@@ -18,12 +18,18 @@ new class extends Component
     public $header_data = [];
     public $selected_account;
 
+    /** Tab keys to show. All four are on by default. */
+    // public array $enabledTabs = ['sales', 'inventories', 'accounts', 'trends'];
+    public array $enabledTabs = ['sales', 'inventories', 'accounts'];
+
     /** Tracks which tabs have ever been visited so components aren't mounted until needed. */
     public array $initializedTabs = ['sales'];
 
     public function mount(): void
     {
         $this->globalYear = date('Y');
+        $this->initializedTabs = array_slice($this->enabledTabs, 0, 1);
+        $this->selected_tab = $this->initializedTabs[0] ?? 'sales';
         $this->getData();
     }
 
@@ -63,6 +69,10 @@ new class extends Component
 
     public function selectTab($tab): void
     {
+        if (!in_array($tab, $this->enabledTabs)) {
+            return;
+        }
+
         $this->selected_tab = $tab;
 
         if (!in_array($tab, $this->initializedTabs)) {
@@ -144,6 +154,7 @@ new class extends Component
         <div class="dash-tabs-card">
 
             <ul class="dash-tab-nav" role="tablist">
+                @if(in_array('sales', $enabledTabs))
                 <li class="nav-item">
                     <a class="nav-link {{ $selected_tab === 'sales' ? 'active' : '' }}"
                        role="tab"
@@ -153,6 +164,8 @@ new class extends Component
                         <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('sales')"></i>
                     </a>
                 </li>
+                @endif
+                @if(in_array('inventories', $enabledTabs))
                 <li class="nav-item">
                     <a class="nav-link {{ $selected_tab === 'inventories' ? 'active' : '' }}"
                        role="tab"
@@ -162,6 +175,8 @@ new class extends Component
                         <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('inventories')"></i>
                     </a>
                 </li>
+                @endif
+                @if(in_array('accounts', $enabledTabs))
                 <li class="nav-item">
                     <a class="nav-link {{ $selected_tab === 'accounts' ? 'active' : '' }}"
                        role="tab"
@@ -171,6 +186,8 @@ new class extends Component
                         <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('accounts')"></i>
                     </a>
                 </li>
+                @endif
+                @if(in_array('trends', $enabledTabs))
                 <li class="nav-item">
                     <a class="nav-link {{ $selected_tab === 'trends' ? 'active' : '' }}"
                        role="tab"
@@ -180,6 +197,7 @@ new class extends Component
                         <i class="fa fa-spinner fa-spin ml-1" wire:loading wire:target="selectTab('trends')"></i>
                     </a>
                 </li>
+                @endif
             </ul>
 
             <div class="dash-tab-body">
@@ -203,7 +221,7 @@ new class extends Component
                 <div wire:loading.remove wire:target="selectTab">
 
                 {{-- ── SALES TAB ──────────────────────────────────── --}}
-                @if(in_array('sales', $this->initializedTabs))
+                @if(in_array('sales', $enabledTabs) && in_array('sales', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'sales' ? '' : 'd-none' }}">
 
                         <livewire:dashboard.insight :year="$globalYear" type="sales" wire:key="insight-sales-{{ $globalYear }}" />
@@ -287,7 +305,7 @@ new class extends Component
                 @endif
 
                 {{-- ── INVENTORIES TAB ────────────────────────────── --}}
-                @if(in_array('inventories', $this->initializedTabs))
+                @if(in_array('inventories', $enabledTabs) && in_array('inventories', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'inventories' ? '' : 'd-none' }}">
 
                         <livewire:dashboard.insight :year="$globalYear" type="inventories" wire:key="insight-inventories-{{ $globalYear }}" />
@@ -355,14 +373,14 @@ new class extends Component
                 @endif
 
                 {{-- ── ACCOUNTS TAB ───────────────────────────────── --}}
-                @if(in_array('accounts', $this->initializedTabs))
+                @if(in_array('accounts', $enabledTabs) && in_array('accounts', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'accounts' ? '' : 'd-none' }}">
                         <livewire:dashboard.accounts :year="$globalYear" />
                     </div>
                 @endif
 
                 {{-- ── TRENDS TAB ─────────────────────────────────── --}}
-                @if(in_array('trends', $this->initializedTabs))
+                @if(in_array('trends', $enabledTabs) && in_array('trends', $this->initializedTabs))
                     <div class="{{ $selected_tab === 'trends' ? '' : 'd-none' }}">
                         <div class="row">
                             <div class="col-lg-6">

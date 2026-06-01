@@ -11,13 +11,19 @@ new class extends Component
     #[Reactive]
     public $year;
     #[Reactive]
-    public ?int $account_id = null;
+    public $account_id;
+    #[Reactive]
+    public ?string $date_from = null;
+    #[Reactive]
+    public ?string $date_to = null;
     public array $chart_data = [];
 
-    public function mount($year, $account_id = null): void
+    public function mount($year = null, $account_id = null, $date_from = null, $date_to = null): void
     {
-        $this->year = $year;
+        $this->year       = $year;
         $this->account_id = $account_id;
+        $this->date_from  = $date_from;
+        $this->date_to    = $date_to;
         $this->chartUpdated();
     }
 
@@ -26,14 +32,33 @@ new class extends Component
         $this->chartUpdated();
     }
 
+    public function updatedAccountId(): void
+    {
+        $this->chartUpdated();
+    }
+
+    public function updatedDateFrom(): void
+    {
+        $this->chartUpdated();
+    }
+
+    public function updatedDateTo(): void
+    {
+        $this->chartUpdated();
+    }
+
     public function chartUpdated(): void
     {
-        $plan  = $this->getRollingMonthPlan(18);
-        $years = collect($plan)->pluck('year')->unique();
-
-        $all = collect();
-        foreach ($years as $yr) {
-            $all = $all->merge($this->getInventoryData($yr, $this->account_id)->all());
+        if ($this->date_from && $this->date_to) {
+            $plan = $this->getMonthPlanForRange($this->date_from, $this->date_to);
+            $all  = $this->getInventoryDataForRange($this->date_from, $this->date_to, $this->account_id);
+        } else {
+            $plan  = $this->getRollingMonthPlan(18);
+            $years = collect($plan)->pluck('year')->unique();
+            $all   = collect();
+            foreach ($years as $yr) {
+                $all = $all->merge($this->getInventoryData($yr, $this->account_id)->all());
+            }
         }
 
         $byYearMonth = $all->groupBy(fn($row) => $row['year'] . '-' . $row['month'])

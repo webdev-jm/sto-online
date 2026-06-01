@@ -223,6 +223,61 @@ trait SalesDataAggregator
         return $plan;
     }
 
+    /**
+     * Returns an ordered month-by-month plan for any date range.
+     * Each entry: ['year', 'month', 'label'].
+     */
+    protected function getMonthPlanForRange(string $dateFrom, string $dateTo): array
+    {
+        $from = \Carbon\Carbon::parse($dateFrom . '-01');
+        $to   = \Carbon\Carbon::parse($dateTo   . '-01');
+        $plan = [];
+        $cur  = $from->copy();
+        while ($cur->lte($to)) {
+            $plan[] = ['year' => $cur->year, 'month' => $cur->month, 'label' => $cur->format("M 'y")];
+            $cur->addMonth();
+        }
+        return $plan;
+    }
+
+    /**
+     * Fetches and merges yearly sales data for every year in the range,
+     * then filters to only the months within the range.
+     */
+    protected function getSalesDataForRange(string $dateFrom, string $dateTo, ?int $accountId = null): \Illuminate\Support\Collection
+    {
+        $from  = \Carbon\Carbon::parse($dateFrom . '-01');
+        $to    = \Carbon\Carbon::parse($dateTo   . '-01');
+        $years = range($from->year, $to->year);
+        $data  = collect();
+        foreach ($years as $year) {
+            $data = $data->merge($this->getYearlySalesData($year));
+        }
+        return $data
+            ->filter(fn($row) => \Carbon\Carbon::create($row['year'], $row['month'], 1)->between($from, $to))
+            ->when($accountId, fn($col) => $col->where('account_id', $accountId))
+            ->values();
+    }
+
+    /**
+     * Fetches and merges yearly inventory data for every year in the range,
+     * then filters to only the months within the range.
+     */
+    protected function getInventoryDataForRange(string $dateFrom, string $dateTo, ?int $accountId = null): \Illuminate\Support\Collection
+    {
+        $from  = \Carbon\Carbon::parse($dateFrom . '-01');
+        $to    = \Carbon\Carbon::parse($dateTo   . '-01');
+        $years = range($from->year, $to->year);
+        $data  = collect();
+        foreach ($years as $year) {
+            $data = $data->merge($this->getYearlyInventoryData($year));
+        }
+        return $data
+            ->filter(fn($row) => \Carbon\Carbon::create($row['year'], $row['month'], 1)->between($from, $to))
+            ->when($accountId, fn($col) => $col->where('account_id', $accountId))
+            ->values();
+    }
+
     private function computeRemainingDays($expiryDate): int
     {
         if (empty($expiryDate)) return 0;

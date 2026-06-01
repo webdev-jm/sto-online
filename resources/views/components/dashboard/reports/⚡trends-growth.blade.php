@@ -11,16 +11,22 @@ new class extends Component
     #[Reactive]
     public $year;
     #[Reactive]
-    public ?int $account_id = null;
+    public $account_id;
+    #[Reactive]
+    public ?string $date_from = null;
+    #[Reactive]
+    public ?string $date_to = null;
     public array $growth_stats = [];
     public array $sku_table    = [];
     public string $recent_label = '';
     public string $prior_label  = '';
 
-    public function mount($year, $account_id = null): void
+    public function mount($year = null, $account_id = null, $date_from = null, $date_to = null): void
     {
-        $this->year = $year;
+        $this->year       = $year;
         $this->account_id = $account_id;
+        $this->date_from  = $date_from;
+        $this->date_to    = $date_to;
         $this->computeGrowth();
     }
 
@@ -29,25 +35,62 @@ new class extends Component
         $this->computeGrowth();
     }
 
+    public function updatedAccountId(): void
+    {
+        $this->computeGrowth();
+    }
+
+    public function updatedDateFrom(): void
+    {
+        $this->computeGrowth();
+    }
+
+    public function updatedDateTo(): void
+    {
+        $this->computeGrowth();
+    }
+
     public function computeGrowth(): void
     {
-        $plan  = $this->getRollingMonthPlan(18);
-        $years = collect($plan)->pluck('year')->unique();
+        if ($this->date_from && $this->date_to) {
+            $plan = $this->getMonthPlanForRange($this->date_from, $this->date_to);
+            $all  = $this->getSalesDataForRange($this->date_from, $this->date_to, $this->account_id);
 
-        $all = collect();
-        foreach ($years as $yr) {
-            $all = $all->merge($this->getSalesData($yr, $this->account_id)->all());
+            // Split the range in half: first half = prior, second half = recent
+            $total  = count($plan);
+            $midIdx = (int) floor($total / 2);
+
+            $planIndex = collect($plan)->mapWithKeys(fn($m, $i) => [$m['year'] . '-' . $m['month'] => $i]);
+
+            $indexed = $all->filter(fn($row) => $planIndex->has($row['year'] . '-' . $row['month']))
+                ->map(fn($row) => [...$row, 'plan_idx' => $planIndex[$row['year'] . '-' . $row['month']]]);
+
+            $recent = $indexed->filter(fn($r) => $r['plan_idx'] >= $midIdx);
+            $prior  = $indexed->filter(fn($r) => $r['plan_idx'] < $midIdx);
+
+            $this->recent_label = ($plan[$midIdx]['label'] ?? '') . ' – ' . ($plan[$total - 1]['label'] ?? '');
+            $this->prior_label  = ($plan[0]['label'] ?? '') . ' – ' . ($plan[max(0, $midIdx - 1)]['label'] ?? '');
+        } else {
+            $plan  = $this->getRollingMonthPlan(18);
+            $years = collect($plan)->pluck('year')->unique();
+
+            $all = collect();
+            foreach ($years as $yr) {
+                $all = $all->merge($this->getSalesData($yr, $this->account_id)->all());
+            }
+
+            $planIndex = collect($plan)->mapWithKeys(fn($m, $i) => [$m['year'] . '-' . $m['month'] => $i]);
+
+            $indexed = $all->filter(fn($row) => $planIndex->has($row['year'] . '-' . $row['month']))
+                ->map(fn($row) => [...$row, 'plan_idx' => $planIndex[$row['year'] . '-' . $row['month']]]);
+
+            // Recent 6 months = plan indices 12–17 | Prior 6 months = plan indices 6–11
+            $recent = $indexed->filter(fn($r) => $r['plan_idx'] >= 12);
+            $prior  = $indexed->filter(fn($r) => $r['plan_idx'] >= 6 && $r['plan_idx'] < 12);
+
+            $this->recent_label = $plan[12]['label'] . ' – ' . $plan[17]['label'];
+            $this->prior_label  = $plan[6]['label']  . ' – ' . $plan[11]['label'];
         }
-
-        // Attach a plan index (0 = oldest, 17 = newest) to every row so we can split into halves
-        $planIndex = collect($plan)->mapWithKeys(fn($m, $i) => [$m['year'] . '-' . $m['month'] => $i]);
-
-        $indexed = $all->filter(fn($row) => $planIndex->has($row['year'] . '-' . $row['month']))
-            ->map(fn($row) => array_merge($row, ['plan_idx' => $planIndex[$row['year'] . '-' . $row['month']]]));
-
-        // Recent 6 months = plan indices 12–17 | Prior 6 months = plan indices 6–11
-        $recent = $indexed->filter(fn($r) => $r['plan_idx'] >= 12);
-        $prior  = $indexed->filter(fn($r) => $r['plan_idx'] >= 6 && $r['plan_idx'] < 12);
 
         $recentTotal = $recent->sum('sales');
         $priorTotal  = $prior->sum('sales');
@@ -62,7 +105,7 @@ new class extends Component
             $momPct = $penult > 0 ? (($last - $penult) / $penult) * 100 : null;
         }
 
-        // SKU comparison: recent 6 months vs prior 6 months
+        // SKU comparison: recent half vs prior half
         $recentBySku = $recent->groupBy('sku')->map(fn($rows) => ['name' => $rows->first()['name'], 'total' => $rows->sum('sales')]);
         $priorBySku  = $prior->groupBy('sku')->map(fn($rows) => ['name' => $rows->first()['name'], 'total' => $rows->sum('sales')]);
 
@@ -85,9 +128,6 @@ new class extends Component
         })
         ->filter()
         ->values();
-
-        $this->recent_label = $plan[12]['label'] . ' – ' . $plan[17]['label'];
-        $this->prior_label  = $plan[6]['label']  . ' – ' . $plan[11]['label'];
 
         $this->growth_stats = [
             'six_mo'       => $sixMoPct !== null ? round($sixMoPct, 1) : null,
@@ -141,7 +181,7 @@ new class extends Component
             </div>
 
             <div class="stat-card stat-col-3">
-                <div class="stat-card-icon"><i class="fa fa-peso-sign"></i></div>
+                <div class="stat-card-icon"><i class="fa fa-history"></i></div>
                 <div class="stat-card-body">
                     <span class="stat-card-label">Recent 6M Sales</span>
                     <span class="stat-card-value">

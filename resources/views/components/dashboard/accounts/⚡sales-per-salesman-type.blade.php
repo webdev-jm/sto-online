@@ -9,32 +9,40 @@ new class extends Component
     use SalesDataAggregator;
 
     #[Reactive]
-    public $year;
+    public $date_from;
+    #[Reactive]
+    public $date_to;
     #[Reactive]
     public $account_id;
 
     public $chart_data = [];
 
-    public function mount($year, $account_id) {
-        $this->year       = $year;
+    public function mount($date_from, $date_to, $account_id): void
+    {
+        $this->date_from  = $date_from;
+        $this->date_to    = $date_to;
         $this->account_id = $account_id;
         $this->chartUpdated();
     }
 
-    public function updatedYear() {
+    public function updatedDateFrom(): void
+    {
         $this->chartUpdated();
     }
 
-    public function updatedAccountId() {
+    public function updatedDateTo(): void
+    {
         $this->chartUpdated();
     }
 
-    public function chartUpdated() {
-        $raw = $this->getYearlySalesData($this->year);
-        $collection = collect($raw);
+    public function updatedAccountId(): void
+    {
+        $this->chartUpdated();
+    }
 
-        // Filter by account if necessary
-        $filtered = $collection->when($this->account_id, fn($col) => $col->where('account_id', $this->account_id));
+    public function chartUpdated(): void
+    {
+        $filtered = $this->getSalesDataForRange($this->date_from, $this->date_to, $this->account_id);
 
         $drilldownSeries = [];
 
@@ -78,12 +86,13 @@ new class extends Component
         $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
+
 ?>
 
 <div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">SALES BY SALESMAN TYPE {{ $this->year }}</h3>
+            <h3 class="card-title">SALES BY SALESMAN TYPE</h3>
         </div>
         <div class="chart-sk">
             <div class="chart-sk-shimmer"></div>
