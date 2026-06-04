@@ -170,12 +170,17 @@ class SalesImportJob implements ShouldQueue
                     $upload->id // The unique identifier from your original $upload object
                 ]);
 
-                // Perform bulk insert for all valid sales records
+                // MySQL prepared statements cap at 65,535 placeholders.
+                // Chunk size is derived from the actual column count so it stays correct if columns are added.
                 if (!empty($salesToInsert)) {
-                    // Sale::on($connectionName)->insert($salesToInsert);
-                    DB::connection($connectionName)
-                        ->table('sales')
-                        ->insert($salesToInsert);
+                    $columnCount = \count(reset($salesToInsert));
+                    $chunkSize = (int) floor(65000 / $columnCount);
+
+                    foreach (array_chunk($salesToInsert, $chunkSize) as $chunk) {
+                        DB::connection($connectionName)
+                            ->table('sales')
+                            ->insert($chunk);
+                    }
                 }
 
                 // UPDATE SALES REPORTS
