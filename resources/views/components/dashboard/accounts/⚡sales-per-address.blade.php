@@ -179,6 +179,8 @@ new class extends Component
             }
         });
 
+        console.log(lookup);
+
         // Aliases for province names that differ between our data and the geoJSON.
         // Keys are the UPPERCASE database values; values are the geoJSON hc-key.
         const aliases = {
