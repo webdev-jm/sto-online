@@ -218,6 +218,7 @@ class Customer extends Component
                     'address' => $address,
                     'salesman' => $salesmanCode, // This is the salesman code
                     'channel' => [],
+                    'invalid_channel_code' => null,
                     'street' => $street,
                     'brgy' => $brgyName,
                     'city' => $cityName,
@@ -227,19 +228,31 @@ class Customer extends Component
                     'status' => 0, // Default: No UBO similarity / New UBO
                     'similar' => [], // To store details of similar UBO for display
                     'check' => 3, // Default: Error - Incomplete/Invalid
+                    'empty_fields' => [],
                     'brgy_id' => null,
                     'city_id' => null,
                     'province_id' => null,
                 ];
 
                 // Basic validation for required fields from Excel
-                if (empty($code) || empty($name) || empty($channel_code) || empty($provinceName) || empty($cityName) || empty($brgyName)) {
+                $emptyFields = array_keys(array_filter([
+                    'Code'         => empty($code),
+                    'Name'         => empty($name),
+                    'Channel Code' => empty($channel_code),
+                    'Province'     => empty($provinceName),
+                    'City/Town'    => empty($cityName),
+                    'Barangay'     => empty($brgyName),
+                ]));
+
+                if (!empty($emptyFields)) {
+                    $customerData['empty_fields'] = $emptyFields;
                     return $customerData; // 'check' remains 3 (incomplete)
                 }
 
                 $channel = $channels->where('code', $channel_code)->first();
                 if (!$channel) {
-                    $customerData['check'] = 2; // Error: Invalid channel
+                    $customerData['check'] = 2;
+                    $customerData['invalid_channel_code'] = $channel_code;
                     return $customerData;
                 }
                 $customerData['channel'] = $channel->toArray(); // Pass channel data to job

@@ -99,11 +99,17 @@
                                                 @break
                                                 @case(2)
                                                     <i class="fa fa-times-circle text-danger d-block"></i>
-                                                    <small class="text-danger">Channel</small>
+                                                    <small class="text-danger">Invalid channel</small>
+                                                    @if(!empty($data['invalid_channel_code']))
+                                                        <small class="text-danger d-block">'{{$data['invalid_channel_code']}}'</small>
+                                                    @endif
                                                 @break
                                                 @case(3)
                                                     <i class="fa fa-times-circle text-danger d-block"></i>
                                                     <small class="text-danger">Empty fields</small>
+                                                    @foreach($data['empty_fields'] ?? [] as $field)
+                                                        <small class="text-danger d-block">{{ $field }}</small>
+                                                    @endforeach
                                                 @break
                                             @endswitch
                                         </td>
@@ -111,7 +117,15 @@
                                         <td class="align-middle">{{$data['name'] ?? '-'}}</td>
                                         <td class="align-middle">{{$data['address'] ?? '-'}}</td>
                                         <td class="align-middle">{{$data['salesman'] ?? '-'}}</td>
-                                        <td class="align-middle">{{!empty($data['channel']) ? '['.$data['channel']['code'].'] '.$data['channel']['name'] : '-'}}</td>
+                                        <td class="align-middle">
+                                            @if(!empty($data['channel']))
+                                                [{{$data['channel']['code']}}] {{$data['channel']['name']}}
+                                            @elseif(!empty($data['invalid_channel_code']))
+                                                <span class="text-danger">'{{$data['invalid_channel_code']}}' not found</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         <td class="align-middle">{{$data['street'] ?? '-'}}</td>
                                         <td class="align-middle">
                                             {{$data['brgy'] ?? '-'}}
