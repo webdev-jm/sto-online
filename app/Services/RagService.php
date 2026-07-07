@@ -3,29 +3,21 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class RagService
 {
     /**
-     * Generate an embedding vector for the given text using Ollama's /api/embed endpoint.
+     * Generate an embedding vector for the given text using the AI_PROVIDER-selected service.
      *
      * @return float[]
      */
     public function embed(string $text): array
     {
-        $response = Http::timeout(60)->post(config('services.ollama.url') . '/api/embed', [
-            'model' => config('services.ollama.embed_model', config('services.ollama.model')),
-            'input' => $text,
-        ]);
-
-        $embeddings = $response->json('embeddings');
-
-        return $embeddings[0] ?? [];
+        return app('ai.embed')->embed($text);
     }
 
     /**
-     * Generate embeddings for multiple texts in a single Ollama request.
+     * Generate embeddings for multiple texts in a single request via the AI_PROVIDER-selected service.
      *
      * @param  string[]  $texts
      * @return float[][]
@@ -36,12 +28,7 @@ class RagService
             return [];
         }
 
-        $response = Http::timeout(120)->post(config('services.ollama.url') . '/api/embed', [
-            'model' => config('services.ollama.embed_model', config('services.ollama.model')),
-            'input' => $texts,
-        ]);
-
-        return $response->json('embeddings') ?? [];
+        return app('ai.embed')->embedBatch($texts);
     }
 
     /**

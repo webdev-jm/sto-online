@@ -8,7 +8,6 @@ use Livewire\WithPagination;
 use App\Models\SMSProduct;
 use App\Models\MonthlyInventory;
 use App\Models\Sale;
-use App\Services\OllamaService;
 use App\Exceptions\AiUnavailableException;
 
 use Illuminate\Support\Facades\DB;
@@ -82,7 +81,7 @@ class Vmi extends Component
         ])->values()->toJson(JSON_UNESCAPED_UNICODE);
 
         try {
-            $content = app(OllamaService::class)->chat([
+            $content = app('ai.chat')->chat([
                 [
                     'role'    => 'system',
                     'content' => 'VMI analyst. Target WOC=' . $this->parameter . '. Each item: id=product int, sale=[1mo,2mo,3mo,6mo] avg monthly sales (CS), gap=[1mo,2mo,3mo,6mo] coverage gap vs target (positive=understocked, negative=overstocked). Write a 2-3 sentence analysis per product covering stock status, sales trend, and action needed. OUTPUT: raw JSON array only, no markdown. Each element: {"product_id":<id>,"analysis":"<2-3 sentence text>"}',

@@ -12,9 +12,25 @@ trait SalesDataAggregator
 {
     use PriceCodeTrait;
 
+    /**
+     * Per-request memoization of decoded yearly datasets, keyed by cache key.
+     * Cache::remember() still unserializes the file payload on every call, so
+     * without this, components that call these getters more than once per
+     * request (e.g. inventory-inactive) redundantly re-decode the same
+     * multi-thousand-row dataset and can exhaust the memory limit.
+     *
+     * @var array<string, array>
+     */
+    protected static array $yearlyDataMemo = [];
+
+    protected function rememberOncePerRequest(string $key, int $ttl, \Closure $callback): array
+    {
+        return static::$yearlyDataMemo[$key] ??= Cache::remember($key, $ttl, $callback);
+    }
+
     public function getYearlySalesData(int $year): array
     {
-        return Cache::remember("sales_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
+        return $this->rememberOncePerRequest("sales_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $sqlite = DB::connection('sqlite_reports');
 
@@ -113,7 +129,7 @@ trait SalesDataAggregator
 
     public function getYearlyInventoryData(int $year): array
     {
-        return Cache::remember("inventory_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
+        return $this->rememberOncePerRequest("inventory_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $accounts = \App\Models\Account::where('id', '>=', 10)
                 ->get()
@@ -145,7 +161,7 @@ trait SalesDataAggregator
 
     public function getYearlyInventoryAgingData(int $year): array
     {
-        return Cache::remember("inventory_aging_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
+        return $this->rememberOncePerRequest("inventory_aging_data_consolidated_{$year}", 60 * 60 * 24, function () use ($year) {
 
             $accounts = \App\Models\Account::where('id', '>=', 10)
                 ->get()
