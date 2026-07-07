@@ -41,10 +41,20 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'ai' => [
+        'driver' => env('AI_PROVIDER', 'ollama'),
+    ],
+
     'ollama' => [
         'url' => env('OLLAMA_URL', 'http://localhost:11434'),
         'model' => env('OLLAMA_MODEL', 'llama3.2'),
         'embed_model' => env('OLLAMA_EMBED_MODEL', 'nomic-embed-text'),
+    ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+        'embed_model' => env('GEMINI_EMBED_MODEL', 'text-embedding-004'),
     ],
 
 ];

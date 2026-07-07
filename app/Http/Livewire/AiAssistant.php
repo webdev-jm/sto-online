@@ -3,7 +3,6 @@
 namespace App\Http\Livewire;
 
 use App\Exceptions\AiUnavailableException;
-use App\Services\OllamaService;
 use App\Services\RagService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -139,7 +138,7 @@ class AiAssistant extends Component
         ];
 
         try {
-            $reply = app(OllamaService::class)->chat($messages);
+            $reply = app('ai.chat')->chat($messages);
         } catch (AiUnavailableException) {
             $this->messages[] = ['role' => 'assistant', 'content' => 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.'];
             $this->isLoading = false;
@@ -178,7 +177,7 @@ class AiAssistant extends Component
         );
 
         try {
-            $aiReply = app(OllamaService::class)->chat($history);
+            $aiReply = app('ai.chat')->chat($history);
         } catch (AiUnavailableException) {
             $this->messages[] = ['role' => 'assistant', 'content' => 'I\'m unable to connect to the AI service right now. Please ensure Ollama is running and try again.'];
             $this->isLoading  = false;

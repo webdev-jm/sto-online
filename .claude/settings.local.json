@@ -61,7 +61,14 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\jm.renon\\\\Documents\\\\2026\\\\PROJECTS\\\\sales-order-v2\" -Directory)",
       "Bash(Get-ChildItem -Recurse -Directory)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jm.renon\\\\Documents\\\\2025\\\\PROJECT-DOCS\\\\sales-order\" -Recurse -Directory)",
-      "Bash(grep -E \"\\\\.\\(php|blade\\\\.php\\)$\")"
+      "Bash(grep -E \"\\\\.\\(php|blade\\\\.php\\)$\")",
+      "Bash(php -r ' *)",
+      "Bash(rm -f \"/c/Users/jm.renon/AppData/Local/Temp/abp_query_log_3.json\" \"/c/Users/jm.renon/AppData/Local/Temp/abp_query_log_30.json\")",
+      "Bash(vendor/bin/pint --dirty --format agent)",
+      "Bash(xargs ls)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\jm.renon\\AppData\\Local\\Temp"
     ]
   }
 }

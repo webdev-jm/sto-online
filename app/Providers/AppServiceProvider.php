@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use App\Support\FormBuilder;
+use App\Services\GeminiService;
+use App\Services\OllamaService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,14 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('form.builder', fn() => new FormBuilder());
+
+        // Resolves to the chat/embedding provider selected by AI_PROVIDER (see config/services.php).
+        $aiProvider = fn($app) => config('services.ai.driver') === 'gemini'
+            ? $app->make(GeminiService::class)
+            : $app->make(OllamaService::class);
+
+        $this->app->bind('ai.chat', $aiProvider);
+        $this->app->bind('ai.embed', $aiProvider);
     }
 
     /**

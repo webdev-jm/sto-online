@@ -3,7 +3,6 @@
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
 use App\Exceptions\AiUnavailableException;
-use App\Services\OllamaService;
 use App\Services\RagService;
 use Illuminate\Support\Facades\DB;
 
@@ -96,7 +95,7 @@ new class extends Component
         ];
 
         try {
-            $reply = trim(app(OllamaService::class)->chat($messages));
+            $reply = trim(app('ai.chat')->chat($messages));
         } catch (AiUnavailableException $e) {
             $this->error        = 'Unable to reach the AI service. Please ensure Ollama is running and try again.';
             $this->isGenerating = false;

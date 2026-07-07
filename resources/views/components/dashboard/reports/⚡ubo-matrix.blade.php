@@ -9,7 +9,6 @@ use App\Models\SMSPriceCode;
 use App\Http\Traits\PriceCodeTrait;
 use Illuminate\Support\Facades\Cache;
 
-ini_set('memory_limit', '256M');
 new class extends Component
 {
     use PriceCodeTrait;

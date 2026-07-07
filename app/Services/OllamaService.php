@@ -38,4 +38,41 @@ class OllamaService
 
         return $content;
     }
+
+    /**
+     * Generate an embedding vector for the given text using Ollama's /api/embed endpoint.
+     *
+     * @return float[]
+     */
+    public function embed(string $text): array
+    {
+        $response = Http::timeout(60)->post(config('services.ollama.url') . '/api/embed', [
+            'model' => config('services.ollama.embed_model', config('services.ollama.model')),
+            'input' => $text,
+        ]);
+
+        $embeddings = $response->json('embeddings');
+
+        return $embeddings[0] ?? [];
+    }
+
+    /**
+     * Generate embeddings for multiple texts in a single Ollama request.
+     *
+     * @param  string[]  $texts
+     * @return float[][]
+     */
+    public function embedBatch(array $texts): array
+    {
+        if (empty($texts)) {
+            return [];
+        }
+
+        $response = Http::timeout(120)->post(config('services.ollama.url') . '/api/embed', [
+            'model' => config('services.ollama.embed_model', config('services.ollama.model')),
+            'input' => $texts,
+        ]);
+
+        return $response->json('embeddings') ?? [];
+    }
 }
