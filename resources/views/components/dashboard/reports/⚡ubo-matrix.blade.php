@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
 use App\Models\Account;
 use App\Models\SMSProduct;
@@ -18,7 +19,6 @@ new class extends Component
     #[Reactive]
     public ?int $account_id = null;
     public ?string $account_code = null;
-    public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
@@ -52,18 +52,48 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        $count = count($this->chart_data);
+        $count = count($this->chartData);
         if ($count === 0) {
             return "No UBO matrix data available for {$this->year}.";
         }
-        $topSales = collect($this->chart_data)->sortByDesc('x')->first();
-        $topUnits = collect($this->chart_data)->sortByDesc('y')->first();
+        $topSales = collect($this->chartData)->sortByDesc('x')->first();
+        $topUnits = collect($this->chartData)->sortByDesc('y')->first();
         return "{$count} active buyers tracked in the UBO matrix for {$this->year}. "
             . "Highest sales buyer: {$topSales['name']} (₱" . number_format($topSales['x'], 2) . "). "
             . "Most units: {$topUnits['name']} (" . number_format($topUnits['y'], 0) . " pcs).";
     }
 
-    public function chartUpdated()
+    public function chartUpdated(): void
+    {
+        unset($this->chartData);
+
+        if (!empty($this->chartData)) {
+            $this->dispatch('update-chart',
+                data: $this->chartData,
+                year: $this->year
+            );
+        }
+    }
+
+    /**
+     * Built on demand so the dataset is never stored in the Livewire snapshot.
+     * Held in the cache for five minutes to spare the price lookups on the
+     * follow-up insight request.
+     *
+     * @return array<int, array{x: float, y: float, z: float, name: ?string, account: ?string, channel_code: ?string, channel_name: ?string}>
+     */
+    #[Computed]
+    public function chartData(): array
+    {
+        $scope = $this->account_code ?: 'all';
+
+        return Cache::remember("ubo-matrix-chart_{$this->year}_{$scope}", 60 * 5, fn() => $this->buildChartData());
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildChartData(): array
     {
         $rows = Cache::remember("ubo-matrix_{$this->year}", 60 * 60, function() {
             return DB::connection('sqlite_reports')
@@ -95,72 +125,68 @@ new class extends Component
             $rows = $rows->where('account_code', $this->account_code)->values();
         }
 
-        if (!$rows->isEmpty()) {
-
-            $stockCodes = $rows->pluck('stock_code')->unique();
-            $products   = SMSProduct::whereIn('stock_code', $stockCodes)
-                ->get()->keyBy('stock_code');
-
-            $accounts = Account::where('id', '>=', 10)
-                ->with('sms_account.company')
-                ->get()
-                ->filter(fn($a) => $a->sms_account && $a->sms_account->company)
-                ->keyBy('account_code');
-
-            $priceCache = [];
-            foreach ($accounts as $accountCode => $account) {
-                $smsAccount = $account->sms_account;
-                $priceCodes = SMSPriceCode::where('company_id', $smsAccount->company->id)
-                    ->where('code', $smsAccount->price_code)
-                    ->whereIn('product_id', $products->pluck('id'))
-                    ->get()->keyBy('product_id');
-
-                foreach ($products as $sku => $product) {
-                    $pCode     = $priceCodes->get($product->id);
-                    $basePrice = $pCode ? $this->calculateBaseUnitPrice($product, $pCode) : 0;
-                    if ($smsAccount->discount && $basePrice > 0) {
-                        $basePrice = $this->applyDiscounts($basePrice, $smsAccount->discount);
-                    }
-                    $priceCache[$accountCode][$sku] = $basePrice;
-                }
-            }
-
-            $this->chart_data = $rows->groupBy('customer_code')
-                ->map(function ($items) use ($products, $priceCache) {
-                    $first      = $items->first();
-                    $totalSales = 0;
-                    $totalQty   = 0;
-
-                    foreach ($items as $item) {
-                        $product   = $products->get($item->stock_code);
-                        if (!$product) continue;
-
-                        $netPrice  = $priceCache[$item->account_code][$item->stock_code] ?? 0;
-                        $uomFactor = $this->getConversionFactor($product, $item->uom);
-                        $qtyPcs    = $item->total_qty * $uomFactor;
-
-                        $totalQty   += $qtyPcs;
-                        $totalSales += $qtyPcs * $netPrice;
-                    }
-
-                    return [
-                        'x'            => round($totalSales, 2),
-                        'y'            => round($totalQty, 2),
-                        'z'            => 0.1,
-                        'name'         => $first->customer_name,
-                        'account'      => $first->account_name,
-                        'channel_code' => $first->channel_code,
-                        'channel_name' => $first->channel_name,
-                    ];
-                })
-                ->values()
-                ->toArray();
-
-            $this->dispatch('update-chart',
-                data: $this->chart_data,
-                year: $this->year
-            );
+        if ($rows->isEmpty()) {
+            return [];
         }
+
+        $stockCodes = $rows->pluck('stock_code')->unique();
+        $products   = SMSProduct::whereIn('stock_code', $stockCodes)
+            ->get()->keyBy('stock_code');
+
+        $accounts = Account::where('id', '>=', 10)
+            ->with('sms_account.company')
+            ->get()
+            ->filter(fn($a) => $a->sms_account && $a->sms_account->company)
+            ->keyBy('account_code');
+
+        $priceCache = [];
+        foreach ($accounts as $accountCode => $account) {
+            $smsAccount = $account->sms_account;
+            $priceCodes = SMSPriceCode::where('company_id', $smsAccount->company->id)
+                ->where('code', $smsAccount->price_code)
+                ->whereIn('product_id', $products->pluck('id'))
+                ->get()->keyBy('product_id');
+
+            foreach ($products as $sku => $product) {
+                $pCode     = $priceCodes->get($product->id);
+                $basePrice = $pCode ? $this->calculateBaseUnitPrice($product, $pCode) : 0;
+                if ($smsAccount->discount && $basePrice > 0) {
+                    $basePrice = $this->applyDiscounts($basePrice, $smsAccount->discount);
+                }
+                $priceCache[$accountCode][$sku] = $basePrice;
+            }
+        }
+
+        return $rows->groupBy('customer_code')
+            ->map(function ($items) use ($products, $priceCache) {
+                $first      = $items->first();
+                $totalSales = 0;
+                $totalQty   = 0;
+
+                foreach ($items as $item) {
+                    $product   = $products->get($item->stock_code);
+                    if (!$product) continue;
+
+                    $netPrice  = $priceCache[$item->account_code][$item->stock_code] ?? 0;
+                    $uomFactor = $this->getConversionFactor($product, $item->uom);
+                    $qtyPcs    = $item->total_qty * $uomFactor;
+
+                    $totalQty   += $qtyPcs;
+                    $totalSales += $qtyPcs * $netPrice;
+                }
+
+                return [
+                    'x'            => round($totalSales, 2),
+                    'y'            => round($totalQty, 2),
+                    'z'            => 0.1,
+                    'name'         => $first->customer_name,
+                    'account'      => $first->account_name,
+                    'channel_code' => $first->channel_code,
+                    'channel_name' => $first->channel_name,
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 };
 ?>
@@ -249,7 +275,7 @@ new class extends Component
                 followPointer: true
             },
             // ✅ Read directly from Blade-rendered computed property on init
-            series: [{ data: @json($this->chart_data) }]
+            series: [{ data: @json($this->chartData) }]
         });
     };
 

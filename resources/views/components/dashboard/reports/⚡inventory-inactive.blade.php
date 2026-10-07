@@ -2,6 +2,8 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Traits\SalesDataAggregator;
 use App\Http\Traits\AccountProduct;
 use App\Models\Account;
@@ -15,9 +17,6 @@ new class extends Component
     public $year;
     #[Reactive]
     public ?int $account_id = null;
-    public $table_data      = [];
-    public $raw_table_data  = [];
-    public $brands          = [];
     public $search          = '';
     public $selectedBrand   = '';
     public string $insight        = '';
@@ -27,12 +26,10 @@ new class extends Component
     {
         $this->year       = $year;
         $this->account_id = $account_id;
-        $this->buildTableData();
     }
 
     public function updatedYear(): void
     {
-        $this->buildTableData();
         $this->generateInsight();
     }
 
@@ -51,19 +48,68 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        $total = count($this->table_data);
+        $total = count($this->tableData);
         if ($total === 0) {
             return "No inactive products found for {$this->year}.";
         }
-        $deadStock = collect($this->table_data)->filter(fn($r) => $r['inventory'] > 0)->count();
+        $deadStock = collect($this->tableData)->filter(fn($r) => $r['inventory'] > 0)->count();
         $noStock   = $total - $deadStock;
-        $distCount = collect($this->table_data)->pluck('account_code')->unique()->count();
+        $distCount = collect($this->tableData)->pluck('account_code')->unique()->count();
         return "{$total} inactive SKUs (zero sales) across {$distCount} distributors for {$this->year}. "
             . "{$deadStock} have inventory on hand (dead stock risk); "
             . "{$noStock} have no inventory and no sales.";
     }
 
-    public function buildTableData(): void
+    /**
+     * Every row for the selected year and account. Kept in the cache for five
+     * minutes instead of the Livewire snapshot, so searching never posts the
+     * dataset back.
+     *
+     * @return array<int, array{account_code: string, short_name: ?string, sku: string, description: string, brand: string, inventory: float, sales: int, month: ?int}>
+     */
+    #[Computed]
+    public function rows(): array
+    {
+        $scope = $this->account_id ?: 'all';
+
+        return Cache::remember("inventory_inactive_rows_{$this->year}_{$scope}", 60 * 5, fn() => $this->buildRows());
+    }
+
+    /**
+     * Rows narrowed by the brand and search filters.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    #[Computed]
+    public function tableData(): array
+    {
+        $term  = strtolower($this->search);
+        $brand = $this->selectedBrand;
+
+        return collect($this->rows)
+            ->when($brand, fn($c) => $c->filter(fn($row) => $row['brand'] === $brand))
+            ->when($term,  fn($c) => $c->filter(fn($row) =>
+                str_contains(strtolower($row['account_code']), $term) ||
+                str_contains(strtolower($row['short_name']), $term) ||
+                str_contains(strtolower($row['sku']), $term)
+            ))
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    #[Computed]
+    public function brands(): array
+    {
+        return collect($this->rows)->pluck('brand')->filter()->unique()->sort()->values()->toArray();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildRows(): array
     {
         $salesLookup = collect($this->getYearlySalesData($this->year))
             ->groupBy(fn($row) => $row['account_id'] . ':' . $row['sku'])
@@ -115,35 +161,8 @@ new class extends Component
         }
 
         usort($rows, fn($a, $b) => $a['account_code'] <=> $b['account_code'] ?: $a['sku'] <=> $b['sku']);
-        $this->raw_table_data = $rows;
-        $this->brands         = collect($rows)->pluck('brand')->filter()->unique()->sort()->values()->toArray();
-        $this->applyFilters();
-    }
 
-    public function updatedSearch(): void
-    {
-        $this->applyFilters();
-    }
-
-    public function updatedSelectedBrand(): void
-    {
-        $this->applyFilters();
-    }
-
-    public function applyFilters(): void
-    {
-        $term  = strtolower($this->search);
-        $brand = $this->selectedBrand;
-
-        $this->table_data = collect($this->raw_table_data)
-            ->when($brand, fn($c) => $c->filter(fn($row) => $row['brand'] === $brand))
-            ->when($term,  fn($c) => $c->filter(fn($row) =>
-                str_contains(strtolower($row['account_code']), $term) ||
-                str_contains(strtolower($row['short_name']), $term) ||
-                str_contains(strtolower($row['sku']), $term)
-            ))
-            ->values()
-            ->toArray();
+        return $rows;
     }
 };
 ?>
@@ -155,7 +174,7 @@ new class extends Component
             <div class="card-tools m-0 d-flex" style="gap: 4px;">
                 <select class="form-control form-control-sm" wire:model.live="selectedBrand">
                     <option value="">All Brands</option>
-                    @foreach ($brands as $brand)
+                    @foreach ($this->brands as $brand)
                         <option value="{{ $brand }}">{{ $brand }}</option>
                     @endforeach
                 </select>
@@ -173,8 +192,8 @@ new class extends Component
                         <th>AS OF</th>
                     </tr>
                 </thead>
-                <tbody wire:loading.remove wire:target="search, selectedBrand, buildTableData">
-                    @foreach ($table_data as $index => $item)
+                <tbody wire:loading.remove wire:target="search, selectedBrand">
+                    @foreach ($this->tableData as $index => $item)
                         <tr>
                             <td>{{ $item['account_code'] }} - {{ $item['short_name'] }}</td>
                             <td title="{{ $item['description'] }}">{{ $item['sku'] }}</td>
@@ -184,7 +203,7 @@ new class extends Component
                         </tr>
                     @endforeach
                 </tbody>
-                <tbody wire:loading wire:target="search, selectedBrand, buildTableData">
+                <tbody wire:loading wire:target="search, selectedBrand">
                     <tr>
                         <td colspan="5">
                             <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">

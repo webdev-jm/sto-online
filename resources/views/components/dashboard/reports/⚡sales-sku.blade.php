@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
 use App\Http\Traits\SalesDataAggregator;
 
 new class extends Component
@@ -12,7 +13,6 @@ new class extends Component
     public $year;
     #[Reactive]
     public ?int $account_id = null;
-    public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
@@ -43,15 +43,28 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        if (empty($this->chart_data['data'])) {
+        if (empty($this->chartData['data'])) {
             return "No SKU sales data available for {$this->year}.";
         }
-        $top3 = collect($this->chart_data['data'])->take(3)
+        $top3 = collect($this->chartData['data'])->take(3)
             ->map(fn($d) => ($d['full_name'] ?: $d['name']) . ": ₱" . number_format($d['y'], 2))->implode(', ');
         return "Top 10 SKUs by sales for {$this->year}. Top 3: {$top3}.";
     }
 
     public function chartUpdated(): void
+    {
+        unset($this->chartData);
+
+        $this->dispatch('update-chart', data: $this->chartData);
+    }
+
+    /**
+     * Built on demand so the dataset is never stored in the Livewire snapshot.
+     *
+     * @return array{data: array<int, array<string, mixed>>, drilldown: array<int, array<string, mixed>>}
+     */
+    #[Computed]
+    public function chartData(): array
     {
         $collection = $this->getSalesData($this->year, $this->account_id);
 
@@ -94,12 +107,10 @@ new class extends Component
             ->take(10)
             ->values();
 
-        $this->chart_data = [
+        return [
             'data'      => $top10->toArray(),
             'drilldown' => $drilldown,
         ];
-
-        $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
 ?>
@@ -200,7 +211,7 @@ new class extends Component
     });
 
     const initChart = () => {
-        chart = Highcharts.chart('container-sku', buildConfig($wire.chart_data));
+        chart = Highcharts.chart('container-sku', buildConfig(@json($this->chartData)));
     };
 
     initChart();

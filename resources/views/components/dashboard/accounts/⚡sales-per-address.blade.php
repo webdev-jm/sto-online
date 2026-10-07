@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
 use App\Http\Traits\SalesDataAggregator;
 use App\Models\Province;
 use Illuminate\Support\Facades\Cache;
@@ -15,7 +16,6 @@ new class extends Component
     #[Reactive]
     public $account_id;
 
-    public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
@@ -53,11 +53,11 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        if (empty($this->chart_data['data'])) {
+        if (empty($this->chartData['data'])) {
             return "No geographic sales data available for {$this->year}.";
         }
 
-        $provinces = collect($this->chart_data['data'])
+        $provinces = collect($this->chartData['data'])
             ->sortByDesc('value')
             ->take(5)
             ->map(fn($d) => "{$d['name']}: ₱" . number_format($d['value'], 2))
@@ -68,7 +68,20 @@ new class extends Component
 
     public function chartUpdated(): void
     {
-        $raw = $this->getYearlySalesData($this->year);
+        unset($this->chartData);
+
+        $this->dispatch('update-chart', data: $this->chartData);
+    }
+
+    /**
+     * Built on demand so the dataset is never stored in the Livewire snapshot.
+     *
+     * @return array{data: array<int, array<string, mixed>>, drilldown: array<int, array<string, mixed>>}
+     */
+    #[Computed]
+    public function chartData(): array
+    {
+        $raw =$this->getYearlySalesData($this->year);
 
         $collection = collect($raw)
             ->map(function ($item) {
@@ -125,12 +138,10 @@ new class extends Component
             ->values()
             ->toArray();
 
-        $this->chart_data = [
+        return [
             'data'      => $mapData,
             'drilldown' => $drilldownSeries,
         ];
-
-        $this->dispatch('update-chart', data: $this->chart_data);
     }
 };
 ?>
@@ -413,14 +424,17 @@ new class extends Component
         chart = Highcharts.mapChart('container-sales-by-address', buildConfig(data));
     };
 
+    let latestData = @json($this->chartData);
+
     fetch('{{ asset('vendor/highcharts/maps/ph-all.geo.json') }}')
         .then(r => r.json())
         .then(json => {
             geoJson = json;
-            initChart($wire.chart_data);
+            initChart(latestData);
         });
 
     $wire.on('update-chart', (event) => {
+        latestData = event.data;
         if (!geoJson) return;
         if (chart) chart.destroy();
         initChart(event.data);
