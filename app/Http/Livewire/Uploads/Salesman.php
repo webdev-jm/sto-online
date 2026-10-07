@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Uploads;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -20,10 +21,11 @@ class Salesman extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use WithCachedUploadData;
     use UploadMappingTrait;
     protected $paginationTheme = 'bootstrap';
 
-    public $salesman_data;
+    protected $salesman_data;
     public $file;
     public $account;
     public $account_branch;
@@ -40,6 +42,14 @@ class Salesman extends Component
 
     public $upload_triggered = false;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['salesman_data'];
+    }
 
     public function uploadData() {
         if($this->upload_triggered) {

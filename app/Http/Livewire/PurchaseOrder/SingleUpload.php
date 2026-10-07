@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\PurchaseOrder;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -16,11 +17,20 @@ use Illuminate\Support\Facades\Session;
 class SingleUpload extends Component
 {
     use WithFileUploads;
+    use WithCachedUploadData;
     use MergedCellReaderHelper;
 
     public $account_branch;
     public $file;
-    public $po_data;
+    protected $po_data;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['po_data'];
+    }
 
     public function checkUploads() {
         $this->validate([

@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Uploads;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -36,13 +37,14 @@ use App\Http\Traits\UploadMappingTrait;
 class Customer extends Component
 {
     use WithFileUploads;
+    use WithCachedUploadData;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
     use ChannelMappingTrait;
     use UploadMappingTrait;
 
-    public ?array $customer_data = [];
+    protected ?array $customer_data = [];
     public $file;
     public AccountModel $account;
     public $account_branch;
@@ -59,6 +61,14 @@ class Customer extends Component
 
     public $upload_triggered = false;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['customer_data'];
+    }
 
     public function uploadData() {
         // avoid duplicate uploads

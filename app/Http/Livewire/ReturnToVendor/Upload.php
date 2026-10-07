@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\ReturnToVendor;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -18,12 +19,21 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 class Upload extends Component
 {
     use WithFileUploads;
+    use WithCachedUploadData;
 
     public $account_branch;
     public $upload_files;
-    public $rtv_data;
+    protected $rtv_data;
     public $rtv_errors = array();
     public $success_msg = array();
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['rtv_data'];
+    }
 
     public function uploadRTV() {
         $this->validate([
