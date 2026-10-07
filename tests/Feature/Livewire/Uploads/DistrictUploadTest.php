@@ -72,7 +72,6 @@ class DistrictUploadTest extends TestCase
     {
         Livewire::test(District::class)
             ->set('upload_triggered', true)
-            ->set('district_data', [])
             ->call('uploadData')
             ->assertSet('upload_triggered', true);
     }
@@ -80,7 +79,7 @@ class DistrictUploadTest extends TestCase
     public function test_no_data_shows_no_preview(): void
     {
         Livewire::test(District::class)
-            ->assertSet('district_data', null)
+            ->assertSet('uploadDataKey', null)
             ->assertDontSee('PREVIEW');
     }
 
@@ -90,12 +89,11 @@ class DistrictUploadTest extends TestCase
             ->assertSet('err_msg', null);
     }
 
-    public function test_area_codes_property_exists_in_district_data_structure(): void
+    public function test_district_data_cannot_be_set_from_the_browser(): void
     {
-        $component = Livewire::test(District::class);
+        $this->expectException(\Throwable::class);
 
-        // Set district_data manually to verify the structure is handled correctly
-        $component->set('district_data', [
+        Livewire::test(District::class)->set('district_data', [
             [
                 'check'         => 0,
                 'district_code' => 'D001',
@@ -104,8 +102,5 @@ class DistrictUploadTest extends TestCase
                 'invalid_areas' => ['AREA1', 'AREA2'],
             ],
         ]);
-
-        $component->assertSet('district_data.0.district_code', 'D001')
-            ->assertSet('district_data.0.invalid_areas.0', 'AREA1');
     }
 }

@@ -72,7 +72,6 @@ class AreaUploadTest extends TestCase
     {
         Livewire::test(Area::class)
             ->set('upload_triggered', true)
-            ->set('area_data', [])
             ->call('uploadData')
             ->assertSet('upload_triggered', true);
     }
@@ -80,7 +79,7 @@ class AreaUploadTest extends TestCase
     public function test_no_data_shows_no_preview(): void
     {
         Livewire::test(Area::class)
-            ->assertSet('area_data', null)
+            ->assertSet('uploadDataKey', null)
             ->assertDontSee('PREVIEW');
     }
 

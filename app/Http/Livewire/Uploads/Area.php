@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Uploads;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -18,11 +19,12 @@ class Area extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use WithCachedUploadData;
     use UploadMappingTrait;
     protected $paginationTheme = 'bootstrap';
 
     public $file;
-    public $area_data;
+    protected $area_data;
     public $account;
     public $account_branch;
     public $err_msg;
@@ -37,6 +39,14 @@ class Area extends Component
     public $perPage = 10;
     public $upload_triggered = false;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['area_data'];
+    }
 
     public function uploadData(): mixed
     {

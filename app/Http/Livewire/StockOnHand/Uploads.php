@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\StockOnHand;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -22,16 +23,25 @@ use Illuminate\Support\Collection;
 class Uploads extends Component
 {
     use WithFileUploads;
+    use WithCachedUploadData;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
     public $account_branch;
     public $upload_file;
-    public $data;
+    protected $data;
     public $perPage = 20;
     public $year, $month;
     public $success_msg;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['data'];
+    }
 
     public function save() {
         $this->validate([

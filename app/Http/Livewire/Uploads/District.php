@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Uploads;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -19,11 +20,12 @@ class District extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use WithCachedUploadData;
     use UploadMappingTrait;
     protected $paginationTheme = 'bootstrap';
 
     public $file;
-    public $district_data;
+    protected $district_data;
     public $account;
     public $account_branch;
     public $err_msg;
@@ -38,6 +40,14 @@ class District extends Component
     public $perPage = 10;
     public $upload_triggered = false;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['district_data'];
+    }
 
     public function uploadData(): mixed
     {

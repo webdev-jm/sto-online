@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\TemplateConverter;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -12,12 +13,21 @@ use App\Models\Customer;
 class Create extends Component
 {
     use WithFileUploads;
+    use WithCachedUploadData;
     protected $paginationTheme = 'bootstrap';
 
     public $account_branch;
     public $file_upload;
-    public $file_content;
-    public $data = [];
+    protected $file_content;
+    protected $data = [];
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['file_content', 'data'];
+    }
 
     public function updatedFileUpload()
     {

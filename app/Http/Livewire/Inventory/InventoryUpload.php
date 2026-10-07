@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Inventory;
 
+use App\Http\Traits\WithCachedUploadData;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -34,14 +35,15 @@ class InventoryUpload extends Component
     use GenerateMonthlyInventory;
 
     use WithFileUploads;
+    use WithCachedUploadData;
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
-    public $inventory_data;
+    protected $inventory_data;
     public $inventory_date;
-    public $keys;
+    protected $keys;
     public $file;
-    public $data;
+    protected $data;
     public $err_msg;
 
     public $account;
@@ -54,6 +56,14 @@ class InventoryUpload extends Component
 
     public $upload_triggered = false;
     public $page;
+
+    /**
+     * @return array<int, string>
+     */
+    protected function cachedUploadData(): array
+    {
+        return ['inventory_data', 'data', 'keys'];
+    }
 
     public function uploadData() {
         if(!empty($this->inventory_data)) {
