@@ -5,10 +5,13 @@ namespace App\Http\Livewire\Sales;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Locked;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -38,8 +41,17 @@ class SalesUpload extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
-    public $sales_data;
-    public $data;
+    /** How long an uploaded preview stays available, in seconds. */
+    private const PREVIEW_TTL = 60 * 60 * 6;
+
+    /**
+     * Identifies the uploaded rows held in the cache. The rows themselves are
+     * kept out of the component state, since every request posts that state
+     * back and a large file exceeded the web server's request body limit.
+     */
+    #[Locked]
+    public ?string $uploadKey = null;
+
     public $file;
     public $account;
     public $account_branch;
@@ -62,7 +74,46 @@ class SalesUpload extends Component
     ];
 
     public function updateData() {
-        $this->checkData($this->data);
+        $this->checkData($this->loadPreview('data'));
+    }
+
+    private function previewCacheKey(string $part): string
+    {
+        return "sales-upload-preview:{$this->uploadKey}:{$part}";
+    }
+
+    /**
+     * @param  'data'|'sales'  $part
+     */
+    private function storePreview(string $part, array $rows): void
+    {
+        if ($this->uploadKey === null) {
+            $this->uploadKey = (string) Str::uuid();
+        }
+
+        Cache::put($this->previewCacheKey($part), $rows, self::PREVIEW_TTL);
+    }
+
+    /**
+     * @param  'data'|'sales'  $part
+     */
+    private function loadPreview(string $part): array
+    {
+        if ($this->uploadKey === null) {
+            return [];
+        }
+
+        return Cache::get($this->previewCacheKey($part), []);
+    }
+
+    private function forgetPreview(): void
+    {
+        if ($this->uploadKey === null) {
+            return;
+        }
+
+        Cache::forget($this->previewCacheKey('data'));
+        Cache::forget($this->previewCacheKey('sales'));
     }
 
     public function maintainCustomer($customer_code) {
@@ -79,7 +130,9 @@ class SalesUpload extends Component
             return;
         }
 
-        if(!empty($this->sales_data)) {
+        $sales_data = $this->loadPreview('sales');
+
+        if(!empty($sales_data)) {
 
             $upload = new Upload([
                 'account_id' => $this->account->id,
@@ -93,10 +146,10 @@ class SalesUpload extends Component
             ]);
             $upload->save();
 
-            SalesImportJob::dispatch($this->sales_data, $this->account->id, $this->account_branch->id, auth()->user()->id, $upload->id);
+            SalesImportJob::dispatch($sales_data, $this->account->id, $this->account_branch->id, auth()->user()->id, $upload->id);
 
             $total = 0;
-            foreach($this->sales_data as $data) {
+            foreach($sales_data as $data) {
                 if($data['check'] == 0) {
                     $total++;
                 }
@@ -114,6 +167,7 @@ class SalesUpload extends Component
             ->log(':causer.name has uploaded sales data on ['.$this->account->short_name.']');
 
             $this->upload_triggered = true;
+            $this->forgetPreview();
 
             return redirect()->route('sales.index')->with([
                 'message_success' => 'Sales data has been added to queue for processing.',
@@ -148,18 +202,18 @@ class SalesUpload extends Component
             $data[] = $rowResults; // Store the results for this row in the main results array
         }
 
-        $this->data = $data;
+        $this->forgetPreview();
+        $this->uploadKey = (string) Str::uuid();
+        $this->storePreview('data', $data);
 
-        $this->checkData($this->data);
+        $this->checkData($data);
 
         $this->resetPage('page');
     }
 
     public function checkData($data) {
-        $this->reset([
-            'sales_data',
-            'err_msg'
-        ]);
+        $this->reset('err_msg');
+        $this->storePreview('sales', []);
 
         if (empty($data) || count($data) < 3) {
             $this->err_msg = 'The file is empty or has no data rows.';
@@ -330,13 +384,15 @@ class SalesUpload extends Component
         }
 
         // 5. Final sort and assignment
-        $this->sales_data = array_values($processedData);
-        usort($this->sales_data, function($a, $b) {
+        $sales_data = array_values($processedData);
+        usort($sales_data, function($a, $b) {
             if ($a['check'] !== $b['check']) {
                 return $b['check'] <=> $a['check'];
             }
             return $a['date'] <=> $b['date'];
         });
+
+        $this->storePreview('sales', $sales_data);
     }
 
     private function isExcelDate(Cell $cell) {
@@ -428,12 +484,15 @@ class SalesUpload extends Component
 
     public function render()
     {
+        $sales_data = $this->loadPreview('sales');
+
         $paginatedData = NULL;
-        if(!empty($this->sales_data)) {
-            $paginatedData = $this->paginateArray($this->sales_data, $this->perPage);
+        if(!empty($sales_data)) {
+            $paginatedData = $this->paginateArray($sales_data, $this->perPage);
         }
 
         return view('livewire.sales.sales-upload')->with([
+            'sales_data' => $sales_data,
             'paginatedData' => $paginatedData
         ]);
     }
