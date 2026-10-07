@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
 use App\Http\Traits\SalesDataAggregator;
 
 new class extends Component
@@ -12,7 +13,6 @@ new class extends Component
     public $year;
     #[Reactive]
     public ?int $account_id = null;
-    public $chart_data    = [];
     public string $insight        = '';
     public bool   $loadingInsight = false;
 
@@ -50,19 +50,32 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        if (empty($this->chart_data['data'])) {
+        if (empty($this->chartData['data'])) {
             return "No inventory aging data available for {$this->year}.";
         }
-        $buckets = collect($this->chart_data['data'])
+        $buckets = collect($this->chartData['data'])
             ->map(fn($d) => "{$d['name']}: " . number_format($d['y'], 0) . " pcs")->implode(', ');
-        $highest = collect($this->chart_data['data'])->sortByDesc('y')->first();
+        $highest = collect($this->chartData['data'])->sortByDesc('y')->first();
         return "Inventory aging distribution for {$this->year}: {$buckets}. "
             . "Largest bucket: {$highest['name']}.";
     }
 
     public function chartUpdated(): void
     {
-        $raw = $this->getInventoryAgingData($this->year, $this->account_id)->all();
+        unset($this->chartData);
+
+        $this->dispatch('update-chart', data: $this->chartData, year: $this->year);
+    }
+
+    /**
+     * Built on demand so the dataset is never stored in the Livewire snapshot.
+     *
+     * @return array{data: array<int, array<string, mixed>>, drilldown: array<int, array<string, mixed>>}
+     */
+    #[Computed]
+    public function chartData(): array
+    {
+        $raw =$this->getInventoryAgingData($this->year, $this->account_id)->all();
 
         $bucketGroups = array_map(fn() => collect(), array_flip(array_keys(self::EXPIRY_BUCKETS)));
 
@@ -126,12 +139,10 @@ new class extends Component
             ];
         }
 
-        $this->chart_data = [
+        return [
             'data'      => $chart_data,
             'drilldown' => $drilldown,
         ];
-
-        $this->dispatch('update-chart', data: $this->chart_data, year: $this->year);
     }
 
     private function resolveBucket(float $months): ?string
@@ -262,7 +273,7 @@ new class extends Component
     });
 
     const initChart = () => {
-        chart = Highcharts.chart('container-aging', buildConfig($wire.chart_data));
+        chart = Highcharts.chart('container-aging', buildConfig(@json($this->chartData)));
     };
 
     initChart();

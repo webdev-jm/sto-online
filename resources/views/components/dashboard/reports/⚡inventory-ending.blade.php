@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Computed;
 use App\Http\Traits\SalesDataAggregator;
 use App\Http\Traits\UomConversionTrait;
 use App\Models\SMSProduct;
@@ -18,10 +19,6 @@ new class extends Component
     public $year;
     #[Reactive]
     public ?int $account_id = null;
-    public $table_data     = [];
-    public $raw_table_data = [];
-    public $brands         = [];
-    public $products;
     public $search         = '';
     public $selectedBrand  = '';
     public string $insight        = '';
@@ -30,17 +27,10 @@ new class extends Component
     public function mount($year, $account_id = null): void {
         $this->year = $year;
         $this->account_id = $account_id;
-
-        $this->products = Cache::remember('products_cache', 60 * 60, function () {
-            return SMSProduct::get()->keyBy('stock_code');
-        });
-
-        $this->chartUpdated();
     }
 
     public function updatedYear(): void
     {
-        $this->chartUpdated();
         $this->generateInsight();
     }
 
@@ -59,33 +49,53 @@ new class extends Component
 
     private function buildInsightSummary(): string
     {
-        $total     = count($this->raw_table_data);
-        $distCount = collect($this->raw_table_data)->pluck('account')->unique()->count();
+        $total     = count($this->rows);
+        $distCount = collect($this->rows)->pluck('account')->unique()->count();
         if ($total === 0) {
             return "No ending inventory data available for {$this->year}.";
         }
-        $negCount = collect($this->raw_table_data)
+        $negCount = collect($this->rows)
             ->filter(fn($r) => (($r['total'] + $r['sell_in']) - $r['sell_out']) < 0)->count();
         return "{$total} SKUs tracked across {$distCount} distributors for {$this->year}. "
             . "{$negCount} SKUs have a negative projected ending balance.";
     }
 
-    public function updatedSearch(): void
+    /**
+     * Every row for the selected year and account. Kept in the cache instead of
+     * the Livewire snapshot, so searching never posts the dataset back and never
+     * repeats the sell-in API calls.
+     *
+     * @return array<int, array{account: ?string, sku: string, description: string, brand: string, total: float, sell_in: float|int, sell_out: float|int, latest_month: int}>
+     */
+    #[Computed]
+    public function rows(): array
     {
-        $this->applyFilters();
+        $scope     = $this->account_id ?: 'all';
+        $cache_key = "inventory_ending_rows_{$this->year}_{$scope}";
+
+        $rows = Cache::get($cache_key);
+
+        if ($rows === null) {
+            ['rows' => $rows, 'complete' => $complete] = $this->buildRows();
+
+            Cache::put($cache_key, $rows, $complete ? 60 * 15 : 60);
+        }
+
+        return $rows;
     }
 
-    public function updatedSelectedBrand(): void
-    {
-        $this->applyFilters();
-    }
-
-    public function applyFilters(): void
+    /**
+     * Rows narrowed by the brand and search filters.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    #[Computed]
+    public function tableData(): array
     {
         $term  = strtolower($this->search);
         $brand = $this->selectedBrand;
 
-        $this->table_data = collect($this->raw_table_data)
+        return collect($this->rows)
             ->when($brand, fn($c) => $c->filter(fn($row) => $row['brand'] === $brand))
             ->when($term,  fn($c) => $c->filter(fn($row) =>
                 str_contains(strtolower($row['account']), $term) ||
@@ -95,7 +105,28 @@ new class extends Component
             ->toArray();
     }
 
-    public function chartUpdated() {
+    /**
+     * @return array<int, string>
+     */
+    #[Computed]
+    public function brands(): array
+    {
+        return collect($this->rows)->pluck('brand')->filter()->unique()->sort()->values()->toArray();
+    }
+
+    /**
+     * Builds the rows from inventory, sell-in and sell-out data. "complete" is
+     * false when a sell-in request failed, so the result is only cached briefly.
+     *
+     * @return array{rows: array<int, array<string, mixed>>, complete: bool}
+     */
+    private function buildRows(): array
+    {
+        $products = Cache::remember('products_cache', 60 * 60, function () {
+            return SMSProduct::get()->keyBy('stock_code');
+        });
+
+        $complete  = true;
         $cache_key = "yearly_inventory_{$this->year}";
         $raw       = Cache::remember($cache_key, 60 * 15, fn() => $this->getYearlyInventoryData($this->year));
 
@@ -170,11 +201,9 @@ new class extends Component
                 ->get();
         });
 
-        $this->brands = [];
-
-        $this->raw_table_data = $grouped->map(function ($row) use ($responses, $sales_data) {
+        $rows = $grouped->map(function ($row) use ($responses, $sales_data, $products, &$complete) {
             $first        = $row['first'];
-            $product      = $this->products->get($first['sku']);
+            $product      = $products->get($first['sku']);
             $sell_in      = 0;
             $sell_out     = 0;
             $account_code = $first['account_code'] ?? null;
@@ -182,6 +211,7 @@ new class extends Component
             $response     = $responses[$account_code] ?? null;
 
             if ($response instanceof \Throwable) {
+                $complete = false;
                 \Log::warning("Pool request failed for account [{$account_code}]: " . $response->getMessage());
             } elseif ($response && $response->successful()) {
                 $sell_in = collect($response->json())
@@ -209,8 +239,7 @@ new class extends Component
             ];
         })->values()->toArray();
 
-        $this->brands = collect($this->raw_table_data)->pluck('brand')->filter()->unique()->sort()->values()->toArray();
-        $this->applyFilters();
+        return ['rows' => $rows, 'complete' => $complete];
     }
 };
 ?>
@@ -222,7 +251,7 @@ new class extends Component
             <div class="card-tools m-0 d-flex" style="gap: 4px;">
                 <select class="form-control form-control-sm" wire:model.live="selectedBrand">
                     <option value="">All Brands</option>
-                    @foreach ($brands as $brand)
+                    @foreach ($this->brands as $brand)
                         <option value="{{ $brand }}">{{ $brand }}</option>
                     @endforeach
                 </select>
@@ -248,8 +277,8 @@ new class extends Component
                     </tr>
                 </thead>
 
-                <tbody wire:loading.remove wire:target="search, selectedBrand, chartUpdated">
-                    @foreach($table_data as $data)
+                <tbody wire:loading.remove wire:target="search, selectedBrand">
+                    @foreach($this->tableData as $data)
                         <tr>
                             <td>{{ $data['account'] }}</td>
                             <td title="{{ $data['description'] }}">{{ $data['sku'] }}</td>
@@ -262,7 +291,7 @@ new class extends Component
                     @endforeach
                 </tbody>
 
-                <tbody wire:loading wire:target="search, selectedBrand, chartUpdated">
+                <tbody wire:loading wire:target="search, selectedBrand">
                     <tr>
                         <td colspan="7">
                             <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
